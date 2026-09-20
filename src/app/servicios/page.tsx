@@ -27,7 +27,16 @@ export default function ServiciosPage() {
         const servRaw = extractData<any>(servRes);
         const catRaw = extractData<any>(catRes);
         setServicios(servRaw?.data || servRaw || []);
-        setCategorias(catRaw?.data || catRaw || []);
+        const cats = catRaw?.data || catRaw || [];
+        setCategorias(cats);
+
+        const params = new URLSearchParams(window.location.search);
+        const catSlug = params.get('categoria') || '';
+        if (catSlug) {
+          const normalize = (s: string) => s.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
+          const match = cats.find((c: any) => normalize(c.nombre) === normalize(catSlug));
+          if (match) setCategoria(match.id_categoria.toString());
+        }
       } catch (e) {
         console.error('Error fetching servicios:', e);
       } finally {
