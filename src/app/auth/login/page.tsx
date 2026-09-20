@@ -26,9 +26,13 @@ export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false);
   const errorRef = useRef<HTMLDivElement>(null);
 
-  const { register, handleSubmit, resetField, formState: { errors, isSubmitting } } = useForm<LoginForm>({
+  const { register, handleSubmit, reset, resetField, formState: { errors, isSubmitting } } = useForm<LoginForm>({
     resolver: zodResolver(loginSchema),
   });
+
+  useEffect(() => {
+    reset();
+  }, [reset]);
 
   useEffect(() => {
     if (error && errorRef.current) {
@@ -80,6 +84,7 @@ export default function LoginPage() {
                   placeholder="••••••••"
                   error={errors.password?.message}
                   onFocus={clearError}
+                  autoComplete="new-password"
                   {...register('password')}
                 />
                 <button
