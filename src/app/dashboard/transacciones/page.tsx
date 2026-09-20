@@ -1,7 +1,6 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import DashboardLayout from '../layout';
 import { Card, CardTitle } from '@/components/ui/Card';
 import Button from '@/components/ui/Button';
 import api, { extractData } from '@/lib/api';
@@ -50,7 +49,7 @@ export default function TransaccionesPage() {
   });
 
   return (
-    <DashboardLayout>
+    <div>
       <div className="mb-6">
         <h1 className="text-2xl font-bold text-white">Mis Transacciones</h1>
         <p className="text-slate-400 mt-1">Gestioná tus transacciones y pagos</p>
@@ -118,6 +117,6 @@ export default function TransaccionesPage() {
           })}
         </div>
       )}
-    </DashboardLayout>
+    </div>
   );
 }

@@ -1,7 +1,6 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import DashboardLayout from '../layout';
 import { Card, CardTitle } from '@/components/ui/Card';
 import Button from '@/components/ui/Button';
 import api, { extractData } from '@/lib/api';
@@ -36,7 +35,7 @@ export default function ContratosPage() {
   }, []);
 
   return (
-    <DashboardLayout>
+    <div>
       <div className="mb-6">
         <h1 className="text-2xl font-bold text-white">Mis Contratos</h1>
         <p className="text-slate-400 mt-1">Gestioná y firmá tus contratos digitales</p>
@@ -101,6 +100,6 @@ export default function ContratosPage() {
           ))}
         </div>
       )}
-    </DashboardLayout>
+    </div>
   );
 }

@@ -7,7 +7,9 @@ import { Menu, X, Search, Bell, User, LogOut, ChevronDown } from 'lucide-react';
 import Button from '@/components/ui/Button';
 
 export default function Header() {
-  const { user, isAuthenticated, logout } = useAuthStore();
+  const user = useAuthStore((s) => s.user);
+  const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
+  const logout = useAuthStore((s) => s.logout);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [userMenuOpen, setUserMenuOpen] = useState(false);
 
@@ -74,13 +76,13 @@ export default function Header() {
 
                   {userMenuOpen && (
                     <div className="absolute right-0 mt-2 w-48 bg-slate-800 border border-slate-700 rounded-lg shadow-xl py-1">
-                      <Link href="/perfil" className="block px-4 py-2 text-sm text-slate-300 hover:bg-slate-700">
+                      <Link href="/perfil" className="block px-4 py-2 text-sm text-slate-300 hover:bg-slate-700" onClick={() => setUserMenuOpen(false)}>
                         Mi Perfil
                       </Link>
-                      <Link href="/dashboard/configuracion" className="block px-4 py-2 text-sm text-slate-300 hover:bg-slate-700">
+                      <Link href="/dashboard/configuracion" className="block px-4 py-2 text-sm text-slate-300 hover:bg-slate-700" onClick={() => setUserMenuOpen(false)}>
                         Configuración
                       </Link>
-                      <Link href="/dashboard" className="block px-4 py-2 text-sm text-slate-300 hover:bg-slate-700">
+                      <Link href="/dashboard" className="block px-4 py-2 text-sm text-slate-300 hover:bg-slate-700" onClick={() => setUserMenuOpen(false)}>
                         Dashboard
                       </Link>
                       <hr className="border-slate-700 my-1" />

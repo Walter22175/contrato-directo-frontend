@@ -19,7 +19,7 @@ const recentActivity = [
 ];
 
 export default function DashboardPage() {
-  const { user } = useAuthStore();
+  const user = useAuthStore((s) => s.user);
 
   return (
     <div>

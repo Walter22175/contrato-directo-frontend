@@ -28,7 +28,12 @@ export default function AyudaPage() {
         const faqsRaw = extractData<any>(faqsRes);
         const catsRaw = extractData<any>(catsRes);
         setFaqs(faqsRaw?.data || faqsRaw || []);
-        setCategorias(catsRaw?.data || catsRaw || []);
+        const catsData = catsRaw?.data || catsRaw || [];
+        setCategorias(
+          Array.isArray(catsData)
+            ? catsData.map((c: any) => typeof c === 'string' ? c : c.categoria || c.nombre || '')
+            : []
+        );
       } catch {
         setFaqs([]);
         setCategorias([]);

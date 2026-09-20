@@ -14,7 +14,8 @@ interface Msg {
 }
 
 export default function ConfiguracionPage() {
-  const { user, loadUser } = useAuthStore();
+  const user = useAuthStore((s) => s.user);
+  const loadUser = useAuthStore((s) => s.loadUser);
   const [tab, setTab] = useState<Tab>('perfil');
   const [saving, setSaving] = useState(false);
   const [msg, setMsg] = useState<Msg | null>(null);

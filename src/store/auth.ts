@@ -70,20 +70,59 @@ export const useAuthStore = create<AuthState>((set) => ({
   },
 
   loadUser: async () => {
-    try {
-      const token = localStorage.getItem('access_token');
-      if (!token) {
+    const token = localStorage.getItem('access_token');
+    const refreshToken = localStorage.getItem('refresh_token');
+
+    if (!token && !refreshToken) {
+      set({ isLoading: false });
+      return;
+    }
+
+    if (!token && refreshToken) {
+      try {
+        const { data } = await api.post('/auth/refresh', { refresh_token: refreshToken });
+        const raw = extractData<{ access_token: string; refresh_token: string; usuario: Partial<Usuario> }>(data);
+        if (raw.access_token && raw.refresh_token && raw.usuario) {
+          localStorage.setItem('access_token', raw.access_token);
+          localStorage.setItem('refresh_token', raw.refresh_token);
+          setCookies(raw.access_token, raw.refresh_token);
+          set({ user: raw.usuario, isAuthenticated: true, isLoading: false });
+          return;
+        }
+      } catch {
+        localStorage.removeItem('access_token');
+        localStorage.removeItem('refresh_token');
+        clearCookies();
         set({ isLoading: false });
         return;
       }
+    }
+
+    try {
       const res = await api.get('/auth/me');
       const data = extractData<any>(res);
       set({ user: data, isAuthenticated: true, isLoading: false });
-    } catch {
-      localStorage.removeItem('access_token');
-      localStorage.removeItem('refresh_token');
-      clearCookies();
-      set({ user: null, isAuthenticated: false, isLoading: false });
+    } catch (err: any) {
+      if (err.response?.status === 401) {
+        try {
+          const { data } = await api.post('/auth/refresh', { refresh_token: refreshToken! });
+          const raw = extractData<{ access_token: string; refresh_token: string; usuario: Partial<Usuario> }>(data);
+          if (raw.access_token && raw.refresh_token && raw.usuario) {
+            localStorage.setItem('access_token', raw.access_token);
+            localStorage.setItem('refresh_token', raw.refresh_token);
+            setCookies(raw.access_token, raw.refresh_token);
+            set({ user: raw.usuario, isAuthenticated: true, isLoading: false });
+            return;
+          }
+        } catch {
+          localStorage.removeItem('access_token');
+          localStorage.removeItem('refresh_token');
+          clearCookies();
+          set({ user: null, isAuthenticated: false, isLoading: false });
+          return;
+        }
+      }
+      set({ isLoading: false });
     }
   },
 
