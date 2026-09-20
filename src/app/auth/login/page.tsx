@@ -33,7 +33,9 @@ export default function LoginPage() {
       clearError();
       await login(data);
       router.push('/dashboard');
-    } catch {}
+    } catch {
+      // error already set in store
+    }
   };
 
   return (

@@ -2,6 +2,16 @@ import { create } from 'zustand';
 import api, { extractData } from '@/lib/api';
 import type { Usuario, LoginDto, RegisterDto, AuthResponse } from '@/types';
 
+function setCookies(access: string, refresh: string) {
+  document.cookie = `access_token=${access}; path=/; max-age=900`;
+  document.cookie = `refresh_token=${refresh}; path=/; max-age=604800`;
+}
+
+function clearCookies() {
+  document.cookie = 'access_token=; path=/; max-age=0';
+  document.cookie = 'refresh_token=; path=/; max-age=0';
+}
+
 interface AuthState {
   user: Partial<Usuario> | null;
   isAuthenticated: boolean;
@@ -27,6 +37,7 @@ export const useAuthStore = create<AuthState>((set) => ({
       const data = extractData<AuthResponse>(res);
       localStorage.setItem('access_token', data.access_token);
       localStorage.setItem('refresh_token', data.refresh_token);
+      setCookies(data.access_token, data.refresh_token);
       set({ user: data.usuario, isAuthenticated: true, isLoading: false });
     } catch (err: any) {
       const message = err.response?.data?.message || 'Error al iniciar sesión';
@@ -42,6 +53,7 @@ export const useAuthStore = create<AuthState>((set) => ({
       const data = extractData<AuthResponse>(res);
       localStorage.setItem('access_token', data.access_token);
       localStorage.setItem('refresh_token', data.refresh_token);
+      setCookies(data.access_token, data.refresh_token);
       set({ user: data.usuario, isAuthenticated: true, isLoading: false });
     } catch (err: any) {
       const message = err.response?.data?.message || 'Error al registrarse';
@@ -53,6 +65,7 @@ export const useAuthStore = create<AuthState>((set) => ({
   logout: () => {
     localStorage.removeItem('access_token');
     localStorage.removeItem('refresh_token');
+    clearCookies();
     set({ user: null, isAuthenticated: false, isLoading: false });
   },
 
@@ -69,6 +82,7 @@ export const useAuthStore = create<AuthState>((set) => ({
     } catch {
       localStorage.removeItem('access_token');
       localStorage.removeItem('refresh_token');
+      clearCookies();
       set({ user: null, isAuthenticated: false, isLoading: false });
     }
   },

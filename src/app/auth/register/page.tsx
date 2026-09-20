@@ -41,7 +41,9 @@ export default function RegisterPage() {
       clearError();
       await registerUser(data);
       router.push('/dashboard');
-    } catch {}
+    } catch {
+      // error already set in store
+    }
   };
 
   return (
