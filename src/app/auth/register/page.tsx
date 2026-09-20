@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useForm } from 'react-hook-form';
@@ -30,11 +30,18 @@ export default function RegisterPage() {
   const router = useRouter();
   const { register: registerUser, error, clearError } = useAuthStore();
   const [showPassword, setShowPassword] = useState(false);
+  const errorRef = useRef<HTMLDivElement>(null);
 
-  const { register, handleSubmit, formState: { errors, isSubmitting } } = useForm<RegisterForm>({
+  const { register, handleSubmit, reset, formState: { errors, isSubmitting } } = useForm<RegisterForm>({
     resolver: zodResolver(registerSchema),
     defaultValues: { tipo_persona: 'fisica' },
   });
+
+  useEffect(() => {
+    if (error && errorRef.current) {
+      errorRef.current.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+  }, [error]);
 
   const onSubmit = async (data: RegisterForm) => {
     try {
@@ -42,7 +49,7 @@ export default function RegisterPage() {
       await registerUser(data);
       router.push('/dashboard');
     } catch {
-      // error already set in store
+      reset({ ...data, password: '', tipo_persona: data.tipo_persona });
     }
   };
 
@@ -58,7 +65,7 @@ export default function RegisterPage() {
             </div>
 
             {error && (
-              <div className="mb-4 p-3 bg-red-500/10 border border-red-500/20 rounded-lg text-red-400 text-sm">
+              <div ref={errorRef} className="mb-4 p-3 bg-red-500/10 border border-red-500/20 rounded-lg text-red-400 text-sm">
                 {error}
               </div>
             )}

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useRef, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useForm } from 'react-hook-form';
@@ -11,6 +11,7 @@ import Header from '@/components/layout/Header';
 import Button from '@/components/ui/Button';
 import Input from '@/components/ui/Input';
 import { Eye, EyeOff } from 'lucide-react';
+import { useState } from 'react';
 
 const loginSchema = z.object({
   email: z.string().email('Email inválido'),
@@ -23,10 +24,17 @@ export default function LoginPage() {
   const router = useRouter();
   const { login, error, clearError } = useAuthStore();
   const [showPassword, setShowPassword] = useState(false);
+  const errorRef = useRef<HTMLDivElement>(null);
 
   const { register, handleSubmit, formState: { errors, isSubmitting } } = useForm<LoginForm>({
     resolver: zodResolver(loginSchema),
   });
+
+  useEffect(() => {
+    if (error && errorRef.current) {
+      errorRef.current.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+  }, [error]);
 
   const onSubmit = async (data: LoginForm) => {
     try {
@@ -50,7 +58,7 @@ export default function LoginPage() {
             </div>
 
             {error && (
-              <div className="mb-4 p-3 bg-red-500/10 border border-red-500/20 rounded-lg text-red-400 text-sm">
+              <div ref={errorRef} className="mb-4 p-3 bg-red-500/10 border border-red-500/20 rounded-lg text-red-400 text-sm">
                 {error}
               </div>
             )}
