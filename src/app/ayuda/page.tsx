@@ -6,7 +6,7 @@ import Footer from '@/components/layout/Footer';
 import { Card, CardTitle } from '@/components/ui/Card';
 import Button from '@/components/ui/Button';
 import Input from '@/components/ui/Input';
-import api from '@/lib/api';
+import api, { extractData } from '@/lib/api';
 import { Search, ChevronDown, ChevronUp, HelpCircle, MessageSquare, Mail, Phone } from 'lucide-react';
 import type { Faq } from '@/types';
 
@@ -25,8 +25,10 @@ export default function AyudaPage() {
           api.get('/centro-ayuda'),
           api.get('/centro-ayuda/categorias'),
         ]);
-        setFaqs(faqsRes.data || []);
-        setCategorias(catsRes.data || []);
+        const faqsRaw = extractData<any>(faqsRes);
+        const catsRaw = extractData<any>(catsRes);
+        setFaqs(faqsRaw?.data || faqsRaw || []);
+        setCategorias(catsRaw?.data || catsRaw || []);
       } catch {
         setFaqs([]);
         setCategorias([]);

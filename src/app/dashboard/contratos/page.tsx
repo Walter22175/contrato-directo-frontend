@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import DashboardLayout from '../layout';
 import { Card, CardTitle } from '@/components/ui/Card';
 import Button from '@/components/ui/Button';
-import api from '@/lib/api';
+import api, { extractData } from '@/lib/api';
 import { formatDate } from '@/lib/utils';
 import { FileText, Download, Pen, Clock, CheckCircle, XCircle } from 'lucide-react';
 import type { Contrato } from '@/types';
@@ -23,8 +23,9 @@ export default function ContratosPage() {
   useEffect(() => {
     const fetchContratos = async () => {
       try {
-        const { data } = await api.get('/contratos');
-        setContratos(data.data || data || []);
+        const res = await api.get('/contratos');
+        const raw = extractData<any>(res);
+        setContratos(raw?.data || raw || []);
       } catch {
         setContratos([]);
       } finally {

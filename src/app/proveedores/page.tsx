@@ -5,7 +5,7 @@ import Link from 'next/link';
 import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
 import { Card } from '@/components/ui/Card';
-import api from '@/lib/api';
+import api, { extractData } from '@/lib/api';
 import { Search, Star, Shield, MapPin } from 'lucide-react';
 import type { PerfilProveedor, Usuario } from '@/types';
 
@@ -19,8 +19,9 @@ export default function ProveedoresPage() {
   useEffect(() => {
     const fetchProveedores = async () => {
       try {
-        const { data } = await api.get('/proveedores');
-        setProveedores(data.data || data || []);
+        const res = await api.get('/proveedores');
+        const raw = extractData<any>(res);
+        setProveedores(raw?.data || raw || []);
       } catch {
         setProveedores([]);
       } finally {

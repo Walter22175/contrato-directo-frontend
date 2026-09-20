@@ -7,7 +7,7 @@ import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
 import { Card } from '@/components/ui/Card';
 import Select from '@/components/ui/Select';
-import api from '@/lib/api';
+import api, { extractData } from '@/lib/api';
 import { Search, Star } from 'lucide-react';
 import type { Servicio, Categoria } from '@/types';
 
@@ -28,8 +28,10 @@ function ServiciosContent() {
           api.get('/servicios', { params: { activo: true } }),
           api.get('/catalogo/categorias', { params: { activa: true } }),
         ]);
-        setServicios(servRes.data.data || []);
-        setCategorias(catRes.data.data || []);
+        const servData = extractData<any>(servRes);
+        const catData = extractData<any>(catRes);
+        setServicios(servData?.data || servData || []);
+        setCategorias(catData?.data || catData || []);
       } catch {
         setServicios([]);
         setCategorias([]);

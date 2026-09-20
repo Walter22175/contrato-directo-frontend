@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import api from '@/lib/api';
+import api, { extractData } from '@/lib/api';
 import type { Usuario, LoginDto, RegisterDto, AuthResponse } from '@/types';
 
 interface AuthState {
@@ -23,7 +23,8 @@ export const useAuthStore = create<AuthState>((set) => ({
   login: async (dto: LoginDto) => {
     try {
       set({ isLoading: true, error: null });
-      const { data } = await api.post<AuthResponse>('/auth/login', dto);
+      const res = await api.post('/auth/login', dto);
+      const data = extractData<AuthResponse>(res);
       localStorage.setItem('access_token', data.access_token);
       localStorage.setItem('refresh_token', data.refresh_token);
       set({ user: data.usuario, isAuthenticated: true, isLoading: false });
@@ -37,7 +38,8 @@ export const useAuthStore = create<AuthState>((set) => ({
   register: async (dto: RegisterDto) => {
     try {
       set({ isLoading: true, error: null });
-      const { data } = await api.post<AuthResponse>('/auth/register', dto);
+      const res = await api.post('/auth/register', dto);
+      const data = extractData<AuthResponse>(res);
       localStorage.setItem('access_token', data.access_token);
       localStorage.setItem('refresh_token', data.refresh_token);
       set({ user: data.usuario, isAuthenticated: true, isLoading: false });
@@ -61,7 +63,8 @@ export const useAuthStore = create<AuthState>((set) => ({
         set({ isLoading: false });
         return;
       }
-      const { data } = await api.get('/auth/me');
+      const res = await api.get('/auth/me');
+      const data = extractData<any>(res);
       set({ user: data, isAuthenticated: true, isLoading: false });
     } catch {
       localStorage.removeItem('access_token');

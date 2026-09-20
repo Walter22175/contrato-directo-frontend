@@ -7,7 +7,7 @@ import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
 import { Card, CardTitle } from '@/components/ui/Card';
 import Button from '@/components/ui/Button';
-import api from '@/lib/api';
+import api, { extractData } from '@/lib/api';
 import { formatCurrency } from '@/lib/utils';
 import { Star, MapPin, Shield, Clock, ArrowLeft, MessageSquare } from 'lucide-react';
 import type { Servicio, ServicioProveedor } from '@/types';
@@ -21,9 +21,10 @@ export default function ServicioDetallePage() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const { data } = await api.get(`/servicios/${params.id}`);
+        const res = await api.get(`/servicios/${params.id}`);
+        const data = extractData<any>(res);
         setServicio(data);
-        setProveedores(data.servicios_proveedor || []);
+        setProveedores(data?.servicios_proveedor || []);
       } catch {
         setServicio(null);
       } finally {

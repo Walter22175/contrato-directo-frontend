@@ -7,7 +7,7 @@ import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
 import { Card, CardTitle } from '@/components/ui/Card';
 import Button from '@/components/ui/Button';
-import api from '@/lib/api';
+import api, { extractData } from '@/lib/api';
 import { Star, Shield, Clock, ArrowLeft, MapPin, Globe, MessageSquare } from 'lucide-react';
 import type { PerfilProveedor, Usuario } from '@/types';
 
@@ -21,7 +21,8 @@ export default function ProveedorDetallePage() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const { data } = await api.get(`/proveedores/${params.id}`);
+        const res = await api.get(`/proveedores/${params.id}`);
+        const data = extractData<any>(res);
         setProveedor(data);
       } catch {
         setProveedor(null);

@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import DashboardLayout from '../layout';
 import { Card, CardTitle } from '@/components/ui/Card';
 import Button from '@/components/ui/Button';
-import api from '@/lib/api';
+import api, { extractData } from '@/lib/api';
 import { formatCurrency, formatDate } from '@/lib/utils';
 import { CreditCard, Eye, Filter, Clock, CheckCircle, XCircle, AlertCircle } from 'lucide-react';
 import type { Transaccion } from '@/types';
@@ -32,8 +32,9 @@ export default function TransaccionesPage() {
   useEffect(() => {
     const fetchTransacciones = async () => {
       try {
-        const { data } = await api.get('/transacciones');
-        setTransacciones(data.data || data || []);
+        const res = await api.get('/transacciones');
+        const raw = extractData<any>(res);
+        setTransacciones(raw?.data || raw || []);
       } catch {
         setTransacciones([]);
       } finally {

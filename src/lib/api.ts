@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const api = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000/api/v1',
+  baseURL: 'http://localhost:3001/api/v1',
   headers: { 'Content-Type': 'application/json' },
 });
 
@@ -14,12 +14,7 @@ api.interceptors.request.use((config) => {
 });
 
 api.interceptors.response.use(
-  (response) => {
-    if (response.data && typeof response.data === 'object' && 'data' in response.data && 'timestamp' in response.data) {
-      response.data = response.data.data;
-    }
-    return response;
-  },
+  (response) => response,
   async (error) => {
     const originalRequest = error.config;
     if (error.response?.status === 401 && !originalRequest._retry) {
@@ -45,5 +40,13 @@ api.interceptors.response.use(
     return Promise.reject(error);
   },
 );
+
+export function extractData<T>(response: { data: any }): T {
+  const raw = response.data;
+  if (raw && typeof raw === 'object' && 'data' in raw && 'timestamp' in raw) {
+    return raw.data as T;
+  }
+  return raw as T;
+}
 
 export default api;
