@@ -1,0 +1,214 @@
+export interface Usuario {
+  id_usuario: string;
+  email: string;
+  nombre: string;
+  apellido?: string;
+  tipo_persona: 'fisica' | 'juridica';
+  cuit_cuil?: string;
+  dni?: string;
+  telefono?: string;
+  direccion?: string;
+  estado: 'activo' | 'suspendido' | 'cancelado' | 'pendiente';
+  email_verificado: boolean;
+  fecha_registro: string;
+  usuario_roles?: UsuarioRol[];
+}
+
+export interface UsuarioRol {
+  id_usuario_rol: number;
+  id_usuario: string;
+  id_rol: number;
+  activo: boolean;
+  rol: Rol;
+}
+
+export interface Rol {
+  id_rol: number;
+  nombre: string;
+  descripcion?: string;
+}
+
+export interface AuthResponse {
+  usuario: Partial<Usuario>;
+  access_token: string;
+  refresh_token: string;
+}
+
+export interface LoginDto {
+  email: string;
+  password: string;
+}
+
+export interface RegisterDto {
+  email: string;
+  password: string;
+  nombre: string;
+  apellido?: string;
+  tipo_persona: 'fisica' | 'juridica';
+  cuit_cuil?: string;
+  dni?: string;
+  telefono?: string;
+  direccion?: string;
+}
+
+export interface ForgotPasswordDto {
+  email: string;
+}
+
+export interface ResetPasswordDto {
+  token: string;
+  nuevaPassword: string;
+}
+
+export interface Categoria {
+  id_categoria: number;
+  nombre: string;
+  descripcion?: string;
+  icono_url?: string;
+  activa: boolean;
+  orden: number;
+  servicios?: Servicio[];
+}
+
+export interface Servicio {
+  id_servicio: number;
+  id_categoria: number;
+  nombre: string;
+  descripcion?: string;
+  palabras_clave?: string[];
+  activo: boolean;
+  categoria?: Categoria;
+  servicios_proveedor?: ServicioProveedor[];
+}
+
+export interface ServicioProveedor {
+  id_servicio_proveedor: number;
+  id_usuario: string;
+  id_servicio: number;
+  precio_estimado?: number;
+  moneda: string;
+  descripcion_personalizada?: string;
+  disponible: boolean;
+  servicio?: Servicio;
+  proveedor?: Partial<Usuario>;
+}
+
+export interface PerfilProveedor {
+  id_perfil_proveedor: number;
+  id_usuario: string;
+  rubro_principal?: string;
+  descripcion?: string;
+  sitio_web?: string;
+  sello_verificado: boolean;
+  calificacion_promedio?: number;
+  cantidad_valoraciones: number;
+  proveedor_destacado: boolean;
+  tasa_respuesta?: number;
+  tasa_cumplimiento?: number;
+  antiguedad_meses: number;
+}
+
+export interface Transaccion {
+  id_transaccion: string;
+  id_cliente: string;
+  id_proveedor: string;
+  id_servicio: number;
+  descripcion?: string;
+  monto_acordado: number;
+  moneda: string;
+  comision_porcentaje: number;
+  comision_monto: number;
+  estado: string;
+  tipo_transaccion: 'servicio' | 'producto';
+  fecha_creacion: string;
+  cliente?: Partial<Usuario>;
+  proveedor?: Partial<Usuario>;
+  servicio?: Servicio;
+}
+
+export interface Contrato {
+  id_contrato: string;
+  id_transaccion: string;
+  tipo_contrato: string;
+  incluye_iva: boolean;
+  url_pdf_borrador?: string;
+  url_pdf_firmado?: string;
+  estado: 'borrador' | 'pendiente_firma' | 'firmado' | 'cancelado';
+  fecha_generacion: string;
+  fecha_firma_cliente?: string;
+  fecha_firma_proveedor?: string;
+  transaccion?: Transaccion;
+}
+
+export interface Valoracion {
+  id_valoracion: number;
+  id_transaccion: string;
+  id_evaluador: string;
+  id_evaluado: string;
+  tipo_evaluador: 'cliente' | 'proveedor';
+  puntuacion: number;
+  comentario?: string;
+  fecha_valoracion: string;
+  estado: string;
+}
+
+export interface Reclamo {
+  id_reclamo: string;
+  id_transaccion: string;
+  id_reclamante: string;
+  id_reclamado: string;
+  tipo_reclamo: string;
+  descripcion: string;
+  fecha_incidente: string;
+  estado: string;
+  fecha_apertura: string;
+}
+
+export interface Ticket {
+  id_ticket: string;
+  id_usuario: string;
+  asunto: string;
+  descripcion: string;
+  nivel: string;
+  canal: string;
+  estado: string;
+  prioridad: string;
+  fecha_creacion: string;
+}
+
+export interface Faq {
+  id_faq: number;
+  categoria: string;
+  pregunta: string;
+  respuesta: string;
+  orden: number;
+  activo: boolean;
+  veces_consultado: number;
+}
+
+export interface Notificacion {
+  id_notificacion: string;
+  id_usuario: string;
+  tipo: string;
+  evento: string;
+  titulo: string;
+  mensaje: string;
+  canal: string;
+  leida: boolean;
+  fecha_envio: string;
+}
+
+export interface PaginatedResponse<T> {
+  data: T[];
+  meta: {
+    total: number;
+    page?: number;
+    limit?: number;
+    totalPages?: number;
+  };
+}
+
+export interface ApiResponse<T> {
+  data: T;
+  message?: string;
+}
