@@ -33,8 +33,12 @@ export default function ServiciosPage() {
         const params = new URLSearchParams(window.location.search);
         const catSlug = params.get('categoria') || '';
         if (catSlug) {
-          const normalize = (s: string) => s.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
-          const match = cats.find((c: any) => normalize(c.nombre) === normalize(catSlug));
+          const norm = (s: string) => s.normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/-/g, ' ').toLowerCase();
+          const match = cats.find((c: any) => {
+            const n = norm(c.nombre);
+            const slug = norm(catSlug);
+            return n === slug || n.startsWith(slug) || slug.startsWith(n);
+          });
           if (match) setCategoria(match.id_categoria.toString());
         }
       } catch (e) {
