@@ -26,14 +26,21 @@ api.interceptors.response.use(
             `${api.defaults.baseURL}/auth/refresh`,
             { refresh_token: refreshToken },
           );
-          localStorage.setItem('access_token', data.access_token);
-          localStorage.setItem('refresh_token', data.refresh_token);
-          originalRequest.headers.Authorization = `Bearer ${data.access_token}`;
+          const raw = data?.data || data;
+          const newAccess = raw.access_token;
+          const newRefresh = raw.refresh_token;
+          localStorage.setItem('access_token', newAccess);
+          localStorage.setItem('refresh_token', newRefresh);
+          document.cookie = `access_token=${newAccess}; path=/; max-age=900`;
+          document.cookie = `refresh_token=${newRefresh}; path=/; max-age=604800`;
+          originalRequest.headers.Authorization = `Bearer ${newAccess}`;
           return api(originalRequest);
         }
       } catch {
         localStorage.removeItem('access_token');
         localStorage.removeItem('refresh_token');
+        document.cookie = 'access_token=; path=/; max-age=0';
+        document.cookie = 'refresh_token=; path=/; max-age=0';
         if (typeof window !== 'undefined') window.location.href = '/auth/login';
       }
     }
