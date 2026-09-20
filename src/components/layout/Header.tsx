@@ -74,8 +74,11 @@ export default function Header() {
 
                   {userMenuOpen && (
                     <div className="absolute right-0 mt-2 w-48 bg-slate-800 border border-slate-700 rounded-lg shadow-xl py-1">
-                      <Link href="/dashboard/configuracion" className="block px-4 py-2 text-sm text-slate-300 hover:bg-slate-700">
+                      <Link href="/perfil" className="block px-4 py-2 text-sm text-slate-300 hover:bg-slate-700">
                         Mi Perfil
+                      </Link>
+                      <Link href="/dashboard/configuracion" className="block px-4 py-2 text-sm text-slate-300 hover:bg-slate-700">
+                        Configuración
                       </Link>
                       <Link href="/dashboard" className="block px-4 py-2 text-sm text-slate-300 hover:bg-slate-700">
                         Dashboard
