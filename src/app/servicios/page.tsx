@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import Link from 'next/link';
 import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
@@ -18,46 +18,36 @@ export default function ServiciosPage() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const params = new URLSearchParams(window.location.search);
-    setCategoria(params.get('categoria') || '');
-  }, []);
-
-  useEffect(() => {
-    let cancelled = false;
-    const fetchData = async () => {
+    (async () => {
       try {
         const [servRes, catRes] = await Promise.all([
           api.get('/servicios', { params: { activo: true } }),
           api.get('/catalogo/categorias', { params: { activa: true } }),
         ]);
-        if (cancelled) return;
-        const servData = extractData<any>(servRes);
-        const catData = extractData<any>(catRes);
-        setServicios(servData?.data || servData || []);
-        setCategorias(catData?.data || catData || []);
-      } catch {
-        if (!cancelled) {
-          setServicios([]);
-          setCategorias([]);
-        }
+        const servRaw = extractData<any>(servRes);
+        const catRaw = extractData<any>(catRes);
+        setServicios(servRaw?.data || servRaw || []);
+        setCategorias(catRaw?.data || catRaw || []);
+      } catch (e) {
+        console.error('Error fetching servicios:', e);
       } finally {
-        if (!cancelled) setLoading(false);
+        setLoading(false);
       }
-    };
-    fetchData();
-    return () => { cancelled = true; };
+    })();
   }, []);
 
-  const serviciosFiltrados = servicios.filter((s) => {
-    const matchBusqueda = !busqueda || s.nombre.toLowerCase().includes(busqueda.toLowerCase());
-    const matchCategoria = !categoria || s.id_categoria?.toString() === categoria;
-    return matchBusqueda && matchCategoria;
-  });
+  const filtered = useMemo(() => {
+    return servicios.filter((s) => {
+      const matchBusqueda = !busqueda || s.nombre.toLowerCase().includes(busqueda.toLowerCase());
+      const matchCategoria = !categoria || s.id_categoria?.toString() === categoria;
+      return matchBusqueda && matchCategoria;
+    });
+  }, [servicios, busqueda, categoria]);
 
-  const opcionesCategorias = categorias.map((c) => ({
-    value: c.id_categoria.toString(),
-    label: c.nombre,
-  }));
+  const opcionesCategorias = useMemo(
+    () => categorias.map((c) => ({ value: c.id_categoria.toString(), label: c.nombre })),
+    [categorias],
+  );
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -90,52 +80,53 @@ export default function ServiciosPage() {
         </div>
 
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <p className="text-slate-400 mb-6">
-            {loading ? 'Buscando...' : `${serviciosFiltrados.length} servicios encontrados`}
-          </p>
-
           {loading ? (
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
               {[1, 2, 3].map((i) => (
                 <div key={i} className="h-48 bg-slate-800/50 rounded-xl animate-pulse" />
               ))}
             </div>
-          ) : serviciosFiltrados.length === 0 ? (
-            <div className="text-center py-16">
-              <Search className="w-16 h-16 text-slate-600 mx-auto mb-4" />
-              <h2 className="text-xl font-semibold text-white mb-2">No se encontraron servicios</h2>
-              <p className="text-slate-400">Intentá con otros términos de búsqueda</p>
-            </div>
           ) : (
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {serviciosFiltrados.map((servicio) => (
-                <Link key={servicio.id_servicio} href={`/servicios/${servicio.id_servicio}`}>
-                  <Card hover className="h-full">
-                    <div className="flex items-start justify-between mb-3">
-                      <div className="w-10 h-10 bg-cyan-500/10 border border-cyan-500/20 rounded-lg flex items-center justify-center">
-                        <span className="text-cyan-400 text-lg">🔧</span>
-                      </div>
-                      <span className="text-xs text-slate-500 bg-slate-700/50 px-2 py-1 rounded">
-                        {servicio.categoria?.nombre || 'Servicio'}
-                      </span>
-                    </div>
-                    <h3 className="text-lg font-semibold text-white mb-2">{servicio.nombre}</h3>
-                    <p className="text-sm text-slate-400 mb-4 line-clamp-2">
-                      {servicio.descripcion || 'Sin descripción'}
-                    </p>
-                    <div className="flex items-center justify-between text-sm">
-                      <div className="flex items-center gap-1 text-slate-400">
-                        <Star className="w-4 h-4 text-yellow-400" />
-                        <span>4.8</span>
-                      </div>
-                      <span className="text-cyan-400 font-medium">
-                        {servicio.servicios_proveedor?.length || 0} proveedores
-                      </span>
-                    </div>
-                  </Card>
-                </Link>
-              ))}
-            </div>
+            <>
+              <p className="text-slate-400 mb-6">{filtered.length} servicios encontrados</p>
+              {filtered.length === 0 ? (
+                <div className="text-center py-16">
+                  <Search className="w-16 h-16 text-slate-600 mx-auto mb-4" />
+                  <h2 className="text-xl font-semibold text-white mb-2">No se encontraron servicios</h2>
+                  <p className="text-slate-400">Intentá con otros términos de búsqueda</p>
+                </div>
+              ) : (
+                <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {filtered.map((s) => (
+                    <Link key={s.id_servicio} href={`/servicios/${s.id_servicio}`}>
+                      <Card hover className="h-full">
+                        <div className="flex items-start justify-between mb-3">
+                          <div className="w-10 h-10 bg-cyan-500/10 border border-cyan-500/20 rounded-lg flex items-center justify-center">
+                            <span className="text-cyan-400 text-lg">🔧</span>
+                          </div>
+                          <span className="text-xs text-slate-500 bg-slate-700/50 px-2 py-1 rounded">
+                            {s.categoria?.nombre || 'Servicio'}
+                          </span>
+                        </div>
+                        <h3 className="text-lg font-semibold text-white mb-2">{s.nombre}</h3>
+                        <p className="text-sm text-slate-400 mb-4 line-clamp-2">
+                          {s.descripcion || 'Sin descripción'}
+                        </p>
+                        <div className="flex items-center justify-between text-sm">
+                          <div className="flex items-center gap-1 text-slate-400">
+                            <Star className="w-4 h-4 text-yellow-400" />
+                            <span>4.8</span>
+                          </div>
+                          <span className="text-cyan-400 font-medium">
+                            {s.servicios_proveedor?.length || 0} proveedores
+                          </span>
+                        </div>
+                      </Card>
+                    </Link>
+                  ))}
+                </div>
+              )}
+            </>
           )}
         </div>
       </main>
