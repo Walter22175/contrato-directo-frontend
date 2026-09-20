@@ -14,6 +14,7 @@ import {
   Settings,
   Users,
   BarChart3,
+  Bell,
 } from 'lucide-react';
 
 const clientLinks = [
@@ -22,6 +23,7 @@ const clientLinks = [
   { href: '/dashboard/transacciones', label: 'Mis Transacciones', icon: CreditCard },
   { href: '/dashboard/contratos', label: 'Mis Contratos', icon: FileText },
   { href: '/dashboard/valoraciones', label: 'Mis Valoraciones', icon: Star },
+  { href: '/dashboard/notificaciones', label: 'Notificaciones', icon: Bell },
   { href: '/dashboard/tickets', label: 'Soporte', icon: MessageSquare },
   { href: '/dashboard/configuracion', label: 'Configuración', icon: Settings },
   { href: '/ayuda', label: 'Centro de Ayuda', icon: HelpCircle },
@@ -33,6 +35,7 @@ const providerLinks = [
   { href: '/dashboard/transacciones', label: 'Transacciones', icon: CreditCard },
   { href: '/dashboard/contratos', label: 'Contratos', icon: FileText },
   { href: '/dashboard/valoraciones', label: 'Valoraciones', icon: Star },
+  { href: '/dashboard/notificaciones', label: 'Notificaciones', icon: Bell },
   { href: '/dashboard/tickets', label: 'Soporte', icon: MessageSquare },
   { href: '/dashboard/configuracion', label: 'Configuración', icon: Settings },
 ];
