@@ -4,6 +4,7 @@ jest.mock('next/navigation', () => ({
   useRouter: () => ({ push: jest.fn(), back: jest.fn(), refresh: jest.fn() }),
   useSearchParams: () => new URLSearchParams(),
   usePathname: () => '',
+  useParams: () => ({ id: 'test-id' }),
 }));
 
 jest.mock('next/link', () => {
