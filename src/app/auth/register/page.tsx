@@ -75,6 +75,7 @@ export default function RegisterPage() {
                 label="Nombre"
                 placeholder="Tu nombre"
                 error={errors.nombre?.message}
+                onFocus={clearError}
                 {...register('nombre')}
               />
 
@@ -82,6 +83,7 @@ export default function RegisterPage() {
                 label="Apellido (opcional)"
                 placeholder="Tu apellido"
                 error={errors.apellido?.message}
+                onFocus={clearError}
                 {...register('apellido')}
               />
 
@@ -90,6 +92,7 @@ export default function RegisterPage() {
                 type="email"
                 placeholder="tu@email.com"
                 error={errors.email?.message}
+                onFocus={clearError}
                 {...register('email')}
               />
 
@@ -99,6 +102,7 @@ export default function RegisterPage() {
                   type={showPassword ? 'text' : 'password'}
                   placeholder="Mínimo 8 caracteres"
                   error={errors.password?.message}
+                  onFocus={clearError}
                   {...register('password')}
                 />
                 <button

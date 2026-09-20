@@ -26,7 +26,7 @@ export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false);
   const errorRef = useRef<HTMLDivElement>(null);
 
-  const { register, handleSubmit, formState: { errors, isSubmitting } } = useForm<LoginForm>({
+  const { register, handleSubmit, resetField, formState: { errors, isSubmitting } } = useForm<LoginForm>({
     resolver: zodResolver(loginSchema),
   });
 
@@ -42,7 +42,7 @@ export default function LoginPage() {
       await login(data);
       router.push('/dashboard');
     } catch {
-      // error already set in store
+      resetField('password');
     }
   };
 
@@ -69,6 +69,7 @@ export default function LoginPage() {
                 type="email"
                 placeholder="tu@email.com"
                 error={errors.email?.message}
+                onFocus={clearError}
                 {...register('email')}
               />
 
@@ -78,6 +79,7 @@ export default function LoginPage() {
                   type={showPassword ? 'text' : 'password'}
                   placeholder="••••••••"
                   error={errors.password?.message}
+                  onFocus={clearError}
                   {...register('password')}
                 />
                 <button
