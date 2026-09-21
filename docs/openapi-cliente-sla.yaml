@@ -1,0 +1,732 @@
+openapi: 3.0.3
+info:
+  title: Contrato Directo - API de Atención al Cliente
+  description: |
+    API para el sistema integral de atención al cliente de Contrato Directo.
+    Incluye gestión de tickets, SLA, centro de ayuda, encuestas, métricas y agentes de soporte.
+  version: 1.0.0
+  contact:
+    name: Contrato Directo
+    email: soporte@contratodirecto.com
+
+servers:
+  - url: http://localhost:3001/api/v1
+    description: Servidor de desarrollo
+
+tags:
+  - name: Tickets
+    description: Gestión de tickets de soporte
+  - name: Centro de Ayuda
+    description: FAQs, chatbot y feedback
+  - name: SLA
+    description: Niveles de servicio y seguimiento
+  - name: Encuestas
+    description: Encuestas de satisfacción
+  - name: Métricas
+    description: Métricas de atención al cliente
+  - name: Agentes
+    description: Gestión de agentes de soporte
+  - name: Horarios
+    description: Horarios de atención y feriados
+
+paths:
+  /tickets:
+    get:
+      tags: [Tickets]
+      summary: Listar tickets del usuario
+      parameters:
+        - name: id_usuario
+          in: query
+          schema:
+            type: string
+        - name: estado
+          in: query
+          schema:
+            type: string
+            enum: [abierto, en_proceso, resuelto, cerrado]
+        - name: prioridad
+          in: query
+          schema:
+            type: string
+            enum: [baja, media, alta, critica]
+        - name: nivel
+          in: query
+          schema:
+            type: string
+            enum: [nivel_1, nivel_2, nivel_3, nivel_4, nivel_5]
+        - name: page
+          in: query
+          schema:
+            type: integer
+            default: 1
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 20
+      responses:
+        '200':
+          description: Lista de tickets
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedTickets'
+    post:
+      tags: [Tickets]
+      summary: Crear nuevo ticket
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CrearTicketDto'
+      responses:
+        '201':
+          description: Ticket creado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Ticket'
+
+  /tickets/{id}:
+    get:
+      tags: [Tickets]
+      summary: Obtener detalle de ticket
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Detalle del ticket
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TicketDetalle'
+
+  /tickets/{id}/responder':
+    post:
+      tags: [Tickets]
+      summary: Responder a un ticket
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ResponderTicketDto'
+      responses:
+        '201':
+          description: Respuesta enviada
+
+  /tickets/{id}/asignar:
+    post:
+      tags: [Tickets, Agentes]
+      summary: Asignar ticket a agente
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AsignarTicketDto'
+      responses:
+        '200':
+          description: Ticket asignado
+
+  /tickets/{id}/escalar:
+    post:
+      tags: [Tickets]
+      summary: Escalar ticket a nivel superior
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EscalarTicketDto'
+      responses:
+        '200':
+          description: Ticket escalado
+
+  /centro-ayuda:
+    get:
+      tags: [Centro de Ayuda]
+      summary: Obtener preguntas frecuentes
+      parameters:
+        - name: categoria
+          in: query
+          schema:
+            type: string
+        - name: busqueda
+          in: query
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Lista de FAQs
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Faq'
+
+  /centro-ayuda/categorias:
+    get:
+      tags: [Centro de Ayuda]
+      summary: Obtener categorías de FAQs
+      responses:
+        '200':
+          description: Lista de categorías
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+
+  /centro-ayuda/feedback:
+    post:
+      tags: [Centro de Ayuda]
+      summary: Enviar feedback sobre artículo
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FeedbackDto'
+      responses:
+        '201':
+          description: Feedback registrado
+
+  /centro-ayuda/chatbot:
+    post:
+      tags: [Centro de Ayuda]
+      summary: Enviar mensaje al chatbot
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                sessionId:
+                  type: string
+                mensaje:
+                  type: string
+      responses:
+        '200':
+          description: Respuesta del chatbot
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  respuesta:
+                    type: string
+                  derivaTicket:
+                    type: boolean
+
+  /sla/configuracion:
+    get:
+      tags: [SLA]
+      summary: Obtener configuración de niveles SLA
+      responses:
+        '200':
+          description: Configuración de SLA
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/SlaConfig'
+
+  /sla/tracking:
+    get:
+      tags: [SLA]
+      summary: Obtener tracking de SLA por ticket
+      parameters:
+        - name: id_ticket
+          in: query
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Tracking de SLA
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SlaTracking'
+
+  /encuestas:
+    post:
+      tags: [Encuestas]
+      summary: Enviar encuesta de satisfacción
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EncuestaDto'
+      responses:
+        '201':
+          description: Encuesta registrada
+
+  /metricas/atencion:
+    get:
+      tags: [Métricas]
+      summary: Obtener métricas de atención
+      parameters:
+        - name: periodo
+          in: query
+          schema:
+            type: string
+            enum: [actual, trimestre, anual]
+            default: actual
+      responses:
+        '200':
+          description: Métricas de atención
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MetricaAtencion'
+
+  /metricas/reporte-trimestral:
+    get:
+      tags: [Métricas]
+      summary: Obtener reporte trimestral
+      responses:
+        '200':
+          description: Reporte trimestral
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReporteTrimestral'
+
+  /metricas/por-agente:
+    get:
+      tags: [Métricas, Agentes]
+      summary: Obtener métricas por agente
+      responses:
+        '200':
+          description: Métricas por agente
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/MetricaAgente'
+
+  /agentes:
+    get:
+      tags: [Agentes]
+      summary: Listar agentes de soporte
+      responses:
+        '200':
+          description: Lista de agentes
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/AgenteSoporte'
+
+  /horarios:
+    get:
+      tags: [Horarios]
+      summary: Obtener horarios de atención
+      responses:
+        '200':
+          description: Horarios configurados
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/HorarioAtencion'
+
+  /horarios/feriados:
+    get:
+      tags: [Horarios]
+      summary: Obtener feriados
+      parameters:
+        - name: anio
+          in: query
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Lista de feriados
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Feriado'
+
+components:
+  schemas:
+    Ticket:
+      type: object
+      properties:
+        id_ticket:
+          type: string
+        id_usuario:
+          type: string
+        asunto:
+          type: string
+        descripcion:
+          type: string
+        nivel:
+          type: string
+          enum: [nivel_1, nivel_2, nivel_3, nivel_4, nivel_5]
+        canal:
+          type: string
+          enum: [whatsapp, email, telefono, centro_ayuda, redes_sociales, formulario]
+        estado:
+          type: string
+          enum: [abierto, en_proceso, resuelto, cerrado]
+        prioridad:
+          type: string
+          enum: [baja, media, alta, critica]
+        fecha_creacion:
+          type: string
+          format: date-time
+
+    TicketDetalle:
+      allOf:
+        - $ref: '#/components/schemas/Ticket'
+        - type: object
+          properties:
+            respuestas:
+              type: array
+              items:
+                $ref: '#/components/schemas/RespuestaTicket'
+
+    RespuestaTicket:
+      type: object
+      properties:
+        id_respuesta:
+          type: integer
+        id_autor:
+          type: string
+        contenido:
+          type: string
+        es_interna:
+          type: boolean
+        fecha_respuesta:
+          type: string
+          format: date-time
+
+    PaginatedTickets:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/Ticket'
+        meta:
+          type: object
+          properties:
+            total:
+              type: integer
+            page:
+              type: integer
+            limit:
+              type: integer
+            totalPages:
+              type: integer
+
+    CrearTicketDto:
+      type: object
+      required: [id_usuario, asunto, descripcion]
+      properties:
+        id_usuario:
+          type: string
+        asunto:
+          type: string
+        descripcion:
+          type: string
+        nivel:
+          type: string
+          enum: [nivel_1, nivel_2, nivel_3, nivel_4, nivel_5]
+          default: nivel_1
+        canal:
+          type: string
+          enum: [whatsapp, email, telefono, centro_ayuda, redes_sociales, formulario]
+          default: formulario
+        prioridad:
+          type: string
+          enum: [baja, media, alta, critica]
+          default: media
+
+    ResponderTicketDto:
+      type: object
+      required: [id_autor, respuesta]
+      properties:
+        id_autor:
+          type: string
+        respuesta:
+          type: string
+
+    AsignarTicketDto:
+      type: object
+      required: [id_agente]
+      properties:
+        id_agente:
+          type: string
+
+    EscalarTicketDto:
+      type: object
+      required: [nivel_nuevo, motivo]
+      properties:
+        nivel_nuevo:
+          type: string
+          enum: [nivel_1, nivel_2, nivel_3, nivel_4, nivel_5]
+        motivo:
+          type: string
+        id_agente_destino:
+          type: string
+
+    Faq:
+      type: object
+      properties:
+        id_faq:
+          type: integer
+        categoria:
+          type: string
+        pregunta:
+          type: string
+        respuesta:
+          type: string
+        orden:
+          type: integer
+        activo:
+          type: boolean
+        veces_consultado:
+          type: integer
+
+    FeedbackDto:
+      type: object
+      required: [id_faq, id_usuario, util]
+      properties:
+        id_faq:
+          type: integer
+        id_usuario:
+          type: string
+        util:
+          type: boolean
+        comentario:
+          type: string
+
+    SlaConfig:
+      type: object
+      properties:
+        nivel:
+          type: string
+          enum: [nivel_1, nivel_2, nivel_3, nivel_4, nivel_5]
+        nombre:
+          type: string
+        descripcion:
+          type: string
+        tiempo_primera_respuesta_min:
+          type: integer
+        tiempo_resolucion_min:
+          type: integer
+        canales_recomendados:
+          type: array
+          items:
+            type: string
+            enum: [whatsapp, email, telefono, centro_ayuda, redes_sociales, formulario]
+
+    SlaTracking:
+      type: object
+      properties:
+        id_ticket:
+          type: string
+        nivel:
+          type: string
+        canal:
+          type: string
+        fecha_creacion:
+          type: string
+          format: date-time
+        fecha_primera_respuesta:
+          type: string
+          format: date-time
+          nullable: true
+        fecha_resolucion:
+          type: string
+          format: date-time
+          nullable: true
+        estado_sla:
+          type: string
+          enum: [cumplido, en_riesgo, vencido, pendiente]
+        tiempo_limite_primera_respuesta:
+          type: string
+          format: date-time
+        tiempo_limite_resolucion:
+          type: string
+          format: date-time
+
+    EncuestaDto:
+      type: object
+      required: [id_ticket, id_usuario, puntuacion, tipo]
+      properties:
+        id_ticket:
+          type: string
+        id_usuario:
+          type: string
+        puntuacion:
+          type: integer
+          minimum: 1
+          maximum: 5
+        comentario:
+          type: string
+        tipo:
+          type: string
+          enum: [post_ticket, post_reclamo, post_mediacion]
+
+    MetricaAtencion:
+      type: object
+      properties:
+        periodo:
+          type: string
+        tpr_whatsapp_min:
+          type: number
+        tpr_email_min:
+          type: number
+        tr_whatsapp_min:
+          type: number
+        tr_email_min:
+          type: number
+        csat:
+          type: number
+        nps:
+          type: number
+        fcr_porcentaje:
+          type: number
+        uso_centro_ayuda_porcentaje:
+          type: number
+        derivacion_chatbot_porcentaje:
+          type: number
+        tickets_totales:
+          type: integer
+        tickets_resueltos:
+          type: integer
+
+    MetricaAgente:
+      type: object
+      properties:
+        id_agente:
+          type: string
+        nombre:
+          type: string
+        email:
+          type: string
+        tickets_resueltos:
+          type: integer
+        tiempo_promedio_respuesta_min:
+          type: number
+        tiempo_promedio_resolucion_min:
+          type: number
+        csat_promedio:
+          type: number
+        activo:
+          type: boolean
+
+    ReporteTrimestral:
+      type: object
+      properties:
+        periodo:
+          type: string
+        fecha_generacion:
+          type: string
+          format: date-time
+        metricas:
+          $ref: '#/components/schemas/MetricaAtencion'
+        temas_frecuentes:
+          type: array
+          items:
+            type: object
+            properties:
+              tema:
+                type: string
+              cantidad:
+                type: integer
+        areas_mejora:
+          type: array
+          items:
+            type: string
+
+    AgenteSoporte:
+      type: object
+      properties:
+        id_agente:
+          type: string
+        id_usuario:
+          type: string
+        nivel:
+          type: integer
+        especialidades:
+          type: array
+          items:
+            type: string
+        tickets_asignados:
+          type: integer
+        max_tickets:
+          type: integer
+        activo:
+          type: boolean
+
+    HorarioAtencion:
+      type: object
+      properties:
+        id_horario:
+          type: integer
+        nombre:
+          type: string
+        dia_semana:
+          type: array
+          items:
+            type: integer
+            description: 0=Domingo, 1=Lunes, ..., 6=Sábado
+        hora_inicio:
+          type: string
+          example: "08:00"
+        hora_fin:
+          type: string
+          example: "20:00"
+        activo:
+          type: boolean
+
+    Feriado:
+      type: object
+      properties:
+        id_feriado:
+          type: integer
+        fecha:
+          type: string
+          format: date
+        nombre:
+          type: string
+        nacional:
+          type: boolean

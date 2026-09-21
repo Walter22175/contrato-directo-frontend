@@ -17,7 +17,7 @@ describe('AyudaPage', () => {
     await act(async () => {
       render(<AyudaPage />);
     });
-    expect(screen.getByPlaceholderText('Buscar preguntas...')).toBeInTheDocument();
+    expect(screen.getByPlaceholderText('Buscá preguntas frecuentes...')).toBeInTheDocument();
   });
 
   it('renders "Todas" filter button', async () => {

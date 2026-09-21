@@ -378,3 +378,137 @@ export interface CrearSancionDto {
   fecha_inicio: string;
   fecha_fin?: string;
 }
+
+export type SlaNivel = 'nivel_1' | 'nivel_2' | 'nivel_3' | 'nivel_4' | 'nivel_5';
+
+export type SlaCanal = 'whatsapp' | 'email' | 'telefono' | 'centro_ayuda' | 'redes_sociales' | 'formulario';
+
+export interface SlaConfig {
+  nivel: SlaNivel;
+  nombre: string;
+  descripcion: string;
+  tiempo_primera_respuesta_min: number;
+  tiempo_resolucion_min: number;
+  canales_recomendados: SlaCanal[];
+}
+
+export interface SlaTracking {
+  id_ticket: string;
+  nivel: SlaNivel;
+  canal: SlaCanal;
+  fecha_creacion: string;
+  fecha_primera_respuesta?: string;
+  fecha_resolucion?: string;
+  estado_sla: 'cumplido' | 'en_riesgo' | 'vencido' | 'pendiente';
+  tiempo_limite_primera_respuesta: string;
+  tiempo_limite_resolucion: string;
+}
+
+export interface HorarioAtencion {
+  id_horario: number;
+  nombre: string;
+  dia_semana: number[];
+  hora_inicio: string;
+  hora_fin: string;
+  activo: boolean;
+}
+
+export interface Feriado {
+  id_feriado: number;
+  fecha: string;
+  nombre: string;
+  nacional: boolean;
+}
+
+export interface MetricaAtencion {
+  periodo: string;
+  tpr_whatsapp_min: number;
+  tpr_email_min: number;
+  tr_whatsapp_min: number;
+  tr_email_min: number;
+  csat: number;
+  nps: number;
+  fcr_porcentaje: number;
+  uso_centro_ayuda_porcentaje: number;
+  derivacion_chatbot_porcentaje: number;
+  espera_telefono_min: number;
+  tickets_por_agente_simple: number;
+  tickets_por_agente_complejo: number;
+}
+
+export interface MetricaAgente {
+  id_agente: string;
+  nombre: string;
+  email: string;
+  tickets_resueltos: number;
+  tiempo_promedio_respuesta_min: number;
+  tiempo_promedio_resolucion_min: number;
+  csat_promedio: number;
+  activo: boolean;
+}
+
+export interface EncuestaSatisfaccion {
+  id_encuesta: number;
+  id_ticket: string;
+  id_usuario: string;
+  puntuacion: number;
+  comentario?: string;
+  fecha_encuesta: string;
+  tipo: 'post_ticket' | 'post_reclamo' | 'post_mediacion';
+}
+
+export interface ChatbotMensaje {
+  id_mensaje: number;
+  sessionId: string;
+  remitente: 'usuario' | 'bot';
+  contenido: string;
+  fecha: string;
+}
+
+export interface FeedbackAyuda {
+  id_feedback: number;
+  id_faq: number;
+  id_usuario: string;
+  util: boolean;
+  comentario?: string;
+  fecha: string;
+}
+
+export interface ReporteTrimestral {
+  id_reporte: number;
+  periodo: string;
+  fecha_generacion: string;
+  metricas: MetricaAtencion;
+  temas_frecuentes: { tema: string; cantidad: number }[];
+  areas_mejora: string[];
+}
+
+export interface AgenteSoporte {
+  id_agente: string;
+  id_usuario: string;
+  nivel: number;
+  especialidades: string[];
+  tickets_asignados: number;
+  max_tickets: number;
+  activo: boolean;
+  usuario?: Partial<Usuario>;
+}
+
+export interface AsignacionTicket {
+  id_asignacion: number;
+  id_ticket: string;
+  id_agente: string;
+  fecha_asignacion: string;
+  agente?: AgenteSoporte;
+}
+
+export interface Escalamiento {
+  id_escalamiento: number;
+  id_ticket: string;
+  nivel_anterior: SlaNivel;
+  nivel_nuevo: SlaNivel;
+  motivo: string;
+  fecha: string;
+  id_agente_origen?: string;
+  id_agente_destino?: string;
+}

@@ -18,6 +18,11 @@ import {
   AlertTriangle,
   Scale,
   Shield,
+  Phone,
+  Clock,
+  Activity,
+  UserCheck,
+  FileBarChart,
 } from 'lucide-react';
 
 const clientLinks = [
@@ -29,6 +34,8 @@ const clientLinks = [
   { href: '/dashboard/reclamos', label: 'Reclamos', icon: AlertTriangle },
   { href: '/dashboard/notificaciones', label: 'Notificaciones', icon: Bell },
   { href: '/dashboard/tickets', label: 'Soporte', icon: MessageSquare },
+  { href: '/dashboard/sla', label: 'Estado SLA', icon: Clock },
+  { href: '/contacto', label: 'Contacto', icon: Phone },
   { href: '/dashboard/configuracion', label: 'Configuración', icon: Settings },
   { href: '/ayuda', label: 'Centro de Ayuda', icon: HelpCircle },
 ];
@@ -42,16 +49,23 @@ const providerLinks = [
   { href: '/dashboard/reclamos', label: 'Reclamos', icon: AlertTriangle },
   { href: '/dashboard/notificaciones', label: 'Notificaciones', icon: Bell },
   { href: '/dashboard/tickets', label: 'Soporte', icon: MessageSquare },
+  { href: '/dashboard/sla', label: 'Estado SLA', icon: Clock },
+  { href: '/contacto', label: 'Contacto', icon: Phone },
   { href: '/dashboard/configuracion', label: 'Configuración', icon: Settings },
 ];
 
 const adminLinks = [
-  { href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
-  { href: '/dashboard/usuarios', label: 'Usuarios', icon: Users },
-  { href: '/dashboard/reportes', label: 'Reportes', icon: BarChart3 },
+  { href: '/dashboard/admin', label: 'Dashboard', icon: LayoutDashboard },
+  { href: '/dashboard/admin/usuarios', label: 'Usuarios', icon: Users },
+  { href: '/dashboard/admin/reportes', label: 'Reportes', icon: BarChart3 },
+  { href: '/dashboard/admin/reportes/trimestral', label: 'Reporte Trimestral', icon: FileBarChart },
+  { href: '/dashboard/admin/metricas', label: 'Métricas de Atención', icon: Activity },
+  { href: '/dashboard/admin/agentes', label: 'Agentes de Soporte', icon: UserCheck },
+  { href: '/dashboard/sla', label: 'Gestión SLA', icon: Clock },
   { href: '/dashboard/reclamos', label: 'Reclamos', icon: AlertTriangle },
   { href: '/dashboard/mediacion', label: 'Mediación', icon: Scale },
   { href: '/dashboard/sanciones', label: 'Sanciones', icon: Shield },
+  { href: '/ayuda', label: 'Centro de Ayuda', icon: HelpCircle },
   { href: '/dashboard/configuracion', label: 'Configuración', icon: Settings },
 ];
 

@@ -5,7 +5,9 @@ import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
 import { Card, CardTitle } from '@/components/ui/Card';
 import Button from '@/components/ui/Button';
-import Input from '@/components/ui/Input';
+import BuscadorInteligente from '@/components/ayuda/BuscadorInteligente';
+import FeedbackArticulo from '@/components/ayuda/FeedbackArticulo';
+import Chatbot from '@/components/ayuda/Chatbot';
 import api, { extractData } from '@/lib/api';
 import { Search, ChevronDown, ChevronUp, HelpCircle, MessageSquare, Mail, Phone } from 'lucide-react';
 import type { Faq } from '@/types';
@@ -60,14 +62,13 @@ export default function AyudaPage() {
             <HelpCircle className="w-16 h-16 text-cyan-400 mx-auto mb-4" />
             <h1 className="text-3xl font-bold text-white mb-4">Centro de Ayuda</h1>
             <p className="text-slate-400 mb-6">¿Tenés una pregunta? Encontrá la respuesta aquí</p>
-            <div className="relative max-w-lg mx-auto">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
-              <input
-                type="text"
-                placeholder="Buscar preguntas..."
-                value={busqueda}
-                onChange={(e) => setBusqueda(e.target.value)}
-                className="w-full pl-11 pr-4 py-3 bg-slate-800 border border-slate-700 rounded-xl text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-cyan-500"
+            <div className="max-w-lg mx-auto">
+              <BuscadorInteligente
+                faqs={faqs}
+                onSelect={(faq) => {
+                  setBusqueda(faq.pregunta);
+                  setCategoriaActiva(faq.categoria);
+                }}
               />
             </div>
           </div>
@@ -137,6 +138,7 @@ export default function AyudaPage() {
                   {faqAbierta === faq.id_faq && (
                     <div className="mt-4 pt-4 border-t border-slate-700/50">
                       <p className="text-slate-300">{faq.respuesta}</p>
+                      <FeedbackArticulo idFaq={faq.id_faq} />
                     </div>
                   )}
                 </Card>
@@ -166,6 +168,7 @@ export default function AyudaPage() {
         </div>
       </main>
       <Footer />
+      <Chatbot />
     </div>
   );
 }
