@@ -7,6 +7,7 @@ const api = axios.create({
 
 let isRefreshing = false;
 let failedQueue: Array<{ resolve: (token: string) => void; reject: (err: unknown) => void }> = [];
+let refreshFailed = false;
 
 function processQueue(error: unknown, token: string | null) {
   failedQueue.forEach((prom) => {
@@ -35,7 +36,8 @@ api.interceptors.response.use(
       error.response?.status === 401 &&
       !originalRequest._retry &&
       !originalRequest.url?.includes('/auth/refresh') &&
-      !originalRequest.url?.includes('/auth/login')
+      !originalRequest.url?.includes('/auth/login') &&
+      !refreshFailed
     ) {
       if (isRefreshing) {
         return new Promise<string>((resolve, reject) => {
@@ -43,7 +45,7 @@ api.interceptors.response.use(
         }).then((token) => {
           originalRequest.headers.Authorization = `Bearer ${token}`;
           return api(originalRequest);
-        });
+        }).catch(() => Promise.reject(error));
       }
 
       originalRequest._retry = true;
@@ -72,6 +74,11 @@ api.interceptors.response.use(
         }
         throw new Error('Invalid refresh response');
       } catch (refreshError) {
+        refreshFailed = true;
+        localStorage.removeItem('access_token');
+        localStorage.removeItem('refresh_token');
+        document.cookie = 'access_token=; path=/; max-age=0';
+        document.cookie = 'refresh_token=; path=/; max-age=0';
         processQueue(refreshError, null);
         return Promise.reject(error);
       } finally {

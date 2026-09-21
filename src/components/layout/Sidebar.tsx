@@ -23,6 +23,7 @@ import {
   Activity,
   UserCheck,
   FileBarChart,
+  X,
 } from 'lucide-react';
 
 const clientLinks = [
@@ -65,38 +66,62 @@ const adminLinks = [
   { href: '/dashboard/reclamos', label: 'Reclamos', icon: AlertTriangle },
   { href: '/dashboard/mediacion', label: 'Mediación', icon: Scale },
   { href: '/dashboard/sanciones', label: 'Sanciones', icon: Shield },
+  { href: '/dashboard/notificaciones', label: 'Notificaciones', icon: Bell },
   { href: '/ayuda', label: 'Centro de Ayuda', icon: HelpCircle },
   { href: '/dashboard/configuracion', label: 'Configuración', icon: Settings },
 ];
 
-export default function Sidebar({ role = 'cliente' }: { role?: string }) {
+export default function Sidebar({ role = 'cliente', isOpen, onClose }: { role?: string; isOpen?: boolean; onClose?: () => void }) {
   const pathname = usePathname();
-
   const links = role === 'admin' ? adminLinks : role === 'proveedor' ? providerLinks : clientLinks;
 
+  const navContent = (
+    <nav className="p-4 space-y-1">
+      {links.map((link) => {
+        const Icon = link.icon;
+        const isActive = pathname === link.href;
+        return (
+          <Link
+            key={link.href}
+            href={link.href}
+            onClick={onClose}
+            className={cn(
+              'flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors',
+              isActive
+                ? 'bg-cyan-500/10 text-cyan-400 border border-cyan-500/20'
+                : 'text-slate-400 hover:text-white hover:bg-slate-800',
+            )}
+          >
+            <Icon className="w-5 h-5" />
+            {link.label}
+          </Link>
+        );
+      })}
+    </nav>
+  );
+
   return (
-    <aside className="hidden lg:block w-64 bg-slate-900 border-r border-slate-800 min-h-[calc(100vh-4rem)]">
-      <nav className="p-4 space-y-1">
-        {links.map((link) => {
-          const Icon = link.icon;
-          const isActive = pathname === link.href;
-          return (
-            <Link
-              key={link.href}
-              href={link.href}
-              className={cn(
-                'flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors',
-                isActive
-                  ? 'bg-cyan-500/10 text-cyan-400 border border-cyan-500/20'
-                  : 'text-slate-400 hover:text-white hover:bg-slate-800',
-              )}
-            >
-              <Icon className="w-5 h-5" />
-              {link.label}
-            </Link>
-          );
-        })}
-      </nav>
-    </aside>
+    <>
+      {/* Desktop sidebar */}
+      <aside className="hidden lg:block w-64 bg-slate-900 border-r border-slate-800 min-h-[calc(100vh-4rem)]">
+        {navContent}
+      </aside>
+
+      {/* Mobile drawer */}
+      {isOpen && (
+        <div className="lg:hidden fixed inset-0 z-40">
+          <div className="absolute inset-0 bg-black/60" onClick={onClose} />
+          <aside className="absolute left-0 top-0 bottom-0 w-72 bg-slate-900 border-r border-slate-800 overflow-y-auto">
+            <div className="flex items-center justify-between p-4 border-b border-slate-800">
+              <span className="text-lg font-bold text-white">Menú</span>
+              <button onClick={onClose} className="text-slate-400 hover:text-white">
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+            {navContent}
+          </aside>
+        </div>
+      )}
+    </>
   );
 }

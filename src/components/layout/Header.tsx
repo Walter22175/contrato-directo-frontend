@@ -2,22 +2,84 @@
 
 import Link from 'next/link';
 import { useAuthStore } from '@/store/auth';
-import { useState } from 'react';
-import { Menu, X, Search, Bell, User, LogOut, ChevronDown } from 'lucide-react';
+import { useNotificationStore } from '@/store/notifications';
+import { useNotificationsSocket } from '@/hooks/useNotificationsSocket';
+import { useState, useEffect, useRef } from 'react';
+import { Menu, Search, Bell, User, LogOut, ChevronDown, Check } from 'lucide-react';
 import Button from '@/components/ui/Button';
 
-export default function Header() {
+function formatRelativeTime(dateStr: string): string {
+  const now = new Date();
+  const date = new Date(dateStr);
+  const diffMs = now.getTime() - date.getTime();
+  const diffMin = Math.floor(diffMs / 60000);
+  const diffH = Math.floor(diffMin / 60);
+  const diffD = Math.floor(diffH / 24);
+  if (diffMin < 1) return 'Ahora';
+  if (diffMin < 60) return `Hace ${diffMin}min`;
+  if (diffH < 24) return `Hace ${diffH}h`;
+  return `Hace ${diffD}d`;
+}
+
+export default function Header({ onToggleSidebar }: { onToggleSidebar?: () => void }) {
   const user = useAuthStore((s) => s.user);
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
   const logout = useAuthStore((s) => s.logout);
+  const { noLeidas, notificaciones, fetchNoLeidas, fetchNotificaciones, marcarLeida, marcarTodasLeidas } = useNotificationStore();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [userMenuOpen, setUserMenuOpen] = useState(false);
+  const [notifOpen, setNotifOpen] = useState(false);
+  const notifRef = useRef<HTMLDivElement>(null);
+
+  useNotificationsSocket((event) => {
+    useNotificationStore.getState().addNotificacion({
+      id_notificacion: crypto.randomUUID(),
+      id_usuario: event.id_usuario,
+      tipo: event.tipo,
+      evento: event.evento,
+      titulo: event.titulo,
+      mensaje: event.mensaje,
+      canal: 'plataforma',
+      leida: false,
+      fecha_envio: event.fecha,
+    });
+  });
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      fetchNoLeidas();
+      const interval = setInterval(fetchNoLeidas, 30000);
+      return () => clearInterval(interval);
+    }
+  }, [isAuthenticated, fetchNoLeidas]);
+
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (notifRef.current && !notifRef.current.contains(e.target as Node)) {
+        setNotifOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  const handleNotifClick = async () => {
+    if (!notifOpen) {
+      await fetchNotificaciones();
+    }
+    setNotifOpen(!notifOpen);
+  };
+
+  const handleNotifItemClick = async (notif: typeof notificaciones[0]) => {
+    if (!notif.leida) {
+      await marcarLeida(notif.id_notificacion);
+    }
+  };
 
   return (
     <header className="sticky top-0 z-50 bg-slate-900/80 backdrop-blur-md border-b border-slate-800">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
-          {/* Logo */}
           <Link href="/" className="flex items-center gap-2">
             <div className="w-8 h-8 bg-gradient-to-br from-blue-600 to-cyan-400 rounded-lg flex items-center justify-center">
               <span className="text-white font-bold text-sm">CD</span>
@@ -25,7 +87,6 @@ export default function Header() {
             <span className="text-xl font-bold text-white hidden sm:block">Contrato Directo</span>
           </Link>
 
-          {/* Search - Desktop */}
           {isAuthenticated && (
             <div className="hidden md:flex flex-1 max-w-md mx-8">
               <div className="relative w-full">
@@ -39,7 +100,6 @@ export default function Header() {
             </div>
           )}
 
-          {/* Nav - Desktop */}
           <nav className="hidden md:flex items-center gap-6">
             {isAuthenticated ? (
               <>
@@ -53,15 +113,76 @@ export default function Header() {
                   Dashboard
                 </Link>
 
-                {/* Notifications */}
-                <button className="relative text-slate-300 hover:text-white transition-colors">
-                  <Bell className="w-5 h-5" />
-                  <span className="absolute -top-1 -right-1 w-4 h-4 bg-cyan-500 rounded-full text-xs text-white flex items-center justify-center">
-                    3
-                  </span>
-                </button>
+                {/* Notifications Bell */}
+                <div className="relative" ref={notifRef}>
+                  <button
+                    onClick={handleNotifClick}
+                    className="relative text-slate-300 hover:text-white transition-colors"
+                  >
+                    <Bell className="w-5 h-5" />
+                    {noLeidas > 0 && (
+                      <span className="absolute -top-1 -right-1 w-4 h-4 bg-cyan-500 rounded-full text-xs text-white flex items-center justify-center">
+                        {noLeidas > 99 ? '99+' : noLeidas}
+                      </span>
+                    )}
+                  </button>
 
-                {/* User Menu */}
+                  {notifOpen && (
+                    <div className="absolute right-0 mt-2 w-80 bg-slate-800 border border-slate-700 rounded-lg shadow-xl overflow-hidden">
+                      <div className="flex items-center justify-between px-4 py-3 border-b border-slate-700">
+                        <span className="text-sm font-medium text-white">Notificaciones</span>
+                        {noLeidas > 0 && (
+                          <button
+                            onClick={() => marcarTodasLeidas()}
+                            className="text-xs text-cyan-400 hover:text-cyan-300 flex items-center gap-1"
+                          >
+                            <Check className="w-3 h-3" />
+                            Marcar todas leídas
+                          </button>
+                        )}
+                      </div>
+                      <div className="max-h-80 overflow-y-auto">
+                        {notificaciones.length === 0 ? (
+                          <div className="px-4 py-8 text-center text-slate-500 text-sm">
+                            No hay notificaciones
+                          </div>
+                        ) : (
+                          notificaciones.slice(0, 10).map((notif) => (
+                            <button
+                              key={notif.id_notificacion}
+                              onClick={() => handleNotifItemClick(notif)}
+                              className={`w-full text-left px-4 py-3 border-b border-slate-700/50 hover:bg-slate-700/50 transition-colors ${
+                                !notif.leida ? 'bg-slate-700/30' : ''
+                              }`}
+                            >
+                              <div className="flex items-start gap-3">
+                                <div className={`w-2 h-2 rounded-full mt-2 flex-shrink-0 ${
+                                  notif.tipo === 'transaccional' ? 'bg-cyan-400' :
+                                  notif.tipo === 'actividad' ? 'bg-yellow-400' : 'bg-slate-500'
+                                }`} />
+                                <div className="flex-1 min-w-0">
+                                  <p className={`text-sm ${!notif.leida ? 'font-medium text-white' : 'text-slate-300'}`}>
+                                    {notif.titulo}
+                                  </p>
+                                  <p className="text-xs text-slate-500 truncate">{notif.mensaje}</p>
+                                  <p className="text-xs text-slate-600 mt-1">{formatRelativeTime(notif.fecha_envio)}</p>
+                                </div>
+                              </div>
+                            </button>
+                          ))
+                        )}
+                      </div>
+                      <Link
+                        href="/dashboard/notificaciones"
+                        onClick={() => setNotifOpen(false)}
+                        className="block px-4 py-3 text-center text-sm text-cyan-400 hover:bg-slate-700/50 border-t border-slate-700"
+                      >
+                        Ver todas
+                      </Link>
+                    </div>
+                  )}
+                </div>
+
                 <div className="relative">
                   <button
                     onClick={() => setUserMenuOpen(!userMenuOpen)}
@@ -109,16 +230,17 @@ export default function Header() {
             )}
           </nav>
 
-          {/* Mobile Menu Button */}
           <button
-            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+            onClick={() => {
+              setMobileMenuOpen(false);
+              onToggleSidebar?.();
+            }}
             className="md:hidden text-slate-300 hover:text-white"
           >
-            {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+            <Menu className="w-6 h-6" />
           </button>
         </div>
 
-        {/* Mobile Menu */}
         {mobileMenuOpen && (
           <div className="md:hidden py-4 border-t border-slate-800">
             {isAuthenticated ? (

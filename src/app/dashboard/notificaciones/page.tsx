@@ -1,9 +1,10 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
+import Link from 'next/link';
 import api, { extractData } from '@/lib/api';
 import { Card } from '@/components/ui/Card';
-import { Bell, BellOff, CheckCheck, CreditCard, Activity, Globe } from 'lucide-react';
+import { Bell, BellOff, CheckCheck, CreditCard, Activity, Globe, Settings } from 'lucide-react';
 import type { Notificacion } from '@/types';
 
 const tipoIcon: Record<string, typeof Bell> = {
@@ -84,6 +85,13 @@ export default function NotificacionesPage() {
           {noLeidas > 0 && <p className="text-sm text-slate-400">{noLeidas} sin leer</p>}
         </div>
         <div className="flex gap-2">
+          <Link
+            href="/dashboard/notificaciones/configuracion"
+            className="flex items-center gap-2 px-3 py-2 text-sm bg-slate-800 border border-slate-700 rounded-lg text-slate-300 hover:bg-slate-700 transition-colors"
+          >
+            <Settings className="w-4 h-4" />
+            Configuración
+          </Link>
           <button
             onClick={() => setFiltro(filtro === 'todas' ? 'no_leidas' : 'todas')}
             className="flex items-center gap-2 px-3 py-2 text-sm bg-slate-800 border border-slate-700 rounded-lg text-slate-300 hover:bg-slate-700 transition-colors"

@@ -102,27 +102,14 @@ export const useAuthStore = create<AuthState>((set) => ({
       const res = await api.get('/auth/me');
       const data = extractData<any>(res);
       set({ user: data, isAuthenticated: true, isLoading: false });
-    } catch (err: any) {
-      if (err.response?.status === 401) {
-        try {
-          const { data } = await api.post('/auth/refresh', { refresh_token: refreshToken! });
-          const raw = extractData<{ access_token: string; refresh_token: string; usuario: Partial<Usuario> }>(data);
-          if (raw.access_token && raw.refresh_token && raw.usuario) {
-            localStorage.setItem('access_token', raw.access_token);
-            localStorage.setItem('refresh_token', raw.refresh_token);
-            setCookies(raw.access_token, raw.refresh_token);
-            set({ user: raw.usuario, isAuthenticated: true, isLoading: false });
-            return;
-          }
-        } catch {
-          localStorage.removeItem('access_token');
-          localStorage.removeItem('refresh_token');
-          clearCookies();
-          set({ user: null, isAuthenticated: false, isLoading: false });
-          return;
-        }
+    } catch {
+      // Interceptor already handled refresh attempt. If tokens are gone, we're logged out.
+      const currentToken = localStorage.getItem('access_token');
+      if (!currentToken) {
+        set({ user: null, isAuthenticated: false, isLoading: false });
+      } else {
+        set({ isLoading: false });
       }
-      set({ isLoading: false });
     }
   },
 

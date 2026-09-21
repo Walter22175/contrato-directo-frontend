@@ -1,15 +1,15 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import Link from 'next/link';
 import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
 import { Card, CardTitle } from '@/components/ui/Card';
 import Button from '@/components/ui/Button';
 import BuscadorInteligente from '@/components/ayuda/BuscadorInteligente';
 import FeedbackArticulo from '@/components/ayuda/FeedbackArticulo';
-import Chatbot from '@/components/ayuda/Chatbot';
 import api, { extractData } from '@/lib/api';
-import { Search, ChevronDown, ChevronUp, HelpCircle, MessageSquare, Mail, Phone } from 'lucide-react';
+import { ChevronDown, ChevronUp, HelpCircle, MessageSquare, Mail, Phone } from 'lucide-react';
 import type { Faq } from '@/types';
 
 export default function AyudaPage() {
@@ -153,10 +153,12 @@ export default function AyudaPage() {
                 <CardTitle>¿No encontraste tu respuesta?</CardTitle>
                 <p className="text-slate-400 mt-2 mb-6">Nuestro equipo de soporte está disponible para ayudarte</p>
                 <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                  <Button variant="outline">
-                    <MessageSquare className="w-4 h-4 mr-2" />
-                    Abrir Ticket
-                  </Button>
+                  <Link href="/dashboard/tickets">
+                    <Button variant="outline">
+                      <MessageSquare className="w-4 h-4 mr-2" />
+                      Abrir Ticket
+                    </Button>
+                  </Link>
                   <Button variant="outline">
                     <Mail className="w-4 h-4 mr-2" />
                     soporte@contratodirecto.com
@@ -168,7 +170,6 @@ export default function AyudaPage() {
         </div>
       </main>
       <Footer />
-      <Chatbot />
     </div>
   );
 }

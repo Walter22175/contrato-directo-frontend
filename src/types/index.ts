@@ -297,6 +297,18 @@ export interface Notificacion {
   canal: string;
   leida: boolean;
   fecha_envio: string;
+  fecha_lectura?: string;
+}
+
+export interface PreferenciaNotificacion {
+  id_preferencia: string;
+  id_usuario: string;
+  tipo_notificacion: string;
+  canal_preferido: string;
+  habilitada: boolean;
+  frecuencia_resumen: string;
+  fecha_creacion: string;
+  fecha_actualizacion: string;
 }
 
 export interface PaginatedResponse<T> {
