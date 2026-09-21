@@ -15,6 +15,9 @@ import {
   Users,
   BarChart3,
   Bell,
+  AlertTriangle,
+  Scale,
+  Shield,
 } from 'lucide-react';
 
 const clientLinks = [
@@ -23,6 +26,8 @@ const clientLinks = [
   { href: '/dashboard/transacciones', label: 'Mis Transacciones', icon: CreditCard },
   { href: '/dashboard/contratos', label: 'Mis Contratos', icon: FileText },
   { href: '/dashboard/valoraciones', label: 'Mis Valoraciones', icon: Star },
+  { href: '/dashboard/reclamos', label: 'Reclamos', icon: AlertTriangle },
+  { href: '/dashboard/mediacion', label: 'Mediación', icon: Scale },
   { href: '/dashboard/notificaciones', label: 'Notificaciones', icon: Bell },
   { href: '/dashboard/tickets', label: 'Soporte', icon: MessageSquare },
   { href: '/dashboard/configuracion', label: 'Configuración', icon: Settings },
@@ -35,6 +40,8 @@ const providerLinks = [
   { href: '/dashboard/transacciones', label: 'Transacciones', icon: CreditCard },
   { href: '/dashboard/contratos', label: 'Contratos', icon: FileText },
   { href: '/dashboard/valoraciones', label: 'Valoraciones', icon: Star },
+  { href: '/dashboard/reclamos', label: 'Reclamos', icon: AlertTriangle },
+  { href: '/dashboard/mediacion', label: 'Mediación', icon: Scale },
   { href: '/dashboard/notificaciones', label: 'Notificaciones', icon: Bell },
   { href: '/dashboard/tickets', label: 'Soporte', icon: MessageSquare },
   { href: '/dashboard/configuracion', label: 'Configuración', icon: Settings },
@@ -44,7 +51,9 @@ const adminLinks = [
   { href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
   { href: '/dashboard/usuarios', label: 'Usuarios', icon: Users },
   { href: '/dashboard/reportes', label: 'Reportes', icon: BarChart3 },
-  { href: '/dashboard/sanciones', label: 'Sanciones', icon: Settings },
+  { href: '/dashboard/reclamos', label: 'Reclamos', icon: AlertTriangle },
+  { href: '/dashboard/mediacion', label: 'Mediación', icon: Scale },
+  { href: '/dashboard/sanciones', label: 'Sanciones', icon: Shield },
   { href: '/dashboard/configuracion', label: 'Configuración', icon: Settings },
 ];
 

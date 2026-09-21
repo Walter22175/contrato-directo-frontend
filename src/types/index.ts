@@ -162,6 +162,107 @@ export interface Reclamo {
   fecha_incidente: string;
   estado: string;
   fecha_apertura: string;
+  fecha_cierre?: string;
+  fecha_limite_contestacion?: string;
+  fecha_limite_apelacion?: string;
+  reclamante?: Partial<Usuario>;
+  reclamado?: Partial<Usuario>;
+  transaccion?: Transaccion;
+  contestacion?: ContestacionReclamo;
+  mediacion?: Mediacion;
+  documentos?: DocumentoReclamo[];
+}
+
+export interface ContestacionReclamo {
+  id_contestacion: number;
+  id_reclamo: string;
+  id_contestante: string;
+  descripcion: string;
+  fecha_contestacion: string;
+  prorroga_solicitada: boolean;
+  contestante?: Partial<Usuario>;
+}
+
+export interface DocumentoReclamo {
+  id_documento: number;
+  id_reclamo: string;
+  nombre_archivo: string;
+  url_archivo: string;
+  tipo_archivo?: string;
+  tamano_bytes: number;
+  fecha_subida: string;
+}
+
+export interface Mediacion {
+  id_mediacion: string;
+  id_reclamo: string;
+  id_mediador?: string;
+  estado: string;
+  fecha_asignacion: string;
+  fecha_resolucion?: string;
+  audiencia_virtual: boolean;
+  fecha_audiencia?: string;
+  duracion_audiencia_minutos?: number;
+  acta_audiencia_url?: string;
+  fecha_limite_resolucion?: string;
+  prorroga_solicitada: boolean;
+  mediacion_voluntaria_ofrecida: boolean;
+  reclamo?: Reclamo;
+  mediador?: Partial<Usuario>;
+  resolucion?: ResolucionMediacion;
+  sanciones?: Sancion[];
+}
+
+export interface ResolucionMediacion {
+  id_resolucion: number;
+  id_mediacion: string;
+  tipo_resolucion: string;
+  fundamentos: string;
+  plazo_cumplimiento_dias: number;
+  fecha_emision: string;
+  estado: string;
+  apelaciones?: ApelacionMediacion[];
+}
+
+export interface ApelacionMediacion {
+  id_apelacion: number;
+  id_resolucion: number;
+  id_apelante: string;
+  motivo: string;
+  estado: string;
+  id_mediador_supervisor?: string;
+  fecha_apelacion: string;
+  fecha_resolucion?: string;
+  resolucion_final?: string;
+  apelante?: Partial<Usuario>;
+  mediador_supervisor?: Partial<Usuario>;
+}
+
+export interface Sancion {
+  id_sancion: number;
+  id_usuario: string;
+  id_mediacion?: string;
+  tipo_sancion: string;
+  descripcion: string;
+  fecha_inicio: string;
+  fecha_fin?: string;
+  activa: boolean;
+  id_aplicador: string;
+  usuario?: Partial<Usuario>;
+  aplicador?: Partial<Usuario>;
+}
+
+export interface Reembolso {
+  id_reembolso: number;
+  id_transaccion: string;
+  id_solicitante: string;
+  monto_solicitado: number;
+  monto_aprobado?: number;
+  motivo: string;
+  estado: string;
+  fecha_solicitud: string;
+  fecha_resolucion?: string;
+  id_resolutor?: string;
 }
 
 export interface Ticket {
