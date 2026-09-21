@@ -19,7 +19,7 @@ import {
   Calendar,
   Ban,
 } from 'lucide-react';
-import type { Reclamo, CreateReclamoDto, ContestarReclamoDto } from '@/types';
+import type { Reclamo, CreateReclamoDto, ContestarReclamoDto, Transaccion } from '@/types';
 
 const TIPOS_RECLAMO = [
   { value: 'incumplimiento_servicio', label: 'Incumplimiento de servicio' },
@@ -60,6 +60,8 @@ export default function ReclamosPage() {
   const [showForm, setShowForm] = useState(false);
   const [sending, setSending] = useState(false);
   const [msg, setMsg] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
+  const [transacciones, setTransacciones] = useState<Transaccion[]>([]);
+  const [loadingTransacciones, setLoadingTransacciones] = useState(false);
 
   const isAdmin = user?.usuario_roles?.some((r: any) => r.rol?.nombre === 'super_admin');
 
@@ -73,6 +75,19 @@ export default function ReclamosPage() {
   });
 
   const [contestacion, setContestacion] = useState('');
+
+  const fetchTransacciones = async () => {
+    setLoadingTransacciones(true);
+    try {
+      const res = await api.get('/transacciones', { params: { id_cliente: user?.id_usuario } });
+      const data = extractData<any>(res);
+      setTransacciones(data?.data || data || []);
+    } catch {
+      setTransacciones([]);
+    } finally {
+      setLoadingTransacciones(false);
+    }
+  };
 
   const fetchReclamos = useCallback(async () => {
     setLoading(true);
@@ -341,7 +356,7 @@ export default function ReclamosPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold text-white">Reclamos</h1>
-        <button onClick={() => { setShowForm(true); setMsg(null); }} className="flex items-center gap-2 px-4 py-2.5 bg-cyan-600 hover:bg-cyan-700 text-white rounded-lg text-sm font-medium transition-colors">
+        <button onClick={() => { setShowForm(true); setMsg(null); fetchTransacciones(); }} className="flex items-center gap-2 px-4 py-2.5 bg-cyan-600 hover:bg-cyan-700 text-white rounded-lg text-sm font-medium transition-colors">
           <Plus className="w-4 h-4" /> Nuevo Reclamo
         </button>
       </div>
@@ -391,12 +406,36 @@ export default function ReclamosPage() {
                 </select>
               </div>
               <div>
-                <label className={labelCls}>ID Transacción *</label>
-                <input className={inputCls} value={form.id_transaccion} onChange={(e) => setForm({ ...form, id_transaccion: e.target.value })} required placeholder="UUID de la transacción" />
+                <label className={labelCls}>Transacción *</label>
+                <select
+                  className={inputCls}
+                  value={form.id_transaccion}
+                  onChange={(e) => {
+                    const txId = e.target.value;
+                    const tx = transacciones.find((t) => t.id_transaccion === txId);
+                    setForm({
+                      ...form,
+                      id_transaccion: txId,
+                      id_reclamado: tx?.id_proveedor || '',
+                    });
+                  }}
+                  required
+                  disabled={loadingTransacciones}
+                >
+                  <option value="">{loadingTransacciones ? 'Cargando...' : 'Seleccionar transacción...'}</option>
+                  {transacciones.map((t) => (
+                    <option key={t.id_transaccion} value={t.id_transaccion}>
+                      #{t.id_transaccion?.slice(0, 8)} — {t.descripcion || t.tipo_transaccion} — ${t.monto_acordado}
+                    </option>
+                  ))}
+                </select>
+                {transacciones.length === 0 && !loadingTransacciones && (
+                  <p className="text-xs text-slate-500 mt-1">No tenés transacciones disponibles</p>
+                )}
               </div>
               <div>
-                <label className={labelCls}>ID Reclamado *</label>
-                <input className={inputCls} value={form.id_reclamado} onChange={(e) => setForm({ ...form, id_reclamado: e.target.value })} required placeholder="UUID del reclamado" />
+                <label className={labelCls}>Proveedor (reclamado)</label>
+                <input className={inputCls + ' bg-slate-700'} value={form.id_reclamado ? `#${form.id_reclamado.slice(0, 8)}` : 'Se completa automáticamente'} readOnly />
               </div>
               <div>
                 <label className={labelCls}>Fecha del Incidente *</label>
