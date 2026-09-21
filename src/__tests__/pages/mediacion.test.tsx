@@ -10,14 +10,15 @@ describe('MediacionPage', () => {
     await act(async () => {
       render(<MediacionPage />);
     });
-    expect(screen.getByText('Espacio de Mediación')).toBeInTheDocument();
+    expect(screen.getByText('Mediación')).toBeInTheDocument();
   });
 
   it('renders tab buttons', async () => {
     await act(async () => {
       render(<MediacionPage />);
     });
-    expect(screen.getByText('Mis Reclamos')).toBeInTheDocument();
-    expect(screen.getByText('Todos')).toBeInTheDocument();
+    expect(screen.getByText('En Proceso')).toBeInTheDocument();
+    expect(screen.getByText('Resueltas')).toBeInTheDocument();
+    expect(screen.getByText('Todas')).toBeInTheDocument();
   });
 });

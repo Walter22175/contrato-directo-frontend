@@ -168,7 +168,7 @@ export interface Reclamo {
   reclamante?: Partial<Usuario>;
   reclamado?: Partial<Usuario>;
   transaccion?: Transaccion;
-  contestacion?: ContestacionReclamo;
+  contestaciones?: ContestacionReclamo[];
   mediacion?: Mediacion;
   documentos?: DocumentoReclamo[];
 }
@@ -312,4 +312,69 @@ export interface PaginatedResponse<T> {
 export interface ApiResponse<T> {
   data: T;
   message?: string;
+}
+
+export interface CreateReclamoDto {
+  id_transaccion: string;
+  id_reclamante: string;
+  id_reclamado: string;
+  tipo_reclamo: string;
+  descripcion: string;
+  fecha_incidente: string;
+}
+
+export interface ContestarReclamoDto {
+  id_contestatario: string;
+  respuesta: string;
+}
+
+export interface IniciarMediacionDto {
+  id_mediador: string;
+  audiencia_virtual?: boolean;
+  fecha_audiencia?: string;
+}
+
+export interface ResolverMediacionDto {
+  tipo_resolucion: string;
+  fundamentos?: string;
+  detalle?: string;
+  acta_audiencia_url?: string;
+  plazo_cumplimiento_dias?: number;
+}
+
+export interface AgregarDocumentoDto {
+  nombre_archivo: string;
+  url_archivo: string;
+  tipo_archivo?: string;
+  tamano_bytes: number;
+}
+
+export interface AsignarMediadorDto {
+  id_mediador: string;
+}
+
+export interface ConvocarAudienciaDto {
+  fecha_audiencia: string;
+  audiencia_virtual?: boolean;
+  duracion_audiencia_minutos?: number;
+}
+
+export interface CrearApelacionDto {
+  id_resolucion: number;
+  id_apelante: string;
+  motivo: string;
+}
+
+export interface ResolverApelacionDto {
+  id_mediador_supervisor: string;
+  resolucion_final: string;
+}
+
+export interface CrearSancionDto {
+  id_usuario: string;
+  id_mediacion?: string;
+  tipo_sancion: string;
+  descripcion: string;
+  fecha_inicio: string;
+  fecha_fin?: string;
 }

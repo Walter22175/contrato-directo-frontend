@@ -10,14 +10,28 @@ describe('ReclamosPage', () => {
     await act(async () => {
       render(<ReclamosPage />);
     });
-    const headings = screen.getAllByText('Mis Reclamos');
-    expect(headings.length).toBeGreaterThanOrEqual(1);
+    expect(screen.getByText('Reclamos')).toBeInTheDocument();
   });
 
   it('renders tab buttons', async () => {
     await act(async () => {
       render(<ReclamosPage />);
     });
-    expect(screen.getByText('Todos')).toBeInTheDocument();
+    expect(screen.getAllByText('Todos').length).toBeGreaterThanOrEqual(1);
+  });
+
+  it('renders new claim button', async () => {
+    await act(async () => {
+      render(<ReclamosPage />);
+    });
+    expect(screen.getByText('Nuevo Reclamo')).toBeInTheDocument();
+  });
+
+  it('renders estado filter buttons', async () => {
+    await act(async () => {
+      render(<ReclamosPage />);
+    });
+    expect(screen.getByText('Abierto')).toBeInTheDocument();
+    expect(screen.getByText('En revisión')).toBeInTheDocument();
   });
 });
