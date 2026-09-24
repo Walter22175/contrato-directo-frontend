@@ -10,9 +10,9 @@ import { Bell, Mail, Smartphone, Save, Check } from 'lucide-react';
 import type { PreferenciaNotificacion } from '@/types';
 
 const TIPOS_NOTIFICACION = [
-  { key: 'transaccional', label: 'Transaccionales', description: 'Pagos, reclamos, contratos, conformidades', icon: '💳', disabled: true },
-  { key: 'actividad', label: 'Actividad', description: 'Solicitudes, valoraciones, mensajes, ofertas', icon: '🔔', disabled: false },
-  { key: 'plataforma', label: 'Plataforma', description: 'Boletines, promociones, novedades', icon: '📰', disabled: false },
+  { key: 'transaccional', label: 'Transaccionales', description: 'Pagos, reclamos, contratos, conformidades', icon: '💳', disabled: true, defaultEnabled: true },
+  { key: 'actividad', label: 'Actividad', description: 'Solicitudes, valoraciones, mensajes, ofertas', icon: '🔔', disabled: false, defaultEnabled: true },
+  { key: 'plataforma', label: 'Plataforma', description: 'Boletines, promociones, novedades', icon: '📰', disabled: false, defaultEnabled: true },
 ];
 
 const CANALES = [
@@ -56,6 +56,11 @@ export default function NotificacionesConfigPage() {
 
   const getPreferencia = (tipo: string, canal: string) => {
     return preferencias.find((p) => p.tipo_notificacion === tipo && p.canal_preferido === canal);
+  };
+
+  const getDefaultEnabled = (tipo: string) => {
+    const tipoConfig = TIPOS_NOTIFICACION.find(t => t.key === tipo);
+    return tipoConfig?.defaultEnabled ?? false;
   };
 
   const togglePreferencia = async (tipo: string, canal: string, currentValue: boolean) => {
@@ -147,7 +152,8 @@ export default function NotificacionesConfigPage() {
                 <div className="grid grid-cols-3 gap-3">
                   {CANALES.map((canal) => {
                     const pref = getPreferencia(tipo.key, canal.key);
-                    const enabled = pref ? pref.habilitada : tipo.key === 'transaccional';
+                    const defaultEnabled = getDefaultEnabled(tipo.key);
+                    const enabled = pref ? pref.habilitada : defaultEnabled;
                     const Icon = canal.icon;
 
                     return (

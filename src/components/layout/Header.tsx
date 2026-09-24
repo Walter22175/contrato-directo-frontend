@@ -1,11 +1,12 @@
 'use client';
 
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { useAuthStore } from '@/store/auth';
 import { useNotificationStore } from '@/store/notifications';
 import { useNotificationsSocket } from '@/hooks/useNotificationsSocket';
 import { useState, useEffect, useRef } from 'react';
-import { Menu, Search, Bell, User, LogOut, ChevronDown, Check } from 'lucide-react';
+import { Menu, Search, Bell, User, LogOut, ChevronDown, Check, X } from 'lucide-react';
 import Button from '@/components/ui/Button';
 
 function formatRelativeTime(dateStr: string): string {
@@ -21,7 +22,10 @@ function formatRelativeTime(dateStr: string): string {
   return `Hace ${diffD}d`;
 }
 
+const RECENT_SEARCHES_KEY = 'recent_searches';
+
 export default function Header({ onToggleSidebar }: { onToggleSidebar?: () => void }) {
+  const router = useRouter();
   const user = useAuthStore((s) => s.user);
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
   const logout = useAuthStore((s) => s.logout);
@@ -29,6 +33,10 @@ export default function Header({ onToggleSidebar }: { onToggleSidebar?: () => vo
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [userMenuOpen, setUserMenuOpen] = useState(false);
   const [notifOpen, setNotifOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [showSearchResults, setShowSearchResults] = useState(false);
+  const [recentSearches, setRecentSearches] = useState<string[]>([]);
+  const searchRef = useRef<HTMLDivElement>(null);
   const notifRef = useRef<HTMLDivElement>(null);
 
   useNotificationsSocket((event) => {
@@ -54,7 +62,46 @@ export default function Header({ onToggleSidebar }: { onToggleSidebar?: () => vo
   }, [isAuthenticated, fetchNoLeidas]);
 
   useEffect(() => {
+    try {
+      const stored = localStorage.getItem(RECENT_SEARCHES_KEY);
+      if (stored) setRecentSearches(JSON.parse(stored));
+    } catch {}
+  }, []);
+
+  const saveRecentSearch = (query: string) => {
+    if (!query.trim()) return;
+    const normalized = query.trim();
+    setRecentSearches(prev => {
+      const filtered = prev.filter(s => s.toLowerCase() !== normalized.toLowerCase());
+      const updated = [normalized, ...filtered].slice(0, 5);
+      localStorage.setItem(RECENT_SEARCHES_KEY, JSON.stringify(updated));
+      return updated;
+    });
+  };
+
+  const doSearch = (query: string) => {
+    const trimmed = query.trim();
+    if (!trimmed) return;
+    saveRecentSearch(trimmed);
+    setShowSearchResults(false);
+    router.push(`/servicios?q=${encodeURIComponent(trimmed)}`);
+  };
+
+  const handleSearchSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    doSearch(searchQuery);
+  };
+
+  const handleSearchResultClick = (result: string) => {
+    setSearchQuery(result);
+    doSearch(result);
+  };
+
+  useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
+      if (searchRef.current && !searchRef.current.contains(e.target as Node)) {
+        setShowSearchResults(false);
+      }
       if (notifRef.current && !notifRef.current.contains(e.target as Node)) {
         setNotifOpen(false);
       }
@@ -76,6 +123,17 @@ export default function Header({ onToggleSidebar }: { onToggleSidebar?: () => vo
     }
   };
 
+  const handleSearchFocus = () => {
+    if (searchQuery.trim() || recentSearches.length > 0) {
+      setShowSearchResults(true);
+    }
+  };
+
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchQuery(e.target.value);
+    setShowSearchResults(true);
+  };
+
   return (
     <header className="sticky top-0 z-50 bg-slate-900/80 backdrop-blur-md border-b border-slate-800">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -89,13 +147,50 @@ export default function Header({ onToggleSidebar }: { onToggleSidebar?: () => vo
 
           {isAuthenticated && (
             <div className="hidden md:flex flex-1 max-w-md mx-8">
-              <div className="relative w-full">
+              <div className="relative w-full" ref={searchRef}>
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
-                <input
-                  type="text"
-                  placeholder="Buscar servicios, proveedores..."
-                  className="w-full pl-10 pr-4 py-2 bg-slate-800 border border-slate-700 rounded-lg text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-cyan-500"
-                />
+                <form onSubmit={handleSearchSubmit}>
+                  <input
+                    type="text"
+                    placeholder="Buscar servicios, proveedores..."
+                    value={searchQuery}
+                    onChange={handleSearchChange}
+                    onFocus={handleSearchFocus}
+                    className="w-full pl-10 pr-4 py-2 bg-slate-800 border border-slate-700 rounded-lg text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-cyan-500"
+                  />
+                </form>
+                {showSearchResults && (recentSearches.length > 0 || searchQuery) && (
+                  <div className="absolute top-full left-0 right-0 mt-1 bg-slate-800 border border-slate-700 rounded-lg shadow-lg overflow-hidden z-50">
+                    {recentSearches.length > 0 && (
+                      <div className="p-2 border-b border-slate-700">
+                        <p className="text-xs text-slate-500 px-3 py-1">Búsquedas recientes</p>
+                        <div className="max-h-40 overflow-y-auto">
+                          {recentSearches.map((term, i) => (
+                            <button
+                              key={i}
+                              onClick={() => handleSearchResultClick(term)}
+                              className="w-full text-left px-3 py-2 text-sm text-slate-300 hover:bg-slate-700 rounded transition-colors flex items-center gap-2"
+                            >
+                              <Search className="w-4 h-4 text-slate-500" />
+                              {term}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                    {searchQuery && (
+                      <div className="p-2">
+                        <button
+                          onClick={(e) => { e.preventDefault(); doSearch(searchQuery); }}
+                          className="w-full text-left px-3 py-2 text-sm text-cyan-400 hover:bg-slate-700 rounded transition-colors flex items-center gap-2"
+                        >
+                          <Search className="w-4 h-4" />
+                          Buscar "{searchQuery}"
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                )}
               </div>
             </div>
           )}

@@ -21,16 +21,19 @@ const features = [
     icon: Shield,
     title: 'Pagos Seguros',
     description: 'Tu dinero está protegido hasta que el servicio sea completado y conformado.',
+    href: '/ayuda/pagos-seguros',
   },
   {
     icon: FileText,
     title: 'Contratos Digitales',
     description: 'Contratos con validez legal que protegen a ambas partes.',
+    href: '/ayuda/contratos-digitales',
   },
   {
     icon: Star,
     title: 'Proveedores Verificados',
     description: 'Todos nuestros proveedores pasan por un riguroso proceso de verificación.',
+    href: '/ayuda/proveedores-verificados',
   },
 ];
 
@@ -98,13 +101,19 @@ export default function HomePage() {
               {features.map((feat) => {
                 const Icon = feat.icon;
                 return (
-                  <div key={feat.title} className="text-center p-6">
-                    <div className="w-14 h-14 bg-cyan-500/10 border border-cyan-500/20 rounded-xl flex items-center justify-center mx-auto mb-4">
-                      <Icon className="w-7 h-7 text-cyan-400" />
+                  <Link key={feat.title} href={feat.href} className="group">
+                    <div className="text-center p-6 hover:shadow-lg hover:shadow-cyan-500/10 rounded-xl transition-all duration-300 bg-slate-800/30 border border-slate-700/50 hover:border-cyan-500/30">
+                      <div className="w-14 h-14 bg-cyan-500/10 border border-cyan-500/20 rounded-xl flex items-center justify-center mx-auto mb-4 group-hover:scale-105 transition-transform">
+                        <Icon className="w-7 h-7 text-cyan-400" />
+                      </div>
+                      <h3 className="text-lg font-semibold text-white mb-2 group-hover:text-cyan-400 transition-colors">{feat.title}</h3>
+                      <p className="text-slate-400">{feat.description}</p>
+                      <div className="mt-4 flex items-center justify-center gap-1 text-cyan-400 text-sm font-medium group-hover:translate-x-1 transition-transform">
+                        <span>Ver más</span>
+                        <ArrowRight className="w-4 h-4" />
+                      </div>
                     </div>
-                    <h3 className="text-lg font-semibold text-white mb-2">{feat.title}</h3>
-                    <p className="text-slate-400">{feat.description}</p>
-                  </div>
+                  </Link>
                 );
               })}
             </div>
@@ -119,11 +128,11 @@ export default function HomePage() {
               Unite a miles de profesionales que ya confían en Contrato Directo para conseguir nuevos clientes.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Link href="/auth/register">
-                <Button size="lg">Registrarse Gratis</Button>
+              <Link href="/proveedores/convertir">
+                <Button size="lg">Quiero Ser Proveedor</Button>
               </Link>
-              <Link href="/ayuda">
-                <Button variant="outline" size="lg">Más Información</Button>
+              <Link href="/auth/register">
+                <Button variant="outline" size="lg">Registrarse como Cliente</Button>
               </Link>
             </div>
           </div>
