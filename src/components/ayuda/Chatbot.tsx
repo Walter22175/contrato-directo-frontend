@@ -38,7 +38,7 @@ function obtenerRespuesta(pregunta: string): string {
 export default function Chatbot() {
   const [abierto, setAbierto] = useState(false);
   const [mensajes, setMensajes] = useState<Mensaje[]>([
-    { id: 1, remitente: 'bot', contenido: '¡Hola! Soy el asistente de Contrato Directo. ¿En qué puedo ayudarte?', fecha: new Date() },
+    { id: 1, remitente: 'bot', contenido: 'Hola soy CoDi el asistente virtual de Contrato Directo. ¿En que puedo ayudarte?', fecha: new Date() },
   ]);
   const [input, setInput] = useState('');
   const scrollRef = useRef<HTMLDivElement>(null);

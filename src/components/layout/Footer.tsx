@@ -7,9 +7,7 @@ export default function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           <div className="col-span-1 md:col-span-2">
             <Link href="/" className="flex items-center gap-2 mb-4">
-              <div className="w-8 h-8 bg-gradient-to-br from-blue-600 to-cyan-400 rounded-lg flex items-center justify-center">
-                <span className="text-white font-bold text-sm">CD</span>
-              </div>
+              <img src="/logo-institucional.png" alt="Contrato Directo" className="w-8 h-8" />
               <span className="text-xl font-bold text-white">Contrato Directo</span>
             </Link>
             <p className="text-slate-400 text-sm">

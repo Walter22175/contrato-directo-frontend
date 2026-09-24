@@ -3,6 +3,8 @@
 import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+import { useState } from 'react';
 import { Search, Shield, FileText, Star, ArrowRight } from 'lucide-react';
 import Button from '@/components/ui/Button';
 
@@ -38,6 +40,15 @@ const features = [
 ];
 
 export default function HomePage() {
+  const router = useRouter();
+  const [heroSearch, setHeroSearch] = useState('');
+
+  const handleHeroSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    const query = heroSearch.trim();
+    if (query) router.push(`/servicios?q=${encodeURIComponent(query)}`);
+  };
+
   return (
     <div className="min-h-screen flex flex-col">
       <Header />
@@ -56,20 +67,22 @@ export default function HomePage() {
               </p>
 
               {/* Search Bar */}
-              <div className="flex flex-col sm:flex-row gap-3 max-w-xl mx-auto">
+              <form onSubmit={handleHeroSearch} className="flex flex-col sm:flex-row gap-3 max-w-xl mx-auto">
                 <div className="relative flex-1">
                   <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
                   <input
                     type="text"
                     placeholder="¿Qué servicio necesitás?"
+                    value={heroSearch}
+                    onChange={(e) => setHeroSearch(e.target.value)}
                     className="w-full pl-11 pr-4 py-3 bg-slate-800 border border-slate-700 rounded-xl text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-cyan-500"
                   />
                 </div>
-                <Button size="lg" className="whitespace-nowrap">
+                <Button type="submit" size="lg" className="whitespace-nowrap">
                   Buscar
                   <ArrowRight className="w-5 h-5 ml-2" />
                 </Button>
-              </div>
+              </form>
             </div>
           </div>
         </section>
