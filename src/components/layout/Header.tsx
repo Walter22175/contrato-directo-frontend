@@ -183,16 +183,23 @@ export default function Header({ onToggleSidebar }: { onToggleSidebar?: () => vo
   };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (!showSearchResults || suggestions.length === 0) return;
+    // Always prevent default for navigation keys to avoid form submission
+    if (e.key === 'ArrowDown' || e.key === 'ArrowUp' || e.key === 'Enter' || e.key === 'Escape') {
+      e.preventDefault();
+    }
+    
+    if (!showSearchResults || suggestions.length === 0) {
+      if (e.key === 'Enter') {
+        handleSearchSubmit(e as unknown as React.FormEvent<HTMLFormElement>);
+      }
+      return;
+    }
     
     if (e.key === 'ArrowDown') {
-      e.preventDefault();
       setSelectedIndex(prev => Math.min(prev + 1, suggestions.length - 1));
     } else if (e.key === 'ArrowUp') {
-      e.preventDefault();
       setSelectedIndex(prev => Math.max(prev - 1, 0));
     } else if (e.key === 'Enter') {
-      e.preventDefault();
       if (selectedIndex >= 0 && suggestions[selectedIndex]) {
         handleSuggestionClick(suggestions[selectedIndex]);
       } else {
