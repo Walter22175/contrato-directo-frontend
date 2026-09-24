@@ -6,6 +6,11 @@ import GlobalChatbot from "@/components/providers/GlobalChatbot";
 export const metadata: Metadata = {
   title: "Contrato Directo - Conecta. Acuerda. Realiza.",
   description: "Plataforma que conecta clientes con proveedores de servicios de confianza en Argentina.",
+  icons: {
+    icon: "/logo-institucional.png",
+    shortcut: "/logo-institucional.png",
+    apple: "/logo-institucional.png",
+  },
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

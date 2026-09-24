@@ -137,9 +137,9 @@ export default function Header({ onToggleSidebar }: { onToggleSidebar?: () => vo
   return (
     <header className="sticky top-0 z-50 bg-slate-900/80 backdrop-blur-md border-b border-slate-800">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-16">
+        <div className="flex items-center justify-between h-24">
           <Link href="/" className="flex items-center gap-2">
-            <img src="/logo-institucional.png" alt="Contrato Directo" className="w-12 h-12" />
+            <img src="/logo-institucional.png" alt="Contrato Directo" className="w-24 h-24" />
             <span className="text-xl font-bold text-white hidden sm:block">Contrato Directo</span>
           </Link>
 
