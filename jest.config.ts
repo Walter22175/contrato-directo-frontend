@@ -12,7 +12,7 @@ const config: Config = {
     '^@/(.*)$': '<rootDir>/src/$1',
     '\\.(css|less|scss|sass)$': 'identity-obj-proxy',
   },
-  testPathIgnorePatterns: ['<rootDir>/.next/', '<rootDir>/node_modules/', 'setup\\.tsx$'],
+  testPathIgnorePatterns: ['<rootDir>/.next/', '<rootDir>/node_modules/', '<rootDir>/tests/e2e/', 'setup\\.tsx$'],
   transform: {
     '^.+\\.(ts|tsx)$': ['@swc/jest', {}],
   },

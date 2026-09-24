@@ -12,6 +12,7 @@ export interface Usuario {
   email_verificado: boolean;
   fecha_registro: string;
   usuario_roles?: UsuarioRol[];
+  perfil_proveedor?: PerfilProveedor;
 }
 
 export interface UsuarioRol {
@@ -389,6 +390,7 @@ export interface CrearSancionDto {
   descripcion: string;
   fecha_inicio: string;
   fecha_fin?: string;
+  id_aplicador?: string;
 }
 
 export type SlaNivel = 'nivel_1' | 'nivel_2' | 'nivel_3' | 'nivel_4' | 'nivel_5';

@@ -12,6 +12,9 @@ import Button from '@/components/ui/Button';
 import Input from '@/components/ui/Input';
 import Select from '@/components/ui/Select';
 import { Eye, EyeOff } from 'lucide-react';
+import SUSModal from '@/components/ui/SUSModal';
+import api from '@/lib/api';
+import { extractData } from '@/lib/api';
 
 const registerSchema = z.object({
   email: z.string().email('Email inválido'),
@@ -28,8 +31,9 @@ type RegisterForm = z.infer<typeof registerSchema>;
 
 export default function RegisterPage() {
   const router = useRouter();
-  const { register: registerUser, error, clearError } = useAuthStore();
+  const { register: registerUser, error, clearError, user } = useAuthStore();
   const [showPassword, setShowPassword] = useState(false);
+  const [showSUS, setShowSUS] = useState(false);
   const errorRef = useRef<HTMLDivElement>(null);
 
   const { register, handleSubmit, reset, formState: { errors, isSubmitting } } = useForm<RegisterForm>({
@@ -47,10 +51,24 @@ export default function RegisterPage() {
     try {
       clearError();
       await registerUser(data);
-      router.push('/dashboard');
+      setShowSUS(true);
     } catch {
       reset({ ...data, password: '', tipo_persona: data.tipo_persona });
     }
+  };
+
+  const handleSUSSubmit = async (score: number, responses: any) => {
+    try {
+      await api.post('/metricas/sus', {
+        ...responses,
+        sus_score: score,
+        flujo: 'registro_cliente',
+        id_usuario: user?.id_usuario,
+      });
+    } catch (e) {
+      console.error('Error enviando SUS:', e);
+    }
+    router.push('/dashboard');
   };
 
   return (
@@ -159,6 +177,16 @@ export default function RegisterPage() {
           </div>
         </div>
       </main>
+
+      <SUSModal
+        open={showSUS}
+        onClose={() => {
+          setShowSUS(false);
+          router.push('/dashboard');
+        }}
+        onSubmit={handleSUSSubmit}
+        context="cliente"
+      />
     </div>
   );
 }
