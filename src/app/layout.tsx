@@ -9,9 +9,9 @@ export const metadata: Metadata = {
   title: "Contrato Directo - Conecta. Acuerda. Realiza.",
   description: "Plataforma que conecta clientes con proveedores de servicios de confianza en Argentina.",
   icons: {
-    icon: "/logo-institucional.png",
-    shortcut: "/logo-institucional.png",
-    apple: "/logo-institucional.png",
+    icon: "/favicon.ico",
+    shortcut: "/favicon.ico",
+    apple: "/favicon.ico",
   },
 };
 
