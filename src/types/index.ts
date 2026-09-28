@@ -526,3 +526,45 @@ export interface Escalamiento {
   id_agente_origen?: string;
   id_agente_destino?: string;
 }
+
+export interface Promocion {
+  id_promocion: number;
+  titulo: string;
+  descripcion: string;
+  precio: number;
+  moneda: string;
+  imagen_url: string;
+  enlace?: string;
+  activa: boolean;
+  orden: number;
+  fecha_inicio: string;
+  fecha_fin?: string;
+  fecha_creacion: string;
+  fecha_actualizacion: string;
+}
+
+export interface CreatePromocionDto {
+  titulo: string;
+  descripcion: string;
+  precio: number;
+  moneda?: string;
+  imagen_url: string;
+  enlace?: string;
+  activa?: boolean;
+  orden?: number;
+  fecha_inicio: string;
+  fecha_fin?: string;
+}
+
+export interface UpdatePromocionDto {
+  titulo?: string;
+  descripcion?: string;
+  precio?: number;
+  moneda?: string;
+  imagen_url?: string;
+  enlace?: string;
+  activa?: boolean;
+  orden?: number;
+  fecha_inicio?: string;
+  fecha_fin?: string;
+}

@@ -2,7 +2,6 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
-import Header from '@/components/layout/Header';
 import Button from '@/components/ui/Button';
 import { useAuthStore } from '@/store/auth';
 import api from '@/lib/api';
@@ -169,27 +168,23 @@ export default function ConvertirProveedorPage() {
 
   if (isProveedor) {
     return (
-      <div className="min-h-screen flex flex-col bg-slate-950">
-        <Header />
-        <main className="flex-1">
-          <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-            <div className="text-center py-12">
-              <Check className="w-16 h-16 text-green-500 mx-auto mb-4" />
-              <h1 className="text-3xl font-bold text-white">Ya eres Proveedor</h1>
-              <p className="text-slate-400 mt-2">Tu cuenta ya tiene el rol de proveedor activo.</p>
-              <Button onClick={() => router.push('/proveedores/verificacion')} className="mt-6" size="lg">
-                Ver estado de verificación
-              </Button>
-            </div>
+      <main className="flex-1">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          <div className="text-center py-12">
+            <Check className="w-16 h-16 text-green-500 mx-auto mb-4" />
+            <h1 className="text-3xl font-bold text-white">Ya eres Proveedor</h1>
+            <p className="text-slate-400 mt-2">Tu cuenta ya tiene el rol de proveedor activo.</p>
+            <Button onClick={() => router.push('/proveedores/verificacion')} className="mt-6" size="lg">
+              Ver estado de verificación
+            </Button>
           </div>
-        </main>
-      </div>
+        </div>
+      </main>
     );
   }
 
   return (
-    <div className="min-h-screen flex flex-col bg-slate-950">
-      <Header />
+    <>
       <main className="flex-1">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <div className="mb-8">
@@ -322,6 +317,6 @@ export default function ConvertirProveedorPage() {
         onSubmit={handleSUSSubmit}
         context="proveedor"
       />
-    </div>
+    </>
   );
 }

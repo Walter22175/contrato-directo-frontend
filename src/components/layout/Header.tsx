@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import { usePathname } from 'next/navigation';
 import { useAuthStore } from '@/store/auth';
 import { useNotificationStore } from '@/store/notifications';
 import { useNotificationsSocket } from '@/hooks/useNotificationsSocket';
@@ -34,6 +35,7 @@ interface SearchSuggestion {
 
 export default function Header({ onToggleSidebar }: { onToggleSidebar?: () => void }) {
   const router = useRouter();
+  const pathname = usePathname();
   const user = useAuthStore((s) => s.user);
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
   const logout = useAuthStore((s) => s.logout);
@@ -160,7 +162,7 @@ export default function Header({ onToggleSidebar }: { onToggleSidebar?: () => vo
     const servMatches = services
       .filter(s => s.nombre.toLowerCase().includes(query))
       .slice(0, 5)
-      .map(s => ({ type: 'servicio' as const, label: s.nombre, value: s.nombre }));
+      .map(s => ({ type: 'servicio' as const, label: s.nombre, value: s.nombre, id_servicio: s.id_servicio }));
 
     sug.push(...recentMatches, ...catMatches, ...servMatches);
     setSuggestions(sug);
@@ -169,12 +171,14 @@ export default function Header({ onToggleSidebar }: { onToggleSidebar?: () => vo
 
   useEffect(() => {
     generateSuggestions();
-    setShowSearchResults(searchQuery.length > 0 || recentSearches.length > 0 || suggestions.length > 0);
+    setShowSearchResults(searchQuery.length > 0);
   }, [generateSuggestions, searchQuery, recentSearches]);
 
-  const handleSuggestionClick = (suggestion: {type: string; value: string; slug?: string}) => {
+  const handleSuggestionClick = (suggestion: {type: string; value: string; slug?: string; id_servicio?: number}) => {
     if (suggestion.type === 'categoria' && suggestion.slug) {
       router.push(`/servicios?categoria=${suggestion.slug}`);
+    } else if (suggestion.type === 'servicio' && suggestion.id_servicio) {
+      router.push(`/servicios/${suggestion.id_servicio}`);
     } else {
       router.push(`/servicios?q=${encodeURIComponent(suggestion.value)}`);
     }
@@ -244,19 +248,22 @@ export default function Header({ onToggleSidebar }: { onToggleSidebar?: () => vo
   };
 
   return (
-    <header className="sticky top-0 z-50 bg-slate-900/80 backdrop-blur-md border-b border-slate-800">
+    <header className="sticky top-0 z-50 bg-white/95 backdrop-blur-md border-b border-slate-200 shadow-sm">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-24">
-          <Link href="/" className="flex items-center gap-2">
-            <img src="/logo-institucional.png" alt="Contrato Directo" className="w-24 h-24" />
-            <span className="text-xl font-bold text-white hidden sm:block">Contrato Directo</span>
-          </Link>
+        <div className="flex items-center justify-between h-28 relative">
+          {/* Cyan accent line at bottom of header */}
+          <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-gradient-to-r from-transparent via-cyan-500 to-transparent opacity-60" />
+          
+            <Link href="/" className="flex items-center gap-2 transition-transform active:scale-90" prefetch={false}>
+              <img src="/logo-institucional.png" alt="Contrato Directo" className="w-24 h-24 transition-transform duration-200" />
+            </Link>
 
           {isAuthenticated && (
             <div className="hidden md:flex flex-1 max-w-md mx-8">
               <div className="relative w-full" ref={searchRef}>
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
-                <form onSubmit={handleSearchSubmit}>
+                <div className="absolute inset-0 bg-gradient-to-r from-cyan-500/10 via-transparent to-cyan-500/10 rounded-xl -m-1 opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none" />
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 group-hover:text-cyan-500 transition-colors" />
+                <form onSubmit={handleSearchSubmit} className="group relative">
                   <input
                     ref={searchInputRef}
                     type="text"
@@ -265,22 +272,22 @@ export default function Header({ onToggleSidebar }: { onToggleSidebar?: () => vo
                     onChange={handleSearchChange}
                     onKeyDown={handleKeyDown}
                     onFocus={() => searchQuery && setShowSearchResults(true)}
-                    className="w-full pl-10 pr-4 py-2 bg-slate-800 border border-slate-700 rounded-lg text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-cyan-500"
+                    className="w-full pl-10 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-lg text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500 group-hover:border-cyan-300 transition-colors duration-200"
                   />
                 </form>
                 {showSearchResults && (recentSearches.length > 0 || searchQuery || suggestions.length > 0) && (
-                  <div className="absolute top-full left-0 right-0 mt-1 bg-slate-800 border border-slate-700 rounded-lg shadow-lg overflow-hidden z-50 max-h-96 overflow-y-auto">
+                  <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-slate-200 rounded-lg shadow-lg overflow-hidden z-50 max-h-96 overflow-y-auto">
                     {recentSearches.length > 0 && (
-                      <div className="p-2 border-b border-slate-700">
+                      <div className="p-2 border-b border-slate-100">
                         <p className="text-xs text-slate-500 px-3 py-1">Búsquedas recientes</p>
                         <div className="max-h-40 overflow-y-auto">
                           {recentSearches.map((term, i) => (
                             <button
                               key={i}
                               onClick={() => { setSearchQuery(term); doSearch(term); }}
-                              className="w-full text-left px-3 py-2 text-sm text-slate-300 hover:bg-slate-700 rounded transition-colors flex items-center gap-2"
+                              className="w-full text-left px-3 py-2 text-sm text-slate-700 hover:bg-slate-50 rounded transition-colors flex items-center gap-2"
                             >
-                              <Search className="w-4 h-4 text-slate-500" />
+                              <Search className="w-4 h-4 text-slate-400" />
                               {term}
                             </button>
                           ))}
@@ -288,35 +295,28 @@ export default function Header({ onToggleSidebar }: { onToggleSidebar?: () => vo
                       </div>
                     )}
                     {suggestions.length > 0 && (
-                      <div className="p-2 border-b border-slate-700">
+                      <div className="p-2 border-b border-slate-100">
                         <p className="text-xs text-slate-500 px-3 py-1">Sugerencias</p>
                         <div className="max-h-40 overflow-y-auto">
                           {suggestions.map((sug, i) => (
                             <button
                               key={i}
-                              onClick={() => {
-                                if (sug.type === 'categoria' && sug.slug) {
-                                  router.push(`/servicios?categoria=${sug.slug}`);
-                                } else {
-                                  router.push(`/servicios?q=${encodeURIComponent(sug.value)}`);
-                                }
-                                setShowSearchResults(false);
-                              }}
+                              onClick={() => handleSuggestionClick(sug)}
                               onMouseEnter={() => setSelectedIndex(i)}
-                              className={`w-full px-3 py-2 text-sm text-left hover:bg-slate-700 rounded transition-colors flex items-center gap-2 ${
-                                i === selectedIndex ? 'bg-slate-700' : ''
+                              className={`w-full px-3 py-2 text-sm text-left hover:bg-slate-50 rounded transition-colors flex items-center gap-2 ${
+                                i === selectedIndex ? 'bg-slate-50' : ''
                               }`}
                             >
                               <div className="w-6 h-6 rounded flex items-center justify-center flex-shrink-0 
-                                {sug.type === 'categoria' ? 'bg-purple-500/20 text-purple-400' : 
-                                 sug.type === 'servicio' ? 'bg-cyan-500/20 text-cyan-400' : 
-                                 'bg-slate-500/20 text-slate-400'}
+                                {sug.type === 'categoria' ? 'bg-purple-100 text-purple-600' : 
+                                 sug.type === 'servicio' ? 'bg-cyan-100 text-cyan-600' : 
+                                 'bg-slate-100 text-slate-500'}
                               ">
                                 {sug.type === 'categoria' && <Box className="w-4 h-4" />}
                                 {sug.type === 'servicio' && <Search className="w-4 h-4" />}
-                                {sug.type === 'recent' && <Search className="w-4 h-4 text-slate-500" />}
+                                {sug.type === 'recent' && <Search className="w-4 h-4 text-slate-400" />}
                               </div>
-                              <span className="text-white font-medium truncate flex-1">{sug.label}</span>
+                              <span className="text-slate-900 font-medium truncate flex-1">{sug.label}</span>
                               <div className="text-xs text-slate-500">
                                 {sug.type === 'categoria' && 'Categoría'}
                                 {sug.type === 'servicio' && 'Servicio'}
@@ -331,7 +331,7 @@ export default function Header({ onToggleSidebar }: { onToggleSidebar?: () => vo
                       <div className="p-2">
                         <button
                           onClick={(e) => { e.preventDefault(); doSearch(searchQuery); }}
-                          className="w-full text-left px-3 py-2 text-sm text-cyan-400 hover:bg-slate-700 rounded transition-colors flex items-center gap-2"
+                          className="w-full text-left px-3 py-2 text-sm text-cyan-600 hover:bg-slate-100 rounded transition-colors flex items-center gap-2"
                         >
                           <Search className="w-4 h-4" />
                           Buscar "{searchQuery}"
@@ -344,16 +344,37 @@ export default function Header({ onToggleSidebar }: { onToggleSidebar?: () => vo
             </div>
           )}
 
-          <nav className="hidden md:flex items-center gap-6">
+<nav className="hidden md:flex items-center gap-6">
             {isAuthenticated ? (
               <>
-                <Link href="/servicios" className="text-slate-300 hover:text-white transition-colors">
+                <Link 
+                  href="/servicios" 
+                  className={`font-medium transition-colors ${
+                    pathname === '/servicios' 
+                      ? 'text-cyan-600 active:text-cyan-700' 
+                      : 'text-slate-600 hover:text-slate-900 active:text-cyan-600'
+                  }`}
+                >
                   Servicios
                 </Link>
-                <Link href="/proveedores" className="text-slate-300 hover:text-white transition-colors">
+                <Link 
+                  href="/proveedores" 
+                  className={`font-medium transition-colors ${
+                    pathname === '/proveedores' 
+                      ? 'text-cyan-600 active:text-cyan-700' 
+                      : 'text-slate-600 hover:text-slate-900 active:text-cyan-600'
+                  }`}
+                >
                   Proveedores
                 </Link>
-                <Link href="/dashboard" className="text-slate-300 hover:text-white transition-colors">
+                <Link 
+                  href="/dashboard" 
+                  className={`font-medium transition-colors ${
+                    pathname.startsWith('/dashboard') 
+                      ? 'text-cyan-600 active:text-cyan-700' 
+                      : 'text-slate-600 hover:text-slate-900 active:text-cyan-600'
+                  }`}
+                >
                   Dashboard
                 </Link>
 
@@ -361,24 +382,24 @@ export default function Header({ onToggleSidebar }: { onToggleSidebar?: () => vo
                 <div className="relative" ref={notifRef}>
                   <button
                     onClick={handleNotifClick}
-                    className="relative text-slate-300 hover:text-white transition-colors"
+                    className="relative text-amber-500 hover:text-amber-600 active:text-amber-700 transition-colors"
                   >
                     <Bell className="w-5 h-5" />
                     {noLeidas > 0 && (
-                      <span className="absolute -top-1 -right-1 w-4 h-4 bg-cyan-500 rounded-full text-xs text-white flex items-center justify-center">
+                      <span className="absolute -top-1 -right-1 w-4 h-4 bg-amber-500 rounded-full text-xs text-white flex items-center justify-center">
                         {noLeidas > 99 ? '99+' : noLeidas}
                       </span>
                     )}
                   </button>
 
                   {notifOpen && (
-                    <div className="absolute right-0 mt-2 w-80 bg-slate-800 border border-slate-700 rounded-lg shadow-xl overflow-hidden">
-                      <div className="flex items-center justify-between px-4 py-3 border-b border-slate-700">
-                        <span className="text-sm font-medium text-white">Notificaciones</span>
+                    <div className="absolute right-0 mt-2 w-80 bg-white border border-slate-200 rounded-lg shadow-xl overflow-hidden">
+                      <div className="flex items-center justify-between px-4 py-3 border-b border-slate-100">
+                        <span className="text-sm font-medium text-slate-900">Notificaciones</span>
                         {noLeidas > 0 && (
                           <button
                             onClick={() => marcarTodasLeidas()}
-                            className="text-xs text-cyan-400 hover:text-cyan-300 flex items-center gap-1"
+                            className="text-xs text-cyan-600 hover:text-cyan-700 flex items-center gap-1"
                           >
                             <Check className="w-3 h-3" />
                             Marcar todas leídas
@@ -395,21 +416,21 @@ export default function Header({ onToggleSidebar }: { onToggleSidebar?: () => vo
                             <button
                               key={notif.id_notificacion}
                               onClick={() => handleNotifItemClick(notif)}
-                              className={`w-full text-left px-4 py-3 border-b border-slate-700/50 hover:bg-slate-700/50 transition-colors ${
-                                !notif.leida ? 'bg-slate-700/30' : ''
+                              className={`w-full text-left px-4 py-3 border-b border-slate-100 hover:bg-slate-50 transition-colors ${
+                                !notif.leida ? 'bg-slate-50' : ''
                               }`}
                             >
                               <div className="flex items-start gap-3">
                                 <div className={`w-2 h-2 rounded-full mt-2 flex-shrink-0 ${
-                                  notif.tipo === 'transaccional' ? 'bg-cyan-400' :
-                                  notif.tipo === 'actividad' ? 'bg-yellow-400' : 'bg-slate-500'
+                                  notif.tipo === 'transaccional' ? 'bg-cyan-500' :
+                                  notif.tipo === 'actividad' ? 'bg-yellow-500' : 'bg-slate-400'
                                 }`} />
                                 <div className="flex-1 min-w-0">
-                                  <p className={`text-sm ${!notif.leida ? 'font-medium text-white' : 'text-slate-300'}`}>
+                                  <p className={`text-sm ${!notif.leida ? 'font-medium text-slate-900' : 'text-slate-600'}`}>
                                     {notif.titulo}
                                   </p>
                                   <p className="text-xs text-slate-500 truncate">{notif.mensaje}</p>
-                                  <p className="text-xs text-slate-600 mt-1">{formatRelativeTime(notif.fecha_envio)}</p>
+                                  <p className="text-xs text-slate-400 mt-1">{formatRelativeTime(notif.fecha_envio)}</p>
                                 </div>
                               </div>
                             </button>
@@ -419,7 +440,7 @@ export default function Header({ onToggleSidebar }: { onToggleSidebar?: () => vo
                       <Link
                         href="/dashboard/notificaciones"
                         onClick={() => setNotifOpen(false)}
-                        className="block px-4 py-3 text-center text-sm text-cyan-400 hover:bg-slate-700/50 border-t border-slate-700"
+                        className="block px-4 py-3 text-center text-sm text-cyan-600 hover:bg-slate-50 border-t border-slate-100"
                       >
                         Ver todas
                       </Link>
@@ -427,50 +448,51 @@ export default function Header({ onToggleSidebar }: { onToggleSidebar?: () => vo
                   )}
                 </div>
 
+                {/* User Menu */}
                 <div className="relative">
                   <button
                     onClick={() => setUserMenuOpen(!userMenuOpen)}
-                    className="flex items-center gap-2 text-slate-300 hover:text-white transition-colors"
+                    className="flex items-center gap-2 text-slate-600 hover:text-slate-900 active:text-cyan-600 transition-colors"
                   >
-                    <div className="w-8 h-8 bg-slate-700 rounded-full flex items-center justify-center">
-                      <User className="w-4 h-4" />
+                    <div className="w-8 h-8 bg-slate-100 rounded-full flex items-center justify-center active:bg-cyan-50">
+                      <User className="w-4 h-4 text-slate-600 active:text-cyan-600" />
                     </div>
-                    <span className="text-sm">{user?.nombre}</span>
-                    <ChevronDown className="w-4 h-4" />
+                    <span className="text-sm text-slate-700">{user?.nombre}</span>
+                    <ChevronDown className="w-4 h-4 text-slate-500 active:text-cyan-600" />
                   </button>
 
-                  {userMenuOpen && (
-                    <div className="absolute right-0 mt-2 w-48 bg-slate-800 border border-slate-700 rounded-lg shadow-xl py-1">
-                      <Link href="/perfil" className="block px-4 py-2 text-sm text-slate-300 hover:bg-slate-700" onClick={() => setUserMenuOpen(false)}>
+                  {userMenuOpen ? (
+                    <div className="absolute right-0 mt-2 w-48 bg-white border border-slate-200 rounded-lg shadow-xl py-1">
+                      <Link href="/perfil" className="block px-4 py-2 text-sm text-slate-700 hover:bg-slate-50" onClick={() => setUserMenuOpen(false)}>
                         Mi Perfil
                       </Link>
-                      <Link href="/dashboard/configuracion" className="block px-4 py-2 text-sm text-slate-300 hover:bg-slate-700" onClick={() => setUserMenuOpen(false)}>
+                      <Link href="/dashboard/configuracion" className="block px-4 py-2 text-sm text-slate-700 hover:bg-slate-50" onClick={() => setUserMenuOpen(false)}>
                         Configuración
                       </Link>
-                      <Link href="/dashboard" className="block px-4 py-2 text-sm text-slate-300 hover:bg-slate-700" onClick={() => setUserMenuOpen(false)}>
+                      <Link href="/dashboard" className="block px-4 py-2 text-sm text-slate-700 hover:bg-slate-50" onClick={() => setUserMenuOpen(false)}>
                         Dashboard
                       </Link>
-                      <hr className="border-slate-700 my-1" />
+                      <hr className="border-slate-100 my-1" />
                       <button
                         onClick={() => { logout(); setUserMenuOpen(false); }}
-                        className="w-full text-left px-4 py-2 text-sm text-red-400 hover:bg-slate-700 flex items-center gap-2"
+                        className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-slate-50 flex items-center gap-2"
                       >
                         <LogOut className="w-4 h-4" />
                         Cerrar Sesión
                       </button>
                     </div>
-                  )}
+                  ) : null}
                 </div>
               </>
             ) : (
-              <>
+              <div className="flex items-center gap-4">
                 <Link href="/auth/login">
-                  <Button variant="ghost" size="sm">Iniciar Sesión</Button>
+                  <Button variant="ghost" size="sm" className="text-slate-600 hover:text-slate-900 hover:bg-slate-100 active:text-cyan-600 active:bg-cyan-50">Iniciar Sesión</Button>
                 </Link>
                 <Link href="/auth/register">
-                  <Button size="sm">Registrarse</Button>
+                  <Button size="sm" className="bg-cyan-600 hover:bg-cyan-700 active:bg-cyan-700 active:text-white">Registrarse</Button>
                 </Link>
-              </>
+              </div>
             )}
           </nav>
 
@@ -479,29 +501,29 @@ export default function Header({ onToggleSidebar }: { onToggleSidebar?: () => vo
               setMobileMenuOpen(false);
               onToggleSidebar?.();
             }}
-            className="md:hidden text-slate-300 hover:text-white"
+            className="md:hidden text-slate-600 hover:text-slate-900"
           >
             <Menu className="w-6 h-6" />
           </button>
         </div>
 
         {mobileMenuOpen && (
-          <div className="md:hidden py-4 border-t border-slate-800">
+          <div className="md:hidden py-4 border-t border-slate-100">
             {isAuthenticated ? (
               <div className="space-y-2">
-                <Link href="/servicios" className="block py-2 text-slate-300 hover:text-white" onClick={() => setMobileMenuOpen(false)}>
+                <Link href="/servicios" className="block py-2 text-slate-600 hover:text-slate-900 active:text-cyan-600" onClick={() => setMobileMenuOpen(false)}>
                   Servicios
                 </Link>
-                <Link href="/proveedores" className="block py-2 text-slate-300 hover:text-white" onClick={() => setMobileMenuOpen(false)}>
+                <Link href="/proveedores" className="block py-2 text-slate-600 hover:text-slate-900 active:text-cyan-600" onClick={() => setMobileMenuOpen(false)}>
                   Proveedores
                 </Link>
-                <Link href="/dashboard" className="block py-2 text-slate-300 hover:text-white" onClick={() => setMobileMenuOpen(false)}>
+                <Link href="/dashboard" className="block py-2 text-slate-600 hover:text-slate-900 active:text-cyan-600" onClick={() => setMobileMenuOpen(false)}>
                   Dashboard
                 </Link>
-                <hr className="border-slate-700" />
+                <hr className="border-slate-100" />
                 <button
                   onClick={() => { logout(); setMobileMenuOpen(false); }}
-                  className="block py-2 text-red-400 hover:text-red-300"
+                  className="block py-2 text-red-600 hover:text-red-700 active:text-red-700"
                 >
                   Cerrar Sesión
                 </button>
@@ -509,10 +531,10 @@ export default function Header({ onToggleSidebar }: { onToggleSidebar?: () => vo
             ) : (
               <div className="space-y-2">
                 <Link href="/auth/login" onClick={() => setMobileMenuOpen(false)}>
-                  <Button variant="outline" className="w-full">Iniciar Sesión</Button>
+                  <Button variant="outline" className="w-full border-slate-200 text-slate-700 hover:bg-slate-50 active:bg-cyan-50 active:text-cyan-600 active:border-cyan-200">Iniciar Sesión</Button>
                 </Link>
                 <Link href="/auth/register" onClick={() => setMobileMenuOpen(false)}>
-                  <Button className="w-full">Registrarse</Button>
+                  <Button size="sm" className="w-full bg-cyan-600 hover:bg-cyan-700 active:bg-cyan-700 active:text-white">Registrarse</Button>
                 </Link>
               </div>
             )}

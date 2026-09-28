@@ -1,14 +1,16 @@
+'use client';
+
 import Link from 'next/link';
 
 export default function Footer() {
+
   return (
     <footer className="bg-slate-900 border-t border-slate-800">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           <div className="col-span-1 md:col-span-2">
-            <Link href="/" className="flex items-center gap-2 mb-4">
-              <img src="/logo-institucional.png" alt="Contrato Directo" className="w-8 h-8" />
-              <span className="text-xl font-bold text-white">Contrato Directo</span>
+<Link href="/" className="flex items-center gap-2 mb-4 transition-transform duration-200 hover:scale-105 active:scale-90 hover:cursor-pointer focus:outline-none focus:ring-0 rounded-full p-1" prefetch={false}>
+              <img src="/logo-institucional.png" alt="Contrato Directo" className="w-8 h-8 transition-transform duration-200" />
             </Link>
             <p className="text-slate-400 text-sm">
               Conecta. Acuerda. Realiza. La plataforma que conecta clientes con proveedores de servicios de confianza.

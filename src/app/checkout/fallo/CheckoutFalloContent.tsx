@@ -2,8 +2,6 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import Header from '@/components/layout/Header';
-import Footer from '@/components/layout/Footer';
 import { Card, CardTitle } from '@/components/ui/Card';
 import Button from '@/components/ui/Button';
 import api, { extractData } from '@/lib/api';
@@ -125,12 +123,9 @@ export function CheckoutFalloContent() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex flex-col">
-        <Header />
-        <main className="flex-1 flex items-center justify-center">
-          <div className="animate-spin w-8 h-8 border-2 border-cyan-500 border-t-transparent rounded-full text-cyan-500" />
-        </main>
-      </div>
+      <main className="flex-1 flex items-center justify-center">
+        <div className="animate-spin w-8 h-8 border-2 border-cyan-500 border-t-transparent rounded-full text-cyan-500" />
+      </main>
     );
   }
 
@@ -140,168 +135,164 @@ export function CheckoutFalloContent() {
   const total = transaccion.monto_acordado + comision;
 
   return (
-    <div className="min-h-screen flex flex-col bg-slate-950">
-      <Header />
-      <main className="flex-1">
-        <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-          {/* Error Header */}
-          <div className="text-center mb-10">
-            <div className="w-20 h-20 bg-red-500/10 border border-red-500/20 rounded-full flex items-center justify-center mx-auto mb-6">
-              <XCircle className="w-10 h-10 text-red-500" />
-            </div>
-            <h1 className="text-3xl font-bold text-white mb-2">{errorInfo.title}</h1>
-            <p className="text-slate-400 text-lg">{errorInfo.description}</p>
+    <main className="flex-1">
+      <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        {/* Error Header */}
+        <div className="text-center mb-10">
+          <div className="w-20 h-20 bg-red-500/10 border border-red-500/20 rounded-full flex items-center justify-center mx-auto mb-6">
+            <XCircle className="w-10 h-10 text-red-500" />
           </div>
+          <h1 className="text-3xl font-bold text-white mb-2">{errorInfo.title}</h1>
+          <p className="text-slate-400 text-lg">{errorInfo.description}</p>
+        </div>
 
-          {/* Solución */}
-          <Card className="mb-6 bg-red-500/10 border-red-500/20">
-            <CardTitle className="flex items-center gap-2">
-              <AlertCircle className="w-5 h-5 text-yellow-400" />
-              ¿Qué podés hacer?
-            </CardTitle>
-            <p className="text-slate-300 mt-3">{errorInfo.solucion}</p>
-          </Card>
+        {/* Solución */}
+        <Card className="mb-6 bg-red-500/10 border-red-500/20">
+          <CardTitle className="flex items-center gap-2">
+            <AlertCircle className="w-5 h-5 text-yellow-400" />
+            ¿Qué podés hacer?
+          </CardTitle>
+          <p className="text-slate-300 mt-3">{errorInfo.solucion}</p>
+        </Card>
 
-          {/* Transaccion Details */}
-          <Card className="mb-6">
-            <CardTitle>Detalle de la Transacción</CardTitle>
-            <div className="mt-4 space-y-4">
-              <div className="flex items-start gap-4">
-                <div className="w-14 h-14 bg-cyan-500/10 border border-cyan-500/20 rounded-xl flex items-center justify-center flex-shrink-0">
-                  <span className="text-2xl">🔧</span>
-                </div>
-                <div className="flex-1">
-                  <h3 className="font-semibold text-white">{transaccion.servicio?.nombre || 'Servicio'}</h3>
-                  <p className="text-sm text-slate-400">{transaccion.proveedor?.nombre} {transaccion.proveedor?.apellido}</p>
-                </div>
+        {/* Transaccion Details */}
+        <Card className="mb-6">
+          <CardTitle>Detalle de la Transacción</CardTitle>
+          <div className="mt-4 space-y-4">
+            <div className="flex items-start gap-4">
+              <div className="w-14 h-14 bg-cyan-500/10 border border-cyan-500/20 rounded-xl flex items-center justify-center flex-shrink-0">
+                <span className="text-2xl">🔧</span>
               </div>
-
-              <div className="grid grid-cols-2 gap-4 pt-4 border-t border-slate-700">
-                <div>
-                  <p className="text-xs text-slate-500">Monto Servicio</p>
-                  <p className="font-semibold text-white">{formatCurrency(transaccion.monto_acordado)}</p>
-                </div>
-                <div>
-                  <p className="text-xs text-slate-500">Total</p>
-                  <p className="font-bold text-cyan-400 text-lg">{formatCurrency(total)}</p>
-                </div>
-                <div>
-                  <p className="text-xs text-slate-500">Tiempo intentado</p>
-                  <p className="font-semibold text-white">{tiempoMinutos}</p>
-                </div>
-                <div>
-                  <p className="text-xs text-slate-500">Código de error</p>
-                  <p className="font-mono text-sm text-red-400">{errorCode}</p>
-                </div>
+              <div className="flex-1">
+                <h3 className="font-semibold text-white">{transaccion.servicio?.nombre || 'Servicio'}</h3>
+                <p className="text-sm text-slate-400">{transaccion.proveedor?.nombre} {transaccion.proveedor?.apellido}</p>
               </div>
             </div>
-          </Card>
 
-          {/* Acciones */}
-          <div className="space-y-4 mb-6">
-            <Button
-              onClick={handleReintentar}
-              disabled={reintentando}
-              className="w-full"
-              size="lg"
-            >
-              {reintentando ? (
-                <>
-                  <span className="animate-spin mr-2">⏳</span>
-                  Reintentando...
-                </>
-              ) : (
-                <>
-                  <RefreshCw className="w-4 h-4 mr-2" />
-                  Reintentar Pago
-                </>
-              )}
-            </Button>
-
-            <Button
-              onClick={handleContactarSoporte}
-              variant="outline"
-              className="w-full"
-              size="lg"
-            >
-              <HelpCircle className="w-4 h-4 mr-2" />
-              Contactar Soporte
-            </Button>
+            <div className="grid grid-cols-2 gap-4 pt-4 border-t border-slate-700">
+              <div>
+                <p className="text-xs text-slate-500">Monto Servicio</p>
+                <p className="font-semibold text-white">{formatCurrency(transaccion.monto_acordado)}</p>
+              </div>
+              <div>
+                <p className="text-xs text-slate-500">Total</p>
+                <p className="font-bold text-cyan-400 text-lg">{formatCurrency(total)}</p>
+              </div>
+              <div>
+                <p className="text-xs text-slate-500">Tiempo intentado</p>
+                <p className="font-semibold text-white">{tiempoMinutos}</p>
+              </div>
+              <div>
+                <p className="text-xs text-slate-500">Código de error</p>
+                <p className="font-mono text-sm text-red-400">{errorCode}</p>
+              </div>
+            </div>
           </div>
+        </Card>
 
-          {/* Alternativas */}
-          <Card className="mb-6 bg-cyan-500/5 border-cyan-500/20">
-            <CardTitle className="flex items-center gap-2">
-              <Shield className="w-5 h-5 text-cyan-400" />
-              Métodos de Pago Alternativos
-            </CardTitle>
-            <div className="mt-4 grid grid-cols-2 gap-4">
-              <div className="p-4 bg-slate-800/50 rounded-xl border border-slate-700 text-center">
-                <div className="w-10 h-10 bg-green-500/10 border border-green-500/20 rounded-full flex items-center justify-center mx-auto mb-2">
-                  <span className="text-2xl">🏦</span>
-                </div>
-                <h4 className="font-semibold text-white">Transferencia Bancaria</h4>
-                <p className="text-sm text-slate-400 mt-1">CBU/CVU - Acreditación 1-24hs</p>
-              </div>
-              <div className="p-4 bg-slate-800/50 rounded-xl border border-slate-700 text-center">
-                <div className="w-10 h-10 bg-cyan-500/10 border border-cyan-500/20 rounded-full flex items-center justify-center mx-auto mb-2">
-                  <span className="text-2xl">💳</span>
-                </div>
-                <h4 className="font-semibold text-white">Otra Tarjeta</h4>
-                <p className="text-sm text-slate-400 mt-1">Visa, Mastercard, Amex, Cabal</p>
-              </div>
-            </div>
-            <p className="text-xs text-slate-500 text-center mt-4">
-              Al reintentar, podrás seleccionar un método diferente en el checkout.
-            </p>
-          </Card>
-
-          {/* Seguridad */}
-          <Card className="mb-6">
-            <CardTitle className="flex items-center gap-2">
-              <Shield className="w-5 h-5 text-green-400" />
-              Tu Seguridad
-            </CardTitle>
-            <ul className="mt-4 space-y-2 text-sm text-slate-400">
-              <li className="flex items-center gap-2"><Shield className="w-4 h-4 text-green-500" /> Tus datos de tarjeta <strong className="text-white">NUNCA</strong> tocan nuestros servidores</li>
-              <li className="flex items-center gap-2"><Shield className="w-4 h-4 text-green-500" /> Procesado por <strong className="text-white">Mercado Pago</strong> (PCI DSS Level 1)</li>
-              <li className="flex items-center gap-2"><Shield className="w-4 h-4 text-green-500" /> Pago en <strong className="text-white">custodia</strong> hasta conformidad del servicio</li>
-            </ul>
-          </Card>
-
-          {/* Navegación */}
-          <div className="flex flex-col sm:flex-row gap-4">
-            {transaccion && (
-              <Button
-                onClick={() => router.push(`/servicios/${transaccion.id_servicio}`)}
-                variant="outline"
-                className="flex-1"
-              >
-                <ArrowLeft className="w-4 h-4 mr-2" />
-                Volver al Servicio
-              </Button>
+        {/* Acciones */}
+        <div className="space-y-4 mb-6">
+          <Button
+            onClick={handleReintentar}
+            disabled={reintentando}
+            className="w-full"
+            size="lg"
+          >
+            {reintentando ? (
+              <>
+                <span className="animate-spin mr-2">⏳</span>
+                Reintentando...
+              </>
+            ) : (
+              <>
+                <RefreshCw className="w-4 h-4 mr-2" />
+                Reintentar Pago
+              </>
             )}
+          </Button>
+
+          <Button
+            onClick={handleContactarSoporte}
+            variant="outline"
+            className="w-full"
+            size="lg"
+          >
+            <HelpCircle className="w-4 h-4 mr-2" />
+            Contactar Soporte
+          </Button>
+        </div>
+
+        {/* Alternativas */}
+        <Card className="mb-6 bg-cyan-500/5 border-cyan-500/20">
+          <CardTitle className="flex items-center gap-2">
+            <Shield className="w-5 h-5 text-cyan-400" />
+            Métodos de Pago Alternativos
+          </CardTitle>
+          <div className="mt-4 grid grid-cols-2 gap-4">
+            <div className="p-4 bg-slate-800/50 rounded-xl border border-slate-700 text-center">
+              <div className="w-10 h-10 bg-green-500/10 border border-green-500/20 rounded-full flex items-center justify-center mx-auto mb-2">
+                <span className="text-2xl">🏦</span>
+              </div>
+              <h4 className="font-semibold text-white">Transferencia Bancaria</h4>
+              <p className="text-sm text-slate-400 mt-1">CBU/CVU - Acreditación 1-24hs</p>
+            </div>
+            <div className="p-4 bg-slate-800/50 rounded-xl border border-slate-700 text-center">
+              <div className="w-10 h-10 bg-cyan-500/10 border border-cyan-500/20 rounded-full flex items-center justify-center mx-auto mb-2">
+                <span className="text-2xl">💳</span>
+              </div>
+              <h4 className="font-semibold text-white">Otra Tarjeta</h4>
+              <p className="text-sm text-slate-400 mt-1">Visa, Mastercard, Amex, Cabal</p>
+            </div>
+          </div>
+          <p className="text-xs text-slate-500 text-center mt-4">
+            Al reintentar, podrás seleccionar un método diferente en el checkout.
+          </p>
+        </Card>
+
+        {/* Seguridad */}
+        <Card className="mb-6">
+          <CardTitle className="flex items-center gap-2">
+            <Shield className="w-5 h-5 text-green-400" />
+            Tu Seguridad
+          </CardTitle>
+          <ul className="mt-4 space-y-2 text-sm text-slate-400">
+            <li className="flex items-center gap-2"><Shield className="w-4 h-4 text-green-500" /> Tus datos de tarjeta <strong className="text-white">NUNCA</strong> tocan nuestros servidores</li>
+            <li className="flex items-center gap-2"><Shield className="w-4 h-4 text-green-500" /> Procesado por <strong className="text-white">Mercado Pago</strong> (PCI DSS Level 1)</li>
+            <li className="flex items-center gap-2"><Shield className="w-4 h-4 text-green-500" /> Pago en <strong className="text-white">custodia</strong> hasta conformidad del servicio</li>
+          </ul>
+        </Card>
+
+        {/* Navegación */}
+        <div className="flex flex-col sm:flex-row gap-4">
+          {transaccion && (
             <Button
-              onClick={() => router.push('/dashboard/transacciones')}
+              onClick={() => router.push(`/servicios/${transaccion.id_servicio}`)}
+              variant="outline"
               className="flex-1"
             >
-              Ver Mis Transacciones
+              <ArrowLeft className="w-4 h-4 mr-2" />
+              Volver al Servicio
             </Button>
-          </div>
-
-          <div className="mt-8 text-center">
-            <p className="text-slate-500 text-sm">
-              ¿Necesitás ayuda?{' '}
-              <a href="/ayuda" className="text-cyan-400 hover:underline">Centro de Ayuda</a>
-              {' '}·{' '}
-              <a href="/dashboard/tickets" className="text-cyan-400 hover:underline">Crear Ticket</a>
-              {' '}·{' '}
-              <a href="/ayuda/faq" className="text-cyan-400 hover:underline">Preguntas Frecuentes</a>
-            </p>
-          </div>
+          )}
+          <Button
+            onClick={() => router.push('/dashboard/transacciones')}
+            className="flex-1"
+          >
+            Ver Mis Transacciones
+          </Button>
         </div>
-      </main>
-      <Footer />
-    </div>
+
+        <div className="mt-8 text-center">
+          <p className="text-slate-500 text-sm">
+            ¿Necesitás ayuda?{' '}
+            <a href="/ayuda" className="text-cyan-400 hover:underline">Centro de Ayuda</a>
+            {' '}·{' '}
+            <a href="/dashboard/tickets" className="text-cyan-400 hover:underline">Crear Ticket</a>
+            {' '}·{' '}
+            <a href="/ayuda/faq" className="text-cyan-400 hover:underline">Preguntas Frecuentes</a>
+          </p>
+        </div>
+      </div>
+    </main>
   );
 }

@@ -3,8 +3,6 @@
 import { useState, useEffect, useMemo, useRef, useCallback } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import Header from '@/components/layout/Header';
-import Footer from '@/components/layout/Footer';
 import { Card } from '@/components/ui/Card';
 import Select from '@/components/ui/Select';
 import api, { extractData } from '@/lib/api';
@@ -167,7 +165,6 @@ export default function ServiciosContent() {
 
   return (
     <div className="min-h-screen flex flex-col">
-      <Header />
       <main className="flex-1">
         <div className="bg-slate-900/50 border-b border-slate-800 py-8">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -195,9 +192,9 @@ export default function ServiciosContent() {
                           onClick={() => handleSuggestionClick(sug)}
                           className="w-full px-4 py-3 text-left hover:bg-slate-700 transition-colors flex items-center gap-3 border-b border-slate-700/50 last:border-0"
                         >
-                          <div className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 
-                            {sug.type === 'categoria' ? 'bg-purple-500/20 text-purple-400' : 'bg-cyan-500/20 text-cyan-400'}
-                          ">
+                          <div className={`w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 ${
+                            sug.type === 'categoria' ? 'bg-purple-500/20 text-purple-400' : 'bg-cyan-500/20 text-cyan-400'
+                          }`}>
                             {sug.type === 'categoria' ? (
                               <Box className="w-4 h-4" />
                             ) : (
@@ -289,8 +286,9 @@ export default function ServiciosContent() {
                       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
                         {filteredCategorias.map((cat) => {
                           const count = servicios.filter(s => s.id_categoria?.toString() === cat.id_categoria.toString()).length;
+                          const catHref = '/servicios?categoria=' + cat.id_categoria;
                           return (
-                            <Link key={cat.id_categoria} href={`/servicios?categoria=${cat.id_categoria}`} className="group">
+                            <Link key={cat.id_categoria} href={catHref} className="group">
                               <Card className="p-4 text-center hover:border-purple-500/50 hover:shadow-lg hover:shadow-purple-500/10 transition-all duration-300 bg-slate-800/50 border-slate-700">
                                 <div className="w-14 h-14 mx-auto mb-3 bg-purple-500/10 border border-purple-500/20 rounded-xl flex items-center justify-center group-hover:scale-105 transition-transform">
                                   <Box className="w-7 h-7 text-purple-400" />
@@ -312,33 +310,36 @@ export default function ServiciosContent() {
                         <h3 className="text-lg font-semibold text-white mb-4">Servicios encontrados</h3>
                       )}
                       <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-                        {filtered.map((s) => (
-                          <Link key={s.id_servicio} href={`/servicios/${s.id_servicio}`}>
-                            <Card hover className="h-full">
-                              <div className="flex items-start justify-between mb-3">
-                                <div className="w-10 h-10 bg-cyan-500/10 border border-cyan-500/20 rounded-lg flex items-center justify-center">
-                                  <span className="text-cyan-400 text-lg">🔧</span>
+                        {filtered.map((s) => {
+                          const servHref = '/servicios/' + s.id_servicio;
+                          return (
+                            <Link key={s.id_servicio} href={servHref}>
+                              <Card hover className="h-full">
+                                <div className="flex items-start justify-between mb-3">
+                                  <div className="w-10 h-10 bg-cyan-500/10 border border-cyan-500/20 rounded-lg flex items-center justify-center">
+                                    <span className="text-cyan-400 text-lg">🔧</span>
+                                  </div>
+                                  <span className="text-xs text-slate-500 bg-slate-700/50 px-2 py-1 rounded">
+                                    {s.categoria?.nombre || 'Servicio'}
+                                  </span>
                                 </div>
-                                <span className="text-xs text-slate-500 bg-slate-700/50 px-2 py-1 rounded">
-                                  {s.categoria?.nombre || 'Servicio'}
-                                </span>
-                              </div>
-                              <h3 className="text-lg font-semibold text-white mb-2">{s.nombre}</h3>
-                              <p className="text-sm text-slate-400 mb-4 line-clamp-2">
-                                {s.descripcion || 'Sin descripción'}
-                              </p>
-                              <div className="flex items-center justify-between text-sm">
-                                <div className="flex items-center gap-1 text-slate-400">
-                                  <Star className="w-4 h-4 text-yellow-400" />
-                                  <span>4.8</span>
+                                <h3 className="text-lg font-semibold text-white mb-2">{s.nombre}</h3>
+                                <p className="text-sm text-slate-400 mb-4 line-clamp-2">
+                                  {s.descripcion || 'Sin descripción'}
+                                </p>
+                                <div className="flex items-center justify-between text-sm">
+                                  <div className="flex items-center gap-1 text-slate-400">
+                                    <Star className="w-4 h-4 text-yellow-400" />
+                                    <span>4.8</span>
+                                  </div>
+                                  <span className="text-cyan-400 font-medium">
+                                    {s.servicios_proveedor?.length || 0} proveedores
+                                  </span>
                                 </div>
-                                <span className="text-cyan-400 font-medium">
-                                  {s.servicios_proveedor?.length || 0} proveedores
-                                </span>
-                              </div>
-                            </Card>
-                          </Link>
-                        ))}
+                              </Card>
+                            </Link>
+                          );
+                        })}
                       </div>
                     </div>
                   )}
@@ -348,7 +349,6 @@ export default function ServiciosContent() {
           )}
         </div>
       </main>
-      <Footer />
     </div>
   );
 }

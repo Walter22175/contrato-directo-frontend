@@ -2,7 +2,6 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
-import Header from '@/components/layout/Header';
 import Button from '@/components/ui/Button';
 import { useAuthStore } from '@/store/auth';
 import { useRegistroProveedorDraft } from '@/hooks/useRegistroProveedorDraft';
@@ -127,123 +126,120 @@ export default function RegistroProveedorPage() {
   const progress = (pasoActual / 6) * 100;
 
   return (
-    <div className="min-h-screen flex flex-col bg-slate-950">
-      <Header />
-      <main className="flex-1">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <div className="mb-8">
-            <div className="flex items-center justify-between mb-4">
-              <div>
-                <h1 className="text-3xl font-bold text-white">Registro como Proveedor</h1>
-                <p className="text-slate-400 mt-1">Completá los 6 pasos para crear tu perfil profesional</p>
-              </div>
-              {draft && !draft.completado && (
-                <Button variant="ghost" size="sm" onClick={() => setShowCancel(true)}>
-                  Cancelar
-                </Button>
-              )}
+    <main className="flex-1">
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="mb-8">
+          <div className="flex items-center justify-between mb-4">
+            <div>
+              <h1 className="text-3xl font-bold text-white">Registro como Proveedor</h1>
+              <p className="text-slate-400 mt-1">Completá los 6 pasos para crear tu perfil profesional</p>
             </div>
+            {draft && !draft.completado && (
+              <Button variant="ghost" size="sm" onClick={() => setShowCancel(true)}>
+                Cancelar
+              </Button>
+            )}
+          </div>
 
-            <div className="relative h-2 bg-slate-800 rounded-full overflow-hidden">
-              <div
-                className="h-full bg-gradient-to-r from-cyan-500 to-cyan-400 transition-all duration-500"
-                style={{ width: `${progress}%` }}
-              />
-            </div>
-            <div className="flex justify-between mt-2 text-xs text-slate-500">
+          <div className="relative h-2 bg-slate-800 rounded-full overflow-hidden">
+            <div
+              className="h-full bg-gradient-to-r from-cyan-500 to-cyan-400 transition-all duration-500"
+              style={{ width: `${progress}%` }}
+            />
+          </div>
+          <div className="flex justify-between mt-2 text-xs text-slate-500">
+            {STEPS.map((step, i) => (
+              <div key={step.key} className="text-center w-full">
+                <span className={`font-medium ${
+                  i + 1 < pasoActual ? 'text-cyan-400' :
+                  i + 1 === pasoActual ? 'text-white' : 'text-slate-500'
+                }`}>
+                  Paso {step.key}
+                </span>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <div className="bg-slate-900/50 border border-slate-800 rounded-2xl p-6 sm:p-8">
+          <div className="flex items-center justify-between mb-6">
+            <div className="flex items-center gap-4">
               {STEPS.map((step, i) => (
-                <div key={step.key} className="text-center w-full">
-                  <span className={`font-medium ${
-                    i + 1 < pasoActual ? 'text-cyan-400' :
-                    i + 1 === pasoActual ? 'text-white' : 'text-slate-500'
+                <div key={step.key} className="flex items-center">
+                  <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium transition-all ${
+                    i + 1 < pasoActual
+                      ? 'bg-green-500 text-white'
+                      : i + 1 === pasoActual
+                      ? 'bg-cyan-500 text-white'
+                      : 'bg-slate-800 text-slate-500 border border-slate-700'
                   }`}>
-                    Paso {step.key}
-                  </span>
+                    {i + 1 < pasoActual ? <Check className="w-4 h-4" /> : step.key}
+                  </div>
+                  {i < STEPS.length - 1 && (
+                    <div className={`w-16 h-0.5 mx-2 ${
+                      i + 1 < pasoActual ? 'bg-green-500' : 'bg-slate-800'
+                    }`} />
+                  )}
                 </div>
               ))}
             </div>
           </div>
 
-          <div className="bg-slate-900/50 border border-slate-800 rounded-2xl p-6 sm:p-8">
-            <div className="flex items-center justify-between mb-6">
-              <div className="flex items-center gap-4">
-                {STEPS.map((step, i) => (
-                  <div key={step.key} className="flex items-center">
-                    <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium transition-all ${
-                      i + 1 < pasoActual
-                        ? 'bg-green-500 text-white'
-                        : i + 1 === pasoActual
-                        ? 'bg-cyan-500 text-white'
-                        : 'bg-slate-800 text-slate-500 border border-slate-700'
-                    }`}>
-                      {i + 1 < pasoActual ? <Check className="w-4 h-4" /> : step.key}
-                    </div>
-                    {i < STEPS.length - 1 && (
-                      <div className={`w-16 h-0.5 mx-2 ${
-                        i + 1 < pasoActual ? 'bg-green-500' : 'bg-slate-800'
-                      }`} />
-                    )}
-                  </div>
-                ))}
-              </div>
-            </div>
+          {pasoActual === 1 && (
+            <Paso1DatosPersonales
+              onNext={(data) => handleNext(1, data)}
+              initialData={wizardData.paso1}
+              disabled={saving}
+            />
+          )}
 
-            {pasoActual === 1 && (
-              <Paso1DatosPersonales
-                onNext={(data) => handleNext(1, data)}
-                initialData={wizardData.paso1}
-                disabled={saving}
-              />
-            )}
+          {pasoActual === 2 && (
+            <Paso2DatosFiscales
+              onNext={(data) => handleNext(2, data)}
+              onBack={handleBack}
+              initialData={wizardData.paso2}
+              disabled={saving}
+              onValidarCuit={validarCuitAfip}
+            />
+          )}
 
-            {pasoActual === 2 && (
-              <Paso2DatosFiscales
-                onNext={(data) => handleNext(2, data)}
-                onBack={handleBack}
-                initialData={wizardData.paso2}
-                disabled={saving}
-                onValidarCuit={validarCuitAfip}
-              />
-            )}
+          {pasoActual === 3 && (
+            <Paso3Contacto
+              onNext={(data) => handleNext(3, data)}
+              onBack={handleBack}
+              initialData={wizardData.paso3}
+              disabled={saving}
+            />
+          )}
 
-            {pasoActual === 3 && (
-              <Paso3Contacto
-                onNext={(data) => handleNext(3, data)}
-                onBack={handleBack}
-                initialData={wizardData.paso3}
-                disabled={saving}
-              />
-            )}
+          {pasoActual === 4 && (
+            <Paso4RubroDescripcion
+              onNext={(data) => handleNext(4, data)}
+              onBack={handleBack}
+              initialData={wizardData.paso4}
+              disabled={saving}
+            />
+          )}
 
-            {pasoActual === 4 && (
-              <Paso4RubroDescripcion
-                onNext={(data) => handleNext(4, data)}
-                onBack={handleBack}
-                initialData={wizardData.paso4}
-                disabled={saving}
-              />
-            )}
+          {pasoActual === 5 && (
+            <Paso5DocumentacionFiscal
+              onNext={(data) => handleNext(5, data)}
+              onBack={handleBack}
+              initialData={wizardData.paso5}
+              disabled={saving}
+            />
+          )}
 
-            {pasoActual === 5 && (
-              <Paso5DocumentacionFiscal
-                onNext={(data) => handleNext(5, data)}
-                onBack={handleBack}
-                initialData={wizardData.paso5}
-                disabled={saving}
-              />
-            )}
-
-            {pasoActual === 6 && (
-              <Paso6Avales
-                onComplete={(data) => handleComplete(data)}
-                onBack={handleBack}
-                initialData={wizardData.paso6}
-                disabled={saving}
-              />
-            )}
-          </div>
+          {pasoActual === 6 && (
+            <Paso6Avales
+              onComplete={(data) => handleComplete(data)}
+              onBack={handleBack}
+              initialData={wizardData.paso6}
+              disabled={saving}
+            />
+          )}
         </div>
-      </main>
+      </div>
 
       {showCancel && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
@@ -276,6 +272,6 @@ export default function RegistroProveedorPage() {
         onSubmit={handleSUSSubmit}
         context="proveedor"
       />
-    </div>
+    </main>
   );
 }

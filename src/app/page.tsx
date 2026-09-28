@@ -1,12 +1,13 @@
 'use client';
 
-import Header from '@/components/layout/Header';
-import Footer from '@/components/layout/Footer';
+import PromocionCarousel from '@/components/layout/PromocionCarousel';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { Search, Shield, FileText, Star, ArrowRight, ChevronRight, Box } from 'lucide-react';
 import Button from '@/components/ui/Button';
+import { Promocion } from '@/types';
+import api, { extractData } from '@/lib/api';
 
 const categories = [
   { name: 'Mantenimiento', icon: '🔧', slug: 'mantenimiento' },
@@ -44,6 +45,7 @@ interface SearchSuggestion {
   label: string;
   value: string;
   slug?: string;
+  id_servicio?: number;
 }
 
 export default function HomePage() {
@@ -52,8 +54,35 @@ export default function HomePage() {
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [suggestions, setSuggestions] = useState<SearchSuggestion[]>([]);
   const [selectedIndex, setSelectedIndex] = useState(-1);
+  const [promociones, setPromociones] = useState<Promocion[]>([]);
+  const [promocionesLoading, setPromocionesLoading] = useState(true);
+  const [servicios, setServicios] = useState<Array<{id_servicio: number; nombre: string; id_categoria: number}>>([]);
   const searchInputRef = useRef<HTMLInputElement>(null);
   const suggestionsRef = useRef<HTMLDivElement>(null);
+
+  const fetchPromociones = useCallback(async () => {
+    try {
+      const res = await api.get('/promociones');
+      const data = extractData<Promocion[]>(res);
+      setPromociones(data || []);
+    } catch {} finally {
+      setPromocionesLoading(false);
+    }
+  }, []);
+
+  const fetchServicios = useCallback(async () => {
+    try {
+      const res = await api.get('/servicios', { params: { activo: true } });
+      const data = extractData<any>(res);
+      const servs = data?.data || data || [];
+      setServicios(servs.map((s: any) => ({ id_servicio: s.id_servicio, nombre: s.nombre, id_categoria: s.id_categoria })));
+    } catch {}
+  }, []);
+
+  useEffect(() => {
+    fetchPromociones();
+    fetchServicios();
+  }, [fetchPromociones, fetchServicios]);
 
   const generateSuggestions = useCallback(() => {
     if (!heroSearch.trim()) {
@@ -76,21 +105,21 @@ export default function HomePage() {
         slug: c.slug,
       }));
 
-    // Could also add common service searches
-    const serviceKeywords = ['plomería', 'electricidad', 'gasista', 'pintura', 'carpintería', 'cerrajería', 'jardinería', 'limpieza', 'mudanzas', 'refrigeración'];
-    const servMatches = serviceKeywords
-      .filter((s) => s.includes(query))
+    // Actual servicios from database
+    const servMatches = servicios
+      .filter((s) => s.nombre.toLowerCase().includes(query))
       .slice(0, 5)
       .map((s) => ({
         type: 'servicio' as const,
-        label: s,
-        value: s,
+        label: s.nombre,
+        value: s.nombre,
+        id_servicio: s.id_servicio,
       }));
 
     sug.push(...catMatches, ...servMatches);
     setSuggestions(sug);
     setSelectedIndex(-1);
-  }, [heroSearch]);
+  }, [heroSearch, servicios]);
 
   useEffect(() => {
     generateSuggestions();
@@ -105,6 +134,8 @@ export default function HomePage() {
   const handleSuggestionClick = (suggestion: SearchSuggestion) => {
     if (suggestion.type === 'categoria' && suggestion.slug) {
       router.push(`/servicios?categoria=${suggestion.slug}`);
+    } else if (suggestion.type === 'servicio' && suggestion.id_servicio) {
+      router.push(`/servicios/${suggestion.id_servicio}`);
     } else {
       router.push(`/servicios?q=${encodeURIComponent(suggestion.value)}`);
     }
@@ -153,7 +184,10 @@ export default function HomePage() {
 
   return (
     <div className="min-h-screen flex flex-col">
-      <Header />
+
+      {!promocionesLoading && (
+        <PromocionCarousel promociones={promociones} />
+      )}
 
       <main className="flex-1">
         {/* Hero */}
@@ -304,8 +338,6 @@ export default function HomePage() {
           </div>
         </section>
       </main>
-
-      <Footer />
     </div>
   );
 }

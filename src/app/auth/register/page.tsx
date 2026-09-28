@@ -7,7 +7,6 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { useAuthStore } from '@/store/auth';
-import Header from '@/components/layout/Header';
 import Button from '@/components/ui/Button';
 import Input from '@/components/ui/Input';
 import Select from '@/components/ui/Select';
@@ -68,12 +67,11 @@ export default function RegisterPage() {
     } catch (e) {
       console.error('Error enviando SUS:', e);
     }
-    router.push('/dashboard');
+    router.push('/');
   };
 
   return (
-    <div className="min-h-screen flex flex-col">
-      <Header />
+    <>
       <main className="flex-1 flex items-center justify-center px-4 py-12">
         <div className="w-full max-w-md">
           <div className="bg-slate-800/50 border border-slate-700 rounded-2xl p-8">
@@ -182,11 +180,11 @@ export default function RegisterPage() {
         open={showSUS}
         onClose={() => {
           setShowSUS(false);
-          router.push('/dashboard');
+          router.push('/');
         }}
         onSubmit={handleSUSSubmit}
         context="cliente"
       />
-    </div>
+    </>
   );
 }

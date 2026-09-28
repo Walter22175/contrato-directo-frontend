@@ -1,7 +1,6 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import Header from '@/components/layout/Header';
 import { Card, CardTitle } from '@/components/ui/Card';
 import Button from '@/components/ui/Button';
 import api, { extractData } from '@/lib/api';
@@ -116,133 +115,127 @@ export default function NotificacionesConfigPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex flex-col">
-        <Header />
-        <main className="flex-1 p-6 lg:p-8">
-          <div className="max-w-3xl mx-auto space-y-4">
-            {[1, 2, 3].map((i) => (
-              <div key={i} className="h-24 bg-slate-800/50 rounded-xl animate-pulse" />
-            ))}
-          </div>
-        </main>
-      </div>
+      <main className="flex-1 p-6 lg:p-8">
+        <div className="max-w-3xl mx-auto space-y-4">
+          {[1, 2, 3].map((i) => (
+            <div key={i} className="h-24 bg-slate-800/50 rounded-xl animate-pulse" />
+          ))}
+        </div>
+      </main>
     );
   }
 
   return (
-    <div className="min-h-screen flex flex-col">
-      <Header />
-      <main className="flex-1 p-6 lg:p-8">
-        <div className="max-w-3xl mx-auto">
-          <h1 className="text-2xl font-bold text-white mb-2">Configuración de Notificaciones</h1>
-          <p className="text-slate-400 mb-8">Elegí cómo y cuándo recibir notificaciones</p>
+    <main className="flex-1 p-6 lg:p-8">
+      <div className="max-w-3xl mx-auto">
+        <h1 className="text-2xl font-bold text-white mb-2">Configuración de Notificaciones</h1>
+        <p className="text-slate-400 mb-8">Elegí cómo y cuándo recibir notificaciones</p>
 
-          {/* Notification types by channel */}
-          <div className="space-y-6">
-            {TIPOS_NOTIFICACION.map((tipo) => (
-              <Card key={tipo.key}>
-                <div className="flex items-start gap-3 mb-4">
-                  <span className="text-2xl">{tipo.icon}</span>
-                  <div>
-                    <CardTitle>{tipo.label}</CardTitle>
-                    <p className="text-sm text-slate-400 mt-1">{tipo.description}</p>
-                  </div>
+        {/* Notification types by channel */}
+        <div className="space-y-6">
+          {TIPOS_NOTIFICACION.map((tipo) => (
+            <Card key={tipo.key}>
+              <div className="flex items-start gap-3 mb-4">
+                <span className="text-2xl">{tipo.icon}</span>
+                <div>
+                  <CardTitle>{tipo.label}</CardTitle>
+                  <p className="text-sm text-slate-400 mt-1">{tipo.description}</p>
                 </div>
+              </div>
 
-                <div className="grid grid-cols-3 gap-3">
-                  {CANALES.map((canal) => {
-                    const pref = getPreferencia(tipo.key, canal.key);
-                    const defaultEnabled = getDefaultEnabled(tipo.key);
-                    const enabled = pref ? pref.habilitada : defaultEnabled;
-                    const Icon = canal.icon;
+              <div className="grid grid-cols-3 gap-3">
+                {CANALES.map((canal) => {
+                  const pref = getPreferencia(tipo.key, canal.key);
+                  const defaultEnabled = getDefaultEnabled(tipo.key);
+                  const enabled = pref ? pref.habilitada : defaultEnabled;
+                  const Icon = canal.icon;
 
-                    return (
-                      <button
-                        key={canal.key}
-                        onClick={() => !tipo.disabled && togglePreferencia(tipo.key, canal.key, enabled)}
-                        disabled={tipo.disabled}
-                        className={`flex items-center gap-2 p-3 rounded-lg border text-sm transition-colors ${
-                          tipo.disabled
-                            ? 'border-slate-700 bg-slate-800/50 text-slate-500 cursor-not-allowed'
-                            : enabled
-                              ? 'border-cyan-500/30 bg-cyan-500/10 text-cyan-400'
-                              : 'border-slate-700 bg-slate-800 text-slate-400 hover:border-slate-600'
-                        }`}
-                      >
-                        <Icon className="w-4 h-4" />
-                        <span>{canal.label}</span>
-                        {enabled && !tipo.disabled && <Check className="w-4 h-4 ml-auto" />}
-                      </button>
-                    );
-                  })}
-                </div>
+                  return (
+                    <button
+                      key={canal.key}
+                      onClick={() => !tipo.disabled && togglePreferencia(tipo.key, canal.key, enabled)}
+                      disabled={tipo.disabled}
+                      className={`flex items-center gap-2 p-3 rounded-lg border text-sm transition-colors ${
+                        tipo.disabled
+                          ? 'border-slate-700 bg-slate-800/50 text-slate-500 cursor-not-allowed'
+                          : enabled
+                            ? 'border-cyan-500/30 bg-cyan-500/10 text-cyan-400'
+                            : 'border-slate-700 bg-slate-800 text-slate-400 hover:border-slate-600'
+                      }`}
+                    >
+                      <Icon className="w-4 h-4" />
+                      <span>{canal.label}</span>
+                      {enabled && !tipo.disabled && <Check className="w-4 h-4 ml-auto" />}
+                    </button>
+                  );
+                })}
+              </div>
 
-                {tipo.key === 'transaccional' && (
-                  <p className="text-xs text-slate-500 mt-3">
-                    Las notificaciones transaccionales son obligatorias y no se pueden desactivar.
-                  </p>
-                )}
-              </Card>
+              {tipo.key === 'transaccional' && (
+                <p className="text-xs text-slate-500 mt-3">
+                  Las notificaciones transaccionales son obligatorias y no se pueden desactivar.
+                </p>
+              )}
+            </Card>
+          ))}
+        </div>
+
+        {/* Email frequency */}
+        <Card className="mt-6">
+          <CardTitle>Frecuencia de resumen por email</CardTitle>
+          <p className="text-sm text-slate-400 mt-1 mb-4">Recibí un resumen de actividad periódicamente</p>
+          <div className="flex gap-3">
+            {FRECUENCIAS.map((freq) => (
+              <button
+                key={freq.key}
+                onClick={() => setFrecuencia(freq.key)}
+                className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+                  frecuencia === freq.key
+                    ? 'bg-cyan-500/20 text-cyan-400 border border-cyan-500/30'
+                    : 'bg-slate-800 text-slate-400 border border-slate-700 hover:text-white'
+                }`}
+              >
+                {freq.label}
+              </button>
             ))}
           </div>
+          <div className="mt-4 flex justify-end">
+            <Button onClick={saveFrecuencia} disabled={saving}>
+              {saved ? (
+                <><Check className="w-4 h-4 mr-2" /> Guardado</>
+              ) : saving ? (
+                'Guardando...'
+              ) : (
+                <><Save className="w-4 h-4 mr-2" /> Guardar frecuencia</>
+              )}
+            </Button>
+          </div>
+        </Card>
 
-          {/* Email frequency */}
-          <Card className="mt-6">
-            <CardTitle>Frecuencia de resumen por email</CardTitle>
-            <p className="text-sm text-slate-400 mt-1 mb-4">Recibí un resumen de actividad periódicamente</p>
-            <div className="flex gap-3">
-              {FRECUENCIAS.map((freq) => (
-                <button
-                  key={freq.key}
-                  onClick={() => setFrecuencia(freq.key)}
-                  className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-                    frecuencia === freq.key
-                      ? 'bg-cyan-500/20 text-cyan-400 border border-cyan-500/30'
-                      : 'bg-slate-800 text-slate-400 border border-slate-700 hover:text-white'
-                  }`}
-                >
-                  {freq.label}
-                </button>
-              ))}
+        {/* Do Not Disturb */}
+        <Card className="mt-6">
+          <CardTitle>Horario de no molestar</CardTitle>
+          <p className="text-sm text-slate-400 mt-1 mb-4">Configurá un horario para no recibir notificaciones push</p>
+          <div className="flex items-center gap-4">
+            <div>
+              <label className="text-sm text-slate-400">Desde</label>
+              <input
+                type="time"
+                defaultValue="22:00"
+                className="block mt-1 px-3 py-2 bg-slate-800 border border-slate-700 rounded-lg text-white text-sm"
+              />
             </div>
-            <div className="mt-4 flex justify-end">
-              <Button onClick={saveFrecuencia} disabled={saving}>
-                {saved ? (
-                  <><Check className="w-4 h-4 mr-2" /> Guardado</>
-                ) : saving ? (
-                  'Guardando...'
-                ) : (
-                  <><Save className="w-4 h-4 mr-2" /> Guardar frecuencia</>
-                )}
-              </Button>
+            <div>
+              <label className="text-sm text-slate-400">Hasta</label>
+              <input
+                type="time"
+                defaultValue="08:00"
+                className="block mt-1 px-3 py-2 bg-slate-800 border border-slate-700 rounded-lg text-white text-sm"
+              />
             </div>
-          </Card>
-
-          {/* Do Not Disturb */}
-          <Card className="mt-6">
-            <CardTitle>Horario de no molestar</CardTitle>
-            <p className="text-sm text-slate-400 mt-1 mb-4">Configurá un horario para no recibir notificaciones push</p>
-            <div className="flex items-center gap-4">
-              <div>
-                <label className="text-sm text-slate-400">Desde</label>
-                <input
-                  type="time"
-                  defaultValue="22:00"
-                  className="block mt-1 px-3 py-2 bg-slate-800 border border-slate-700 rounded-lg text-white text-sm"
-                />
-              </div>
-              <div>
-                <label className="text-sm text-slate-400">Hasta</label>
-                <input
-                  type="time"
-                  defaultValue="08:00"
-                  className="block mt-1 px-3 py-2 bg-slate-800 border border-slate-700 rounded-lg text-white text-sm"
-                />
-              </div>
-            </div>
-          </Card>
-        </div>
-      </main>
-    </div>
+          </div>
+        </Card>
+      </div>
+    </main>
   );
 }

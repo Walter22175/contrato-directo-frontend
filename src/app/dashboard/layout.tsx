@@ -1,6 +1,5 @@
 'use client';
 
-import Header from '@/components/layout/Header';
 import Sidebar from '@/components/layout/Sidebar';
 import { useAuthStore } from '@/store/auth';
 import { useEffect, useState } from 'react';
@@ -12,7 +11,6 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   const user = useAuthStore((s) => s.user);
   const router = useRouter();
   const [mounted, setMounted] = useState(false);
-  const [sidebarOpen, setSidebarOpen] = useState(false);
 
   useEffect(() => {
     setMounted(true);
@@ -36,14 +34,11 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   const isAdmin = role === 'super_admin' || role === 'sistemas';
 
   return (
-    <div className="min-h-screen flex flex-col">
-      <Header onToggleSidebar={() => setSidebarOpen(!sidebarOpen)} />
-      <div className="flex flex-1">
-        <Sidebar role={isAdmin ? 'admin' : role} isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
-        <main className="flex-1 p-4 sm:p-6 lg:p-8">
-          {children}
-        </main>
-      </div>
+    <div className="flex flex-1">
+      <Sidebar role={isAdmin ? 'admin' : role} />
+      <main className="flex-1 p-4 sm:p-6 lg:p-8">
+        {children}
+      </main>
     </div>
   );
 }
