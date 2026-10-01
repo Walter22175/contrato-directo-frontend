@@ -8,7 +8,7 @@ import Header from '@/components/layout/Header';
 describe('Header', () => {
   it('renders the brand name', () => {
     render(<Header />);
-    expect(screen.getByText('Contrato Directo')).toBeInTheDocument();
+    expect(screen.getByAltText('Contrato Directo')).toBeInTheDocument();
   });
 
   it('renders navigation links when authenticated', () => {

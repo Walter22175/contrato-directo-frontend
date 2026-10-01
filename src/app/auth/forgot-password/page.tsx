@@ -12,7 +12,7 @@ import { CheckCircle, Mail } from 'lucide-react';
 import type { JSX } from 'react';
 
 const forgotSchema = z.object({
-  email: z.string().email('Email invalido'),
+  email: z.string().email('Email inválido'),
 });
 
 type ForgotForm = z.infer<typeof forgotSchema>;
@@ -26,7 +26,7 @@ const SentView = (): JSX.Element => {
             <CheckCircle className="w-16 h-16 text-green-400 mx-auto mb-4" />
             <h1 className="text-2xl font-bold text-white mb-2">Email Enviado</h1>
             <p className="text-slate-400 mb-6">
-              Si el email esta registrado, recibiste un enlace para restablecer tu contrasena.
+              Si el email está registrado, recibiste un enlace para restablecer tu contraseña.
             </p>
             <Link href="/auth/login">
               <Button className="w-full">Volver al Login</Button>
@@ -52,8 +52,8 @@ const NotSentView = ({ error, handleSubmit, onSubmit, register, errors, isSubmit
         <div className="bg-slate-800/50 border border-slate-700 rounded-2xl p-8">
           <div className="text-center mb-8">
             <Mail className="w-12 h-12 text-cyan-400 mx-auto mb-4" />
-            <h1 className="text-2xl font-bold text-white">Recuperar Contrasena</h1>
-            <p className="text-slate-400 mt-2">Te enviaremos un enlace para restablecer tu contrasena</p>
+            <h1 className="text-2xl font-bold text-white">Recuperar Contraseña</h1>
+            <p className="text-slate-400 mt-2">Te enviaremos un enlace para restablecer tu contraseña</p>
           </div>
 
           {error && (

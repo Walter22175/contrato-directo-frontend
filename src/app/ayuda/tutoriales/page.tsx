@@ -15,30 +15,30 @@ interface Tutorial {
 const tutoriales: Tutorial[] = [
   {
     id: 'registro-cliente',
-    titulo: 'Como registrarse como cliente',
+    titulo: 'Cómo registrarse como cliente',
     descripcion: 'Crea tu cuenta en menos de 3 pasos',
     icono: UserPlus,
     pasos: [
-      'Haz clic en Registrarse en la pagina principal',
-      'Completa tu email, contrasena y datos personales',
+      'Haz clic en Registrarse en la página principal',
+      'Completa tu email, contraseña y datos personales',
       'Valida tu email y ¡listo! Ya puedes buscar servicios',
     ],
   },
   {
     id: 'buscar-servicio',
-    titulo: 'Como buscar y contratar un servicio',
+    titulo: 'Cómo buscar y contratar un servicio',
     descripcion: 'Encuentra el proveedor perfecto para ti',
     icono: Search,
     pasos: [
       'Usa el buscador para encontrar el servicio que necesitas',
-      'Filtra por categoria, valoracion o precio',
+      'Filtra por categoría, valoración o precio',
       'Selecciona un proveedor y revisa su perfil',
       'Solicita el servicio y acuerda los detalles',
     ],
   },
   {
     id: 'pago',
-    titulo: 'Como realizar un pago',
+    titulo: 'Cómo realizar un pago',
     descripcion: 'Paga de forma segura con Mercado Pago',
     icono: CreditCard,
     pasos: [
@@ -50,26 +50,26 @@ const tutoriales: Tutorial[] = [
   },
   {
     id: 'valorar',
-    titulo: 'Como valorar a un proveedor',
+    titulo: 'Cómo valorar a un proveedor',
     descripcion: 'Deja tu experiencia para ayudar a otros',
     icono: Star,
     pasos: [
-      'Despues de un servicio completado, accede a Mis Valoraciones',
-      'Selecciona la transaccion que quieres valorar',
-      'Puntua del 1 al 5 llaves y deja un comentario (opcional)',
-      'Tu valoracion sera publica despues de moderacion',
+      'Después de un servicio completado, accede a Mis Valoraciones',
+      'Selecciona la transacción que quieres valorar',
+      'Puntúa del 1 al 5 llaves y deja un comentario (opcional)',
+      'Tu valoración será pública después de moderación',
     ],
   },
   {
     id: 'reclamo',
-    titulo: 'Como abrir un reclamo',
-    descripcion: 'Resuelve conflictos a traves del espacio de mediacion',
+    titulo: 'Cómo abrir un reclamo',
+    descripcion: 'Resuelve conflictos a través del espacio de mediación',
     icono: Shield,
     pasos: [
-      'Accede al espacio de mediacion desde tu dashboard',
+      'Accede al espacio de mediación desde tu dashboard',
       'Completa el formulario con los detalles del reclamo',
       'Adjunta evidencia (fotos, capturas, comprobantes)',
-      'El equipo de mediacion revisara y emitira una resolucion',
+      'El equipo de mediación revisará y emitirá una resolución',
     ],
   },
 ];
@@ -85,7 +85,7 @@ export default function TutorialesPage() {
             <span className='text-white'>Tutoriales</span>
           </div>
           <h1 className='text-3xl font-bold text-white mb-2'>Tutoriales Paso a Paso</h1>
-          <p className='text-slate-400'>Aprende a usar Contrato Directo con nuestras guias</p>
+          <p className='text-slate-400'>Aprende a usar Contrato Directo con nuestras guías</p>
         </div>
       </div>
 

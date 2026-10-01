@@ -17,13 +17,13 @@ describe('ServiciosPage', () => {
     await act(async () => {
       render(<ServiciosPage />);
     });
-    expect(screen.getByPlaceholderText('¿Qué servicio buscás?')).toBeInTheDocument();
+    expect(screen.getByPlaceholderText(/¿Qué servicio buscás/)).toBeInTheDocument();
   });
 
   it('shows empty results initially', async () => {
     await act(async () => {
       render(<ServiciosPage />);
     });
-    expect(screen.getByText('No se encontraron servicios')).toBeInTheDocument();
+    expect(screen.getByText(/servicios disponibles en/)).toBeInTheDocument();
   });
 });

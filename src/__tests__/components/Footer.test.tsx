@@ -8,7 +8,7 @@ import Footer from '@/components/layout/Footer';
 describe('Footer', () => {
   it('renders the brand name', () => {
     render(<Footer />);
-    expect(screen.getByText('Contrato Directo')).toBeInTheDocument();
+    expect(screen.getByAltText('Contrato Directo')).toBeInTheDocument();
   });
 
   it('renders tagline', () => {
