@@ -87,7 +87,7 @@ export default function ServiciosContent() {
     const catId = categoria ? parseInt(categoria, 10) : undefined;
     reportarBusquedaFallida({
       consulta: busqueda.trim(),
-      tipo: catId ? 'rubro' : 'servicio',
+      tipo: 'servicio',
       ...(catId ? { id_categoria: catId } : {}),
     });
   }, [sinResultados, busqueda, categoria]);

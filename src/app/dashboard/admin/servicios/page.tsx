@@ -34,23 +34,75 @@ interface MetricasCatalogo {
     categorias: { total: number; activas: number };
     servicios: { total: number; activos: number };
   };
-  busquedas: {
-    total_30d: number;
-    rubro_30d: number;
-    servicio_15d: number;
-    top: { consulta: string; total: number }[];
+  busquedasFallidas: {
+    total30d: number;
+    rubros30d: number;
+    servicios15d: number;
+    umbrales: {
+      rubro: { cantidad: number; dias: number };
+      servicio: { cantidad: number; dias: number };
+    };
   };
   solicitudes: {
     pendientes: number;
-    en_revision: number;
+    enRevision: number;
     aprobadas: number;
     rechazadas: number;
     vencidas: number;
-    automaticas: number;
-    pendientes_implementacion: number;
-    proximas_a_vencer: number;
+    automaticasPorUmbral: number;
+    proximasAVencer: number;
   };
-  revisiones_trimestrales: number;
+  sla: {
+    pendientesImplementacion: number;
+    legalDias: number;
+    implementacionDias: number;
+  };
+  revisionesTrimestrales: number;
+  exito?: {
+    incorporacion: {
+      tiempo_promedio_dias_habiles: number | null;
+      objetivo_dias_habiles: number;
+      cumple: boolean | null;
+      solicitudes_implementadas: number;
+    };
+    tasa_aprobacion: {
+      porcentaje: number | null;
+      rango_objetivo: [number, number];
+      cumple: boolean | null;
+      aprobadas: number;
+      rechazadas: number;
+    };
+    busquedas_fallidas: {
+      periodo_actual_30d: number;
+      periodo_anterior_30d: number;
+      variacion_pct: number | null;
+      objetivo_reduccion_pct: number;
+      cumple: boolean | null;
+    };
+    crecimiento_catalogo: {
+      rubros_incorporados: number;
+      servicios_incorporados: number;
+      objetivo: { rubros_min: number; servicios_min: number; plazo: string };
+      cumple: boolean;
+    };
+    satisfaccion_proveedores: {
+      promedio: number | null;
+      encuestas: number;
+      objetivo_min: number;
+      cumple: boolean | null;
+    };
+  };
+}
+
+interface RevisionTrimestral {
+  id_revision: number;
+  periodo: string;
+  fecha_revision: string;
+  estado: string;
+  resumen?: Record<string, number>;
+  rubros_baja_demanda?: { nombre: string; promedio_mensual: number }[];
+  servicios_baja_demanda?: { nombre: string }[];
+  propuestas_umbrales?: { nombre_propuesto: string; estado: string }[];
 }
 
 interface BusquedaFallida {
@@ -86,7 +138,12 @@ interface SolicitudRubro {
   origen: string;
   fecha_solicitud: string;
   fecha_limite_legal?: string;
+  fecha_limite_implementacion?: string;
+  observaciones?: string;
+  implementada?: boolean;
   solicitante?: { id_usuario: string; nombre: string; apellido: string };
+  votos?: { voto: string }[];
+  apoyos?: { id_apoyo: number }[];
 }
 
 type Tab = 'categorias' | 'servicios' | 'dinamico';
@@ -116,6 +173,8 @@ export default function AdminServiciosPage() {
   const [busquedas, setBusquedas] = useState<BusquedaFallida[]>([]);
   const [temas, setTemas] = useState<TemasResponse | null>(null);
   const [solicitudes, setSolicitudes] = useState<SolicitudRubro[]>([]);
+  const [revisiones, setRevisiones] = useState<RevisionTrimestral[]>([]);
+  const [filtroEstado, setFiltroEstado] = useState<'activas' | 'resueltas'>('activas');
   const [filtroTipo, setFiltroTipo] = useState<'todos' | 'rubro' | 'servicio'>('todos');
   const [evaluando, setEvaluando] = useState(false);
   const [accionando, setAccionando] = useState<number | null>(null);
@@ -141,11 +200,12 @@ export default function AdminServiciosPage() {
   const fetchDinamico = useCallback(async () => {
     setLoadingDinamico(true);
     try {
-      const [metRes, busRes, temRes, solRes] = await Promise.allSettled([
+      const [metRes, busRes, temRes, solRes, revRes] = await Promise.allSettled([
         api.get('/catalogo/metricas'),
         api.get('/catalogo/busquedas-fallidas', { params: { limit: 100 } }),
         api.get('/catalogo/busquedas-fallidas/temas'),
         api.get('/solicitud-rubro'),
+        api.get('/catalogo/revisiones-trimestrales'),
       ]);
       if (metRes.status === 'fulfilled') {
         const d = extractData<any>(metRes.value);
@@ -162,6 +222,10 @@ export default function AdminServiciosPage() {
       if (solRes.status === 'fulfilled') {
         const d = extractData<any>(solRes.value);
         setSolicitudes(d?.data || d || []);
+      }
+      if (revRes.status === 'fulfilled') {
+        const d = extractData<any>(revRes.value);
+        setRevisiones(d?.data || d || []);
       }
     } catch {} finally {
       setLoadingDinamico(false);
@@ -204,6 +268,35 @@ export default function AdminServiciosPage() {
     }
   };
 
+  const generarRevision = async () => {
+    setEvaluando(true);
+    setMsg(null);
+    try {
+      const res = await api.post('/catalogo/revisiones-trimestrales/generar');
+      const d = extractData<any>(res);
+      setMsg({ tipo: 'ok', texto: `Revisión ${d?.periodo ?? ''} generada correctamente` });
+      await fetchDinamico();
+    } catch (e: any) {
+      setMsg({ tipo: 'error', texto: e?.response?.data?.message || 'Error al generar revisión trimestral' });
+    } finally {
+      setEvaluando(false);
+    }
+  };
+
+  const marcarRevisada = async (id: number) => {
+    setAccionando(id);
+    setMsg(null);
+    try {
+      await api.patch(`/catalogo/revisiones-trimestrales/${id}/revisada`);
+      setMsg({ tipo: 'ok', texto: 'Revisión trimestral marcada como revisada' });
+      await fetchDinamico();
+    } catch (e: any) {
+      setMsg({ tipo: 'error', texto: e?.response?.data?.message || 'Error al marcar revisión' });
+    } finally {
+      setAccionando(null);
+    }
+  };
+
   const catsFiltradas = categorias.filter((c) =>
     !busqueda || c.nombre.toLowerCase().includes(busqueda.toLowerCase())
   );
@@ -217,7 +310,9 @@ export default function AdminServiciosPage() {
   );
 
   const solicitudesVisibles = solicitudes.filter((s) =>
-    ['pendiente', 'en_revision', 'vencida'].includes(s.estado)
+    filtroEstado === 'activas'
+      ? ['pendiente', 'en_revision', 'vencida'].includes(s.estado)
+      : ['aprobado', 'rechazado'].includes(s.estado)
   );
 
   const m = metricas;
@@ -352,16 +447,16 @@ export default function AdminServiciosPage() {
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
               <Card className="p-4">
                 <p className="text-xs text-slate-400 mb-1">Búsquedas fallidas (30d)</p>
-                <p className="text-2xl font-bold text-white">{m.busquedas?.total_30d ?? 0}</p>
+                <p className="text-2xl font-bold text-white">{m.busquedasFallidas?.total30d ?? 0}</p>
                 <p className="text-xs text-slate-500 mt-1">
-                  Rubro: {m.busquedas?.rubro_30d ?? 0} · Servicio: {m.busquedas?.servicio_15d ?? 0}
+                  Rubro: {m.busquedasFallidas?.rubros30d ?? 0} · Servicio: {m.busquedasFallidas?.servicios15d ?? 0}
                 </p>
               </Card>
               <Card className="p-4">
                 <p className="text-xs text-slate-400 mb-1">Solicitudes pendientes</p>
                 <p className="text-2xl font-bold text-yellow-400">{m.solicitudes?.pendientes ?? 0}</p>
                 <p className="text-xs text-slate-500 mt-1">
-                  En revisión: {m.solicitudes?.en_revision ?? 0}
+                  En revisión: {m.solicitudes?.enRevision ?? 0} · Prox. a vencer: {m.solicitudes?.proximasAVencer ?? 0}
                 </p>
               </Card>
               <Card className="p-4">
@@ -373,12 +468,65 @@ export default function AdminServiciosPage() {
               </Card>
               <Card className="p-4">
                 <p className="text-xs text-slate-400 mb-1">Revisiones trimestrales</p>
-                <p className="text-2xl font-bold text-white">{m.revisiones_trimestrales ?? 0}</p>
+                <p className="text-2xl font-bold text-white">{m.revisionesTrimestrales ?? 0}</p>
                 <p className="text-xs text-slate-500 mt-1">
-                  Automáticas: {m.solicitudes?.automaticas ?? 0}
+                  Automáticas: {m.solicitudes?.automaticasPorUmbral ?? 0} · SLA impl.: {m.sla?.pendientesImplementacion ?? 0}
                 </p>
               </Card>
             </div>
+          )}
+
+          {/* Métricas de éxito (Objetivo 5) */}
+          {m?.exito && (
+            <Card className="p-5">
+              <div className="flex items-center gap-2 mb-4">
+                <CheckCircle className="w-5 h-5 text-green-400" />
+                <h2 className="text-lg font-semibold text-white">Métricas de éxito del catálogo dinámico</h2>
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                <div className="p-3 bg-slate-800/50 border border-slate-700 rounded-xl">
+                  <p className="text-xs text-slate-400 mb-1">Incorporación aprobada &lt; {m.exito.incorporacion?.objetivo_dias_habiles ?? 15} días hábiles</p>
+                  <p className={`text-xl font-bold ${m.exito.incorporacion?.cumple ? 'text-green-400' : m.exito.incorporacion?.tiempo_promedio_dias_habiles == null ? 'text-slate-400' : 'text-red-400'}`}>
+                    {m.exito.incorporacion?.tiempo_promedio_dias_habiles != null ? `${m.exito.incorporacion.tiempo_promedio_dias_habiles} d.h.` : 'Sin datos'}
+                  </p>
+                  <p className="text-xs text-slate-500 mt-1">{m.exito.incorporacion?.solicitudes_implementadas ?? 0} implementadas</p>
+                </div>
+                <div className="p-3 bg-slate-800/50 border border-slate-700 rounded-xl">
+                  <p className="text-xs text-slate-400 mb-1">Tasa de aprobación objetivo 60-80%</p>
+                  <p className={`text-xl font-bold ${m.exito.tasa_aprobacion?.cumple ? 'text-green-400' : m.exito.tasa_aprobacion?.porcentaje == null ? 'text-slate-400' : 'text-red-400'}`}>
+                    {m.exito.tasa_aprobacion?.porcentaje != null ? `${m.exito.tasa_aprobacion.porcentaje}%` : 'Sin datos'}
+                  </p>
+                  <p className="text-xs text-slate-500 mt-1">{m.exito.tasa_aprobacion?.aprobadas ?? 0} aprobadas · {m.exito.tasa_aprobacion?.rechazadas ?? 0} rechazadas</p>
+                </div>
+                <div className="p-3 bg-slate-800/50 border border-slate-700 rounded-xl">
+                  <p className="text-xs text-slate-400 mb-1">Búsquedas fallidas -30% (30d vs. previos)</p>
+                  <p className={`text-xl font-bold ${m.exito.busquedas_fallidas?.cumple ? 'text-green-400' : m.exito.busquedas_fallidas?.variacion_pct == null ? 'text-slate-400' : 'text-red-400'}`}>
+                    {m.exito.busquedas_fallidas?.variacion_pct != null
+                      ? `${m.exito.busquedas_fallidas.variacion_pct > 0 ? '+' : ''}${m.exito.busquedas_fallidas.variacion_pct}%`
+                      : 'Sin datos'}
+                  </p>
+                  <p className="text-xs text-slate-500 mt-1">
+                    Actual: {m.exito.busquedas_fallidas?.periodo_actual_30d ?? 0} · Anterior: {m.exito.busquedas_fallidas?.periodo_anterior_30d ?? 0}
+                  </p>
+                </div>
+                <div className="p-3 bg-slate-800/50 border border-slate-700 rounded-xl">
+                  <p className="text-xs text-slate-400 mb-1">Crecimiento del catálogo (trimestre)</p>
+                  <p className={`text-xl font-bold ${m.exito.crecimiento_catalogo?.cumple ? 'text-green-400' : 'text-yellow-400'}`}>
+                    {m.exito.crecimiento_catalogo?.rubros_incorporados ?? 0} rubros / {m.exito.crecimiento_catalogo?.servicios_incorporados ?? 0} servicios
+                  </p>
+                  <p className="text-xs text-slate-500 mt-1">
+                    Objetivo: ≥{m.exito.crecimiento_catalogo?.objetivo?.rubros_min ?? 2} rubros, ≥{m.exito.crecimiento_catalogo?.objetivo?.servicios_min ?? 10} servicios
+                  </p>
+                </div>
+                <div className="p-3 bg-slate-800/50 border border-slate-700 rounded-xl">
+                  <p className="text-xs text-slate-400 mb-1">Satisfacción del proceso &gt; 4.0</p>
+                  <p className={`text-xl font-bold ${m.exito.satisfaccion_proveedores?.cumple ? 'text-green-400' : m.exito.satisfaccion_proveedores?.promedio == null ? 'text-slate-400' : 'text-red-400'}`}>
+                    {m.exito.satisfaccion_proveedores?.promedio != null ? `${m.exito.satisfaccion_proveedores.promedio} / 5` : 'Sin datos'}
+                  </p>
+                  <p className="text-xs text-slate-500 mt-1">{m.exito.satisfaccion_proveedores?.encuestas ?? 0} evaluaciones</p>
+                </div>
+              </div>
+            </Card>
           )}
 
           {/* Temas en umbral + evaluar */}
@@ -389,7 +537,7 @@ export default function AdminServiciosPage() {
                 <h2 className="text-lg font-semibold text-white">Temas en umbral</h2>
                 {temas && (
                   <span className="text-xs text-slate-500">
-                    (rubro ≥{temas.umbrales?.rubro?.cantidad}/días, servicio ≥{temas.umbrales?.servicio?.cantidad}/días)
+                    (rubro ≥{temas.umbrales?.rubro?.cantidad} en {temas.umbrales?.rubro?.dias} días · servicio ≥{temas.umbrales?.servicio?.cantidad} en {temas.umbrales?.servicio?.dias} días)
                   </span>
                 )}
               </div>
@@ -434,19 +582,38 @@ export default function AdminServiciosPage() {
             )}
           </Card>
 
-          {/* Solicitudes de rubro activas */}
+          {/* Solicitudes de rubro */}
           <Card className="p-5">
-            <div className="flex items-center gap-2 mb-4">
-              <Gavel className="w-5 h-5 text-cyan-400" />
-              <h2 className="text-lg font-semibold text-white">Solicitudes de rubro</h2>
-              <span className="text-xs text-slate-500">({solicitudesVisibles.length} activas)</span>
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center gap-2">
+                <Gavel className="w-5 h-5 text-cyan-400" />
+                <h2 className="text-lg font-semibold text-white">Solicitudes de rubro</h2>
+                <span className="text-xs text-slate-500">({solicitudesVisibles.length} {filtroEstado === 'activas' ? 'activas' : 'resueltas'})</span>
+              </div>
+              <div className="flex gap-1">
+                {(['activas', 'resueltas'] as const).map((t) => (
+                  <button
+                    key={t}
+                    onClick={() => setFiltroEstado(t)}
+                    className={`px-3 py-1.5 text-xs font-medium rounded-lg transition-colors ${
+                      filtroEstado === t ? 'bg-cyan-600 text-white' : 'bg-slate-800 text-slate-400 hover:text-white'
+                    }`}
+                  >
+                    {t === 'activas' ? 'Activas' : 'Resueltas'}
+                  </button>
+                ))}
+              </div>
             </div>
             {solicitudesVisibles.length === 0 ? (
-              <p className="text-sm text-slate-400">No hay solicitudes pendientes de revisión.</p>
+              <p className="text-sm text-slate-400">
+                {filtroEstado === 'activas' ? 'No hay solicitudes pendientes de revisión.' : 'No hay solicitudes resueltas.'}
+              </p>
             ) : (
               <div className="space-y-3">
                 {solicitudesVisibles.map((s) => {
                   const est = ESTADO_SOLICITUD[s.estado] || { label: s.estado, cls: 'text-slate-400 bg-slate-500/10' };
+                  const minApoyos = s.tipo === 'rubro' ? 5 : 2;
+                  const apoyosActuales = s.apoyos?.length ?? 0;
                   return (
                     <div key={s.id_solicitud} className="p-4 bg-slate-800/50 border border-slate-700 rounded-xl">
                       <div className="flex items-start justify-between gap-4">
@@ -458,13 +625,28 @@ export default function AdminServiciosPage() {
                             {s.origen === 'umbral_automatico' && (
                               <span className="text-xs px-2 py-0.5 rounded bg-purple-500/10 text-purple-400">Automática</span>
                             )}
+                            <span className={`text-xs px-2 py-0.5 rounded ${
+                              apoyosActuales >= minApoyos ? 'bg-green-500/10 text-green-400' : 'bg-orange-500/10 text-orange-400'
+                            }`}>
+                              Apoyos: {apoyosActuales}/{minApoyos}
+                            </span>
+                            {s.votos && s.votos.length > 0 && (
+                              <span className="text-xs px-2 py-0.5 rounded bg-blue-500/10 text-blue-400">
+                                Votos: {s.votos.filter((v) => v.voto === 'aprobar').length} a favor · {s.votos.filter((v) => v.voto === 'rechazar').length} en contra
+                              </span>
+                            )}
                           </div>
                           {s.justificacion && (
                             <p className="text-xs text-slate-400 mt-1 line-clamp-2">{s.justificacion}</p>
                           )}
+                          {s.observaciones && ['aprobado', 'rechazado'].includes(s.estado) && (
+                            <p className="text-xs text-slate-500 mt-1 italic">Motivo: {s.observaciones}</p>
+                          )}
                           <p className="text-xs text-slate-500 mt-1">
                             Solicitado: {new Date(s.fecha_solicitud).toLocaleDateString('es-AR')}
-                            {s.fecha_limite_legal && ` · SLA: ${new Date(s.fecha_limite_legal).toLocaleDateString('es-AR')}`}
+                            {s.fecha_limite_legal && ` · SLA legal: ${new Date(s.fecha_limite_legal).toLocaleDateString('es-AR')}`}
+                            {s.estado === 'aprobado' && s.fecha_limite_implementacion &&
+                              ` · SLA impl.: ${new Date(s.fecha_limite_implementacion).toLocaleDateString('es-AR')}`}
                             {s.solicitante && ` · ${s.solicitante.nombre} ${s.solicitante.apellido}`}
                           </p>
                         </div>
@@ -474,7 +656,9 @@ export default function AdminServiciosPage() {
                               onClick={() => resolverSolicitud(s.id_solicitud, 'aprobado')}
                               disabled={accionando === s.id_solicitud}
                               className="p-2 bg-green-500/10 hover:bg-green-500/20 text-green-400 rounded-lg transition-colors disabled:opacity-50"
-                              title="Aprobar"
+                              title={apoyosActuales < minApoyos
+                                ? `Requiere ${minApoyos} apoyos de proveedores verificados (${apoyosActuales}/${minApoyos})`
+                                : 'Aprobar'}
                             >
                               <CheckCircle className="w-4 h-4" />
                             </button>
@@ -492,6 +676,89 @@ export default function AdminServiciosPage() {
                     </div>
                   );
                 })}
+              </div>
+            )}
+          </Card>
+
+          {/* Revisiones trimestrales */}
+          <Card className="p-5">
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center gap-2">
+                <Clock className="w-5 h-5 text-purple-400" />
+                <h2 className="text-lg font-semibold text-white">Revisión trimestral del catálogo</h2>
+                <span className="text-xs text-slate-500">({revisiones.length})</span>
+              </div>
+              <button
+                onClick={generarRevision}
+                disabled={evaluando}
+                className="flex items-center gap-2 px-4 py-2 bg-purple-600 hover:bg-purple-500 disabled:opacity-50 text-white text-sm font-medium rounded-lg transition-colors"
+              >
+                <RefreshCw className={`w-4 h-4 ${evaluando ? 'animate-spin' : ''}`} />
+                {evaluando ? 'Generando...' : 'Generar ahora'}
+              </button>
+            </div>
+            {revisiones.length === 0 ? (
+              <p className="text-sm text-slate-400">
+                No hay revisiones trimestrales generadas. La próxima se ejecuta automáticamente el 1 de enero/abril/julio/octubre a las 3:00 AM.
+              </p>
+            ) : (
+              <div className="space-y-3">
+                {revisiones.map((r) => (
+                  <div key={r.id_revision} className="p-4 bg-slate-800/50 border border-slate-700 rounded-xl">
+                    <div className="flex items-start justify-between gap-4">
+                      <div className="min-w-0">
+                        <div className="flex items-center gap-2 flex-wrap">
+                          <h3 className="text-sm font-medium text-white">{r.periodo}</h3>
+                          <span className="text-xs px-2 py-0.5 rounded bg-slate-700 text-slate-300">
+                            {new Date(r.fecha_revision).toLocaleDateString('es-AR')}
+                          </span>
+                          <span className={`text-xs px-2 py-0.5 rounded ${
+                            r.estado === 'revisada' ? 'text-green-400 bg-green-500/10' : 'text-yellow-400 bg-yellow-500/10'
+                          }`}>
+                            {r.estado === 'revisada' ? 'Revisada' : 'Pendiente de revisión'}
+                          </span>
+                        </div>
+                        {r.resumen && (
+                          <p className="text-xs text-slate-500 mt-1">
+                            {Object.entries(r.resumen).map(([k, v]) => `${k}: ${v}`).join(' · ')}
+                          </p>
+                        )}
+                        {(r.rubros_baja_demanda?.length || r.servicios_baja_demanda?.length || r.propuestas_umbrales?.length) ? (
+                          <div className="mt-2 space-y-1 text-xs text-slate-400">
+                            {r.rubros_baja_demanda && r.rubros_baja_demanda.length > 0 && (
+                              <p>
+                                <span className="text-orange-400">Baja demanda (rubros):</span>{' '}
+                                {r.rubros_baja_demanda.map((x) => `${x.nombre} (${x.promedio_mensual}/mes)`).join(', ')}
+                              </p>
+                            )}
+                            {r.servicios_baja_demanda && r.servicios_baja_demanda.length > 0 && (
+                              <p>
+                                <span className="text-orange-400">Baja demanda (servicios):</span>{' '}
+                                {r.servicios_baja_demanda.map((x) => x.nombre).join(', ')}
+                              </p>
+                            )}
+                            {r.propuestas_umbrales && r.propuestas_umbrales.length > 0 && (
+                              <p>
+                                <span className="text-cyan-400">Propuestas por umbral:</span>{' '}
+                                {r.propuestas_umbrales.map((x) => `${x.nombre_propuesto} (${x.estado})`).join(', ')}
+                              </p>
+                            )}
+                          </div>
+                        ) : null}
+                      </div>
+                      {r.estado !== 'revisada' && (
+                        <button
+                          onClick={() => marcarRevisada(r.id_revision)}
+                          disabled={accionando === r.id_revision}
+                          className="flex items-center gap-1.5 px-3 py-1.5 bg-green-500/10 hover:bg-green-500/20 text-green-400 text-xs font-medium rounded-lg transition-colors disabled:opacity-50 flex-shrink-0"
+                        >
+                          <CheckCircle className="w-3.5 h-3.5" />
+                          Marcar revisada
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                ))}
               </div>
             )}
           </Card>

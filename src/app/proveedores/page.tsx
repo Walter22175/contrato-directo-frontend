@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback, useMemo } from 'react';
 import Link from 'next/link';
 import { Card } from '@/components/ui/Card';
 import api, { extractData } from '@/lib/api';
+import { reportarBusquedaFallida } from '@/lib/catalogo';
 import {
   Search, Star, Shield, Award, ChevronLeft, ChevronRight,
   SlidersHorizontal, X, ArrowUpDown, Clock, TrendingUp, Users
@@ -181,6 +182,20 @@ export default function ProveedoresPage() {
 
   const totalPages = Math.ceil(filtered.length / ITEMS_PER_PAGE);
   const paginated = filtered.slice((page - 1) * ITEMS_PER_PAGE, page * ITEMS_PER_PAGE);
+
+  const sinResultados = !loading && !!filters.busqueda.trim() && filtered.length === 0;
+
+  useEffect(() => {
+    if (!sinResultados) return;
+    const matchCategoria = categorias.find((c) =>
+      c.nombre.toLowerCase().includes(filters.busqueda.trim().toLowerCase())
+    );
+    reportarBusquedaFallida({
+      consulta: filters.busqueda.trim(),
+      tipo: matchCategoria ? 'rubro' : 'servicio',
+      ...(matchCategoria ? { id_categoria: matchCategoria.id_categoria } : {}),
+    });
+  }, [sinResultados, filters.busqueda, categorias]);
 
   useEffect(() => { setPage(1); }, [filters, sortBy, sortDir]);
 

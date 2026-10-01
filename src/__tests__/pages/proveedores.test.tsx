@@ -57,4 +57,18 @@ describe('ProveedoresPage', () => {
     expect(screen.getByText('Recientes:')).toBeInTheDocument();
     expect(screen.getByText('Plomero')).toBeInTheDocument();
   });
+
+  it('reports a failed search when no providers match', async () => {
+    await act(async () => {
+      render(<ProveedoresPage />);
+    });
+    const input = screen.getByPlaceholderText('Buscar proveedores...');
+    await act(async () => {
+      fireEvent.change(input, { target: { value: 'gomeria' } });
+    });
+    expect(api.post).toHaveBeenCalledWith('/catalogo/busquedas-fallidas', {
+      consulta: 'gomeria',
+      tipo: 'servicio',
+    });
+  });
 });
