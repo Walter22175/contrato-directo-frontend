@@ -10,7 +10,7 @@ import Link from 'next/link';
 
 interface Solicitud {
   id_solicitud: number;
-  nombre_rubro: string;
+  nombre_propuesto: string;
   descripcion: string;
   estado: string;
   fecha_solicitud: string;
@@ -23,13 +23,14 @@ export default function SolicitudRubroPage() {
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
   const [sending, setSending] = useState(false);
-  const [form, setForm] = useState({ nombre_rubro: '', descripcion: '', justificacion: '' });
+  const [formError, setFormError] = useState<string | null>(null);
+  const [form, setForm] = useState({ tipo: 'rubro', nombre_propuesto: '', descripcion: '', justificacion: '' });
 
   const fetchSolicitudes = useCallback(async () => {
     if (!user?.id_usuario) return;
     setLoading(true);
     try {
-      const res = await api.get('/solicitud-rubro', { params: { id_solicitante: user.id_usuario } });
+      const res = await api.get('/solicitud-rubro');
       const data = extractData<any>(res);
       setSolicitudes(data?.data || data || []);
     } catch {
@@ -43,17 +44,23 @@ export default function SolicitudRubroPage() {
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
-    if (!form.nombre_rubro.trim() || !form.descripcion.trim() || !user?.id_usuario) return;
+    if (!form.nombre_propuesto.trim() || !form.descripcion.trim()) return;
     setSending(true);
+    setFormError(null);
     try {
       await api.post('/solicitud-rubro', {
-        ...form,
-        id_solicitante: user.id_usuario,
+        tipo: form.tipo,
+        nombre_propuesto: form.nombre_propuesto.trim(),
+        descripcion: form.descripcion.trim(),
+        justificacion: form.justificacion.trim() || undefined,
       });
-      setForm({ nombre_rubro: '', descripcion: '', justificacion: '' });
+      setForm({ tipo: 'rubro', nombre_propuesto: '', descripcion: '', justificacion: '' });
       setShowForm(false);
       await fetchSolicitudes();
-    } catch {} finally {
+    } catch (err: any) {
+      const msg = err?.response?.data?.message || 'No se pudo enviar la solicitud.';
+      setFormError(Array.isArray(msg) ? msg.join(' — ') : String(msg));
+    } finally {
       setSending(false);
     }
   };
@@ -63,9 +70,10 @@ export default function SolicitudRubroPage() {
 
   const estadoColors: Record<string, string> = {
     pendiente: 'text-yellow-400 bg-yellow-500/10',
-    aprobada: 'text-green-400 bg-green-500/10',
-    rechazada: 'text-red-400 bg-red-500/10',
-    en_evaluacion: 'text-blue-400 bg-blue-500/10',
+    aprobado: 'text-green-400 bg-green-500/10',
+    rechazado: 'text-red-400 bg-red-500/10',
+    en_revision: 'text-blue-400 bg-blue-500/10',
+    vencida: 'text-orange-400 bg-orange-500/10',
   };
 
   const inputCls = 'w-full px-4 py-2.5 bg-slate-800 border border-slate-600 rounded-lg text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-transparent';
@@ -90,15 +98,33 @@ export default function SolicitudRubroPage() {
         {showForm && (
           <Card>
             <form onSubmit={handleSubmit} className="p-6 space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-slate-300 mb-1">Nombre del Rubro</label>
-                <input
-                  className={inputCls}
-                  placeholder="Ej: Instalación de Paneles Solares"
-                  value={form.nombre_rubro}
-                  onChange={(e) => setForm({ ...form, nombre_rubro: e.target.value })}
-                  required
-                />
+              {formError && (
+                <div className="p-3 rounded-lg border border-red-500/30 bg-red-500/10 text-red-400 text-sm">
+                  {formError}
+                </div>
+              )}
+              <div className="grid gap-4 sm:grid-cols-2">
+                <div>
+                  <label className="block text-sm font-medium text-slate-300 mb-1">Tipo</label>
+                  <select
+                    className={inputCls}
+                    value={form.tipo}
+                    onChange={(e) => setForm({ ...form, tipo: e.target.value })}
+                  >
+                    <option value="rubro">Rubro</option>
+                    <option value="servicio">Servicio</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-slate-300 mb-1">Nombre Propuesto</label>
+                  <input
+                    className={inputCls}
+                    placeholder="Ej: Instalación de Paneles Solares"
+                    value={form.nombre_propuesto}
+                    onChange={(e) => setForm({ ...form, nombre_propuesto: e.target.value })}
+                    required
+                  />
+                </div>
               </div>
               <div>
                 <label className="block text-sm font-medium text-slate-300 mb-1">Descripción</label>
@@ -163,7 +189,7 @@ export default function SolicitudRubroPage() {
                   <div className="p-4">
                     <div className="flex items-start justify-between">
                       <div>
-                        <h3 className="font-medium text-white">{s.nombre_rubro}</h3>
+                        <h3 className="font-medium text-white">{s.nombre_propuesto}</h3>
                         <p className="text-sm text-slate-400 mt-1">{s.descripcion}</p>
                       </div>
                       <span className={`text-xs px-2 py-0.5 rounded ${estadoColors[s.estado] || 'text-slate-400 bg-slate-500/10'}`}>

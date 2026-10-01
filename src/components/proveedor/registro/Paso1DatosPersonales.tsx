@@ -9,18 +9,28 @@ import Select from '@/components/ui/Select';
 import Button from '@/components/ui/Button';
 import { Eye, EyeOff, CheckCircle, AlertCircle } from 'lucide-react';
 
-const paso1Schema = z.object({
+const baseFields = {
   nombre: z.string().min(1, 'El nombre es obligatorio').max(100),
   apellido: z.string().optional(),
   email: z.string().email('Email inválido'),
+  tipo_persona: z.enum(['fisica', 'juridica'], { required_error: 'Seleccioná un tipo' }),
+};
+
+const paso1Schema = z.object({
+  ...baseFields,
   password: z.string()
     .min(8, 'Mínimo 8 caracteres')
     .regex(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/, 'Debe tener mayúscula, minúscula y número'),
   confirmPassword: z.string(),
-  tipo_persona: z.enum(['fisica', 'juridica'], { required_error: 'Seleccioná un tipo' }),
 }).refine((data) => data.password === data.confirmPassword, {
   message: 'Las contraseñas no coinciden',
   path: ['confirmPassword'],
+});
+
+const paso1SchemaSinPassword = z.object({
+  ...baseFields,
+  password: z.string().optional(),
+  confirmPassword: z.string().optional(),
 });
 
 type Paso1Form = z.infer<typeof paso1Schema>;
@@ -29,9 +39,15 @@ interface Paso1DatosPersonalesProps {
   onNext: (data: Paso1Form) => Promise<void>;
   initialData?: Partial<Paso1Form>;
   disabled?: boolean;
+  ocultarPassword?: boolean;
 }
 
-export default function Paso1DatosPersonales({ onNext, initialData, disabled }: Paso1DatosPersonalesProps) {
+export default function Paso1DatosPersonales({
+  onNext,
+  initialData,
+  disabled,
+  ocultarPassword = false,
+}: Paso1DatosPersonalesProps) {
   const [showPassword, setShowPassword] = useState(false);
   const [validating, setValidating] = useState(false);
   const [emailCheck, setEmailCheck] = useState<'idle' | 'checking' | 'available' | 'taken'>('idle');
@@ -43,7 +59,9 @@ export default function Paso1DatosPersonales({ onNext, initialData, disabled }: 
     setValue,
     formState: { errors, isSubmitting },
   } = useForm<Paso1Form>({
-    resolver: zodResolver(paso1Schema),
+    resolver: zodResolver(
+      ocultarPassword ? paso1SchemaSinPassword : paso1Schema,
+    ) as any,
     defaultValues: {
       tipo_persona: 'fisica',
       ...initialData,
@@ -129,52 +147,56 @@ export default function Paso1DatosPersonales({ onNext, initialData, disabled }: 
         )}
       </div>
 
-      <div className="relative">
-        <Input
-          label="Contraseña *"
-          type={showPassword ? 'text' : 'password'}
-          placeholder="Mínimo 8 caracteres"
-          error={errors.password?.message}
-          {...register('password')}
-          disabled={disabled || isSubmitting || validating}
-        />
-        <button
-          type="button"
-          onClick={() => setShowPassword(!showPassword)}
-          className="absolute right-3 top-9 text-slate-400 hover:text-white disabled:opacity-50"
-          disabled={disabled || isSubmitting || validating}
-        >
-          {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
-        </button>
-      </div>
-
-      {password && (
-        <div className="space-y-1.5 pl-1">
-          <p className="text-xs text-slate-400">Requisitos:</p>
-          <div className="grid grid-cols-2 gap-1.5">
-            {passwordRequirements.map((req) => (
-              <div
-                key={req.label}
-                className={`flex items-center gap-1.5 text-xs ${
-                  req.test(password) ? 'text-green-400' : 'text-slate-500'
-                }`}
-              >
-                <CheckCircle className={`w-3.5 h-3.5 ${req.test(password) ? 'fill-current' : 'opacity-30'}`} />
-                <span>{req.label}</span>
-              </div>
-            ))}
+      {!ocultarPassword && (
+        <>
+          <div className="relative">
+            <Input
+              label="Contraseña *"
+              type={showPassword ? 'text' : 'password'}
+              placeholder="Mínimo 8 caracteres"
+              error={errors.password?.message}
+              {...register('password')}
+              disabled={disabled || isSubmitting || validating}
+            />
+            <button
+              type="button"
+              onClick={() => setShowPassword(!showPassword)}
+              className="absolute right-3 top-9 text-slate-400 hover:text-white disabled:opacity-50"
+              disabled={disabled || isSubmitting || validating}
+            >
+              {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+            </button>
           </div>
-        </div>
-      )}
 
-      <Input
-        label="Confirmar Contraseña *"
-        type={showPassword ? 'text' : 'password'}
-        placeholder="Repetí tu contraseña"
-        error={errors.confirmPassword?.message}
-        {...register('confirmPassword')}
-        disabled={disabled || isSubmitting || validating}
-      />
+          {password && (
+            <div className="space-y-1.5 pl-1">
+              <p className="text-xs text-slate-400">Requisitos:</p>
+              <div className="grid grid-cols-2 gap-1.5">
+                {passwordRequirements.map((req) => (
+                  <div
+                    key={req.label}
+                    className={`flex items-center gap-1.5 text-xs ${
+                      req.test(password) ? 'text-green-400' : 'text-slate-500'
+                    }`}
+                  >
+                    <CheckCircle className={`w-3.5 h-3.5 ${req.test(password) ? 'fill-current' : 'opacity-30'}`} />
+                    <span>{req.label}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          <Input
+            label="Confirmar Contraseña *"
+            type={showPassword ? 'text' : 'password'}
+            placeholder="Repetí tu contraseña"
+            error={errors.confirmPassword?.message}
+            {...register('confirmPassword')}
+            disabled={disabled || isSubmitting || validating}
+          />
+        </>
+      )}
 
       <Select
         label="Tipo de Persona *"

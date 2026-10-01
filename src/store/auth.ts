@@ -22,6 +22,7 @@ interface AuthState {
   logout: () => void;
   loadUser: () => Promise<void>;
   clearError: () => void;
+  cambiarContexto: (rol: 'cliente' | 'proveedor') => Promise<string>;
 }
 
 export const useAuthStore = create<AuthState>((set) => ({
@@ -114,4 +115,23 @@ export const useAuthStore = create<AuthState>((set) => ({
   },
 
   clearError: () => set({ error: null }),
+
+  cambiarContexto: async (rol: 'cliente' | 'proveedor') => {
+    try {
+      const res = await api.post('/auth/contexto', { rol });
+      const data = extractData<{ access_token: string; refresh_token: string; contexto: string; usuario: Partial<Usuario> }>(res);
+      if (data.access_token && data.refresh_token) {
+        localStorage.setItem('access_token', data.access_token);
+        localStorage.setItem('refresh_token', data.refresh_token);
+        setCookies(data.access_token, data.refresh_token);
+      }
+      localStorage.setItem('contexto_activo', data.contexto || rol);
+      if (data.usuario) set({ user: data.usuario });
+      return data.contexto || rol;
+    } catch (err: any) {
+      const message = err.response?.data?.message || 'No se pudo cambiar de rol';
+      set({ error: Array.isArray(message) ? message.join(' — ') : message });
+      throw err;
+    }
+  },
 }));

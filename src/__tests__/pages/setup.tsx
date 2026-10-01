@@ -1,11 +1,14 @@
 import React from 'react';
 
-jest.mock('next/navigation', () => ({
-  useRouter: () => ({ push: jest.fn(), back: jest.fn(), refresh: jest.fn() }),
-  useSearchParams: () => new URLSearchParams(),
-  usePathname: () => '',
-  useParams: () => ({ id: 'test-id' }),
-}));
+jest.mock('next/navigation', () => {
+  const router = { push: jest.fn(), back: jest.fn(), refresh: jest.fn(), replace: jest.fn() };
+  return {
+    useRouter: () => router,
+    useSearchParams: () => new URLSearchParams(),
+    usePathname: () => '',
+    useParams: () => ({ id: 'test-id' }),
+  };
+});
 
 jest.mock('next/link', () => {
   const MockLink = ({ children, href, ...props }: any) => (
@@ -28,7 +31,7 @@ const mockUser = {
   direccion: 'Calle Falsa 123',
   cuit_cuil: '20304050607',
   dni: '30405060',
-  usuario_roles: [{ rol: { nombre: 'cliente' } }],
+  usuario_roles: [{ activo: true, rol: { nombre: 'cliente' } }],
 };
 
 const mockStore = {
@@ -40,6 +43,7 @@ const mockStore = {
   register: jest.fn(),
   loadUser: jest.fn(),
   clearError: jest.fn(),
+  cambiarContexto: jest.fn(() => Promise.resolve('cliente')),
   error: null,
 };
 

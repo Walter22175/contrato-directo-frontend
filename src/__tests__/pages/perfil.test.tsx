@@ -39,6 +39,13 @@ describe('PerfilPage', () => {
     await act(async () => {
       render(<PerfilPage />);
     });
-    expect(screen.getByText('cliente')).toBeInTheDocument();
+    expect(screen.getByText('Cliente')).toBeInTheDocument();
+  });
+
+  it('shows convert CTA for cliente without provider role', async () => {
+    await act(async () => {
+      render(<PerfilPage />);
+    });
+    expect(screen.getByText('Convertirme en Proveedor')).toBeInTheDocument();
   });
 });

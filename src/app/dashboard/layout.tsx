@@ -30,8 +30,16 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     );
   }
 
-  const role = user?.usuario_roles?.[0]?.rol?.nombre || 'cliente';
-  const isAdmin = role === 'super_admin' || role === 'sistemas';
+  const rolesActivos = (user?.usuario_roles || [])
+    .filter((ur: any) => ur.activo)
+    .map((ur: any) => ur.rol?.nombre as string)
+    .filter(Boolean);
+  const contexto = localStorage.getItem('contexto_activo');
+  const role =
+    contexto && rolesActivos.includes(contexto)
+      ? contexto
+      : rolesActivos[0] || 'cliente';
+  const isAdmin = rolesActivos.includes('super_admin') || rolesActivos.includes('sistemas');
 
   return (
     <div className="flex flex-1">

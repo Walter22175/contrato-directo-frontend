@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import Button from '@/components/ui/Button';
 import { useAuthStore } from '@/store/auth';
@@ -45,6 +45,8 @@ export default function ConvertirProveedorPage() {
   const [showSUS, setShowSUS] = useState(false);
   const [prefilledData, setPrefilledData] = useState<any>(null);
   const [clientData, setClientData] = useState<any>(null);
+  const [errorCompleting, setErrorCompleting] = useState<string | null>(null);
+  const wizardRef = useRef<WizardState>({});
 
   useEffect(() => {
     if (!isAuthenticated) {
@@ -76,11 +78,11 @@ export default function ConvertirProveedorPage() {
         email: data.email || '',
         password: '',
         confirmPassword: '',
-        tipo_persona: data.tipo_persona === 'FISICA' ? 'fisica' : 'juridica',
+        tipo_persona: (data.tipo_persona || '').toLowerCase() === 'fisica' ? 'fisica' : 'juridica',
       },
       paso2: {
-        dni: data.dni || '',
-        cuit_cuil: data.cuit_cuil || '',
+        dni: (data.dni || '').replace(/\D/g, ''),
+        cuit_cuil: (data.cuit_cuil || '').replace(/\D/g, ''),
         categoria_iva: '',
         tipo_comercio: '',
       },
@@ -107,6 +109,10 @@ export default function ConvertirProveedorPage() {
     setWizardData(prefilled);
   };
 
+  useEffect(() => {
+    wizardRef.current = wizardData;
+  }, [wizardData]);
+
   const handleNext = useCallback(async (paso: PasoActual, data: any) => {
     setSaving(true);
     try {
@@ -126,26 +132,32 @@ export default function ConvertirProveedorPage() {
   const handleComplete = useCallback(async (data: any) => {
     if (!user?.id_usuario) return;
     setCompleting(true);
+    setErrorCompleting(null);
     try {
-      setWizardData(prev => ({ ...prev, paso6: data }));
+      const w = wizardRef.current;
       const dto = {
-        rubro_principal: wizardData.paso4?.rubro_principal || '',
-        cuit_cuil: wizardData.paso2?.cuit_cuil || '',
-        descripcion: wizardData.paso4?.descripcion || '',
-        documentacion_fiscal_url: wizardData.paso5?.documentacion_fiscal_url || '',
-        avales: data.avales || {},
-        dni: wizardData.paso2?.dni,
-        telefono: wizardData.paso3?.telefono,
-        direccion: wizardData.paso3?.direccion,
+        rubro_principal: w.paso4?.rubro_principal || '',
+        cuit_cuil: (w.paso2?.cuit_cuil || '').replace(/\D/g, ''),
+        descripcion: w.paso4?.descripcion || '',
+        documentacion_fiscal_url: w.paso5?.documentacion_fiscal_url || '',
+        avales: data.avales || [],
+        dni: (w.paso2?.dni || '').replace(/\D/g, ''),
+        telefono: w.paso3?.telefono,
+        direccion: w.paso3?.direccion,
       };
       await api.post('/usuarios/convertir-proveedor', dto);
       setShowSUS(true);
-    } catch (err) {
+    } catch (err: any) {
       console.error('Error completando conversión:', err);
+      const msg =
+        err?.response?.data?.message ||
+        err?.response?.data?.data?.message ||
+        'No se pudo completar la conversión. Verificá los datos e intentá nuevamente.';
+      setErrorCompleting(Array.isArray(msg) ? msg.join(' — ') : msg);
     } finally {
       setCompleting(false);
     }
-  }, [user?.id_usuario, wizardData.paso4?.rubro_principal, wizardData.paso2?.cuit_cuil]);
+  }, [user?.id_usuario]);
 
   const handleSUSSubmit = async (score: number, responses: any) => {
     try {
@@ -196,6 +208,9 @@ export default function ConvertirProveedorPage() {
                 <div>
                   <h1 className="text-3xl font-bold text-white">Convertirme en Proveedor</h1>
                   <p className="text-slate-400 mt-1">Completa los datos adicionales para ofrecer tus servicios</p>
+                  <p className="text-xs text-slate-500 mt-1">
+                    Tu documentación será revisada por nuestro equipo en un plazo máximo de 72 horas hábiles.
+                  </p>
                 </div>
               </div>
             </div>
@@ -244,11 +259,18 @@ export default function ConvertirProveedorPage() {
               </div>
             </div>
 
+            {errorCompleting && (
+              <div className="mb-4 p-3 rounded-lg border border-red-500/30 bg-red-500/10 text-red-400 text-sm">
+                {errorCompleting}
+              </div>
+            )}
+
             {pasoActual === 1 && (
               <Paso1DatosPersonales
                 onNext={(data) => handleNext(1, data)}
                 initialData={wizardData.paso1}
                 disabled={saving}
+                ocultarPassword
               />
             )}
 

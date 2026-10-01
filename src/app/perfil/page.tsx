@@ -1,15 +1,23 @@
 'use client';
 
+import { useEffect, useState } from 'react';
 import { useAuthStore } from '@/store/auth';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { Card } from '@/components/ui/Card';
 import Button from '@/components/ui/Button';
-import { User, Mail, Phone, MapPin, Calendar, Edit3, Shield, Star, FileText, Briefcase, RotateCcw, CheckCircle2 } from 'lucide-react';
+import { User, Mail, Phone, MapPin, Calendar, Edit3, Shield, Star, FileText, Briefcase, RotateCcw, CheckCircle2, Loader2 } from 'lucide-react';
 
 export default function PerfilPage() {
-  const { user, loadUser } = useAuthStore();
+  const { user, loadUser, cambiarContexto } = useAuthStore();
   const router = useRouter();
+  const [contexto, setContexto] = useState<string | null>(null);
+  const [switching, setSwitching] = useState(false);
+  const [switchError, setSwitchError] = useState<string | null>(null);
+
+  useEffect(() => {
+    setContexto(localStorage.getItem('contexto_activo'));
+  }, [user]);
 
   const formatearFecha = (f: string) =>
     new Date(f).toLocaleDateString('es-AR', { day: '2-digit', month: 'long', year: 'numeric' });
@@ -22,9 +30,21 @@ export default function PerfilPage() {
   const esCliente = roles.includes('cliente');
   const esProveedor = roles.includes('proveedor');
   const esAmbos = esCliente && esProveedor;
+  const contextoActivo = contexto || (esAmbos ? 'cliente' : esProveedor ? 'proveedor' : 'cliente');
 
-  const handleSwitchRole = (rol: 'cliente' | 'proveedor') => {
-    router.push(rol === 'proveedor' ? '/proveedores' : '/dashboard');
+  const handleSwitchRole = async (rol: 'cliente' | 'proveedor') => {
+    setSwitching(true);
+    setSwitchError(null);
+    try {
+      await cambiarContexto(rol);
+      await loadUser();
+      router.push(rol === 'proveedor' ? '/proveedores' : '/dashboard');
+    } catch (err: any) {
+      const msg = err?.response?.data?.message || 'No se pudo cambiar de rol. Intentá nuevamente.';
+      setSwitchError(Array.isArray(msg) ? msg.join(' — ') : String(msg));
+    } finally {
+      setSwitching(false);
+    }
   };
 
   const handleConvertirProveedor = () => {
@@ -58,17 +78,31 @@ export default function PerfilPage() {
               
               <div className="mt-4 flex flex-wrap justify-center gap-2">
                 {esCliente && (
-                  <span className="inline-flex items-center gap-1 text-xs px-2.5 py-1 bg-blue-500/10 text-blue-400 border border-blue-500/20 rounded-full">
+                  <span
+                    className={`inline-flex items-center gap-1 text-xs px-2.5 py-1 bg-blue-500/10 text-blue-400 border rounded-full ${
+                      contextoActivo === 'cliente' ? 'border-blue-400 ring-1 ring-blue-400/50' : 'border-blue-500/20'
+                    }`}
+                  >
                     <User className="w-3 h-3" />
                     Cliente
+                    {contextoActivo === 'cliente' && esAmbos && (
+                      <span className="text-[10px] text-blue-300/70">· activo</span>
+                    )}
                   </span>
                 )}
                 {esProveedor && (
-                  <span className="inline-flex items-center gap-1 text-xs px-2.5 py-1 bg-purple-500/10 text-purple-400 border border-purple-500/20 rounded-full">
+                  <span
+                    className={`inline-flex items-center gap-1 text-xs px-2.5 py-1 bg-purple-500/10 text-purple-400 border rounded-full ${
+                      contextoActivo === 'proveedor' ? 'border-purple-400 ring-1 ring-purple-400/50' : 'border-purple-500/20'
+                    }`}
+                  >
                     <Briefcase className="w-3 h-3" />
                     Proveedor
                     {user?.perfil_proveedor?.sello_verificado && (
                       <CheckCircle2 className="w-3 h-3 text-green-400" />
+                    )}
+                    {contextoActivo === 'proveedor' && esAmbos && (
+                      <span className="text-[10px] text-purple-300/70">· activo</span>
                     )}
                   </span>
                 )}
@@ -92,25 +126,38 @@ export default function PerfilPage() {
 
               {esAmbos && (
                 <div className="mt-4 space-y-2">
-                  <p className="text-xs text-slate-500">Cambiar vista:</p>
+                  <p className="text-xs text-slate-500">Cambiar de rol (1 clic):</p>
+                  {switchError && (
+                    <p className="text-xs text-red-400">{switchError}</p>
+                  )}
                   <div className="flex gap-2">
                     <Button 
                       variant="outline" 
                       size="sm" 
                       className="flex-1"
+                      disabled={switching || contextoActivo === 'cliente'}
                       onClick={() => handleSwitchRole('cliente')}
                     >
-                      <User className="w-3.5 h-3.5 mr-1" />
-                      Ver como Cliente
+                      {switching && contextoActivo !== 'cliente' ? (
+                        <Loader2 className="w-3.5 h-3.5 mr-1 animate-spin" />
+                      ) : (
+                        <User className="w-3.5 h-3.5 mr-1" />
+                      )}
+                      {contextoActivo === 'cliente' ? 'Cliente activo' : 'Ver como Cliente'}
                     </Button>
                     <Button 
                       variant="outline" 
                       size="sm" 
                       className="flex-1"
+                      disabled={switching || contextoActivo === 'proveedor'}
                       onClick={() => handleSwitchRole('proveedor')}
                     >
-                      <Briefcase className="w-3.5 h-3.5 mr-1" />
-                      Ver como Proveedor
+                      {switching && contextoActivo !== 'proveedor' ? (
+                        <Loader2 className="w-3.5 h-3.5 mr-1 animate-spin" />
+                      ) : (
+                        <Briefcase className="w-3.5 h-3.5 mr-1" />
+                      )}
+                      {contextoActivo === 'proveedor' ? 'Proveedor activo' : 'Ver como Proveedor'}
                     </Button>
                   </div>
                 </div>

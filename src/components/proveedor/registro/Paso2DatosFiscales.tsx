@@ -109,7 +109,7 @@ export default function Paso2DatosFiscales({
   };
 
   const handleCuitChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setValue('cuit_cuil', formatCuit(e.target.value), { shouldValidate: true });
+    setValue('cuit_cuil', e.target.value.replace(/\D/g, '').slice(0, 11), { shouldValidate: true });
   };
 
   const formatDni = (value: string) => value.replace(/\D/g, '').slice(0, 8);
@@ -139,7 +139,7 @@ export default function Paso2DatosFiscales({
           <Input
             label="CUIT/CUIL"
             placeholder="20-12345678-9"
-            value={cuit}
+            value={cuit ? formatCuit(cuit) : ''}
             onChange={handleCuitChange}
             error={errors.cuit_cuil?.message}
             disabled={disabled || isSubmitting || validating}
