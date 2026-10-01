@@ -131,8 +131,8 @@ export function CheckoutFalloContent() {
 
   if (!transaccion) return null;
 
-  const comision = transaccion.comision_monto || (transaccion.monto_acordado * transaccion.comision_porcentaje / 100);
-  const total = transaccion.monto_acordado + comision;
+  // El cliente paga el monto acordado; la comisión se deduce del pago al proveedor
+  const total = transaccion.monto_acordado;
 
   return (
     <main className="flex-1">

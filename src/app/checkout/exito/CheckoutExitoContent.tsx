@@ -70,7 +70,8 @@ export function CheckoutExitoContent() {
   if (!transaccion) return null;
 
   const comision = transaccion.comision_monto || (transaccion.monto_acordado * transaccion.comision_porcentaje / 100);
-  const total = transaccion.monto_acordado + comision;
+  // El cliente paga el monto acordado; la comisión se deduce del pago al proveedor
+  const total = transaccion.monto_acordado;
 
   return (
     <main className="flex-1">
@@ -108,8 +109,8 @@ export function CheckoutExitoContent() {
                 <p className="font-semibold text-white">{formatCurrency(transaccion.monto_acordado)}</p>
               </div>
               <div>
-                <p className="text-xs text-slate-500">Comisión (8%)</p>
-                <p className="font-semibold text-white">{formatCurrency(transaccion.comision_monto || (transaccion.monto_acordado * 0.08))}</p>
+                <p className="text-xs text-slate-500">Comisión (8%, se deduce al proveedor)</p>
+                <p className="font-semibold text-white">{formatCurrency(comision)}</p>
               </div>
               <div>
                 <p className="text-xs text-slate-500">Tiempo de pago</p>
@@ -117,7 +118,7 @@ export function CheckoutExitoContent() {
               </div>
               <div>
                 <p className="text-xs text-slate-500">Total Pagado</p>
-                <p className="font-bold text-cyan-400 text-lg">{formatCurrency(transaccion.monto_acordado + (transaccion.comision_monto || transaccion.monto_acordado * 0.08))}</p>
+                <p className="font-bold text-cyan-400 text-lg">{formatCurrency(total)}</p>
               </div>
             </div>
           </div>

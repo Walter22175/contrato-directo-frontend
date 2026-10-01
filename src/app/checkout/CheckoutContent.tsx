@@ -5,7 +5,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { Card, CardTitle } from '@/components/ui/Card';
 import Button from '@/components/ui/Button';
 import api, { extractData } from '@/lib/api';
-import { formatCurrency } from '@/lib/utils';
+import { formatCurrency, formatDate } from '@/lib/utils';
 import { CreditCard, Banknote, Shield, AlertCircle, Loader2, CheckCircle, XCircle, Clock, ArrowLeft } from 'lucide-react';
 import type { Transaccion } from '@/types';
 import { useStepTimer } from '@/hooks/useStepTimer';
@@ -20,6 +20,20 @@ declare global {
   }
 }
 
+interface PreferenciaCheckout {
+  id?: string;
+  preference_id?: string;
+  init_point?: string;
+  sandbox_init_point?: string;
+  modo_simulacion?: boolean;
+  transferencia?: { cbu?: string; alias?: string };
+  id_transaccion?: string;
+  monto_total?: number;
+  comision_porcentaje?: number;
+  comision_monto?: number;
+  neto_proveedor?: number;
+}
+
 export function CheckoutContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -32,6 +46,7 @@ export function CheckoutContent() {
   const [metodoPago, setMetodoPago] = useState<'tarjeta' | 'transferencia'>('tarjeta');
   const [mpInstance, setMpInstance] = useState<any>(null);
   const [checkoutRendered, setCheckoutRendered] = useState(false);
+  const [preferencia, setPreferencia] = useState<PreferenciaCheckout | null>(null);
   const checkoutContainerRef = useRef<HTMLDivElement>(null);
   
   // Timer automático con tracking de pasos
@@ -100,7 +115,7 @@ export function CheckoutContent() {
   }, []);
 
   useEffect(() => {
-    if (mpInstance && checkoutContainerRef.current && !checkoutRendered && transaccion?.estado === 'pendiente') {
+    if (mpInstance && checkoutContainerRef.current && !checkoutRendered && transaccion?.estado === 'en_proceso') {
       renderCheckout();
     }
   }, [mpInstance, transaccion, checkoutRendered]);
@@ -111,6 +126,14 @@ export function CheckoutContent() {
     try {
       const res = await api.post('/pagos/crear-checkout-mercadopago', { id_transaccion: idTransaccion });
       const data = extractData<any>(res);
+      setPreferencia(data);
+
+      // Modo demostración (sin MP_ACCESS_TOKEN): se usa el botón de simulación
+      if (data?.modo_simulacion) {
+        setCheckoutRendered(true);
+        return;
+      }
+
       const preferenceId = data?.preference_id || data?.id;
 
       if (!preferenceId) throw new Error('No se obtuvo preference_id');
@@ -139,6 +162,20 @@ export function CheckoutContent() {
       console.error('Error creando checkout:', e);
       trackError(3, e instanceof Error ? e.message : 'Error desconocido');
       setError('Error al iniciar el pago');
+    }
+  };
+
+  const simularPago = async () => {
+    setProcessing(true);
+    try {
+      await api.post('/pagos/checkout/simular', { id_transaccion: idTransaccion });
+      trackPasoCompletado(3, { evento: 'pago_simulado' });
+      handlePagoExitoso();
+    } catch (e) {
+      trackError(3, e instanceof Error ? e.message : 'Error simulando pago');
+      setError('No se pudo simular el pago');
+    } finally {
+      setProcessing(false);
     }
   };
 
@@ -188,7 +225,8 @@ export function CheckoutContent() {
   if (!transaccion) return null;
 
   const comision = transaccion.comision_monto || (transaccion.monto_acordado * transaccion.comision_porcentaje / 100);
-  const total = transaccion.monto_acordado + comision;
+  // El cliente paga el monto acordado; la comisión se deduce del pago al proveedor
+  const total = transaccion.monto_acordado;
 
   return (
     <main className="flex-1">
@@ -260,6 +298,8 @@ export function CheckoutContent() {
               </div>
             </Card>
 
+            {transaccion.estado === 'en_proceso' ? (
+            <>
             <Card>
               <CardTitle>Método de Pago</CardTitle>
               <div className="grid grid-cols-2 gap-4 mt-4">
@@ -309,7 +349,25 @@ export function CheckoutContent() {
               </div>
 
               {metodoPago === 'tarjeta' ? (
-                <div id="mercadopago-checkout" ref={checkoutContainerRef} className="mt-4 min-h-[200px]" />
+                preferencia?.modo_simulacion ? (
+                  <div className="mt-4 space-y-4 p-4 bg-slate-800/50 rounded-xl border border-yellow-500/30">
+                    <h4 className="font-semibold text-yellow-400">Modo demostración</h4>
+                    <p className="text-slate-400 text-sm">
+                      Mercado Pago no está configurado (sin MP_ACCESS_TOKEN). Podés simular
+                      un pago aprobado para probar el flujo de custodia completo.
+                    </p>
+                    <Button onClick={simularPago} disabled={processing} className="w-full" size="lg">
+                      {processing ? (
+                        <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                      ) : (
+                        <CheckCircle className="w-4 h-4 mr-2" />
+                      )}
+                      Simular pago aprobado
+                    </Button>
+                  </div>
+                ) : (
+                  <div id="mercadopago-checkout" ref={checkoutContainerRef} className="mt-4 min-h-[200px]" />
+                )
               ) : (
                 <div className="mt-4 space-y-4 p-4 bg-slate-800/50 rounded-xl border border-slate-700">
                   <h4 className="font-semibold text-white">Transferencia Bancaria</h4>
@@ -347,6 +405,63 @@ export function CheckoutContent() {
                 </div>
               )}
             </Card>
+            </>
+            ) : (
+              <Card>
+                <CardTitle>Estado del pago</CardTitle>
+                <div className="mt-4 space-y-3 text-sm text-slate-400">
+                  {transaccion.estado === 'pendiente' && (
+                    <p>
+                      La oferta todavía no fue aceptada por el proveedor. Cuando la
+                      acepte, vas a poder pagar con custodia.
+                    </p>
+                  )}
+                  {transaccion.estado === 'en_custodia' && (
+                    <>
+                      <p className="text-cyan-400">
+                        Tu pago está retenido en custodia hasta la conformidad.
+                      </p>
+                      {!transaccion.fecha_fin_servicio ? (
+                        <p>Esperando que el proveedor marque la finalización del servicio.</p>
+                      ) : !transaccion.fecha_conformidad ? (
+                        <p>
+                          Servicio finalizado. Conformidad hasta:{' '}
+                          {transaccion.fecha_limite_conformidad
+                            ? formatDate(transaccion.fecha_limite_conformidad)
+                            : '—'}{' '}
+                          — si no respondés, se da conformidad automática y el pago se
+                          libera en 24 horas hábiles.
+                        </p>
+                      ) : (
+                        <p>Conformidad registrada. El pago se liberará en 24 horas hábiles.</p>
+                      )}
+                    </>
+                  )}
+                  {transaccion.estado === 'en_disputa' && (
+                    <p className="text-orange-400">
+                      Conformidad parcial registrada: la parte aceptada se libera y el
+                      resto queda retenido hasta la resolución de la disputa.
+                    </p>
+                  )}
+                  {transaccion.estado === 'completada' && (
+                    <p className="text-green-400">
+                      Servicio completado y pago liberado al proveedor.
+                    </p>
+                  )}
+                  {(transaccion.estado === 'cancelada' ||
+                    transaccion.estado === 'reembolsada') && (
+                    <p>Esta transacción fue {transaccion.estado.replace('_', ' ')}.</p>
+                  )}
+                  <Button
+                    onClick={() => router.push('/dashboard/transacciones')}
+                    variant="outline"
+                    className="w-full"
+                  >
+                    Ver mis transacciones
+                  </Button>
+                </div>
+              </Card>
+            )}
           </div>
 
           {/* Sidebar - Detalle de Costos */}
@@ -368,7 +483,8 @@ export function CheckoutContent() {
                   <span className="text-cyan-400">{formatCurrency(total)}</span>
                 </div>
                 <p className="text-xs text-slate-500 text-center">
-                  El pago queda en custodia hasta que confirmes la conformidad del servicio.
+                  La comisión se deduce del pago al proveedor: no se suma a tu total. El
+                  pago queda en custodia hasta que confirmes la conformidad del servicio.
                 </p>
               </div>
 

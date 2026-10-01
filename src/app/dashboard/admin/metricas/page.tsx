@@ -20,18 +20,50 @@ interface MetricaRow {
   tickets_resueltos: number;
 }
 
+interface MetricaObjetivo2 {
+  pct_pagadas_custodia: number;
+  tiempo_promedio_conformidad_horas: number;
+  pct_liberaciones_sin_disputa: number;
+  pct_liberacion_en_plazo: number;
+  tasa_disputas: number;
+  pct_reembolsos_en_plazo: number;
+  comisiones_totales: number;
+  tasa_conversion_oferta_pago: number;
+  totales?: {
+    transacciones: number;
+    ofertas_aceptadas: number;
+    pagos_en_custodia: number;
+    liberaciones: number;
+    reclamos: number;
+    reembolsos: number;
+    monto_en_custodia: number;
+  };
+}
+
 export default function MetricasPage() {
   const [metricas, setMetricas] = useState<MetricaRow | null>(null);
   const [loading, setLoading] = useState(true);
   const [periodo, setPeriodo] = useState('actual');
+  const [obj2, setObj2] = useState<MetricaObjetivo2 | null>(null);
+
+  useEffect(() => {
+    api
+      .get('/metricas/objetivo-2')
+      .then((res) => {
+        const d = extractData<MetricaObjetivo2 | null>(res);
+        if (d && typeof d.pct_pagadas_custodia === 'number') setObj2(d);
+        else setObj2(null);
+      })
+      .catch(() => setObj2(null));
+  }, []);
 
   useEffect(() => {
     const fetchMetricas = async () => {
       try {
         const res = await api.get('/metricas/atencion', { params: { periodo } });
-        const data = extractData<any>(res);
+        const data = extractData<Partial<MetricaRow> | null>(res);
         if (data && typeof data === 'object' && 'tpr_whatsapp' in data) {
-          setMetricas(data);
+          setMetricas(data as MetricaRow);
         } else {
           setMetricas({
             periodo,
@@ -111,6 +143,49 @@ export default function MetricasPage() {
       ) : (
         <>
           <SlaDashboard metricas={tarjetas} />
+
+          {/* 8 métricas de éxito del Objetivo 2 (pago con custodia) */}
+          <Card>
+            <div className="p-4">
+              <CardTitle>Objetivo 2 — Pago con Custodia</CardTitle>
+              <p className="text-sm text-slate-400 mt-1">
+                Las 8 métricas de éxito de la contratación con pago retenido en custodia
+              </p>
+              <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                {obj2 ? (
+                  [
+                    { titulo: 'Pagadas con custodia', valor: `${obj2.pct_pagadas_custodia}%`, meta: 'sobre ofertas aceptadas' },
+                    { titulo: 'Tiempo hasta conformidad', valor: `${obj2.tiempo_promedio_conformidad_horas}h`, meta: 'promedio desde fin del servicio' },
+                    { titulo: 'Liberaciones sin disputa', valor: `${obj2.pct_liberaciones_sin_disputa}%`, meta: 'sin reclamo asociado' },
+                    { titulo: 'Liberaciones en plazo', valor: `${obj2.pct_liberacion_en_plazo}%`, meta: '≤24h hábiles tras conformidad' },
+                    { titulo: 'Tasa de disputas', valor: `${obj2.tasa_disputas}%`, meta: 'reclamos sobre pagos' },
+                    { titulo: 'Reembolsos en plazo', valor: `${obj2.pct_reembolsos_en_plazo}%`, meta: 'dentro de 10 días hábiles' },
+                    { titulo: 'Comisiones recaudadas', valor: `$${obj2.comisiones_totales.toLocaleString('es-AR')}`, meta: '8% sobre lo liberado' },
+                    { titulo: 'Conversión oferta→pago', valor: `${obj2.tasa_conversion_oferta_pago}%`, meta: 'sobre todas las ofertas' },
+                  ].map((m) => (
+                    <div key={m.titulo} className="p-4 bg-slate-800/50 rounded-xl border border-slate-700">
+                      <p className="text-xs text-slate-400">{m.titulo}</p>
+                      <p className="text-2xl font-bold text-cyan-400 mt-1">{m.valor}</p>
+                      <p className="text-xs text-slate-500 mt-1">{m.meta}</p>
+                    </div>
+                  ))
+                ) : (
+                  <p className="text-sm text-slate-500 col-span-full">
+                    No se pudieron cargar las métricas del Objetivo 2.
+                  </p>
+                )}
+              </div>
+              {obj2?.totales && (
+                <p className="text-xs text-slate-500 mt-3">
+                  Totales: {obj2.totales.transacciones} transacciones ·{' '}
+                  {obj2.totales.ofertas_aceptadas} ofertas aceptadas ·{' '}
+                  {obj2.totales.pagos_en_custodia} pagos en custodia ·{' '}
+                  {obj2.totales.liberaciones} liberaciones · {obj2.totales.reclamos}{' '}
+                  reclamos · {obj2.totales.reembolsos} reembolsos
+                </p>
+              )}
+            </div>
+          </Card>
 
           <Card>
             <div className="p-4">

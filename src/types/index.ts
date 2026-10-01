@@ -125,6 +125,14 @@ export interface Transaccion {
   cliente?: Partial<Usuario>;
   proveedor?: Partial<Usuario>;
   servicio?: Servicio;
+  fecha_fin_servicio?: string | null;
+  fecha_limite_conformidad?: string | null;
+  fecha_conformidad?: string | null;
+  conformidad_porcentaje?: number | null;
+  fecha_liberacion_programada?: string | null;
+  fecha_liberacion?: string | null;
+  monto_liberado?: number | null;
+  fondos_retenidos?: boolean;
 }
 
 export interface Contrato {
