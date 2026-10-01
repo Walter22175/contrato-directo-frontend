@@ -24,6 +24,7 @@ import {
   UserCheck,
   FileBarChart,
   Image as ImageIcon,
+  Briefcase,
 } from 'lucide-react';
 
 const clientLinks = [
@@ -59,6 +60,7 @@ const adminLinks = [
   { href: '/dashboard/admin', label: 'Dashboard', icon: LayoutDashboard },
   { href: '/dashboard/admin/usuarios', label: 'Usuarios', icon: Users },
   { href: '/dashboard/admin/promociones', label: 'Promociones', icon: ImageIcon },
+  { href: '/dashboard/admin/servicios', label: 'Gestión de Servicios', icon: Briefcase },
   { href: '/dashboard/admin/reportes', label: 'Reportes', icon: BarChart3 },
   { href: '/dashboard/admin/reportes/trimestral', label: 'Reporte Trimestral', icon: FileBarChart },
   { href: '/dashboard/admin/metricas', label: 'Métricas de Atención', icon: Activity },

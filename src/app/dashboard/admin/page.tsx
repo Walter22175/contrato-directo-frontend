@@ -51,6 +51,7 @@ export default function AdminPage() {
   const quickLinks = [
     { label: 'Gestión de Usuarios', description: 'Administrar usuarios, roles y verificaciones', icon: Users, href: '/dashboard/admin/usuarios' },
     { label: 'Gestión de Servicios', description: 'Administrar catálogo y categorías', icon: Briefcase, href: '/dashboard/admin/servicios' },
+    { label: 'Catálogo Dinámico', description: 'Búsquedas fallidas, umbrales y solicitudes de rubro', icon: TrendingUp, href: '/dashboard/admin/servicios' },
     { label: 'Reportes Agregados', description: 'Métricas y estadísticas de la plataforma', icon: Activity, href: '/dashboard/admin/reportes' },
     { label: 'Solicitudes de Cambio', description: 'Revisar solicitudes pendientes', icon: FileText, href: '/dashboard/admin/reportes' },
   ];

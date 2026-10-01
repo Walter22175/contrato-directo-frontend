@@ -6,7 +6,8 @@ import { useRouter } from 'next/navigation';
 import { Card } from '@/components/ui/Card';
 import Select from '@/components/ui/Select';
 import api, { extractData } from '@/lib/api';
-import { Search, Star, ChevronRight, Box } from 'lucide-react';
+import { reportarBusquedaFallida } from '@/lib/catalogo';
+import { Search, Star, ChevronRight, Box, FilePlus } from 'lucide-react';
 import type { Servicio, Categoria } from '@/types';
 
 interface SearchSuggestion {
@@ -77,6 +78,19 @@ export default function ServiciosContent() {
       c.nombre.toLowerCase().includes(busqueda.toLowerCase())
     );
   }, [categorias, busqueda]);
+
+  const sinResultados = !loading && (busqueda || categoria) &&
+    filtered.length === 0 && filteredCategorias.length === 0;
+
+  useEffect(() => {
+    if (!sinResultados || !busqueda.trim()) return;
+    const catId = categoria ? parseInt(categoria, 10) : undefined;
+    reportarBusquedaFallida({
+      consulta: busqueda.trim(),
+      tipo: catId ? 'rubro' : 'servicio',
+      ...(catId ? { id_categoria: catId } : {}),
+    });
+  }, [sinResultados, busqueda, categoria]);
 
   const opcionesCategorias = useMemo(
     () => categorias.map((c) => ({ value: c.id_categoria.toString(), label: c.nombre })),
@@ -268,11 +282,26 @@ export default function ServiciosContent() {
                 <p className="text-slate-400 mb-6">{servicios.length} servicios disponibles en {categorias.length} categorías</p>
               )}
 
-              {(filtered.length === 0 && filteredCategorias.length === 0) && (busqueda || categoria) ? (
+              {sinResultados ? (
                 <div className="text-center py-16">
                   <Search className="w-16 h-16 text-slate-600 mx-auto mb-4" />
                   <h2 className="text-xl font-semibold text-white mb-2">No se encontraron resultados</h2>
-                  <p className="text-slate-400">Intentá con otros términos de búsqueda</p>
+                  <p className="text-slate-400 mb-6">Intentá con otros términos de búsqueda</p>
+                  <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
+                    <Link
+                      href="/proveedores/solicitud"
+                      className="inline-flex items-center gap-2 px-5 py-2.5 bg-cyan-600 hover:bg-cyan-500 text-white rounded-xl font-medium transition-colors"
+                    >
+                      <FilePlus className="w-4 h-4" />
+                      Solicitar "{busqueda.trim()}" como nuevo servicio
+                    </Link>
+                    <Link
+                      href="/proveedores"
+                      className="inline-flex items-center gap-2 px-5 py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 rounded-xl font-medium transition-colors"
+                    >
+                      Buscar proveedores
+                    </Link>
+                  </div>
                 </div>
               ) : (
                 <>
