@@ -38,7 +38,16 @@ export default function AdminUsuariosPage() {
     new Date(f).toLocaleDateString('es-AR', { day: '2-digit', month: 'short', year: 'numeric' });
 
   const rolBadge = (u: Usuario) => {
-    const rol = u.usuario_roles?.[0]?.rol?.nombre || 'sin_rol';
+    const activos = (u.usuario_roles || [])
+      .filter((ur) => ur.activo)
+      .map((ur) => ur.rol?.nombre)
+      .filter(Boolean);
+    const jerarquia = ['super_admin', 'sistemas', 'admin_contable', 'admin_comercial'];
+    const rol =
+      jerarquia.find((r) => activos.includes(r)) ||
+      activos.find((r) => r !== 'cliente') ||
+      activos[0] ||
+      'sin_rol';
     const colors: Record<string, string> = {
       super_admin: 'text-red-400 bg-red-500/10',
       sistemas: 'text-purple-400 bg-purple-500/10',

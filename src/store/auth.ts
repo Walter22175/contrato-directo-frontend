@@ -101,8 +101,10 @@ export const useAuthStore = create<AuthState>((set) => ({
 
     try {
       const res = await api.get('/auth/me');
-      const data = extractData<any>(res);
-      set({ user: data, isAuthenticated: true, isLoading: false });
+      const data = extractData<{ usuario?: Partial<Usuario> } & Partial<Usuario>>(res);
+      // /auth/me retorna { usuario }; el interceptor ya desenvuelve el envelope data/timestamp
+      const usuario = data?.usuario ?? data;
+      set({ user: usuario, isAuthenticated: true, isLoading: false });
     } catch {
       // Interceptor already handled refresh attempt. If tokens are gone, we're logged out.
       const currentToken = localStorage.getItem('access_token');

@@ -7,13 +7,18 @@ export default function PublicLayout({ children }: { children: React.ReactNode }
   const user = useAuthStore((s) => s.user);
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
 
-  const role = isAuthenticated 
-    ? (user?.usuario_roles?.[0]?.rol?.nombre === 'super_admin' || user?.usuario_roles?.[0]?.rol?.nombre === 'sistemas' 
-        ? 'admin' 
-        : user?.usuario_roles?.[0]?.rol?.nombre === 'proveedor' 
-          ? 'proveedor' 
-          : 'cliente')
-    : 'cliente';
+  const roles = isAuthenticated
+    ? (user?.usuario_roles || [])
+        .filter((ur) => ur.activo)
+        .map((ur) => ur.rol?.nombre)
+        .filter(Boolean)
+    : [];
+
+  const role = roles.includes('super_admin') || roles.includes('sistemas')
+    ? 'admin'
+    : roles.includes('proveedor')
+      ? 'proveedor'
+      : 'cliente';
 
   return (
     <div className="min-h-screen flex flex-col">

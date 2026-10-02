@@ -35,10 +35,26 @@ function obtenerRespuesta(pregunta: string): string {
   return RESPUESTAS_PREDEFINIDAS.default;
 }
 
+// Convierte **texto** en <strong>texto</strong>
+function renderContenido(texto: string) {
+  const partes = texto.split(/(\*\*.*?\*\*)/g);
+  return partes.map((parte, i) => {
+    if (parte.startsWith('**') && parte.endsWith('**')) {
+      return <strong key={i}>{parte.slice(2, -2)}</strong>;
+    }
+    return <span key={i}>{parte}</span>;
+  });
+}
+
 export default function Chatbot() {
   const [abierto, setAbierto] = useState(false);
   const [mensajes, setMensajes] = useState<Mensaje[]>([
-    { id: 1, remitente: 'bot', contenido: 'Hola soy CoDi el asistente virtual de Contrato Directo. ¿En que puedo ayudarte?', fecha: new Date() },
+    {
+      id: 1,
+      remitente: 'bot',
+      contenido: 'Hola soy **CoDi** el asistente virtual de Contrato Directo. ¿En que puedo ayudarte?',
+      fecha: new Date(),
+    },
   ]);
   const [input, setInput] = useState('');
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -96,7 +112,7 @@ export default function Chatbot() {
                     : 'bg-slate-700 text-slate-200 rounded-tl-none'
                 )}
               >
-                {m.contenido}
+                {renderContenido(m.contenido)}
               </div>
               {m.remitente === 'usuario' && <User className="w-5 h-5 text-slate-400 flex-shrink-0 mt-1" />}
             </div>
