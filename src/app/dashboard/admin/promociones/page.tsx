@@ -36,8 +36,9 @@ export default function AdminPromocionesPage() {
     setLoading(true);
     try {
       const res = await api.get('/promociones');
-      const data = extractData<Promocion[]>(res);
-      setPromociones(data || []);
+      const raw = extractData<Promocion[] | { data?: Promocion[] }>(res);
+      const lista = Array.isArray(raw) ? raw : raw?.data || [];
+      setPromociones(Array.isArray(lista) ? lista : []);
     } catch {} finally {
       setLoading(false);
     }
@@ -115,7 +116,7 @@ export default function AdminPromocionesPage() {
       if (!payload.enlace) delete payload.enlace;
 
       if (editando) {
-        await api.put(`/promociones/${editando.id_promocion}`, payload);
+        await api.patch(`/promociones/${editando.id_promocion}`, payload);
       } else {
         await api.post('/promociones', payload);
       }

@@ -93,7 +93,12 @@ export default function PromocionCarousel({
   const isPausingRef = useRef(false);
   const lastCenterIndexRef = useRef<number | null>(null);
 
-  const validPromociones = promociones.filter(p => p.activa);
+  // Normaliza defensivamente: el backend retorna { data, meta } y un prop
+  // malformado no debe romper el render del home.
+  const promocionesLista = Array.isArray(promociones)
+    ? promociones.filter((p) => p && p.activa)
+    : [];
+  const validPromociones = promocionesLista;
   const hasRealPromociones = validPromociones.length > 0;
   const slides = hasRealPromociones ? validPromociones : staticSlides;
 

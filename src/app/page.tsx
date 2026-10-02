@@ -62,10 +62,13 @@ export default function HomePage() {
 
   const fetchPromociones = useCallback(async () => {
     try {
-      const res = await api.get('/promociones');
-      const data = extractData<Promocion[]>(res);
-      setPromociones(data || []);
-    } catch {} finally {
+      // /promociones/vigentes es público y está pensado para el home;
+      // /promociones requiere rol admin. Ambos retornan { data, meta }.
+      const res = await api.get('/promociones/vigentes');
+      const raw = extractData<Promocion[] | { data?: Promocion[] }>(res);
+      const lista = Array.isArray(raw) ? raw : raw?.data || [];
+      setPromociones(Array.isArray(lista) ? lista : []);
+    } catch { setPromociones([]); } finally {
       setPromocionesLoading(false);
     }
   }, []);
