@@ -174,10 +174,12 @@ export interface Reclamo {
   fecha_cierre?: string;
   fecha_limite_contestacion?: string;
   fecha_limite_apelacion?: string;
+  prorroga_solicitada: boolean;
+  mediacion_voluntaria_ofrecida: boolean;
   reclamante?: Partial<Usuario>;
   reclamado?: Partial<Usuario>;
   transaccion?: Transaccion;
-  contestaciones?: ContestacionReclamo[];
+  contestacion?: ContestacionReclamo;
   mediacion?: Mediacion;
   documentos?: DocumentoReclamo[];
 }
@@ -345,8 +347,8 @@ export interface CreateReclamoDto {
 }
 
 export interface ContestarReclamoDto {
-  id_contestatario: string;
-  respuesta: string;
+  id_contestante: string;
+  descripcion: string;
 }
 
 export interface IniciarMediacionDto {
@@ -396,7 +398,6 @@ export interface CrearSancionDto {
   id_mediacion?: string;
   tipo_sancion: string;
   descripcion: string;
-  fecha_inicio: string;
   fecha_fin?: string;
   id_aplicador?: string;
 }

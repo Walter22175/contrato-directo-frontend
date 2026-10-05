@@ -168,7 +168,7 @@ const INTENCIONES: Intencion[] = [
     id: 'reembolso',
     keywords: ['reembolso', 'devolucion', 'devolver', 'reintegrar', 'garantia'],
     frases: ['como pido un reembolso', 'quiero que me devuelvan el dinero'],
-    respuesta: 'Podés pedir reembolso total o parcial si el proveedor no cumple o hay vicios ocultos. Se abre un reclamo en [/dashboard/reclamos](/dashboard/reclamos), el proveedor tiene **72 horas hábiles** para responder y el equipo de mediación resuelve en hasta **5 días hábiles**. El reintegro se hace en un máximo de **10 días hábiles**.',
+    respuesta: 'Podés pedir reembolso total o parcial si el proveedor no cumple o hay vicios ocultos. Se abre un reclamo en [/dashboard/reclamos](/dashboard/reclamos), el reclamado tiene **5 días hábiles** para contestar y el equipo de mediación resuelve en hasta **7 días hábiles**. El reintegro se hace en un máximo de **10 días hábiles**.',
   },
 
   // ---- Valoraciones y reputación (RF-25 a RF-28, Obj. 7) ----

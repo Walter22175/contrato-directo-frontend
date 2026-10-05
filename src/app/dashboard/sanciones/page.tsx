@@ -18,7 +18,7 @@ import {
 import type { Sancion, CrearSancionDto } from '@/types';
 
 const TIPOS_SANCION = [
-  { value: 'amonestacion_escrita', label: 'Amonestación escrita' },
+  { value: 'amonestacion', label: 'Amonestación escrita' },
   { value: 'suspension_temporal', label: 'Suspensión temporal de cuenta' },
   { value: 'suspension_privilegios', label: 'Suspensión de privilegios' },
   { value: 'reduccion_visibilidad', label: 'Reducción de visibilidad' },
@@ -27,7 +27,7 @@ const TIPOS_SANCION = [
 ];
 
 const TIPO_COLORS: Record<string, string> = {
-  amonestacion_escrita: 'text-yellow-400 bg-yellow-500/10 border-yellow-500/20',
+  amonestacion: 'text-yellow-400 bg-yellow-500/10 border-yellow-500/20',
   suspension_temporal: 'text-orange-400 bg-orange-500/10 border-orange-500/20',
   suspension_privilegios: 'text-red-400 bg-red-500/10 border-red-500/20',
   reduccion_visibilidad: 'text-purple-400 bg-purple-500/10 border-purple-500/20',
@@ -48,7 +48,6 @@ export default function SancionesPage() {
     id_usuario: '',
     tipo_sancion: '',
     descripcion: '',
-    fecha_inicio: new Date().toISOString().split('T')[0],
     id_aplicador: user?.id_usuario || '',
   });
 
@@ -79,7 +78,7 @@ export default function SancionesPage() {
     try {
       await api.post('/sanciones', form);
       setShowForm(false);
-      setForm({ id_usuario: '', tipo_sancion: '', descripcion: '', fecha_inicio: new Date().toISOString().split('T')[0], id_aplicador: user?.id_usuario || '' });
+      setForm({ id_usuario: '', tipo_sancion: '', descripcion: '', id_aplicador: user?.id_usuario || '' });
       setMsg({ type: 'success', text: 'Sanción creada correctamente' });
       setLoading(true);
       await fetchSanciones();
@@ -159,10 +158,6 @@ export default function SancionesPage() {
               <div>
                 <label className={labelCls}>ID Mediación (opcional)</label>
                 <input className={inputCls} value={form.id_mediacion || ''} onChange={(e) => setForm({ ...form, id_mediacion: e.target.value || undefined })} placeholder="UUID de la mediación" />
-              </div>
-              <div>
-                <label className={labelCls}>Fecha de Inicio *</label>
-                <input className={inputCls} type="date" value={form.fecha_inicio} onChange={(e) => setForm({ ...form, fecha_inicio: e.target.value })} required />
               </div>
               <div>
                 <label className={labelCls}>Fecha de Fin (opcional)</label>

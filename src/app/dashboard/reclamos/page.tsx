@@ -18,7 +18,7 @@ import {
   Calendar,
   Ban,
 } from 'lucide-react';
-import type { Reclamo, CreateReclamoDto, ContestarReclamoDto, Transaccion } from '@/types';
+import type { Reclamo, CreateReclamoDto, ContestarReclamoDto, Transaccion, DocumentoReclamo } from '@/types';
 
 const TIPOS_RECLAMO = [
   { value: 'incumplimiento_servicio', label: 'Incumplimiento de servicio' },
@@ -29,6 +29,10 @@ const TIPOS_RECLAMO = [
   { value: 'fraude', label: 'Fraude o mala fe' },
   { value: 'disputa_valoracion', label: 'Disputas sobre valoraciones' },
 ];
+
+const MAX_ADJUNTOS = 6;
+const MAX_TAMANO_BYTES = 10 * 1024 * 1024;
+const TIPOS_ARCHIVO = ['application/pdf', 'image/jpeg', 'image/png', 'image/webp'];
 
 const ESTADO_COLORS: Record<string, string> = {
   abierto: 'text-green-400 bg-green-500/10 border-green-500/20',
@@ -61,6 +65,7 @@ export default function ReclamosPage() {
   const [msg, setMsg] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
   const [transacciones, setTransacciones] = useState<Transaccion[]>([]);
   const [loadingTransacciones, setLoadingTransacciones] = useState(false);
+  const [subiendoAdjunto, setSubiendoAdjunto] = useState(false);
 
   const idUsuario = user?.id_usuario;
 
@@ -146,7 +151,7 @@ export default function ReclamosPage() {
     setSending(true);
     setMsg(null);
     try {
-      const dto: ContestarReclamoDto = { id_contestatario: user?.id_usuario || '', respuesta: contestacion.trim() };
+      const dto: ContestarReclamoDto = { id_contestante: user?.id_usuario || '', descripcion: contestacion.trim() };
       await api.post(`/reclamos/${selected}/contestar`, dto);
       setContestacion('');
       await fetchDetalle(selected);
@@ -188,6 +193,70 @@ export default function ReclamosPage() {
       setMsg({ type: 'success', text: 'Mediación voluntaria ofrecida (3 días hábiles)' });
     } catch (err) {
       setMsg({ type: 'error', text: mensajeError(err, 'Error') });
+    }
+  };
+
+  const handleSubirArchivos = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const archivos = Array.from(e.target.files || []);
+    e.target.value = '';
+    if (archivos.length === 0 || !selected) return;
+
+    const existentes = detalle?.documentos?.length || 0;
+    if (existentes + archivos.length > MAX_ADJUNTOS) {
+      setMsg({ type: 'error', text: `Máximo ${MAX_ADJUNTOS} archivos por reclamo` });
+      return;
+    }
+
+    const invalido = archivos.find(
+      (f) => f.size > MAX_TAMANO_BYTES || !TIPOS_ARCHIVO.includes(f.type),
+    );
+    if (invalido) {
+      setMsg({
+        type: 'error',
+        text: invalido.size > MAX_TAMANO_BYTES
+          ? `${invalido.name} supera los 10 MB`
+          : `${invalido.name}: tipo de archivo no permitido`,
+      });
+      return;
+    }
+
+    setSubiendoAdjunto(true);
+    setMsg(null);
+    try {
+      for (const archivo of archivos) {
+        const formData = new FormData();
+        formData.append('archivo', archivo);
+        await api.post(`/reclamos/${selected}/documentos/archivo`, formData, {
+          headers: { 'Content-Type': 'multipart/form-data' },
+        });
+      }
+      await fetchDetalle(selected);
+      setMsg({ type: 'success', text: 'Archivo adjuntado correctamente' });
+    } catch (err) {
+      setMsg({ type: 'error', text: mensajeError(err, 'Error al adjuntar archivo') });
+    } finally {
+      setSubiendoAdjunto(false);
+    }
+  };
+
+  const handleDescargar = async (d: DocumentoReclamo) => {
+    if (!d.url_archivo) return;
+    if (!d.url_archivo.startsWith('/')) {
+      window.open(d.url_archivo, '_blank', 'noopener,noreferrer');
+      return;
+    }
+    try {
+      const res = await api.get(d.url_archivo, { responseType: 'blob' });
+      const url = URL.createObjectURL(res.data);
+      const enlace = document.createElement('a');
+      enlace.href = url;
+      enlace.download = d.nombre_archivo;
+      document.body.appendChild(enlace);
+      enlace.click();
+      enlace.remove();
+      URL.revokeObjectURL(url);
+    } catch (err) {
+      setMsg({ type: 'error', text: mensajeError(err, 'No se pudo descargar el archivo') });
     }
   };
 
@@ -271,32 +340,42 @@ export default function ReclamosPage() {
         </Card>
 
         {/* Documentos */}
-        {detalle.documentos && detalle.documentos.length > 0 && (
-          <Card>
-            <div className="p-4">
-              <h3 className="text-sm font-medium text-slate-400 mb-2">Documentos Adjuntos</h3>
+        <Card>
+          <div className="p-4 space-y-3">
+            <div className="flex items-center justify-between">
+              <h3 className="text-sm font-medium text-slate-400">Documentos Adjuntos</h3>
+              <span className="text-xs text-slate-500">{(detalle.documentos?.length || 0)}/{MAX_ADJUNTOS}</span>
+            </div>
+
+            {detalle.documentos && detalle.documentos.length > 0 && (
               <div className="flex flex-wrap gap-2">
                 {detalle.documentos.map((d) => (
-                  <a key={d.id_documento} href={d.url_archivo} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 px-3 py-1.5 bg-slate-700/50 rounded-lg text-sm text-slate-300 hover:bg-slate-700 transition-colors">
+                  <button key={d.id_documento} type="button" onClick={() => handleDescargar(d)} className="flex items-center gap-2 px-3 py-1.5 bg-slate-700/50 rounded-lg text-sm text-slate-300 hover:bg-slate-700 transition-colors">
                     <Paperclip className="w-3 h-3" /> {d.nombre_archivo}
-                  </a>
+                  </button>
                 ))}
               </div>
-            </div>
-          </Card>
-        )}
+            )}
 
-        {/* Contestaciones */}
-        {detalle.contestaciones && detalle.contestaciones.length > 0 && (
+            {(detalle.documentos?.length || 0) < MAX_ADJUNTOS && (
+              <label className={`flex items-center gap-2 px-3 py-2 border border-dashed border-slate-600 rounded-lg text-sm text-slate-400 hover:border-cyan-500 hover:text-cyan-400 cursor-pointer transition-colors ${subiendoAdjunto ? 'opacity-50 pointer-events-none' : ''}`}>
+                <Paperclip className="w-3 h-3" />
+                {subiendoAdjunto ? 'Subiendo...' : 'Adjuntar archivo (PDF/JPG/PNG/WebP, máx. 10 MB c/u)'}
+                <input type="file" multiple accept=".pdf,.jpg,.jpeg,.png,.webp,application/pdf,image/jpeg,image/png,image/webp" className="hidden" onChange={handleSubirArchivos} />
+              </label>
+            )}
+          </div>
+        </Card>
+
+        {/* Contestación */}
+        {detalle.contestacion && (
           <Card>
-            <div className="p-4 space-y-3">
-              <h3 className="text-sm font-medium text-slate-400">Contestaciones</h3>
-              {detalle.contestaciones.map((c) => (
-                <div key={c.id_contestacion} className={`p-4 rounded-xl border ${c.id_contestante === user?.id_usuario ? 'bg-cyan-500/5 border-cyan-500/20 ml-8' : 'bg-slate-800/50 border-slate-700 mr-8'}`}>
-                  <p className="text-sm text-slate-300">{c.descripcion}</p>
-                  <p className="text-xs text-slate-500 mt-2">{formatearFecha(c.fecha_contestacion)}</p>
-                </div>
-              ))}
+            <div className="p-4">
+              <h3 className="text-sm font-medium text-slate-400 mb-2">Contestación</h3>
+              <div className={`p-4 rounded-xl border ${detalle.contestacion.id_contestante === user?.id_usuario ? 'bg-cyan-500/5 border-cyan-500/20 ml-8' : 'bg-slate-800/50 border-slate-700 mr-8'}`}>
+                <p className="text-sm text-slate-300">{detalle.contestacion.descripcion}</p>
+                <p className="text-xs text-slate-500 mt-2">{formatearFecha(detalle.contestacion.fecha_contestacion)}</p>
+              </div>
             </div>
           </Card>
         )}
@@ -321,7 +400,7 @@ export default function ReclamosPage() {
         {/* Acciones */}
         <Card>
           <div className="p-4 flex flex-wrap gap-3">
-            {detalle.estado !== 'cerrado' && (
+            {detalle.estado === 'abierto' && !detalle.contestacion && (
               <form onSubmit={handleContestar} className="flex gap-2 flex-1">
                 <input className={inputCls + ' flex-1'} placeholder="Escribí tu contestación..." value={contestacion} onChange={(e) => setContestacion(e.target.value)} />
                 <button type="submit" disabled={sending || !contestacion.trim()} className="px-4 py-2.5 bg-cyan-600 hover:bg-cyan-700 disabled:opacity-50 text-white rounded-lg transition-colors">
@@ -330,15 +409,16 @@ export default function ReclamosPage() {
               </form>
             )}
 
-            {detalle.estado === 'en_revision' && (
-              <>
-                <button onClick={handleProrroga} className="flex items-center gap-2 px-4 py-2 bg-yellow-600/20 text-yellow-400 border border-yellow-500/30 rounded-lg text-sm hover:bg-yellow-600/30 transition-colors">
-                  <Clock className="w-4 h-4" /> Solicitar Prórroga
-                </button>
-                <button onClick={handleMediacionVoluntaria} className="flex items-center gap-2 px-4 py-2 bg-purple-600/20 text-purple-400 border border-purple-500/30 rounded-lg text-sm hover:bg-purple-600/30 transition-colors">
-                  <Scale className="w-4 h-4" /> Mediación Voluntaria
-                </button>
-              </>
+            {detalle.estado === 'abierto' && !detalle.prorroga_solicitada && (
+              <button onClick={handleProrroga} className="flex items-center gap-2 px-4 py-2 bg-yellow-600/20 text-yellow-400 border border-yellow-500/30 rounded-lg text-sm hover:bg-yellow-600/30 transition-colors">
+                <Clock className="w-4 h-4" /> Solicitar Prórroga
+              </button>
+            )}
+
+            {detalle.estado === 'en_revision' && !detalle.mediacion_voluntaria_ofrecida && (
+              <button onClick={handleMediacionVoluntaria} className="flex items-center gap-2 px-4 py-2 bg-purple-600/20 text-purple-400 border border-purple-500/30 rounded-lg text-sm hover:bg-purple-600/30 transition-colors">
+                <Scale className="w-4 h-4" /> Mediación Voluntaria
+              </button>
             )}
 
             {detalle.estado === 'resuelto' && (
