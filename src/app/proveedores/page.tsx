@@ -7,14 +7,34 @@ import api, { extractData } from '@/lib/api';
 import { reportarBusquedaFallida } from '@/lib/catalogo';
 import {
   Search, Shield, Award, ChevronLeft, ChevronRight,
-  SlidersHorizontal, ArrowUpDown, Clock, TrendingUp, Users
+  SlidersHorizontal, ArrowUpDown, Clock, TrendingUp, Users, MessageSquare
 } from 'lucide-react';
 import { LlaveIcon } from '@/components/ui/LlaveIcon';
-import type { PerfilProveedor, Usuario, Categoria } from '@/types';
+import type { PerfilProveedor, Categoria } from '@/types';
 
-type ProveedorConPerfil = PerfilProveedor & { usuario?: Partial<Usuario> };
+type ProveedorLista = Partial<PerfilProveedor> & {
+  id_usuario: string;
+  id_perfil_proveedor?: number;
+  nombre?: string;
+  apellido?: string;
+};
 
-type RespuestaLista<T> = T[] & { data?: T[] };
+interface MetaBusqueda {
+  total: number;
+  pagina: number;
+  por_pagina: number;
+  total_paginas: number;
+  total_proveedores: number;
+  total_registrados: number;
+  total_rubros: number;
+  promedio_general: number;
+  precio_promedio: number | null;
+}
+
+interface RespuestaLista<T> {
+  data?: T[];
+  meta?: Partial<MetaBusqueda>;
+}
 
 type SortOption = 'valoracion' | 'nombre' | 'antiguedad' | 'transacciones';
 type SortDir = 'asc' | 'desc';
@@ -26,9 +46,11 @@ interface Filters {
   rangoPrecio: string;
   antiguedad: string;
   distintivo: string;
+  disponibilidad: string;
 }
 
 const ITEMS_PER_PAGE = 20;
+const BUSQUEDA_RETARDO = 350;
 
 const antiguedadOptions = [
   { value: '', label: 'Cualquiera' },
@@ -44,6 +66,19 @@ const distintivoOptions = [
   { value: 'destacado', label: 'Proveedor Destacado' },
 ];
 
+const precioOptions = [
+  { value: '', label: 'Cualquiera' },
+  { value: 'bajo', label: 'Bajo' },
+  { value: 'medio', label: 'Medio' },
+  { value: 'alto', label: 'Alto' },
+];
+
+const disponibilidadOptions = [
+  { value: '', label: 'Cualquiera' },
+  { value: 'si', label: 'Con servicios disponibles' },
+  { value: 'no', label: 'Incluye sin disponibilidad' },
+];
+
 const sortOptions: { value: SortOption; label: string }[] = [
   { value: 'valoracion', label: 'Valoración' },
   { value: 'nombre', label: 'Nombre' },
@@ -53,8 +88,29 @@ const sortOptions: { value: SortOption; label: string }[] = [
 
 const STORAGE_KEY = 'proveedores_preferencias';
 
+const filtrosIniciales: Filters = {
+  busqueda: '',
+  categorias: [],
+  valoracionMin: 0,
+  rangoPrecio: '',
+  antiguedad: '',
+  distintivo: '',
+  disponibilidad: '',
+};
+
+function formatearAntiguedad(meses?: number) {
+  const total = meses || 0;
+  if (total < 1) return 'Menos de 1 mes';
+  if (total < 12) return `${total} ${total === 1 ? 'mes' : 'meses'}`;
+  const anios = Math.floor(total / 12);
+  const resto = total % 12;
+  const anioTexto = `${anios} ${anios === 1 ? 'año' : 'años'}`;
+  return resto > 0 ? `${anioTexto} y ${resto} ${resto === 1 ? 'mes' : 'meses'}` : anioTexto;
+}
+
 export default function ProveedoresPage() {
-  const [proveedores, setProveedores] = useState<ProveedorConPerfil[]>([]);
+  const [proveedores, setProveedores] = useState<ProveedorLista[]>([]);
+  const [meta, setMeta] = useState<MetaBusqueda | null>(null);
   const [categorias, setCategorias] = useState<Categoria[]>([]);
   const [loading, setLoading] = useState(true);
   const [page, setPage] = useState(1);
@@ -65,21 +121,14 @@ export default function ProveedoresPage() {
   const [showSugerencias, setShowSugerencias] = useState(false);
   const [historial, setHistorial] = useState<string[]>([]);
 
-  const [filters, setFilters] = useState<Filters>({
-    busqueda: '',
-    categorias: [],
-    valoracionMin: 0,
-    rangoPrecio: '',
-    antiguedad: '',
-    distintivo: '',
-  });
+  const [filters, setFilters] = useState<Filters>(filtrosIniciales);
 
   useEffect(() => {
     try {
       const saved = localStorage.getItem(STORAGE_KEY);
       if (saved) {
         const parsed = JSON.parse(saved);
-        if (parsed.filters) setFilters(parsed.filters);
+        if (parsed.filters) setFilters({ ...filtrosIniciales, ...parsed.filters });
         if (parsed.sortBy) setSortBy(parsed.sortBy);
         if (parsed.sortDir) setSortDir(parsed.sortDir);
       }
@@ -94,26 +143,69 @@ export default function ProveedoresPage() {
     } catch {}
   }, [filters, sortBy, sortDir]);
 
+  const construirParams = useCallback(() => {
+    const params: Record<string, string | number | boolean> = {
+      pagina: page,
+      por_pagina: ITEMS_PER_PAGE,
+      ordenar_por: sortBy,
+      orden_direccion: sortDir,
+    };
+    const busqueda = filters.busqueda.trim();
+    if (busqueda) params.q = busqueda;
+    if (filters.categorias.length > 0) params.id_categorias = filters.categorias.join(',');
+    if (filters.valoracionMin > 0) params.valoracion_minima = filters.valoracionMin;
+    if (filters.rangoPrecio) params.rango_precio = filters.rangoPrecio;
+    if (filters.distintivo === 'verificado') params.verificado = true;
+    if (filters.distintivo === 'destacado') params.destacado = true;
+    if (filters.disponibilidad === 'si') params.disponible = true;
+    if (filters.disponibilidad === 'no') params.disponible = false;
+
+    switch (filters.antiguedad) {
+      case '0-3': params.antiguedad_max_meses = 3; break;
+      case '3-6': params.antiguedad_min_meses = 3; params.antiguedad_max_meses = 6; break;
+      case '6-12': params.antiguedad_min_meses = 6; params.antiguedad_max_meses = 12; break;
+      case '12+': params.antiguedad_min_meses = 12; break;
+    }
+    return params;
+  }, [filters, page, sortBy, sortDir]);
+
   const fetchData = useCallback(async () => {
     setLoading(true);
     try {
       const [provRes, catRes] = await Promise.allSettled([
-        api.get('/proveedores'),
+        api.get('/proveedores', { params: construirParams() }),
         api.get('/catalogo/categorias'),
       ]);
-      const provData = provRes.status === 'fulfilled' ? extractData<RespuestaLista<ProveedorConPerfil>>(provRes.value) : null;
-      const catData = catRes.status === 'fulfilled' ? extractData<RespuestaLista<Categoria>>(catRes.value) : null;
-      setProveedores(provData?.data || provData || []);
-      setCategorias(catData?.data || catData || []);
+
+      if (provRes.status === 'fulfilled') {
+        const body = extractData<RespuestaLista<ProveedorLista>>(provRes.value);
+        setProveedores(Array.isArray(body) ? body : body?.data || []);
+        setMeta((!Array.isArray(body) && body?.meta ? body.meta : null) as MetaBusqueda | null);
+      } else {
+        setProveedores([]);
+      }
+
+      if (catRes.status === 'fulfilled') {
+        const cats = extractData<RespuestaLista<Categoria>>(catRes.value);
+        setCategorias(Array.isArray(cats) ? cats : cats?.data || []);
+      }
     } catch {
       setProveedores([]);
-      setCategorias([]);
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [construirParams]);
 
-  useEffect(() => { fetchData(); }, [fetchData]);
+  useEffect(() => {
+    if (!filters.busqueda) {
+      fetchData();
+      return;
+    }
+    const timer = setTimeout(() => { fetchData(); }, BUSQUEDA_RETARDO);
+    return () => clearTimeout(timer);
+  }, [fetchData, filters.busqueda]);
+
+  useEffect(() => { setPage(1); }, [filters, sortBy, sortDir]);
 
   const addHistorial = (term: string) => {
     if (!term.trim()) return;
@@ -122,64 +214,17 @@ export default function ProveedoresPage() {
     try { localStorage.setItem('proveedores_historial', JSON.stringify(updated)); } catch {}
   };
 
-  const stats = useMemo(() => {
-    const total = proveedores.length;
-    const rubros = new Set(proveedores.map((p) => p.rubro_principal).filter(Boolean)).size;
-    const promedio = proveedores.length
-      ? (proveedores.reduce((acc, p) => acc + (p.calificacion_promedio || 0), 0) / proveedores.length).toFixed(1)
-      : '0.0';
-    return { total, rubros, promedio };
-  }, [proveedores]);
+  const totalPages = Math.max(meta?.total_paginas || 1, 1);
+  const totalResultados = meta?.total ?? proveedores.length;
+  const sinResultados = !loading && !!filters.busqueda.trim() && proveedores.length === 0;
 
-  const filtered = useMemo(() => {
-    const result = proveedores.filter((p) => {
-      const search = filters.busqueda.toLowerCase();
-      if (search) {
-        const matchNombre = p.usuario?.nombre?.toLowerCase().includes(search);
-        const matchApellido = p.usuario?.apellido?.toLowerCase().includes(search);
-        const matchRubro = p.rubro_principal?.toLowerCase().includes(search);
-        const matchDesc = p.descripcion?.toLowerCase().includes(search);
-        if (!matchNombre && !matchApellido && !matchRubro && !matchDesc) return false;
-      }
-      if (filters.categorias.length > 0 && p.rubro_principal) {
-        const catMatch = categorias.find((c) =>
-          filters.categorias.includes(c.id_categoria) && c.nombre === p.rubro_principal
-        );
-        if (!catMatch) return false;
-      }
-      if (filters.valoracionMin > 0 && (p.calificacion_promedio || 0) < filters.valoracionMin) return false;
-      if (filters.antiguedad) {
-        const meses = p.antiguedad_meses || 0;
-        switch (filters.antiguedad) {
-          case '0-3': if (meses >= 3) return false; break;
-          case '3-6': if (meses < 3 || meses >= 6) return false; break;
-          case '6-12': if (meses < 6 || meses >= 12) return false; break;
-          case '12+': if (meses < 12) return false; break;
-        }
-      }
-      if (filters.distintivo === 'verificado' && !p.sello_verificado) return false;
-      if (filters.distintivo === 'destacado' && !p.proveedor_destacado) return false;
-      return true;
-    });
-
-    result.sort((a, b) => {
-      let cmp = 0;
-      switch (sortBy) {
-        case 'valoracion': cmp = (a.calificacion_promedio || 0) - (b.calificacion_promedio || 0); break;
-        case 'nombre': cmp = (a.usuario?.nombre || '').localeCompare(b.usuario?.nombre || ''); break;
-        case 'antiguedad': cmp = (a.antiguedad_meses || 0) - (b.antiguedad_meses || 0); break;
-        case 'transacciones': cmp = (a.cantidad_valoraciones || 0) - (b.cantidad_valoraciones || 0); break;
-      }
-      return sortDir === 'desc' ? -cmp : cmp;
-    });
-
-    return result;
-  }, [proveedores, filters, sortBy, sortDir, categorias]);
-
-  const totalPages = Math.ceil(filtered.length / ITEMS_PER_PAGE);
-  const paginated = filtered.slice((page - 1) * ITEMS_PER_PAGE, page * ITEMS_PER_PAGE);
-
-  const sinResultados = !loading && !!filters.busqueda.trim() && filtered.length === 0;
+  const rubrosSugeridos = useMemo(() => {
+    const palabras = filters.busqueda.toLowerCase().split(/\s+/).filter(Boolean);
+    const similares = categorias.filter((c) =>
+      palabras.some((p) => c.nombre.toLowerCase().includes(p))
+    );
+    return (similares.length > 0 ? similares : categorias).slice(0, 4);
+  }, [categorias, filters.busqueda]);
 
   useEffect(() => {
     if (!sinResultados) return;
@@ -193,8 +238,6 @@ export default function ProveedoresPage() {
     });
   }, [sinResultados, filters.busqueda, categorias]);
 
-  useEffect(() => { setPage(1); }, [filters, sortBy, sortDir]);
-
   const toggleCategoria = (id: number) => {
     setFilters((f) => ({
       ...f,
@@ -204,19 +247,17 @@ export default function ProveedoresPage() {
     }));
   };
 
-  const clearFilters = () => {
-    setFilters({ busqueda: '', categorias: [], valoracionMin: 0, rangoPrecio: '', antiguedad: '', distintivo: '' });
-  };
+  const clearFilters = () => setFilters(filtrosIniciales);
 
   const handleSearch = (value: string) => {
     setFilters((f) => ({ ...f, busqueda: value }));
     if (value.length >= 2) {
-      const matches = proveedores
-        .map((p) => [p.usuario?.nombre, p.rubro_principal].filter(Boolean))
+      const nombres = proveedores
+        .map((p) => [p.nombre, p.apellido, p.rubro_principal].filter(Boolean))
         .flat()
         .filter((n): n is string => Boolean(n))
         .filter((n) => n.toLowerCase().includes(value.toLowerCase()));
-      setSugerencias([...new Set(matches)].slice(0, 5));
+      setSugerencias([...new Set(nombres)].slice(0, 5));
       setShowSugerencias(true);
     } else {
       setShowSugerencias(false);
@@ -234,12 +275,17 @@ export default function ProveedoresPage() {
     addHistorial(filters.busqueda);
   };
 
+  const aplicarRubro = (id: number) => {
+    setFilters((f) => ({ ...f, busqueda: '', categorias: [id] }));
+  };
+
   const activeFiltersCount = [
     filters.categorias.length > 0,
     filters.valoracionMin > 0,
     filters.rangoPrecio !== '',
     filters.antiguedad !== '',
     filters.distintivo !== '',
+    filters.disponibilidad !== '',
   ].filter(Boolean).length;
 
   return (
@@ -319,18 +365,23 @@ export default function ProveedoresPage() {
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Stats bar */}
-        <div className="flex flex-wrap gap-6 mb-6 text-sm">
+        <div className="flex flex-wrap gap-6 mb-6 text-sm" aria-live="polite">
           <div className="flex items-center gap-2 text-slate-400">
             <Users className="w-4 h-4 text-cyan-400" />
-            <span><span className="text-white font-semibold">{stats.total}</span> proveedores</span>
+            <span>
+              <span className="text-white font-semibold">{meta?.total_registrados ?? 0}</span> registrados ·{' '}
+              <span className="text-white font-semibold">{meta?.total_proveedores ?? 0}</span> activos
+            </span>
           </div>
           <div className="flex items-center gap-2 text-slate-400">
             <TrendingUp className="w-4 h-4 text-cyan-400" />
-            <span><span className="text-white font-semibold">{stats.rubros}</span> rubros</span>
+            <span><span className="text-white font-semibold">{meta?.total_rubros ?? 0}</span> rubros</span>
           </div>
           <div className="flex items-center gap-2 text-slate-400">
             <LlaveIcon className="w-4 h-4 text-yellow-400" />
-            <span>Promedio: <span className="text-white font-semibold">{stats.promedio}</span></span>
+            <span>Promedio: <span className="text-white font-semibold">
+              {Number(meta?.promedio_general ?? 0).toFixed(1)}
+            </span></span>
           </div>
         </div>
 
@@ -347,12 +398,13 @@ export default function ProveedoresPage() {
 
               {/* Categorías */}
               <div>
-                <label className="text-xs text-slate-400 mb-2 block">Rubro</label>
-                <div className="flex flex-wrap gap-2">
+                <label htmlFor="filtro-rubro" className="text-xs text-slate-400 mb-2 block">Rubro</label>
+                <div id="filtro-rubro" className="flex flex-wrap gap-2">
                   {categorias.map((c) => (
                     <button
                       key={c.id_categoria}
                       onClick={() => toggleCategoria(c.id_categoria)}
+                      aria-pressed={filters.categorias.includes(c.id_categoria)}
                       className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${
                         filters.categorias.includes(c.id_categoria)
                           ? 'bg-cyan-500/20 text-cyan-400 border border-cyan-500/30'
@@ -368,14 +420,15 @@ export default function ProveedoresPage() {
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                 {/* Valoración mínima */}
                 <div>
-                  <label className="text-xs text-slate-400 mb-1 block">Valoración mínima</label>
-                  <div className="flex items-center gap-1">
+                  <span id="filtro-valoracion" className="text-xs text-slate-400 mb-1 block">Valoración mínima</span>
+                  <div className="flex items-center gap-1" role="group" aria-labelledby="filtro-valoracion">
                     {[1, 2, 3, 4, 5].map((n) => (
                       <button
                         key={n}
                         onClick={() => setFilters((f) => ({ ...f, valoracionMin: f.valoracionMin === n ? 0 : n }))}
                         className="p-1"
                         aria-label={`${n} llaves o más`}
+                        aria-pressed={filters.valoracionMin === n}
                       >
                         <LlaveIcon className={`w-5 h-5 ${
                           n <= filters.valoracionMin ? 'text-yellow-400 fill-yellow-400' : 'text-slate-600'
@@ -385,10 +438,26 @@ export default function ProveedoresPage() {
                   </div>
                 </div>
 
+                {/* Rango de precios */}
+                <div>
+                  <label htmlFor="filtro-precio" className="text-xs text-slate-400 mb-1 block">Rango de precios</label>
+                  <select
+                    id="filtro-precio"
+                    value={filters.rangoPrecio}
+                    onChange={(e) => setFilters((f) => ({ ...f, rangoPrecio: e.target.value }))}
+                    className="w-full px-3 py-2 bg-slate-800 border border-slate-600 rounded-lg text-white text-sm"
+                  >
+                    {precioOptions.map((o) => (
+                      <option key={o.value} value={o.value}>{o.label}</option>
+                    ))}
+                  </select>
+                </div>
+
                 {/* Antigüedad */}
                 <div>
-                  <label className="text-xs text-slate-400 mb-1 block">Antigüedad</label>
+                  <label htmlFor="filtro-antiguedad" className="text-xs text-slate-400 mb-1 block">Antigüedad</label>
                   <select
+                    id="filtro-antiguedad"
                     value={filters.antiguedad}
                     onChange={(e) => setFilters((f) => ({ ...f, antiguedad: e.target.value }))}
                     className="w-full px-3 py-2 bg-slate-800 border border-slate-600 rounded-lg text-white text-sm"
@@ -401,8 +470,9 @@ export default function ProveedoresPage() {
 
                 {/* Distintivo */}
                 <div>
-                  <label className="text-xs text-slate-400 mb-1 block">Distintivo</label>
+                  <label htmlFor="filtro-distintivo" className="text-xs text-slate-400 mb-1 block">Distintivo</label>
                   <select
+                    id="filtro-distintivo"
                     value={filters.distintivo}
                     onChange={(e) => setFilters((f) => ({ ...f, distintivo: e.target.value }))}
                     className="w-full px-3 py-2 bg-slate-800 border border-slate-600 rounded-lg text-white text-sm"
@@ -413,11 +483,27 @@ export default function ProveedoresPage() {
                   </select>
                 </div>
 
+                {/* Disponibilidad */}
+                <div>
+                  <label htmlFor="filtro-disponibilidad" className="text-xs text-slate-400 mb-1 block">Disponibilidad</label>
+                  <select
+                    id="filtro-disponibilidad"
+                    value={filters.disponibilidad}
+                    onChange={(e) => setFilters((f) => ({ ...f, disponibilidad: e.target.value }))}
+                    className="w-full px-3 py-2 bg-slate-800 border border-slate-600 rounded-lg text-white text-sm"
+                  >
+                    {disponibilidadOptions.map((o) => (
+                      <option key={o.value} value={o.value}>{o.label}</option>
+                    ))}
+                  </select>
+                </div>
+
                 {/* Ordenamiento */}
                 <div>
-                  <label className="text-xs text-slate-400 mb-1 block">Ordenar por</label>
+                  <label htmlFor="filtro-orden" className="text-xs text-slate-400 mb-1 block">Ordenar por</label>
                   <div className="flex gap-1">
                     <select
+                      id="filtro-orden"
                       value={sortBy}
                       onChange={(e) => setSortBy(e.target.value as SortOption)}
                       className="flex-1 px-3 py-2 bg-slate-800 border border-slate-600 rounded-lg text-white text-sm"
@@ -429,7 +515,7 @@ export default function ProveedoresPage() {
                     <button
                       onClick={() => setSortDir((d) => d === 'asc' ? 'desc' : 'asc')}
                       className="px-2 py-2 bg-slate-800 border border-slate-600 rounded-lg text-slate-400 hover:text-white"
-                      aria-label="Cambiar dirección"
+                      aria-label={`Dirección: ${sortDir === 'asc' ? 'ascendente' : 'descendente'}`}
                     >
                       <ArrowUpDown className="w-4 h-4" />
                     </button>
@@ -447,11 +533,29 @@ export default function ProveedoresPage() {
               <div key={i} className="h-64 bg-slate-800/50 rounded-xl animate-pulse" />
             ))}
           </div>
-        ) : paginated.length === 0 ? (
+        ) : proveedores.length === 0 ? (
           <div className="text-center py-16">
             <Search className="w-16 h-16 text-slate-600 mx-auto mb-4" />
             <h2 className="text-xl font-semibold text-white mb-2">No se encontraron proveedores</h2>
-            <p className="text-slate-400 mb-6">Intentá con otros filtros o términos de búsqueda</p>
+            <p className="text-slate-400 mb-4">Intentá con otros filtros o términos de búsqueda</p>
+
+            {rubrosSugeridos.length > 0 && (
+              <div className="mb-6">
+                <p className="text-xs text-slate-500 mb-2">Rubros similares disponibles:</p>
+                <div className="flex flex-wrap justify-center gap-2">
+                  {rubrosSugeridos.map((r) => (
+                    <button
+                      key={r.id_categoria}
+                      onClick={() => aplicarRubro(r.id_categoria)}
+                      className="px-3 py-1.5 rounded-lg text-xs font-medium bg-slate-800 border border-slate-700 text-slate-300 hover:text-white hover:border-cyan-500/40 transition-colors"
+                    >
+                      {r.nombre}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+
             <Link
               href="/proveedores/solicitud"
               className="inline-flex items-center gap-2 px-4 py-2 bg-cyan-600 hover:bg-cyan-700 text-white rounded-lg text-sm font-medium transition-colors"
@@ -461,93 +565,105 @@ export default function ProveedoresPage() {
           </div>
         ) : (
           <>
-            <p className="text-sm text-slate-400 mb-4">
-              {filtered.length} proveedor{filtered.length !== 1 ? 'es' : ''} encontrado{filtered.length !== 1 ? 's' : ''}
+            <p className="text-sm text-slate-400 mb-4" aria-live="polite">
+              {totalResultados} proveedor{totalResultados !== 1 ? 'es' : ''} encontrado{totalResultados !== 1 ? 's' : ''}
             </p>
 
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {paginated.map((prov) => (
-                <Link key={prov.id_perfil_proveedor} href={`/proveedores/${prov.id_usuario}`}>
-                  <Card hover className="h-full">
-                    <div className="p-5">
-                      {/* Header */}
-                      <div className="flex items-center gap-3 mb-4">
-                        <div className="w-14 h-14 bg-gradient-to-br from-blue-600 to-cyan-400 rounded-full flex items-center justify-center flex-shrink-0">
-                          <span className="text-white text-xl font-bold">
-                            {prov.usuario?.nombre?.[0] || 'P'}
-                          </span>
-                        </div>
-                        <div className="min-w-0">
-                          <div className="flex items-center gap-2">
-                            <h3 className="font-semibold text-white truncate">
-                              {prov.usuario?.nombre} {prov.usuario?.apellido}
-                            </h3>
-                            {prov.proveedor_destacado && (
-                              <Award className="w-4 h-4 text-yellow-400 flex-shrink-0" aria-label="Proveedor destacado" />
-                            )}
-                          </div>
-                          <p className="text-sm text-slate-400 truncate">{prov.rubro_principal || 'Proveedor'}</p>
-                        </div>
-                      </div>
-
-                      {/* Rating */}
-                      <div className="flex items-center gap-2 mb-3">
-                        <div className="flex items-center gap-0.5">
-                          {[1, 2, 3, 4, 5].map((s) => (
-                            <LlaveIcon
-                              key={s}
-                              className={`w-4 h-4 ${
-                                s <= Math.round(prov.calificacion_promedio || 0)
-                                  ? 'text-yellow-400 fill-yellow-400'
-                                  : 'text-slate-600'
-                              }`}
-                              aria-hidden="true"
-                            />
-                          ))}
-                        </div>
-                        <span className="text-sm text-white font-medium">
-                          {prov.calificacion_promedio?.toFixed(1) || '0.0'}
-                        </span>
-                        <span className="text-xs text-slate-500">
-                          ({prov.cantidad_valoraciones} reseñas)
+              {proveedores.map((prov) => (
+                <Card key={prov.id_perfil_proveedor ?? prov.id_usuario} hover className="h-full">
+                  <div className="p-5">
+                    {/* Header */}
+                    <div className="flex items-center gap-3 mb-4">
+                      <div className="w-14 h-14 bg-gradient-to-br from-blue-600 to-cyan-400 rounded-full flex items-center justify-center flex-shrink-0">
+                        <span className="text-white text-xl font-bold">
+                          {prov.nombre?.[0] || 'P'}
                         </span>
                       </div>
-
-                      {/* Badges */}
-                      <div className="flex items-center gap-2 mb-4">
-                        {prov.sello_verificado && (
-                          <span className="flex items-center gap-1 text-xs px-2 py-1 bg-cyan-500/10 text-cyan-400 border border-cyan-500/20 rounded-lg">
-                            <Shield className="w-3 h-3" />
-                            Verificado
-                          </span>
-                        )}
-                        {prov.proveedor_destacado && (
-                          <span className="flex items-center gap-1 text-xs px-2 py-1 bg-yellow-500/10 text-yellow-400 border border-yellow-500/20 rounded-lg">
-                            <Award className="w-3 h-3" />
-                            Destacado
-                          </span>
-                        )}
-                      </div>
-
-                      {/* Description */}
-                      <p className="text-sm text-slate-400 mb-4 line-clamp-2">
-                        {prov.descripcion || 'Proveedor verificado en la plataforma'}
-                      </p>
-
-                      {/* Footer stats */}
-                      <div className="pt-4 border-t border-slate-700/50 flex items-center justify-between text-xs text-slate-500">
-                        <span className="flex items-center gap-1">
-                          <TrendingUp className="w-3 h-3" />
-                          {prov.tasa_cumplimiento?.toFixed(0) || '95'}% cumplimiento
-                        </span>
-                        <span className="flex items-center gap-1">
-                          <Clock className="w-3 h-3" />
-                          {prov.antiguedad_meses} meses
-                        </span>
+                      <div className="min-w-0">
+                        <div className="flex items-center gap-2">
+                          <h3 className="font-semibold text-white truncate">
+                            <Link href={`/proveedores/${prov.id_usuario}`} className="hover:text-cyan-300">
+                              {prov.nombre} {prov.apellido}
+                            </Link>
+                          </h3>
+                          {prov.proveedor_destacado && (
+                            <Award className="w-4 h-4 text-yellow-400 flex-shrink-0" aria-label="Proveedor destacado" />
+                          )}
+                        </div>
+                        <p className="text-sm text-slate-400 truncate">{prov.rubro_principal || 'Proveedor'}</p>
                       </div>
                     </div>
-                  </Card>
-                </Link>
+
+                    {/* Rating */}
+                    <div className="flex items-center gap-2 mb-3">
+                      <div className="flex items-center gap-0.5">
+                        {[1, 2, 3, 4, 5].map((s) => (
+                          <LlaveIcon
+                            key={s}
+                            className={`w-4 h-4 ${
+                              s <= Math.round(prov.calificacion_promedio || 0)
+                                ? 'text-yellow-400 fill-yellow-400'
+                                : 'text-slate-600'
+                            }`}
+                            aria-hidden="true"
+                          />
+                        ))}
+                      </div>
+                      <span className="text-sm text-white font-medium">
+                        {Number(prov.calificacion_promedio ?? 0).toFixed(1)}
+                      </span>
+                      <span className="text-xs text-slate-500">
+                        ({prov.cantidad_valoraciones ?? 0} reseñas)
+                      </span>
+                    </div>
+
+                    {/* Badges */}
+                    <div className="flex items-center gap-2 mb-4">
+                      {prov.sello_verificado && (
+                        <span className="flex items-center gap-1 text-xs px-2 py-1 bg-cyan-500/10 text-cyan-400 border border-cyan-500/20 rounded-lg">
+                          <Shield className="w-3 h-3" />
+                          Verificado
+                        </span>
+                      )}
+                      {prov.proveedor_destacado && (
+                        <span className="flex items-center gap-1 text-xs px-2 py-1 bg-yellow-500/10 text-yellow-400 border border-yellow-500/20 rounded-lg">
+                          <Award className="w-3 h-3" />
+                          Destacado
+                        </span>
+                      )}
+                    </div>
+
+                    {/* Description */}
+                    <p className="text-sm text-slate-400 mb-4 line-clamp-2">
+                      {prov.descripcion || 'Proveedor verificado en la plataforma'}
+                    </p>
+
+                    {/* Footer stats */}
+                    <div className="pt-4 border-t border-slate-700/50 flex items-center justify-between text-xs text-slate-500">
+                      <span className="flex items-center gap-1">
+                        <TrendingUp className="w-3 h-3" />
+                        {prov.tasa_cumplimiento !== null && prov.tasa_cumplimiento !== undefined
+                          ? `${Math.round(prov.tasa_cumplimiento)}% cumplimiento`
+                          : 'Sin datos de cumplimiento'}
+                      </span>
+                      <span className="flex items-center gap-1">
+                        <Clock className="w-3 h-3" />
+                        {formatearAntiguedad(prov.antiguedad_meses)}
+                      </span>
+                    </div>
+
+                    {/* Contacto */}
+                    <Link
+                      href={`/proveedores/${prov.id_usuario}/servicios`}
+                      className="mt-3 w-full inline-flex items-center justify-center gap-2 px-3 py-2 text-xs font-medium rounded-lg bg-cyan-600 hover:bg-cyan-700 text-white transition-colors"
+                      aria-label={`Ver servicios y contacto de ${prov.nombre || 'este proveedor'}`}
+                    >
+                      <MessageSquare className="w-3.5 h-3.5" />
+                      Contacto y servicios
+                    </Link>
+                  </div>
+                </Card>
               ))}
             </div>
 
@@ -577,6 +693,8 @@ export default function ProveedoresPage() {
                     <button
                       key={pageNum}
                       onClick={() => setPage(pageNum)}
+                      aria-current={page === pageNum ? 'page' : undefined}
+                      aria-label={`Página ${pageNum}`}
                       className={`w-10 h-10 rounded-lg text-sm font-medium transition-colors ${
                         page === pageNum
                           ? 'bg-cyan-600 text-white'

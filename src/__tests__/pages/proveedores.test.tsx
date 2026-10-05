@@ -29,8 +29,9 @@ describe('ProveedoresPage', () => {
     await act(async () => {
       render(<ProveedoresPage />);
     });
-    expect(screen.getByText('proveedores')).toBeInTheDocument();
-    expect(screen.getByText('rubros')).toBeInTheDocument();
+    expect(screen.getByText(/registrados/)).toBeInTheDocument();
+    expect(screen.getByText(/rubros/)).toBeInTheDocument();
+    expect(screen.getByText(/Promedio/)).toBeInTheDocument();
   });
 
   it('shows empty state with no results', async () => {
