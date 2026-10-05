@@ -6,17 +6,37 @@ import { Card, CardTitle } from '@/components/ui/Card';
 import Button from '@/components/ui/Button';
 import api, { extractData } from '@/lib/api';
 import { formatCurrency, formatDate } from '@/lib/utils';
-import { CreditCard, Banknote, Shield, AlertCircle, Loader2, CheckCircle, XCircle, Clock, ArrowLeft } from 'lucide-react';
+import { CreditCard, Banknote, Shield, AlertCircle, Loader2, CheckCircle, ArrowLeft } from 'lucide-react';
 import type { Transaccion } from '@/types';
 import { useStepTimer } from '@/hooks/useStepTimer';
-import { TimerDisplay, TimerProgress, StepTimerCard } from '@/components/checkout/TimerDisplay';
+import { StepTimerCard } from '@/components/checkout/TimerDisplay';
 import { useFunnelAnalytics } from '@/hooks/useFunnelAnalytics';
 
 const mpPublicKey = process.env.NEXT_PUBLIC_MERCADOPAGO_PUBLIC_KEY || 'TEST-xxxxxxxxxxxxxxxx';
 
+interface MercadoPagoCheckoutEvent {
+  message?: string;
+}
+
+interface MercadoPagoBrick {
+  on(event: string, callback: (payload?: MercadoPagoCheckoutEvent) => void): void;
+}
+
+interface MercadoPagoInstance {
+  checkout(options: {
+    preference: { id: string };
+    render: { containerId: string; label: string };
+    autoOpen: boolean;
+  }): MercadoPagoBrick;
+}
+
+interface MercadoPagoSDK {
+  new (publicKey: string, options: { locale: string }): MercadoPagoInstance;
+}
+
 declare global {
   interface Window {
-    MercadoPago: any;
+    MercadoPago?: MercadoPagoSDK;
   }
 }
 
@@ -44,7 +64,7 @@ export function CheckoutContent() {
   const [processing, setProcessing] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [metodoPago, setMetodoPago] = useState<'tarjeta' | 'transferencia'>('tarjeta');
-  const [mpInstance, setMpInstance] = useState<any>(null);
+  const [mpInstance, setMpInstance] = useState<MercadoPagoInstance | null>(null);
   const [checkoutRendered, setCheckoutRendered] = useState(false);
   const [preferencia, setPreferencia] = useState<PreferenciaCheckout | null>(null);
   const checkoutContainerRef = useRef<HTMLDivElement>(null);
@@ -53,10 +73,7 @@ export function CheckoutContent() {
   const {
     tiempoActual,
     pasoActual,
-    corriendo,
-    cambiarPaso,
     obtenerTiempoTotal,
-    obtenerTiempoPaso,
   } = useStepTimer({
     pasoInicial: 3,
     autoStart: true,
@@ -69,7 +86,7 @@ export function CheckoutContent() {
   });
   
   // Funnel Analytics
-  const { trackPasoCompletado, trackAbandono, trackError } = useFunnelAnalytics(idTransaccion);
+  const { trackPasoCompletado, trackError } = useFunnelAnalytics(idTransaccion);
 
   useEffect(() => {
     if (!idTransaccion) {
@@ -81,10 +98,10 @@ export function CheckoutContent() {
     const fetchTransaccion = async () => {
       try {
         const res = await api.get(`/transacciones/${idTransaccion}`);
-        const data = extractData<any>(res);
+        const data = extractData<Transaccion>(res);
         setTransaccion(data);
         await api.post('/metricas/paso', { id_transaccion: idTransaccion, paso: 3 });
-      } catch (e) {
+      } catch {
         setError('Error al cargar la transacción');
       } finally {
         setLoading(false);
@@ -114,18 +131,12 @@ export function CheckoutContent() {
     loadMercadoPago();
   }, []);
 
-  useEffect(() => {
-    if (mpInstance && checkoutContainerRef.current && !checkoutRendered && transaccion?.estado === 'en_proceso') {
-      renderCheckout();
-    }
-  }, [mpInstance, transaccion, checkoutRendered]);
-
-  const renderCheckout = async () => {
+  const renderCheckout = useCallback(async () => {
     if (!mpInstance || !checkoutContainerRef.current || !transaccion) return;
 
     try {
       const res = await api.post('/pagos/crear-checkout-mercadopago', { id_transaccion: idTransaccion });
-      const data = extractData<any>(res);
+      const data = extractData<PreferenciaCheckout>(res);
       setPreferencia(data);
 
       // Modo demostración (sin MP_ACCESS_TOKEN): se usa el botón de simulación
@@ -152,7 +163,7 @@ export function CheckoutContent() {
         trackPasoCompletado(3, { evento: 'checkout_rendered', preference_id: preferenceId });
       });
 
-      checkout.on('error', (err: any) => {
+      checkout.on('error', (err) => {
         console.error('MP Checkout error:', err);
         trackError(3, err?.message || 'Error en checkout MP', { preference_id: preferenceId });
         setError('Error al cargar el checkout. Intente nuevamente.');
@@ -163,7 +174,13 @@ export function CheckoutContent() {
       trackError(3, e instanceof Error ? e.message : 'Error desconocido');
       setError('Error al iniciar el pago');
     }
-  };
+  }, [idTransaccion, mpInstance, transaccion, trackPasoCompletado, trackError]);
+
+  useEffect(() => {
+    if (mpInstance && checkoutContainerRef.current && !checkoutRendered && transaccion?.estado === 'en_proceso') {
+      renderCheckout();
+    }
+  }, [mpInstance, transaccion, checkoutRendered, renderCheckout]);
 
   const simularPago = async () => {
     setProcessing(true);
@@ -189,14 +206,6 @@ export function CheckoutContent() {
     } catch {
       router.push(`/checkout/exito?id_transaccion=${idTransaccion}`);
     }
-  };
-
-  const handlePagoFallido = async () => {
-    const tiempoTotal = obtenerTiempoTotal();
-    await api.post('/metricas/tiempo', { id_transaccion: idTransaccion, tiempo_total_segundos: tiempoTotal });
-    await api.post('/metricas/paso', { id_transaccion: idTransaccion, paso: 4 });
-    trackError(4, 'Pago fallido o cancelado por usuario', { tiempo_total: tiempoTotal });
-    router.push(`/checkout/fallo?id_transaccion=${idTransaccion}&tiempo=${tiempoTotal}`);
   };
 
   if (loading) {
@@ -384,7 +393,7 @@ export function CheckoutContent() {
                           id_transaccion: idTransaccion,
                           metodo: 'transferencia'
                         });
-                        const data = extractData<any>(res);
+                        const data = extractData<PreferenciaCheckout>(res);
                         if (data?.transferencia) {
                           alert(`CBU: ${data.transferencia.cbu}\nAlias: ${data.transferencia.alias}\nMonto: ${formatCurrency(total)}`);
                           handlePagoExitoso();

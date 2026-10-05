@@ -4,8 +4,9 @@
 import './setup';
 import { render, screen, act, fireEvent } from '@testing-library/react';
 import SolicitudRubroPage from '@/app/proveedores/solicitud/page';
+import api from '@/lib/api';
 
-const api = require('@/lib/api').default;
+const apiGetMock = api.get as unknown as jest.Mock;
 
 const solicitudesMock = [
   {
@@ -39,7 +40,7 @@ const solicitudesMock = [
 describe('SolicitudRubroPage', () => {
   beforeEach(() => {
     jest.clearAllMocks();
-    api.get.mockResolvedValue({
+    apiGetMock.mockResolvedValue({
       data: { statusCode: 200, timestamp: '', data: { data: [] } },
     });
   });
@@ -75,7 +76,7 @@ describe('SolicitudRubroPage', () => {
   });
 
   it('lista solicitudes con justificación, SLA, apoyos y motivo de resolución', async () => {
-    api.get.mockResolvedValue({
+    apiGetMock.mockResolvedValue({
       data: { statusCode: 200, timestamp: '', data: { data: solicitudesMock } },
     });
 
@@ -99,7 +100,7 @@ describe('SolicitudRubroPage', () => {
   });
 
   it('muestra badge Automática para solicitudes generadas por umbral', async () => {
-    api.get.mockResolvedValue({
+    apiGetMock.mockResolvedValue({
       data: { statusCode: 200, timestamp: '', data: { data: solicitudesMock } },
     });
 

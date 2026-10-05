@@ -3,24 +3,28 @@
  */
 import './setup';
 import { render, screen, act } from '@testing-library/react';
+import type { AnchorHTMLAttributes } from 'react';
 import ProveedorDetailPage from '@/app/proveedores/[id]/page';
+import api from '@/lib/api';
 
-const api = require('@/lib/api').default;
+const apiGetMock = api.get as unknown as jest.Mock;
 
 jest.mock('next/navigation', () => ({
   useParams: () => ({ id: '10' }),
 }));
 
 jest.mock('next/link', () => {
-  return ({ children, href, ...props }: any) => (
+  const MockLink = ({ children, href, ...props }: AnchorHTMLAttributes<HTMLAnchorElement>) => (
     <a href={href} {...props}>{children}</a>
   );
+  MockLink.displayName = 'MockLink';
+  return MockLink;
 });
 
 describe('ProveedorDetailPage', () => {
   beforeEach(() => {
     jest.clearAllMocks();
-    api.get.mockResolvedValue({
+    apiGetMock.mockResolvedValue({
       data: { statusCode: 200, timestamp: '', data: null },
     });
   });

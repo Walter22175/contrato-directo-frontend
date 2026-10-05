@@ -1,6 +1,6 @@
 'use client';
 
-import { Card, CardTitle } from '@/components/ui/Card';
+import { Card } from '@/components/ui/Card';
 import Link from 'next/link';
 import { Shield, CheckCircle, ArrowLeft, Clock, RotateCcw, Lock, DollarSign, RefreshCw } from 'lucide-react';
 

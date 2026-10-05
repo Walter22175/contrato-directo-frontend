@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { Card, CardTitle } from '@/components/ui/Card';
-import { formatearHorario, esDiaHabil, esFeriado, diasHabilesEntre } from '@/lib/horarios';
+import { formatearHorario, esDiaHabil, esFeriado } from '@/lib/horarios';
 import { Clock, Calendar, Check, X } from 'lucide-react';
 import type { HorarioAtencion } from '@/types';
 

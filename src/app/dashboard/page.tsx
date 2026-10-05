@@ -2,19 +2,20 @@
 
 import { useAuthStore } from '@/store/auth';
 import { Card, CardTitle } from '@/components/ui/Card';
-import { CreditCard, FileText, Star, TrendingUp, Clock, CheckCircle } from 'lucide-react';
+import { CreditCard, FileText, TrendingUp, Clock, CheckCircle } from 'lucide-react';
+import { LlaveIcon } from '@/components/ui/LlaveIcon';
 
 const stats = [
   { label: 'Transacciones', value: '12', change: '+3 este mes', icon: CreditCard, color: 'text-cyan-400' },
   { label: 'Contratos Activos', value: '5', change: '2 pendientes', icon: FileText, color: 'text-blue-400' },
-  { label: 'Valoración Promedio', value: '4.8', change: '23 reseñas', icon: Star, color: 'text-yellow-400' },
+  { label: 'Valoración Promedio', value: '4.8', change: '23 reseñas', icon: LlaveIcon, color: 'text-yellow-400' },
   { label: 'Ingresos del Mes', value: '$45.000', change: '+12%', icon: TrendingUp, color: 'text-green-400' },
 ];
 
 const recentActivity = [
   { title: 'Nuevo contrato firmado', description: 'Plomería - Juan Pérez', time: 'Hace 2 horas', icon: CheckCircle, color: 'text-green-400' },
   { title: 'Pago recibido', description: '$12.500 - Servicio de pintura', time: 'Hace 5 horas', icon: CreditCard, color: 'text-cyan-400' },
-  { title: 'Valoración pendiente', description: 'Dejá tu opinión sobre el servicio', time: 'Ayer', icon: Star, color: 'text-yellow-400' },
+  { title: 'Valoración pendiente', description: 'Dejá tu opinión sobre el servicio', time: 'Ayer', icon: LlaveIcon, color: 'text-yellow-400' },
   { title: 'Contrato en revisión', description: 'Esperando firma del proveedor', time: 'Hace 2 días', icon: Clock, color: 'text-slate-400' },
 ];
 

@@ -13,7 +13,7 @@ interface NotificationState {
   marcarTodasLeidas: () => Promise<void>;
 }
 
-export const useNotificationStore = create<NotificationState>((set, get) => ({
+export const useNotificationStore = create<NotificationState>((set) => ({
   notificaciones: [],
   noLeidas: 0,
   isLoading: false,

@@ -12,9 +12,11 @@ export function useStepTimer({ pasoInicial = 1, autoStart = true, onPasoChange }
   const [tiempoActual, setTiempoActual] = useState(0);
   const [pasoActual, setPasoActual] = useState(pasoInicial);
   const [corriendo, setCorriendo] = useState(autoStart);
-  const [historialPasos, setHistorialPasos] = useState<Array<{ paso: number; inicio: number; fin?: number; duracion?: number }>>([
-    { paso: pasoInicial, inicio: Date.now() }
-  ]);
+  const [historialPasos, setHistorialPasos] = useState<Array<{ paso: number; inicio: number; fin?: number; duracion?: number }>>([]);
+
+  useEffect(() => {
+    setHistorialPasos([{ paso: pasoInicial, inicio: Date.now() }]);
+  }, [pasoInicial]);
 
   const tick = useCallback(() => {
     if (corriendo) {

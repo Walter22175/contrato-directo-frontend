@@ -63,7 +63,6 @@ export function obtenerProximoHorario(horarios: HorarioAtencion[]): { fecha: Dat
   const ahora = new Date();
   const offset = -3;
   const horaLocal = new Date(ahora.getTime() + offset * 60 * 60 * 1000);
-  const dia = horaLocal.getDay();
   const horaActual = `${String(horaLocal.getHours()).padStart(2, '0')}:${String(horaLocal.getMinutes()).padStart(2, '0')}`;
 
   for (let diasAdelante = 0; diasAdelante <= 7; diasAdelante++) {

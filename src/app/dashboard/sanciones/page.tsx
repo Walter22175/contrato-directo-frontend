@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback, type FormEvent } from 'react';
 import { useAuthStore } from '@/store/auth';
-import api, { extractData } from '@/lib/api';
+import api, { extractData, mensajeError } from '@/lib/api';
 import { Card } from '@/components/ui/Card';
 import {
   Shield,
@@ -52,21 +52,25 @@ export default function SancionesPage() {
     id_aplicador: user?.id_usuario || '',
   });
 
-  const fetchSanciones = useCallback(async () => {
-    setLoading(true);
-    try {
-      const res = await api.get('/sanciones');
-      const data = extractData<any>(res);
-      setSanciones(data?.data || data || []);
-    } catch {
-      setSanciones([]);
-    } finally {
-      setLoading(false);
-    }
+  const fetchSanciones = useCallback(() => {
+    return api
+      .get('/sanciones')
+      .then((res) => {
+        const raw = extractData<Sancion[] | { data?: Sancion[] } | null>(res);
+        setSanciones(Array.isArray(raw) ? raw : raw?.data || []);
+      })
+      .catch(() => setSanciones([]))
+      .finally(() => setLoading(false));
   }, []);
 
   useEffect(() => { fetchSanciones(); }, [fetchSanciones]);
-  useEffect(() => { if (user?.id_usuario) setForm((f) => ({ ...f, id_aplicador: user.id_usuario! })); }, [user?.id_usuario]);
+
+  const [prevAplicador, setPrevAplicador] = useState<string | undefined>(undefined);
+  const idAplicador = user?.id_usuario;
+  if (idAplicador !== prevAplicador) {
+    setPrevAplicador(idAplicador);
+    if (idAplicador) setForm((f) => ({ ...f, id_aplicador: idAplicador }));
+  }
 
   const handleCreate = async (e: FormEvent) => {
     e.preventDefault();
@@ -77,9 +81,10 @@ export default function SancionesPage() {
       setShowForm(false);
       setForm({ id_usuario: '', tipo_sancion: '', descripcion: '', fecha_inicio: new Date().toISOString().split('T')[0], id_aplicador: user?.id_usuario || '' });
       setMsg({ type: 'success', text: 'Sanción creada correctamente' });
+      setLoading(true);
       await fetchSanciones();
-    } catch (err: any) {
-      setMsg({ type: 'error', text: err.response?.data?.message || 'Error al crear sanción' });
+    } catch (err) {
+      setMsg({ type: 'error', text: mensajeError(err, 'Error al crear sanción') });
     } finally {
       setSending(false);
     }
@@ -89,9 +94,10 @@ export default function SancionesPage() {
     try {
       await api.patch(`/sanciones/${id}/desactivar`);
       setMsg({ type: 'success', text: 'Sanción desactivada' });
+      setLoading(true);
       await fetchSanciones();
-    } catch (err: any) {
-      setMsg({ type: 'error', text: err.response?.data?.message || 'Error al desactivar' });
+    } catch (err) {
+      setMsg({ type: 'error', text: mensajeError(err, 'Error al desactivar') });
     }
   };
 

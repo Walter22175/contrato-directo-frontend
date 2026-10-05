@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback, type FormEvent } from 'react';
 import { useAuthStore } from '@/store/auth';
 import api, { extractData } from '@/lib/api';
 import { Card } from '@/components/ui/Card';
-import { MessageSquare, Plus, Send, ArrowLeft, Circle, CheckCircle, Clock, AlertTriangle } from 'lucide-react';
+import { MessageSquare, Plus, Send, ArrowLeft, Circle, CheckCircle, Clock } from 'lucide-react';
 import type { Ticket } from '@/types';
 
 interface Respuesta {
@@ -52,17 +52,19 @@ export default function TicketsPage() {
   const [showNew, setShowNew] = useState(false);
   const [nuevo, setNuevo] = useState({ asunto: '', descripcion: '', prioridad: 'media' });
 
+  const idUsuario = user?.id_usuario;
+
   const fetchTickets = useCallback(async () => {
     try {
-      const res = await api.get('/tickets', { params: { id_usuario: user?.id_usuario } });
-      const data = extractData<any>(res);
-      setTickets(data?.data || data || []);
+      const res = await api.get('/tickets', { params: { id_usuario: idUsuario } });
+      const data = extractData<Ticket[] | { data?: Ticket[] } | null>(res);
+      setTickets(Array.isArray(data) ? data : data?.data || []);
     } catch {
       setTickets([]);
     } finally {
       setLoading(false);
     }
-  }, [user?.id_usuario]);
+  }, [idUsuario]);
 
   useEffect(() => {
     fetchTickets();
@@ -72,7 +74,7 @@ export default function TicketsPage() {
     setLoadingDetalle(true);
     try {
       const res = await api.get(`/tickets/${id}`);
-      const data = extractData<any>(res);
+      const data = extractData<TicketDetalle | null>(res);
       setDetalle(data);
       setSelected(id);
     } catch {} finally {
@@ -109,7 +111,7 @@ export default function TicketsPage() {
         canal: 'formulario',
         prioridad: nuevo.prioridad,
       });
-      const data = extractData<any>(res);
+      const data = extractData<Ticket | null>(res);
       setShowNew(false);
       setNuevo({ asunto: '', descripcion: '', prioridad: 'media' });
       await fetchTickets();

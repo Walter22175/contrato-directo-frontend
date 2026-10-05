@@ -5,6 +5,12 @@ import api, { extractData } from '@/lib/api';
 import { Card } from '@/components/ui/Card';
 import { Users, Briefcase, FileText, AlertTriangle, TrendingUp, Activity } from 'lucide-react';
 import Link from 'next/link';
+import type { Reclamo, Transaccion, Usuario } from '@/types';
+
+interface ResumenLista<T> {
+  data?: T[];
+  meta?: { total?: number };
+}
 
 interface Stats {
   totalUsuarios: number;
@@ -20,13 +26,13 @@ export default function AdminPage() {
   const fetchStats = useCallback(async () => {
     try {
       const [usersRes, txRes, reclamosRes] = await Promise.allSettled([
-        api.get('/usuarios', { params: { limite: 1 } }),
-        api.get('/transacciones', { params: { limite: 1 } }),
-        api.get('/reclamos', { params: { limite: 1 } }),
+        api.get<ResumenLista<Usuario>>('/usuarios', { params: { limite: 1 } }),
+        api.get<ResumenLista<Transaccion>>('/transacciones', { params: { limite: 1 } }),
+        api.get<ResumenLista<Reclamo>>('/reclamos', { params: { limite: 1 } }),
       ]);
-      const usersData = usersRes.status === 'fulfilled' ? extractData<any>(usersRes.value) : null;
-      const txData = txRes.status === 'fulfilled' ? extractData<any>(txRes.value) : null;
-      const reclamosData = reclamosRes.status === 'fulfilled' ? extractData<any>(reclamosRes.value) : null;
+      const usersData = usersRes.status === 'fulfilled' ? extractData<ResumenLista<Usuario> | null>(usersRes.value) : null;
+      const txData = txRes.status === 'fulfilled' ? extractData<ResumenLista<Transaccion> | null>(txRes.value) : null;
+      const reclamosData = reclamosRes.status === 'fulfilled' ? extractData<ResumenLista<Reclamo> | null>(reclamosRes.value) : null;
 
       setStats({
         totalUsuarios: usersData?.meta?.total || usersData?.data?.length || 0,

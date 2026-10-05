@@ -13,7 +13,6 @@ import Select from '@/components/ui/Select';
 import { Eye, EyeOff } from 'lucide-react';
 import SUSModal from '@/components/ui/SUSModal';
 import api from '@/lib/api';
-import { extractData } from '@/lib/api';
 
 const registerSchema = z.object({
   email: z.string().email('Email inválido'),
@@ -27,6 +26,20 @@ const registerSchema = z.object({
 });
 
 type RegisterForm = z.infer<typeof registerSchema>;
+
+interface RespuestasSUS {
+  q1: number;
+  q2: number;
+  q3: number;
+  q4: number;
+  q5: number;
+  q6: number;
+  q7: number;
+  q8: number;
+  q9: number;
+  q10: number;
+  comentarios?: string;
+}
 
 export default function RegisterPage() {
   const router = useRouter();
@@ -56,7 +69,7 @@ export default function RegisterPage() {
     }
   };
 
-  const handleSUSSubmit = async (score: number, responses: any) => {
+  const handleSUSSubmit = async (score: number, responses: RespuestasSUS) => {
     try {
       await api.post('/metricas/sus', {
         ...responses,

@@ -114,82 +114,9 @@ export default function PromocionCarousel({
     return containerRect.width / 2;
   }, []);
 
-  const getItemCenterX = (index: number, currentPosition: number) => {
+  const getItemCenterX = useCallback((index: number, currentPosition: number) => {
     return currentPosition + index * (itemWidth + gap) + itemWidth / 2;
-  };
-
-  const animate = (currentTime: number) => {
-    if (!trackRef.current) {
-      animationFrameRef.current = requestAnimationFrame(animate);
-      return;
-    }
-
-    // Handle pause at center
-    if (isPausingRef.current) {
-      lastTimeRef.current = currentTime;
-      animationFrameRef.current = requestAnimationFrame(animate);
-      return;
-    }
-
-    if (isPaused) {
-      lastTimeRef.current = currentTime;
-      animationFrameRef.current = requestAnimationFrame(animate);
-      return;
-    }
-
-    const deltaTime = (currentTime - lastTimeRef.current) / 1000;
-    lastTimeRef.current = currentTime;
-
-    positionRef.current -= scrollSpeed * deltaTime;
-
-    // Reset position when we've scrolled one full set
-    if (Math.abs(positionRef.current) >= singleSetWidth) {
-      positionRef.current += singleSetWidth;
-    }
-
-    trackRef.current.style.transform = `translateX(${positionRef.current}px)`;
-
-    // Check which item is at center
-    const centerX = containerCenterX();
-    let closestIndex: number | null = null;
-    let closestDistance = Infinity;
-
-    duplicatedSlides.forEach((_, index) => {
-      const itemCenterX = getItemCenterX(index, positionRef.current);
-      const distance = Math.abs(itemCenterX - centerX);
-      if (distance < closestDistance) {
-        closestDistance = distance;
-        closestIndex = index;
-      }
-    });
-
-    // If an item is close to center (within 50px), trigger pause and effect
-    if (closestIndex !== null && closestDistance < 50 && !isPausingRef.current) {
-      const normalizedIndex = closestIndex % singleSetLength;
-      
-      // Only trigger if different from last centered item AND we've moved past it
-      if (normalizedIndex !== lastCenterIndexRef.current && closestDistance < 30) {
-        lastCenterIndexRef.current = normalizedIndex;
-        setCenterIndex(normalizedIndex);
-        
-        // Random effect
-        const randomEffect = CENTER_EFFECTS[Math.floor(Math.random() * CENTER_EFFECTS.length)];
-        setCenterEffect(randomEffect);
-        isPausingRef.current = true;
-
-        // Pause for 2 seconds
-        if (pauseTimerRef.current) clearTimeout(pauseTimerRef.current);
-        pauseTimerRef.current = setTimeout(() => {
-          isPausingRef.current = false;
-          setCenterEffect(null);
-          setCenterIndex(null);
-          // Don't reset lastCenterIndexRef here - let it naturally change when we move to next item
-        }, 2000);
-      }
-    }
-
-    animationFrameRef.current = requestAnimationFrame(animate);
-  };
+  }, [itemWidth, gap]);
 
   // Manual navigation functions
   const scrollToNext = useCallback(() => {
@@ -213,12 +140,86 @@ export default function PromocionCarousel({
   }, [itemWidth, gap, singleSetWidth]);
 
   useEffect(() => {
+    const animate = (currentTime: number) => {
+      if (!trackRef.current) {
+        animationFrameRef.current = requestAnimationFrame(animate);
+        return;
+      }
+
+      // Handle pause at center
+      if (isPausingRef.current) {
+        lastTimeRef.current = currentTime;
+        animationFrameRef.current = requestAnimationFrame(animate);
+        return;
+      }
+
+      if (isPaused) {
+        lastTimeRef.current = currentTime;
+        animationFrameRef.current = requestAnimationFrame(animate);
+        return;
+      }
+
+      const deltaTime = (currentTime - lastTimeRef.current) / 1000;
+      lastTimeRef.current = currentTime;
+
+      positionRef.current -= scrollSpeed * deltaTime;
+
+      // Reset position when we've scrolled one full set
+      if (Math.abs(positionRef.current) >= singleSetWidth) {
+        positionRef.current += singleSetWidth;
+      }
+
+      trackRef.current.style.transform = `translateX(${positionRef.current}px)`;
+
+      // Check which item is at center
+      const centerX = containerCenterX();
+      let closestIndex: number | null = null;
+      let closestDistance = Infinity;
+
+      const totalItems = singleSetLength * 3;
+      for (let index = 0; index < totalItems; index++) {
+        const itemCenterX = getItemCenterX(index, positionRef.current);
+        const distance = Math.abs(itemCenterX - centerX);
+        if (distance < closestDistance) {
+          closestDistance = distance;
+          closestIndex = index;
+        }
+      }
+
+      // If an item is close to center (within 50px), trigger pause and effect
+      if (closestIndex !== null && closestDistance < 50 && !isPausingRef.current) {
+        const normalizedIndex = closestIndex % singleSetLength;
+
+        // Only trigger if different from last centered item AND we've moved past it
+        if (normalizedIndex !== lastCenterIndexRef.current && closestDistance < 30) {
+          lastCenterIndexRef.current = normalizedIndex;
+          setCenterIndex(normalizedIndex);
+
+          // Random effect
+          const randomEffect = CENTER_EFFECTS[Math.floor(Math.random() * CENTER_EFFECTS.length)];
+          setCenterEffect(randomEffect);
+          isPausingRef.current = true;
+
+          // Pause for 2 seconds
+          if (pauseTimerRef.current) clearTimeout(pauseTimerRef.current);
+          pauseTimerRef.current = setTimeout(() => {
+            isPausingRef.current = false;
+            setCenterEffect(null);
+            setCenterIndex(null);
+            // Don't reset lastCenterIndexRef here - let it naturally change when we move to next item
+          }, 2000);
+        }
+      }
+
+      animationFrameRef.current = requestAnimationFrame(animate);
+    };
+
     animationFrameRef.current = requestAnimationFrame(animate);
     return () => {
       if (animationFrameRef.current) cancelAnimationFrame(animationFrameRef.current);
       if (pauseTimerRef.current) clearTimeout(pauseTimerRef.current);
     };
-  }, [isPaused, scrollSpeed]);
+  }, [isPaused, scrollSpeed, containerCenterX, getItemCenterX, singleSetLength, singleSetWidth]);
 
   if (slides.length === 0) return null;
 

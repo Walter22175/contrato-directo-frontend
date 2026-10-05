@@ -8,8 +8,8 @@ import { Card } from '@/components/ui/Card';
 import SlaBadge from '@/components/sla/SlaBadge';
 import SlaTimer from '@/components/sla/SlaTimer';
 import { SLA_CONFIGURACIONES } from '@/lib/sla';
-import { ArrowLeft, Send, Circle, CheckCircle, Clock } from 'lucide-react';
-import type { Ticket, SlaTracking, SlaNivel } from '@/types';
+import { ArrowLeft, Send } from 'lucide-react';
+import type { Ticket, SlaTracking, SlaNivel, SlaCanal } from '@/types';
 
 interface Respuesta {
   id_respuesta: number;
@@ -28,13 +28,6 @@ const estadoColors: Record<string, string> = {
   en_proceso: 'text-yellow-400 bg-yellow-500/10',
   resuelto: 'text-blue-400 bg-blue-500/10',
   cerrado: 'text-slate-400 bg-slate-500/10',
-};
-
-const estadoIcons: Record<string, typeof Circle> = {
-  abierto: Circle,
-  en_proceso: Clock,
-  resuelto: CheckCircle,
-  cerrado: CheckCircle,
 };
 
 const prioridadColors: Record<string, string> = {
@@ -57,7 +50,7 @@ export default function TicketDetallePage() {
   const fetchDetalle = useCallback(async () => {
     try {
       const res = await api.get(`/tickets/${ticketId}`);
-      const data = extractData<any>(res);
+      const data = extractData<TicketDetalle | null>(res);
       setDetalle(data);
     } catch {
       setDetalle(null);
@@ -98,7 +91,7 @@ export default function TicketDetallePage() {
     return {
       id_ticket: t.id_ticket,
       nivel: t.nivel as SlaNivel,
-      canal: (t.canal as any) || 'formulario',
+      canal: (t.canal as SlaCanal) || 'formulario',
       fecha_creacion: t.fecha_creacion,
       fecha_primera_respuesta: undefined,
       fecha_resolucion: t.estado === 'resuelto' || t.estado === 'cerrado' ? t.fecha_creacion : undefined,

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback, type FormEvent } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useAuthStore } from '@/store/auth';
 import api, { extractData } from '@/lib/api';
 import { Card } from '@/components/ui/Card';
@@ -32,8 +32,8 @@ export default function MisServiciosPage() {
     if (!user?.id_usuario) return;
     try {
       const res = await api.get('/servicios/mis-servicios');
-      const data = extractData<any>(res);
-      setServicios(data?.data || data || []);
+      const data = extractData<MiServicio[] | { data?: MiServicio[] } | null>(res);
+      setServicios(Array.isArray(data) ? data : data?.data || []);
     } catch {
       setServicios([]);
     } finally {

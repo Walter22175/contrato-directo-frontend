@@ -25,6 +25,15 @@ interface ReporteTrimestral {
   areas_mejora: string[];
 }
 
+function esReporteTrimestral(value: unknown): value is ReporteTrimestral {
+  return (
+    typeof value === 'object' &&
+    value !== null &&
+    'metricas' in value &&
+    'temas_frecuentes' in value
+  );
+}
+
 export default function ReporteTrimestralPage() {
   const [reporte, setReporte] = useState<ReporteTrimestral | null>(null);
   const [loading, setLoading] = useState(true);
@@ -33,8 +42,8 @@ export default function ReporteTrimestralPage() {
     const fetchReporte = async () => {
       try {
         const res = await api.get('/metricas/reporte-trimestral');
-        const data = extractData<any>(res);
-        if (data && typeof data === 'object' && 'metricas' in data && 'temas_frecuentes' in data) {
+        const data = extractData<unknown>(res);
+        if (esReporteTrimestral(data)) {
           setReporte(data);
         } else {
           setReporte({

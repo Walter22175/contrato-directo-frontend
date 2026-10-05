@@ -1,13 +1,12 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { useForm } from 'react-hook-form';
+import { useState } from 'react';
+import { useForm, useWatch } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import Input from '@/components/ui/Input';
 import Select from '@/components/ui/Select';
 import Button from '@/components/ui/Button';
-import { Briefcase, Hash, Link2 } from 'lucide-react';
 
 const paso4Schema = z.object({
   rubro_principal: z.string().min(2, 'El rubro es obligatorio').max(100),
@@ -62,16 +61,21 @@ export default function Paso4RubroDescripcion({
     'Otro',
   ],
 }: Paso4RubroDescripcionProps) {
-  const [customRubro, setCustomRubro] = useState(false);
   const [redes, setRedes] = useState<Record<string, string>>(
     initialData?.redes_sociales || {}
   );
+  const [redesPrevias, setRedesPrevias] = useState(initialData?.redes_sociales);
+  if (initialData?.redes_sociales !== redesPrevias) {
+    setRedesPrevias(initialData?.redes_sociales);
+    if (initialData?.redes_sociales) {
+      setRedes(initialData.redes_sociales);
+    }
+  }
 
   const {
     register,
+    control,
     handleSubmit,
-    watch,
-    setValue,
     formState: { errors, isSubmitting },
   } = useForm<Paso4Form>({
     resolver: zodResolver(paso4Schema),
@@ -81,24 +85,19 @@ export default function Paso4RubroDescripcion({
     mode: 'onBlur',
   });
 
-  const rubro = watch('rubro_principal');
-
-  useEffect(() => {
-    if (initialData?.redes_sociales) {
-      setRedes(initialData.redes_sociales);
-    }
-  }, [initialData?.redes_sociales]);
-
-  const handleSubmitForm = async (data: Paso4Form) => {
-    await onNext({ ...data, redes_sociales: redes });
-  };
+  const rubro = useWatch({ control, name: 'rubro_principal' });
+  const descripcion = useWatch({ control, name: 'descripcion' });
 
   const handleRedesChange = (key: string, value: string) => {
     setRedes(prev => ({ ...prev, [key]: value }));
   };
 
+  const handleSubmitForm = async (data: Paso4Form) => {
+    await onNext({ ...data, redes_sociales: redes });
+  };
+
   return (
-    <div className="space-y-5">
+    <form onSubmit={handleSubmit(handleSubmitForm)} className="space-y-5" autoComplete="off">
       <div className="flex items-center justify-between mb-4">
         <Button variant="ghost" size="sm" onClick={onBack} disabled={disabled || isSubmitting}>
           ← Volver
@@ -141,7 +140,7 @@ export default function Paso4RubroDescripcion({
           disabled={disabled || isSubmitting}
         />
         <p className="text-xs text-slate-500 mt-1 text-right">
-          {watch('descripcion')?.length || 0}/500
+          {descripcion?.length || 0}/500
         </p>
         {errors.descripcion && (
           <p className="mt-1 text-sm text-red-400">{errors.descripcion.message}</p>
@@ -175,6 +174,6 @@ export default function Paso4RubroDescripcion({
           Continuar
         </Button>
       </div>
-    </div>
+    </form>
   );
 }

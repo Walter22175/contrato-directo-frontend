@@ -7,12 +7,15 @@ import { Card, CardTitle } from '@/components/ui/Card';
 import Button from '@/components/ui/Button';
 import api, { extractData } from '@/lib/api';
 import {
-  Star, Shield, Award, Clock, ArrowLeft, Globe, MessageSquare,
-  TrendingUp, CheckCircle, DollarSign
+  Shield, Award, Clock, ArrowLeft, Globe, MessageSquare,
+  DollarSign
 } from 'lucide-react';
+import { LlaveIcon } from '@/components/ui/LlaveIcon';
 import type { PerfilProveedor, Usuario, ServicioProveedor, Valoracion } from '@/types';
 
 type ProveedorDetalle = PerfilProveedor & { usuario?: Partial<Usuario> };
+
+type RespuestaLista<T> = T[] & { data?: T[] };
 
 export default function ProveedorDetallePage() {
   const params = useParams();
@@ -28,9 +31,9 @@ export default function ProveedorDetallePage() {
         api.get('/servicios', { params: { id_usuario: params.id } }),
         api.get('/valoraciones', { params: { id_evaluado: params.id } }),
       ]);
-      const provData = provRes.status === 'fulfilled' ? extractData<any>(provRes.value) : null;
-      const servData = servRes.status === 'fulfilled' ? extractData<any>(servRes.value) : null;
-      const valData = valRes.status === 'fulfilled' ? extractData<any>(valRes.value) : null;
+      const provData = provRes.status === 'fulfilled' ? extractData<ProveedorDetalle | null>(provRes.value) : null;
+      const servData = servRes.status === 'fulfilled' ? extractData<RespuestaLista<ServicioProveedor>>(servRes.value) : null;
+      const valData = valRes.status === 'fulfilled' ? extractData<RespuestaLista<Valoracion>>(valRes.value) : null;
       setProveedor(provData);
       setServicios(servData?.data || servData || []);
       setValoraciones(valData?.data || valData || []);
@@ -112,7 +115,7 @@ export default function ProveedorDetallePage() {
                 <p className="text-slate-400">{proveedor.rubro_principal || 'Proveedor profesional'}</p>
                 <div className="flex items-center gap-4 mt-2 text-sm text-slate-500">
                   <span className="flex items-center gap-1">
-                    <Star className="w-4 h-4 text-yellow-400" />
+                    <LlaveIcon className="w-4 h-4 text-yellow-400" />
                     {promedio} ({valoraciones.length} reseñas)
                   </span>
                   <span>{proveedor.antiguedad_meses} meses en plataforma</span>
@@ -180,7 +183,7 @@ export default function ProveedorDetallePage() {
             <CardTitle>Reseñas y Valoraciones</CardTitle>
             {valoraciones.length === 0 ? (
               <div className="mt-4 text-center py-8">
-                <Star className="w-12 h-12 text-slate-600 mx-auto mb-3" />
+                <LlaveIcon className="w-12 h-12 text-slate-600 mx-auto mb-3" />
                 <p className="text-slate-400">Aún no tiene reseñas</p>
               </div>
             ) : (
@@ -191,7 +194,7 @@ export default function ProveedorDetallePage() {
                     <p className="text-4xl font-bold text-white">{promedio}</p>
                     <div className="flex items-center gap-0.5 mt-1">
                       {[1, 2, 3, 4, 5].map((s) => (
-                        <Star
+                        <LlaveIcon
                           key={s}
                           className={`w-4 h-4 ${s <= Math.round(parseFloat(promedio)) ? 'text-yellow-400 fill-yellow-400' : 'text-slate-600'}`}
                         />
@@ -203,7 +206,7 @@ export default function ProveedorDetallePage() {
                     {distribucion.map((d) => (
                       <div key={d.stars} className="flex items-center gap-2">
                         <span className="text-xs text-slate-400 w-4">{d.stars}</span>
-                        <Star className="w-3 h-3 text-yellow-400 fill-yellow-400" />
+                        <LlaveIcon className="w-3 h-3 text-yellow-400 fill-yellow-400" />
                         <div className="flex-1 h-2 bg-slate-700 rounded-full overflow-hidden">
                           <div
                             className="h-full bg-yellow-400 rounded-full"
@@ -233,7 +236,7 @@ export default function ProveedorDetallePage() {
                         </div>
                         <div className="flex items-center gap-1">
                           {[1, 2, 3, 4, 5].map((s) => (
-                            <Star
+                            <LlaveIcon
                               key={s}
                               className={`w-3 h-3 ${s <= v.puntuacion ? 'text-yellow-400 fill-yellow-400' : 'text-slate-600'}`}
                             />

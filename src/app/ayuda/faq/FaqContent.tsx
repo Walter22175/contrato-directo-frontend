@@ -8,6 +8,15 @@ import { Search, ChevronDown, ChevronUp, HelpCircle, BookOpen } from 'lucide-rea
 import Link from 'next/link';
 import type { Faq } from '@/types';
 
+interface CategoriaAyuda {
+  categoria?: string;
+  nombre?: string;
+}
+
+type CategoriaEntrada = string | CategoriaAyuda;
+type CategoriasRespuesta = CategoriaEntrada[] | { data?: CategoriaEntrada[] };
+type FaqsRespuesta = Faq[] | { data?: Faq[] };
+
 export default function FaqContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
@@ -30,13 +39,14 @@ export default function FaqContent() {
           api.get('/centro-ayuda'),
           api.get('/centro-ayuda/categorias'),
         ]);
-        const faqsRaw = extractData<any>(faqsRes);
-        const catsRaw = extractData<any>(catsRes);
-        setFaqs(faqsRaw?.data || faqsRaw || []);
-        const catsData = catsRaw?.data || catsRaw || [];
+        const faqsRaw = extractData<FaqsRespuesta>(faqsRes);
+        const catsRaw = extractData<CategoriasRespuesta>(catsRes);
+        const faqsList = Array.isArray(faqsRaw) ? faqsRaw : faqsRaw.data;
+        setFaqs(Array.isArray(faqsList) ? faqsList : []);
+        const catsData = Array.isArray(catsRaw) ? catsRaw : catsRaw.data;
         setCategorias(
           Array.isArray(catsData)
-            ? catsData.map((c: any) => typeof c === 'string' ? c : c.categoria || c.nombre || '')
+            ? catsData.map((c) => (typeof c === 'string' ? c : c.categoria || c.nombre || ''))
             : []
         );
       } catch {

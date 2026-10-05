@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import Image from 'next/image';
 
 export default function Footer() {
 
@@ -10,7 +11,7 @@ export default function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           <div className="col-span-1 md:col-span-2">
 <Link href="/" className="flex items-center gap-2 mb-4 transition-transform duration-200 hover:scale-105 active:scale-90 hover:cursor-pointer focus:outline-none focus:ring-0 rounded-full p-1" prefetch={false}>
-              <img src="/logo-institucional.png" alt="Contrato Directo" className="w-8 h-8 transition-transform duration-200" />
+              <Image src="/logo-institucional.png" alt="Contrato Directo" width={32} height={32} className="w-8 h-8 transition-transform duration-200" />
             </Link>
             <p className="text-slate-400 text-sm">
               Conecta. Acuerda. Realiza. La plataforma que conecta clientes con proveedores de servicios de confianza.

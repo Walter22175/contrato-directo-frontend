@@ -6,12 +6,15 @@ import { Card } from '@/components/ui/Card';
 import api, { extractData } from '@/lib/api';
 import { reportarBusquedaFallida } from '@/lib/catalogo';
 import {
-  Search, Star, Shield, Award, ChevronLeft, ChevronRight,
-  SlidersHorizontal, X, ArrowUpDown, Clock, TrendingUp, Users
+  Search, Shield, Award, ChevronLeft, ChevronRight,
+  SlidersHorizontal, ArrowUpDown, Clock, TrendingUp, Users
 } from 'lucide-react';
+import { LlaveIcon } from '@/components/ui/LlaveIcon';
 import type { PerfilProveedor, Usuario, Categoria } from '@/types';
 
 type ProveedorConPerfil = PerfilProveedor & { usuario?: Partial<Usuario> };
+
+type RespuestaLista<T> = T[] & { data?: T[] };
 
 type SortOption = 'valoracion' | 'nombre' | 'antiguedad' | 'transacciones';
 type SortDir = 'asc' | 'desc';
@@ -26,13 +29,6 @@ interface Filters {
 }
 
 const ITEMS_PER_PAGE = 20;
-
-const rangoPrecioOptions = [
-  { value: '', label: 'Todos' },
-  { value: 'bajo', label: 'Bajo' },
-  { value: 'medio', label: 'Medio' },
-  { value: 'alto', label: 'Alto' },
-];
 
 const antiguedadOptions = [
   { value: '', label: 'Cualquiera' },
@@ -105,8 +101,8 @@ export default function ProveedoresPage() {
         api.get('/proveedores'),
         api.get('/catalogo/categorias'),
       ]);
-      const provData = provRes.status === 'fulfilled' ? extractData<any>(provRes.value) : null;
-      const catData = catRes.status === 'fulfilled' ? extractData<any>(catRes.value) : null;
+      const provData = provRes.status === 'fulfilled' ? extractData<RespuestaLista<ProveedorConPerfil>>(provRes.value) : null;
+      const catData = catRes.status === 'fulfilled' ? extractData<RespuestaLista<Categoria>>(catRes.value) : null;
       setProveedores(provData?.data || provData || []);
       setCategorias(catData?.data || catData || []);
     } catch {
@@ -136,7 +132,7 @@ export default function ProveedoresPage() {
   }, [proveedores]);
 
   const filtered = useMemo(() => {
-    let result = proveedores.filter((p) => {
+    const result = proveedores.filter((p) => {
       const search = filters.busqueda.toLowerCase();
       if (search) {
         const matchNombre = p.usuario?.nombre?.toLowerCase().includes(search);
@@ -333,7 +329,7 @@ export default function ProveedoresPage() {
             <span><span className="text-white font-semibold">{stats.rubros}</span> rubros</span>
           </div>
           <div className="flex items-center gap-2 text-slate-400">
-            <Star className="w-4 h-4 text-yellow-400" />
+            <LlaveIcon className="w-4 h-4 text-yellow-400" />
             <span>Promedio: <span className="text-white font-semibold">{stats.promedio}</span></span>
           </div>
         </div>
@@ -379,9 +375,9 @@ export default function ProveedoresPage() {
                         key={n}
                         onClick={() => setFilters((f) => ({ ...f, valoracionMin: f.valoracionMin === n ? 0 : n }))}
                         className="p-1"
-                        aria-label={`${n} estrellas o más`}
+                        aria-label={`${n} llaves o más`}
                       >
-                        <Star className={`w-5 h-5 ${
+                        <LlaveIcon className={`w-5 h-5 ${
                           n <= filters.valoracionMin ? 'text-yellow-400 fill-yellow-400' : 'text-slate-600'
                         }`} />
                       </button>
@@ -498,7 +494,7 @@ export default function ProveedoresPage() {
                       <div className="flex items-center gap-2 mb-3">
                         <div className="flex items-center gap-0.5">
                           {[1, 2, 3, 4, 5].map((s) => (
-                            <Star
+                            <LlaveIcon
                               key={s}
                               className={`w-4 h-4 ${
                                 s <= Math.round(prov.calificacion_promedio || 0)

@@ -1,16 +1,22 @@
 'use client';
 
-import { useState, useEffect, type FormEvent } from 'react';
+import { useState, type FormEvent } from 'react';
 import { useAuthStore } from '@/store/auth';
-import api, { extractData } from '@/lib/api';
+import api, { mensajeError } from '@/lib/api';
 import { Card } from '@/components/ui/Card';
 import { User, Lock, FileText, Save, CheckCircle, AlertCircle } from 'lucide-react';
+import type { Usuario } from '@/types';
 
 type Tab = 'perfil' | 'password' | 'datos';
 
 interface Msg {
   type: 'success' | 'error';
   text: string;
+}
+
+interface UsuarioFiscal extends Partial<Usuario> {
+  tipo_comercio?: 'servicio' | 'producto' | 'mixto';
+  categoria_iva?: 'responsable_inscripto' | 'monotributo' | 'no_categorizado';
 }
 
 export default function ConfiguracionPage() {
@@ -42,24 +48,27 @@ export default function ConfiguracionPage() {
     categoria_iva: 'no_categorizado' as 'responsable_inscripto' | 'monotributo' | 'no_categorizado',
   });
 
-  useEffect(() => {
+  const [prevUser, setPrevUser] = useState<Partial<Usuario> | null>(null);
+  if (user !== prevUser) {
+    setPrevUser(user);
     if (user) {
+      const u = user as UsuarioFiscal;
       setPerfil({
-        nombre: user.nombre || '',
-        apellido: user.apellido || '',
-        email: user.email || '',
-        telefono: user.telefono || '',
-        direccion: user.direccion || '',
+        nombre: u.nombre || '',
+        apellido: u.apellido || '',
+        email: u.email || '',
+        telefono: u.telefono || '',
+        direccion: u.direccion || '',
       });
       setDatos({
-        tipo_persona: (user.tipo_persona as any) || 'fisica',
-        cuit_cuil: user.cuit_cuil || '',
-        dni: user.dni || '',
-        tipo_comercio: (user as any).tipo_comercio || 'servicio',
-        categoria_iva: (user as any).categoria_iva || 'no_categorizado',
+        tipo_persona: u.tipo_persona || 'fisica',
+        cuit_cuil: u.cuit_cuil || '',
+        dni: u.dni || '',
+        tipo_comercio: u.tipo_comercio || 'servicio',
+        categoria_iva: u.categoria_iva || 'no_categorizado',
       });
     }
-  }, [user]);
+  }
 
   const handlePerfil = async (e: FormEvent) => {
     e.preventDefault();
@@ -70,8 +79,8 @@ export default function ConfiguracionPage() {
       await api.patch(`/usuarios/${user.id_usuario}`, perfil);
       await loadUser();
       setMsg({ type: 'success', text: 'Perfil actualizado correctamente' });
-    } catch (err: any) {
-      setMsg({ type: 'error', text: err.response?.data?.message || 'Error al actualizar perfil' });
+    } catch (err) {
+      setMsg({ type: 'error', text: mensajeError(err, 'Error al actualizar perfil') });
     } finally {
       setSaving(false);
     }
@@ -93,8 +102,8 @@ export default function ConfiguracionPage() {
       });
       setPassword({ password_actual: '', password_nueva: '', password_confirm: '' });
       setMsg({ type: 'success', text: 'Contraseña cambiada correctamente' });
-    } catch (err: any) {
-      setMsg({ type: 'error', text: err.response?.data?.message || 'Error al cambiar contraseña' });
+    } catch (err) {
+      setMsg({ type: 'error', text: mensajeError(err, 'Error al cambiar contraseña') });
     } finally {
       setSaving(false);
     }
@@ -109,8 +118,8 @@ export default function ConfiguracionPage() {
       await api.patch(`/usuarios/${user.id_usuario}`, datos);
       await loadUser();
       setMsg({ type: 'success', text: 'Datos fiscales actualizados' });
-    } catch (err: any) {
-      setMsg({ type: 'error', text: err.response?.data?.message || 'Error al actualizar datos' });
+    } catch (err) {
+      setMsg({ type: 'error', text: mensajeError(err, 'Error al actualizar datos') });
     } finally {
       setSaving(false);
     }
@@ -229,7 +238,7 @@ export default function ConfiguracionPage() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <label className={labelCls}>Tipo de Persona</label>
-                <select className={inputCls} value={datos.tipo_persona} onChange={(e) => setDatos({ ...datos, tipo_persona: e.target.value as any })}>
+                <select className={inputCls} value={datos.tipo_persona} onChange={(e) => setDatos({ ...datos, tipo_persona: e.target.value as 'fisica' | 'juridica' })}>
                   <option value="fisica">Persona Física</option>
                   <option value="juridica">Persona Jurídica</option>
                 </select>
@@ -244,7 +253,7 @@ export default function ConfiguracionPage() {
               </div>
               <div>
                 <label className={labelCls}>Tipo de Comercio</label>
-                <select className={inputCls} value={datos.tipo_comercio} onChange={(e) => setDatos({ ...datos, tipo_comercio: e.target.value as any })}>
+                <select className={inputCls} value={datos.tipo_comercio} onChange={(e) => setDatos({ ...datos, tipo_comercio: e.target.value as 'servicio' | 'producto' | 'mixto' })}>
                   <option value="servicio">Servicio</option>
                   <option value="producto">Producto</option>
                   <option value="mixto">Mixto</option>
@@ -252,7 +261,7 @@ export default function ConfiguracionPage() {
               </div>
               <div>
                 <label className={labelCls}>Categoría IVA</label>
-                <select className={inputCls} value={datos.categoria_iva} onChange={(e) => setDatos({ ...datos, categoria_iva: e.target.value as any })}>
+                <select className={inputCls} value={datos.categoria_iva} onChange={(e) => setDatos({ ...datos, categoria_iva: e.target.value as 'responsable_inscripto' | 'monotributo' | 'no_categorizado' })}>
                   <option value="responsable_inscripto">Responsable Inscripto</option>
                   <option value="monotributo">Monotributo</option>
                   <option value="no_categorizado">No Categorizado</option>

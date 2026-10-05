@@ -2,7 +2,6 @@
 
 import { useState } from 'react';
 import { ThumbsUp, ThumbsDown, Send } from 'lucide-react';
-import { cn } from '@/lib/utils';
 import api from '@/lib/api';
 import { useAuthStore } from '@/store/auth';
 

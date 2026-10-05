@@ -1,12 +1,12 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useForm } from 'react-hook-form';
+import { useForm, useWatch } from 'react-hook-form';
+import type { Resolver } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import Input from '@/components/ui/Input';
 import Select from '@/components/ui/Select';
-import Button from '@/components/ui/Button';
 import { Eye, EyeOff, CheckCircle, AlertCircle } from 'lucide-react';
 
 const baseFields = {
@@ -55,13 +55,12 @@ export default function Paso1DatosPersonales({
   const {
     register,
     handleSubmit,
-    watch,
-    setValue,
+    control,
     formState: { errors, isSubmitting },
   } = useForm<Paso1Form>({
     resolver: zodResolver(
       ocultarPassword ? paso1SchemaSinPassword : paso1Schema,
-    ) as any,
+    ) as unknown as Resolver<Paso1Form>,
     defaultValues: {
       tipo_persona: 'fisica',
       ...initialData,
@@ -69,8 +68,8 @@ export default function Paso1DatosPersonales({
     mode: 'onBlur',
   });
 
-  const email = watch('email');
-  const password = watch('password');
+  const email = useWatch({ control, name: 'email' });
+  const password = useWatch({ control, name: 'password' });
 
   useEffect(() => {
     if (!email || !email.includes('@')) {

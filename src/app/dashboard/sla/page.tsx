@@ -7,9 +7,9 @@ import { Card, CardTitle } from '@/components/ui/Card';
 import SlaBadge from '@/components/sla/SlaBadge';
 import SlaTimer from '@/components/sla/SlaTimer';
 import SlaDashboard from '@/components/sla/SlaDashboard';
-import { SLA_CONFIGURACIONES, calcularEstadoSla, formatearTiempoRestante, calcularTiempoRestanteMin } from '@/lib/sla';
-import { Clock, AlertTriangle, CheckCircle, Filter, BarChart3 } from 'lucide-react';
-import type { Ticket, SlaTracking, SlaNivel } from '@/types';
+import { SLA_CONFIGURACIONES, formatearTiempoRestante } from '@/lib/sla';
+import { Clock, AlertTriangle, CheckCircle, BarChart3 } from 'lucide-react';
+import type { Ticket, SlaTracking, SlaNivel, SlaCanal } from '@/types';
 
 interface TicketConSla extends Ticket {
   sla?: SlaTracking;
@@ -30,11 +30,13 @@ export default function SlaPage() {
   const [filtroNivel, setFiltroNivel] = useState<string>('');
   const [filtroEstado, setFiltroEstado] = useState<string>('');
 
+  const idUsuario = user?.id_usuario;
+
   const fetchTickets = useCallback(async () => {
     try {
-      const res = await api.get('/tickets', { params: { id_usuario: user?.id_usuario } });
-      const data = extractData<any>(res);
-      const ticketsRaw = data?.data || data || [];
+      const res = await api.get('/tickets', { params: { id_usuario: idUsuario } });
+      const rawData = extractData<Ticket[] | { data?: Ticket[] } | null>(res);
+      const ticketsRaw = Array.isArray(rawData) ? rawData : rawData?.data || [];
       const ticketsConSla: TicketConSla[] = ticketsRaw.map((t: Ticket) => {
         const config = SLA_CONFIGURACIONES.find((c) => c.nivel === t.nivel) || SLA_CONFIGURACIONES[0];
         const fechaCreacion = new Date(t.fecha_creacion);
@@ -43,7 +45,7 @@ export default function SlaPage() {
         const tracking: SlaTracking = {
           id_ticket: t.id_ticket,
           nivel: t.nivel as SlaNivel,
-          canal: (t.canal as any) || 'formulario',
+          canal: (t.canal as SlaCanal) || 'formulario',
           fecha_creacion: t.fecha_creacion,
           fecha_primera_respuesta: undefined,
           fecha_resolucion: t.estado === 'resuelto' || t.estado === 'cerrado' ? t.fecha_creacion : undefined,
@@ -59,7 +61,7 @@ export default function SlaPage() {
     } finally {
       setLoading(false);
     }
-  }, [user?.id_usuario]);
+  }, [idUsuario]);
 
   useEffect(() => {
     fetchTickets();

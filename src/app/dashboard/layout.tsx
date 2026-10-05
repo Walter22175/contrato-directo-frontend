@@ -31,8 +31,8 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   }
 
   const rolesActivos = (user?.usuario_roles || [])
-    .filter((ur: any) => ur.activo)
-    .map((ur: any) => ur.rol?.nombre as string)
+    .filter((ur) => ur.activo)
+    .map((ur) => ur.rol?.nombre as string)
     .filter(Boolean);
   const contexto = localStorage.getItem('contexto_activo');
   const role =

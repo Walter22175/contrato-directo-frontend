@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useRef, useCallback, useState } from 'react';
+import type { Socket } from 'socket.io-client';
 import { useAuthStore } from '@/store/auth';
 
 const WS_URL = process.env.NEXT_PUBLIC_WS_URL || 'http://localhost:3001';
@@ -12,7 +13,25 @@ interface NotificationEvent {
   titulo: string;
   mensaje: string;
   fecha: string;
-  [key: string]: any;
+  [key: string]: unknown;
+}
+
+interface TicketActualizadoData {
+  estado?: string;
+}
+
+interface NuevoMensajeData {
+  contenido?: string;
+}
+
+interface CambioEstadoData {
+  tipo?: string;
+  estado?: string;
+}
+
+interface SlaAlertaData {
+  tipo?: string;
+  id_ticket?: string | number;
 }
 
 type NotificationHandler = (event: NotificationEvent) => void;
@@ -20,11 +39,12 @@ type NotificationHandler = (event: NotificationEvent) => void;
 export function useNotificationsSocket(onNotification?: NotificationHandler) {
   const user = useAuthStore((s) => s.user);
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
-  const socketRef = useRef<any>(null);
+  const socketRef = useRef<Socket | null>(null);
   const [isConnected, setIsConnected] = useState(false);
+  const idUsuario = user?.id_usuario;
 
   const connect = useCallback(async () => {
-    if (!isAuthenticated || !user?.id_usuario) return;
+    if (!isAuthenticated || !idUsuario) return;
 
     try {
       const { io } = await import('socket.io-client');
@@ -37,7 +57,7 @@ export function useNotificationsSocket(onNotification?: NotificationHandler) {
 
       socket.on('connect', () => {
         setIsConnected(true);
-        socket.emit('registrar_usuario', { id_usuario: user.id_usuario });
+        socket.emit('registrar_usuario', { id_usuario: idUsuario });
       });
 
       socket.on('disconnect', () => {
@@ -48,9 +68,9 @@ export function useNotificationsSocket(onNotification?: NotificationHandler) {
         onNotification?.(data);
       });
 
-      socket.on('ticket_actualizado', (data: any) => {
+      socket.on('ticket_actualizado', (data: TicketActualizadoData) => {
         onNotification?.({
-          id_usuario: user.id_usuario,
+          id_usuario: idUsuario,
           tipo: 'actividad',
           evento: 'ticket_actualizado',
           titulo: 'Ticket actualizado',
@@ -60,9 +80,9 @@ export function useNotificationsSocket(onNotification?: NotificationHandler) {
         });
       });
 
-      socket.on('nuevo_mensaje', (data: any) => {
+      socket.on('nuevo_mensaje', (data: NuevoMensajeData) => {
         onNotification?.({
-          id_usuario: user.id_usuario,
+          id_usuario: idUsuario,
           tipo: 'actividad',
           evento: 'nuevo_mensaje',
           titulo: 'Nuevo mensaje',
@@ -72,9 +92,9 @@ export function useNotificationsSocket(onNotification?: NotificationHandler) {
         });
       });
 
-      socket.on('cambio_estado', (data: any) => {
+      socket.on('cambio_estado', (data: CambioEstadoData) => {
         onNotification?.({
-          id_usuario: user.id_usuario,
+          id_usuario: idUsuario,
           tipo: 'actividad',
           evento: 'cambio_estado',
           titulo: 'Cambio de estado',
@@ -84,9 +104,9 @@ export function useNotificationsSocket(onNotification?: NotificationHandler) {
         });
       });
 
-      socket.on('sla_alerta', (data: any) => {
+      socket.on('sla_alerta', (data: SlaAlertaData) => {
         onNotification?.({
-          id_usuario: user.id_usuario,
+          id_usuario: idUsuario,
           tipo: 'transaccional',
           evento: 'sla_alerta',
           titulo: 'Alerta SLA',
@@ -100,7 +120,7 @@ export function useNotificationsSocket(onNotification?: NotificationHandler) {
     } catch (error) {
       console.error('Error connecting to WebSocket:', error);
     }
-  }, [isAuthenticated, user?.id_usuario, onNotification]);
+  }, [isAuthenticated, idUsuario, onNotification]);
 
   useEffect(() => {
     connect();

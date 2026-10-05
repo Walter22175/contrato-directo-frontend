@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback, type FormEvent } from 'react';
 import { useAuthStore } from '@/store/auth';
-import api, { extractData } from '@/lib/api';
+import api, { extractData, mensajeError } from '@/lib/api';
 import { Card } from '@/components/ui/Card';
 import {
   AlertTriangle,
@@ -15,7 +15,6 @@ import {
   X,
   Scale,
   FileText,
-  Upload,
   Calendar,
   Ban,
 } from 'lucide-react';
@@ -63,7 +62,7 @@ export default function ReclamosPage() {
   const [transacciones, setTransacciones] = useState<Transaccion[]>([]);
   const [loadingTransacciones, setLoadingTransacciones] = useState(false);
 
-  const isAdmin = user?.usuario_roles?.some((r: any) => r.rol?.nombre === 'super_admin');
+  const idUsuario = user?.id_usuario;
 
   const [form, setForm] = useState<CreateReclamoDto>({
     id_transaccion: '',
@@ -79,9 +78,9 @@ export default function ReclamosPage() {
   const fetchTransacciones = async () => {
     setLoadingTransacciones(true);
     try {
-      const res = await api.get('/transacciones', { params: { id_cliente: user?.id_usuario } });
-      const data = extractData<any>(res);
-      setTransacciones(data?.data || data || []);
+      const res = await api.get('/transacciones', { params: { id_cliente: idUsuario } });
+      const raw = extractData<Transaccion[] | { data?: Transaccion[] } | null>(res);
+      setTransacciones(Array.isArray(raw) ? raw : raw?.data || []);
     } catch {
       setTransacciones([]);
     } finally {
@@ -89,32 +88,32 @@ export default function ReclamosPage() {
     }
   };
 
-  const fetchReclamos = useCallback(async () => {
-    setLoading(true);
-    try {
-      const params: Record<string, any> = {};
-      if (tab === 'mis_reclamos' && user?.id_usuario) params.id_reclamante = user.id_usuario;
-      if (filtroEstado) params.estado = filtroEstado;
-      const res = await api.get('/reclamos', { params });
-      const data = extractData<any>(res);
-      setReclamos(data?.data || data || []);
-    } catch {
-      setReclamos([]);
-    } finally {
-      setLoading(false);
-    }
-  }, [tab, user?.id_usuario, filtroEstado]);
+  const fetchReclamos = useCallback(() => {
+    const params: Record<string, unknown> = {};
+    if (tab === 'mis_reclamos' && idUsuario) params.id_reclamante = idUsuario;
+    if (filtroEstado) params.estado = filtroEstado;
+    return api
+      .get('/reclamos', { params })
+      .then((res) => {
+        const raw = extractData<Reclamo[] | { data?: Reclamo[] } | null>(res);
+        setReclamos(Array.isArray(raw) ? raw : raw?.data || []);
+      })
+      .catch(() => setReclamos([]))
+      .finally(() => setLoading(false));
+  }, [tab, idUsuario, filtroEstado]);
 
   useEffect(() => { fetchReclamos(); }, [fetchReclamos]);
 
-  useEffect(() => {
-    if (user?.id_usuario) setForm((f) => ({ ...f, id_reclamante: user.id_usuario! }));
-  }, [user?.id_usuario]);
+  const [prevReclamante, setPrevReclamante] = useState<string | undefined>(undefined);
+  if (idUsuario !== prevReclamante) {
+    setPrevReclamante(idUsuario);
+    if (idUsuario) setForm((f) => ({ ...f, id_reclamante: idUsuario }));
+  }
 
   const fetchDetalle = async (id: string) => {
     try {
       const res = await api.get(`/reclamos/${id}`);
-      const data = extractData<any>(res);
+      const data = extractData<Reclamo | null>(res);
       setDetalle(data);
       setSelected(id);
       setMsg(null);
@@ -127,14 +126,15 @@ export default function ReclamosPage() {
     setMsg(null);
     try {
       const res = await api.post('/reclamos', form);
-      const data = extractData<any>(res);
+      const data = extractData<Reclamo | null>(res);
       setShowForm(false);
       setForm({ id_transaccion: '', id_reclamante: user?.id_usuario || '', id_reclamado: '', tipo_reclamo: '', descripcion: '', fecha_incidente: '' });
       setMsg({ type: 'success', text: 'Reclamo creado correctamente' });
+      setLoading(true);
       await fetchReclamos();
       if (data?.id_reclamo) await fetchDetalle(data.id_reclamo);
-    } catch (err: any) {
-      setMsg({ type: 'error', text: err.response?.data?.message || 'Error al crear reclamo' });
+    } catch (err) {
+      setMsg({ type: 'error', text: mensajeError(err, 'Error al crear reclamo') });
     } finally {
       setSending(false);
     }
@@ -151,8 +151,8 @@ export default function ReclamosPage() {
       setContestacion('');
       await fetchDetalle(selected);
       setMsg({ type: 'success', text: 'Contestación enviada' });
-    } catch (err: any) {
-      setMsg({ type: 'error', text: err.response?.data?.message || 'Error al contestar' });
+    } catch (err) {
+      setMsg({ type: 'error', text: mensajeError(err, 'Error al contestar') });
     } finally {
       setSending(false);
     }
@@ -164,8 +164,8 @@ export default function ReclamosPage() {
       await api.patch(`/reclamos/${selected}/cerrar`);
       await fetchDetalle(selected);
       setMsg({ type: 'success', text: 'Reclamo cerrado' });
-    } catch (err: any) {
-      setMsg({ type: 'error', text: err.response?.data?.message || 'Error al cerrar' });
+    } catch (err) {
+      setMsg({ type: 'error', text: mensajeError(err, 'Error al cerrar') });
     }
   };
 
@@ -175,8 +175,8 @@ export default function ReclamosPage() {
       await api.post(`/reclamos/${selected}/solicitar-prorroga`);
       await fetchDetalle(selected);
       setMsg({ type: 'success', text: 'Prórroga concedida (3 días hábiles)' });
-    } catch (err: any) {
-      setMsg({ type: 'error', text: err.response?.data?.message || 'Error al solicitar prórroga' });
+    } catch (err) {
+      setMsg({ type: 'error', text: mensajeError(err, 'Error al solicitar prórroga') });
     }
   };
 
@@ -186,8 +186,8 @@ export default function ReclamosPage() {
       await api.post(`/reclamos/${selected}/mediacion-voluntaria`);
       await fetchDetalle(selected);
       setMsg({ type: 'success', text: 'Mediación voluntaria ofrecida (3 días hábiles)' });
-    } catch (err: any) {
-      setMsg({ type: 'error', text: err.response?.data?.message || 'Error' });
+    } catch (err) {
+      setMsg({ type: 'error', text: mensajeError(err, 'Error') });
     }
   };
 

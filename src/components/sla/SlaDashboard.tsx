@@ -1,7 +1,7 @@
 'use client';
 
-import { Card, CardTitle } from '@/components/ui/Card';
-import { TrendingUp, TrendingDown, Clock, CheckCircle, AlertTriangle } from 'lucide-react';
+import { Card } from '@/components/ui/Card';
+import { TrendingUp, CheckCircle, AlertTriangle } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 interface MetricaItem {

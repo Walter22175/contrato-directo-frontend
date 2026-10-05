@@ -89,12 +89,23 @@ api.interceptors.response.use(
   },
 );
 
-export function extractData<T>(response: { data: any }): T {
+export function extractData<T>(response: { data: unknown }): T {
   const raw = response.data;
   if (raw && typeof raw === 'object' && 'data' in raw && 'timestamp' in raw) {
-    return raw.data as T;
+    return (raw as { data: T }).data;
   }
   return raw as T;
+}
+
+export function mensajeError(error: unknown, fallback = 'Error inesperado'): string {
+  if (axios.isAxiosError(error)) {
+    const data = error.response?.data as { message?: string | string[] } | undefined;
+    const msg = data?.message;
+    if (Array.isArray(msg)) return msg.join(', ');
+    if (typeof msg === 'string' && msg) return msg;
+  }
+  if (error instanceof Error && error.message) return error.message;
+  return fallback;
 }
 
 export default api;

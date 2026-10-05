@@ -29,6 +29,12 @@ interface Solicitud {
   apoyos_min?: number;
 }
 
+type RespuestaLista<T> = T[] & { data?: T[] };
+
+const mensajeDeApi = (err: unknown): string | string[] | undefined =>
+  (err as { response?: { data?: { message?: string | string[] } } } | undefined)?.response?.data
+    ?.message;
+
 export default function SolicitudRubroPage() {
   const { user } = useAuthStore();
   const [solicitudes, setSolicitudes] = useState<Solicitud[]>([]);
@@ -49,7 +55,7 @@ export default function SolicitudRubroPage() {
     setLoading(true);
     try {
       const res = await api.get('/solicitud-rubro');
-      const data = extractData<any>(res);
+      const data = extractData<RespuestaLista<Solicitud>>(res);
       setSolicitudes(data?.data || data || []);
     } catch {
       setSolicitudes([]);
@@ -76,8 +82,8 @@ export default function SolicitudRubroPage() {
       setShowForm(false);
       setMsg({ tipo: 'ok', texto: 'Solicitud enviada. SLA de revisión legal: 5 días hábiles.' });
       await fetchSolicitudes();
-    } catch (err: any) {
-      const m = err?.response?.data?.message || 'No se pudo enviar la solicitud.';
+    } catch (err) {
+      const m = mensajeDeApi(err) || 'No se pudo enviar la solicitud.';
       setFormError(Array.isArray(m) ? m.join(' — ') : String(m));
     } finally {
       setSending(false);
@@ -91,8 +97,8 @@ export default function SolicitudRubroPage() {
       await api.post(`/solicitud-rubro/${s.id_solicitud}/apoyar`);
       setMsg({ tipo: 'ok', texto: 'Apoyo registrado. Gracias por impulsar este rubro.' });
       await fetchSolicitudes();
-    } catch (e: any) {
-      const m = e?.response?.data?.message || 'No se pudo registrar el apoyo';
+    } catch (e) {
+      const m = mensajeDeApi(e) || 'No se pudo registrar el apoyo';
       setMsg({ tipo: 'error', texto: Array.isArray(m) ? m.join(' — ') : String(m) });
     } finally {
       setAccionando(null);
@@ -106,8 +112,8 @@ export default function SolicitudRubroPage() {
       await api.post(`/solicitud-rubro/${s.id_solicitud}/evaluar`, { puntuacion });
       setMsg({ tipo: 'ok', texto: '¡Gracias! Tu evaluación alimenta la métrica de satisfacción del proceso.' });
       await fetchSolicitudes();
-    } catch (e: any) {
-      const m = e?.response?.data?.message || 'No se pudo evaluar el proceso';
+    } catch (e) {
+      const m = mensajeDeApi(e) || 'No se pudo evaluar el proceso';
       setMsg({ tipo: 'error', texto: Array.isArray(m) ? m.join(' — ') : String(m) });
     } finally {
       setEvaluando(null);

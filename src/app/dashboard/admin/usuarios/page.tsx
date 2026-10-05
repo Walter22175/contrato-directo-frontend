@@ -3,10 +3,17 @@
 import { useState, useEffect, useCallback } from 'react';
 import api, { extractData } from '@/lib/api';
 import { Card } from '@/components/ui/Card';
-import { Users, Search, Shield, CheckCircle, XCircle, Eye } from 'lucide-react';
+import { Users, Search, XCircle } from 'lucide-react';
 import type { Usuario } from '@/types';
 
 type Tab = 'todos' | 'pendientes' | 'verificados';
+
+type RespuestaApi<T> = T & { data?: T };
+
+type ErrorApi = { response?: { data?: { message?: string } } };
+
+const mensajeDeError = (error: unknown, fallback: string): string =>
+  (error as ErrorApi | undefined)?.response?.data?.message || fallback;
 
 export default function AdminUsuariosPage() {
   const [usuarios, setUsuarios] = useState<Usuario[]>([]);
@@ -14,16 +21,18 @@ export default function AdminUsuariosPage() {
   const [tab, setTab] = useState<Tab>('todos');
   const [busqueda, setBusqueda] = useState('');
   const [selectedUser, setSelectedUser] = useState<Usuario | null>(null);
+  const [msg, setMsg] = useState<{ tipo: 'ok' | 'error'; texto: string } | null>(null);
+  const [cambiando, setCambiando] = useState<string | null>(null);
 
   const fetchUsuarios = useCallback(async () => {
     setLoading(true);
     try {
-      const params: Record<string, any> = {};
+      const params: Record<string, string> = {};
       if (tab === 'pendientes') params.estado = 'pendiente';
       if (tab === 'verificados') params.estado = 'verificado';
       if (busqueda) params.busqueda = busqueda;
-      const res = await api.get('/usuarios', { params });
-      const data = extractData<any>(res);
+      const res = await api.get<RespuestaApi<Usuario[]>>('/usuarios', { params });
+      const data = extractData<RespuestaApi<Usuario[]> | null>(res);
       setUsuarios(data?.data || data || []);
     } catch {
       setUsuarios([]);
@@ -34,8 +43,31 @@ export default function AdminUsuariosPage() {
 
   useEffect(() => { fetchUsuarios(); }, [fetchUsuarios]);
 
+  const cambiarEstado = async (u: Usuario) => {
+    const nuevo = u.estado === 'activo' ? 'suspendido' : 'activo';
+    setCambiando(u.id_usuario);
+    setMsg(null);
+    try {
+      await api.patch(`/usuarios/${u.id_usuario}/estado`, { estado: nuevo });
+      setUsuarios((prev) =>
+        prev.map((x) => (x.id_usuario === u.id_usuario ? { ...x, estado: nuevo } : x))
+      );
+      setSelectedUser((prev) =>
+        prev && prev.id_usuario === u.id_usuario ? { ...prev, estado: nuevo } : prev
+      );
+      setMsg({ tipo: 'ok', texto: `${u.nombre} ${u.apellido}: estado cambiado a "${nuevo}"` });
+    } catch (e) {
+      setMsg({ tipo: 'error', texto: mensajeDeError(e, 'Error al cambiar el estado del usuario') });
+    } finally {
+      setCambiando(null);
+    }
+  };
+
   const formatearFecha = (f: string) =>
     new Date(f).toLocaleDateString('es-AR', { day: '2-digit', month: 'short', year: 'numeric' });
+
+  const esSuperAdmin = (u: Usuario) =>
+    (u.usuario_roles || []).some((ur) => ur.activo && ur.rol?.nombre === 'super_admin');
 
   const rolBadge = (u: Usuario) => {
     const activos = (u.usuario_roles || [])
@@ -97,6 +129,14 @@ export default function AdminUsuariosPage() {
         />
       </div>
 
+      {msg && (
+        <div className={`px-4 py-3 rounded-lg text-sm ${
+          msg.tipo === 'ok' ? 'bg-green-500/10 text-green-400 border border-green-500/20' : 'bg-red-500/10 text-red-400 border border-red-500/20'
+        }`}>
+          {msg.texto}
+        </div>
+      )}
+
       {loading ? (
         <div className="space-y-3">
           {[1, 2, 3, 4, 5].map((i) => (
@@ -130,15 +170,34 @@ export default function AdminUsuariosPage() {
                 </div>
                 <p className="text-xs text-slate-500 truncate">{u.email}</p>
               </div>
-              <div className="flex flex-col items-end gap-1 flex-shrink-0">
-                <span className={`text-xs px-2 py-0.5 rounded ${
-                  u.estado === 'activo' ? 'text-green-400 bg-green-500/10' :
-                  u.estado === 'pendiente' ? 'text-yellow-400 bg-yellow-500/10' :
-                  'text-slate-400 bg-slate-500/10'
-                }`}>
-                  {u.estado}
-                </span>
-                <span className="text-xs text-slate-600">{formatearFecha(u.fecha_registro)}</span>
+              <div className="flex items-center gap-3 flex-shrink-0">
+                <div className="flex flex-col items-end gap-1">
+                  <span className={`text-xs px-2 py-0.5 rounded ${
+                    u.estado === 'activo' ? 'text-green-400 bg-green-500/10' :
+                    u.estado === 'pendiente' ? 'text-yellow-400 bg-yellow-500/10' :
+                    'text-slate-400 bg-slate-500/10'
+                  }`}>
+                    {u.estado}
+                  </span>
+                  <span className="text-xs text-slate-600">{formatearFecha(u.fecha_registro)}</span>
+                </div>
+                {!(esSuperAdmin(u) && u.estado === 'activo') && (
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      cambiarEstado(u);
+                    }}
+                    disabled={cambiando === u.id_usuario}
+                    className={`px-2.5 py-1 text-xs font-medium rounded-lg transition-colors disabled:opacity-50 ${
+                      u.estado === 'activo'
+                        ? 'bg-red-500/10 hover:bg-red-500/20 text-red-400'
+                        : 'bg-green-500/10 hover:bg-green-500/20 text-green-400'
+                    }`}
+                    title={u.estado === 'activo' ? 'Suspender usuario' : 'Activar usuario'}
+                  >
+                    {cambiando === u.id_usuario ? '...' : u.estado === 'activo' ? 'Suspender' : 'Reactivar'}
+                  </button>
+                )}
               </div>
             </div>
           ))}
@@ -150,9 +209,29 @@ export default function AdminUsuariosPage() {
           <div className="p-6 space-y-4">
             <div className="flex items-center justify-between">
               <h2 className="text-lg font-semibold text-white">Detalle del Usuario</h2>
-              <button onClick={() => setSelectedUser(null)} className="text-slate-400 hover:text-white">
-                <XCircle className="w-5 h-5" />
-              </button>
+              <div className="flex items-center gap-2">
+                {!(esSuperAdmin(selectedUser) && selectedUser.estado === 'activo') && (
+                  <button
+                    onClick={() => cambiarEstado(selectedUser)}
+                    disabled={cambiando === selectedUser.id_usuario}
+                    className={`px-3 py-1.5 text-xs font-medium rounded-lg transition-colors disabled:opacity-50 ${
+                      selectedUser.estado === 'activo'
+                        ? 'bg-red-500/10 hover:bg-red-500/20 text-red-400'
+                        : 'bg-green-500/10 hover:bg-green-500/20 text-green-400'
+                    }`}
+                    title={selectedUser.estado === 'activo' ? 'Suspender usuario' : 'Activar usuario'}
+                  >
+                    {cambiando === selectedUser.id_usuario
+                      ? '...'
+                      : selectedUser.estado === 'activo'
+                        ? 'Suspender usuario'
+                        : 'Activar usuario'}
+                  </button>
+                )}
+                <button onClick={() => setSelectedUser(null)} className="text-slate-400 hover:text-white">
+                  <XCircle className="w-5 h-5" />
+                </button>
+              </div>
             </div>
             <div className="grid grid-cols-2 gap-4 text-sm">
               <div>

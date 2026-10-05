@@ -6,7 +6,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { Card } from '@/components/ui/Card';
 import Button from '@/components/ui/Button';
-import { User, Mail, Phone, MapPin, Calendar, Edit3, Shield, Star, FileText, Briefcase, RotateCcw, CheckCircle2, Loader2 } from 'lucide-react';
+import { User, Mail, Phone, MapPin, Calendar, Edit3, Shield, FileText, Briefcase, RotateCcw, CheckCircle2, Loader2 } from 'lucide-react';
 
 export default function PerfilPage() {
   const { user, loadUser, cambiarContexto } = useAuthStore();
@@ -23,8 +23,8 @@ export default function PerfilPage() {
     new Date(f).toLocaleDateString('es-AR', { day: '2-digit', month: 'long', year: 'numeric' });
 
   const roles = user?.usuario_roles
-    ?.filter((ur: any) => ur.activo)
-    ?.map((ur: any) => ur.rol?.nombre)
+    ?.filter((ur) => ur.activo)
+    ?.map((ur) => ur.rol?.nombre)
     || [];
 
   const esCliente = roles.includes('cliente');
@@ -39,8 +39,9 @@ export default function PerfilPage() {
       await cambiarContexto(rol);
       await loadUser();
       router.push(rol === 'proveedor' ? '/proveedores' : '/dashboard');
-    } catch (err: any) {
-      const msg = err?.response?.data?.message || 'No se pudo cambiar de rol. Intentá nuevamente.';
+    } catch (err) {
+      const msg = (err as { response?: { data?: { message?: unknown } } })?.response?.data?.message
+        || 'No se pudo cambiar de rol. Intentá nuevamente.';
       setSwitchError(Array.isArray(msg) ? msg.join(' — ') : String(msg));
     } finally {
       setSwitching(false);

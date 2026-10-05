@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import api, { extractData } from '@/lib/api';
 import { Card, CardTitle } from '@/components/ui/Card';
 import SlaDashboard from '@/components/sla/SlaDashboard';
-import { TrendingUp, TrendingDown, Users, Clock, Star, Target, BarChart3 } from 'lucide-react';
+import { TrendingUp, Users, Clock, Star, Target, BarChart3 } from 'lucide-react';
 
 interface MetricaRow {
   periodo: string;

@@ -1,14 +1,16 @@
 ﻿'use client';
 
 import { Card } from '@/components/ui/Card';
-import { BookOpen, UserPlus, Search, CreditCard, Star, Shield, ArrowRight } from 'lucide-react';
+import { UserPlus, Search, CreditCard, Shield, ArrowRight } from 'lucide-react';
+import { LlaveIcon } from '@/components/ui/LlaveIcon';
 import Link from 'next/link';
+import type { ComponentType } from 'react';
 
 interface Tutorial {
   id: string;
   titulo: string;
   descripcion: string;
-  icono: typeof BookOpen;
+  icono: ComponentType<{ className?: string }>;
   pasos: string[];
 }
 
@@ -52,7 +54,7 @@ const tutoriales: Tutorial[] = [
     id: 'valorar',
     titulo: 'Cómo valorar a un proveedor',
     descripcion: 'Deja tu experiencia para ayudar a otros',
-    icono: Star,
+    icono: LlaveIcon,
     pasos: [
       'Después de un servicio completado, accede a Mis Valoraciones',
       'Selecciona la transacción que quieres valorar',

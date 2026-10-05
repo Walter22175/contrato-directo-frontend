@@ -27,8 +27,8 @@ export default function NotificacionesPage() {
   const fetchNotificaciones = useCallback(async () => {
     try {
       const res = await api.get('/notificaciones');
-      const data = extractData<any>(res);
-      setNotificaciones(data?.data || data || []);
+      const data = extractData<Notificacion[] | { data?: Notificacion[] } | null>(res);
+      setNotificaciones(Array.isArray(data) ? data : data?.data || []);
     } catch {
       setNotificaciones([]);
     } finally {

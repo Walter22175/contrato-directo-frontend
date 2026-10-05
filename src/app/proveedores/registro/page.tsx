@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, type ComponentProps } from 'react';
 import { useRouter } from 'next/navigation';
 import Button from '@/components/ui/Button';
 import { useAuthStore } from '@/store/auth';
@@ -11,9 +11,17 @@ import Paso3Contacto from '@/components/proveedor/registro/Paso3Contacto';
 import Paso4RubroDescripcion from '@/components/proveedor/registro/Paso4RubroDescripcion';
 import Paso5DocumentacionFiscal from '@/components/proveedor/registro/Paso5DocumentacionFiscal';
 import Paso6Avales from '@/components/proveedor/registro/Paso6Avales';
-import { Check, ChevronRight, Loader2 } from 'lucide-react';
+import { Check } from 'lucide-react';
 import SUSModal from '@/components/ui/SUSModal';
 import api from '@/lib/api';
+
+type InitialDataPaso1 = ComponentProps<typeof Paso1DatosPersonales>['initialData'];
+type InitialDataPaso2 = ComponentProps<typeof Paso2DatosFiscales>['initialData'];
+type InitialDataPaso3 = ComponentProps<typeof Paso3Contacto>['initialData'];
+type InitialDataPaso4 = ComponentProps<typeof Paso4RubroDescripcion>['initialData'];
+type InitialDataPaso5 = ComponentProps<typeof Paso5DocumentacionFiscal>['initialData'];
+type InitialDataPaso6 = ComponentProps<typeof Paso6Avales>['initialData'];
+type RespuestasSUS = Parameters<ComponentProps<typeof SUSModal>['onSubmit']>[1];
 
 const STEPS = [
   { key: 1, label: 'Datos Personales', icon: 'user' },
@@ -27,23 +35,22 @@ const STEPS = [
 type PasoActual = 1 | 2 | 3 | 4 | 5 | 6;
 
 interface WizardState {
-  paso1?: any;
-  paso2?: any;
-  paso3?: any;
-  paso4?: any;
-  paso5?: any;
-  paso6?: any;
+  paso1?: unknown;
+  paso2?: unknown;
+  paso3?: unknown;
+  paso4?: unknown;
+  paso5?: unknown;
+  paso6?: unknown;
 }
 
 export default function RegistroProveedorPage() {
   const router = useRouter();
   const { user, isAuthenticated } = useAuthStore();
-  const { draft, loading: draftLoading, iniciarRegistro, getProgreso, guardarPaso, validarCuitAfip, completarRegistro, cancelarRegistro, error, clearError } = useRegistroProveedorDraft();
+  const { draft, iniciarRegistro, guardarPaso, validarCuitAfip, completarRegistro, cancelarRegistro, error, clearError } = useRegistroProveedorDraft();
 
   const [pasoActual, setPasoActual] = useState<PasoActual>(1);
   const [wizardData, setWizardData] = useState<WizardState>({});
   const [saving, setSaving] = useState(false);
-  const [completing, setCompleting] = useState(false);
   const [showCancel, setShowCancel] = useState(false);
   const [showSUS, setShowSUS] = useState(false);
 
@@ -73,7 +80,7 @@ export default function RegistroProveedorPage() {
     initDraft();
   }, [draft, iniciarRegistro]);
 
-  const handleNext = useCallback(async (paso: PasoActual, data: any) => {
+  const handleNext = useCallback(async (paso: PasoActual, data: Record<string, unknown>) => {
     setSaving(true);
     try {
       setWizardData(prev => ({ ...prev, [paso === 1 ? 'paso1' : paso === 2 ? 'paso2' : paso === 3 ? 'paso3' : paso === 4 ? 'paso4' : paso === 5 ? 'paso5' : 'paso6']: data }));
@@ -90,16 +97,13 @@ export default function RegistroProveedorPage() {
     setPasoActual(prev => Math.max(1, prev - 1) as PasoActual);
   }, []);
 
-  const handleComplete = useCallback(async (data: any) => {
-    setCompleting(true);
+  const handleComplete = useCallback(async (data: Record<string, unknown>) => {
     try {
       setWizardData(prev => ({ ...prev, paso6: data }));
       await completarRegistro(data);
       setShowSUS(true);
     } catch (err) {
       console.error('Error completando registro:', err);
-    } finally {
-      setCompleting(false);
     }
   }, [completarRegistro]);
 
@@ -109,7 +113,7 @@ export default function RegistroProveedorPage() {
     router.push('/proveedores');
   }, [cancelarRegistro, router]);
 
-  const handleSUSSubmit = async (score: number, responses: any) => {
+  const handleSUSSubmit = async (score: number, responses: RespuestasSUS) => {
     try {
       await api.post('/metricas/sus', {
         ...responses,
@@ -188,7 +192,7 @@ export default function RegistroProveedorPage() {
           {pasoActual === 1 && (
             <Paso1DatosPersonales
               onNext={(data) => handleNext(1, data)}
-              initialData={wizardData.paso1}
+              initialData={wizardData.paso1 as InitialDataPaso1}
               disabled={saving}
             />
           )}
@@ -197,7 +201,7 @@ export default function RegistroProveedorPage() {
             <Paso2DatosFiscales
               onNext={(data) => handleNext(2, data)}
               onBack={handleBack}
-              initialData={wizardData.paso2}
+              initialData={wizardData.paso2 as InitialDataPaso2}
               disabled={saving}
               onValidarCuit={validarCuitAfip}
             />
@@ -207,7 +211,7 @@ export default function RegistroProveedorPage() {
             <Paso3Contacto
               onNext={(data) => handleNext(3, data)}
               onBack={handleBack}
-              initialData={wizardData.paso3}
+              initialData={wizardData.paso3 as InitialDataPaso3}
               disabled={saving}
             />
           )}
@@ -216,7 +220,7 @@ export default function RegistroProveedorPage() {
             <Paso4RubroDescripcion
               onNext={(data) => handleNext(4, data)}
               onBack={handleBack}
-              initialData={wizardData.paso4}
+              initialData={wizardData.paso4 as InitialDataPaso4}
               disabled={saving}
             />
           )}
@@ -225,7 +229,7 @@ export default function RegistroProveedorPage() {
             <Paso5DocumentacionFiscal
               onNext={(data) => handleNext(5, data)}
               onBack={handleBack}
-              initialData={wizardData.paso5}
+              initialData={wizardData.paso5 as InitialDataPaso5}
               disabled={saving}
             />
           )}
@@ -234,7 +238,7 @@ export default function RegistroProveedorPage() {
             <Paso6Avales
               onComplete={(data) => handleComplete(data)}
               onBack={handleBack}
-              initialData={wizardData.paso6}
+              initialData={wizardData.paso6 as InitialDataPaso6}
               disabled={saving}
             />
           )}

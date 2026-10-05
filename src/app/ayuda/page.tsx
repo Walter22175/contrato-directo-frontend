@@ -7,8 +7,17 @@ import Button from '@/components/ui/Button';
 import BuscadorInteligente from '@/components/ayuda/BuscadorInteligente';
 import FeedbackArticulo from '@/components/ayuda/FeedbackArticulo';
 import api, { extractData } from '@/lib/api';
-import { ChevronDown, ChevronUp, HelpCircle, MessageSquare, Mail, Phone } from 'lucide-react';
+import { ChevronDown, ChevronUp, HelpCircle, MessageSquare, Mail } from 'lucide-react';
 import type { Faq } from '@/types';
+
+interface CategoriaAyuda {
+  categoria?: string;
+  nombre?: string;
+}
+
+type CategoriaEntrada = string | CategoriaAyuda;
+type CategoriasRespuesta = CategoriaEntrada[] | { data?: CategoriaEntrada[] };
+type FaqsRespuesta = Faq[] | { data?: Faq[] };
 
 export default function AyudaPage() {
   const [faqs, setFaqs] = useState<Faq[]>([]);
@@ -25,13 +34,14 @@ export default function AyudaPage() {
           api.get('/centro-ayuda'),
           api.get('/centro-ayuda/categorias'),
         ]);
-        const faqsRaw = extractData<any>(faqsRes);
-        const catsRaw = extractData<any>(catsRes);
-        setFaqs(faqsRaw?.data || faqsRaw || []);
-        const catsData = catsRaw?.data || catsRaw || [];
+        const faqsRaw = extractData<FaqsRespuesta>(faqsRes);
+        const catsRaw = extractData<CategoriasRespuesta>(catsRes);
+        const faqsList = Array.isArray(faqsRaw) ? faqsRaw : faqsRaw.data;
+        setFaqs(Array.isArray(faqsList) ? faqsList : []);
+        const catsData = Array.isArray(catsRaw) ? catsRaw : catsRaw.data;
         setCategorias(
           Array.isArray(catsData)
-            ? catsData.map((c: any) => typeof c === 'string' ? c : c.categoria || c.nombre || '')
+            ? catsData.map((c) => (typeof c === 'string' ? c : c.categoria || c.nombre || ''))
             : []
         );
       } catch {

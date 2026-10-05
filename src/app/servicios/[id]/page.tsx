@@ -8,7 +8,8 @@ import Button from '@/components/ui/Button';
 import api, { extractData } from '@/lib/api';
 import { formatCurrency } from '@/lib/utils';
 import { useAuthStore } from '@/store/auth';
-import { Star, MapPin, Shield, Clock, ArrowLeft, MessageSquare, Loader2, Send, X } from 'lucide-react';
+import { Shield, ArrowLeft, MessageSquare, Loader2, Send, X } from 'lucide-react';
+import { LlaveIcon } from '@/components/ui/LlaveIcon';
 import type { Servicio, ServicioProveedor } from '@/types';
 
 export default function ServicioDetallePage() {
@@ -135,7 +136,7 @@ export default function ServicioDetallePage() {
                 </span>
               </div>
               <div className="flex items-center gap-1">
-                <Star className="w-5 h-5 text-yellow-400" />
+                <LlaveIcon className="w-5 h-5 text-yellow-400" />
                 <span className="text-lg font-semibold text-white">4.8</span>
                 <span className="text-sm text-slate-400">(12 reseñas)</span>
               </div>
@@ -190,7 +191,7 @@ export default function ServicioDetallePage() {
                           </p>
                         )}
                         <div className="flex items-center gap-1 text-sm text-slate-400">
-                          <Star className="w-4 h-4 text-yellow-400" />
+                          <LlaveIcon className="w-4 h-4 text-yellow-400" />
                           <span>4.9</span>
                         </div>
                       </div>

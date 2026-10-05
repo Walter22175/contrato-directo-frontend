@@ -1,8 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback, type FormEvent } from 'react';
-import { useAuthStore } from '@/store/auth';
-import api, { extractData } from '@/lib/api';
+import api, { extractData, mensajeError } from '@/lib/api';
 import { Card } from '@/components/ui/Card';
 import {
   Scale,
@@ -10,12 +9,9 @@ import {
   Clock,
   CheckCircle,
   AlertTriangle,
-  AlertCircle,
-  Send,
   User,
   Calendar,
   FileText,
-  Ban,
   Gavel,
   Shield,
 } from 'lucide-react';
@@ -55,7 +51,6 @@ const TIPOS_RESOLUCION = [
 ];
 
 export default function MediacionPage() {
-  const { user } = useAuthStore();
   const [mediaciones, setMediaciones] = useState<Mediacion[]>([]);
   const [loading, setLoading] = useState(true);
   const [selected, setSelected] = useState<string | null>(null);
@@ -73,20 +68,18 @@ export default function MediacionPage() {
   const [showAudiencia, setShowAudiencia] = useState(false);
   const [audienciaForm, setAudienciaForm] = useState<ConvocarAudienciaDto>({ fecha_audiencia: '', audiencia_virtual: true, duracion_audiencia_minutos: 30 });
 
-  const fetchMediaciones = useCallback(async () => {
-    setLoading(true);
-    try {
-      const res = await api.get('/mediacion');
-      const data = extractData<any>(res);
-      let list = data?.data || data || [];
-      if (tab === 'en_proceso') list = list.filter((m: Mediacion) => !['resuelta', 'cerrada'].includes(m.estado));
-      else if (tab === 'resueltas') list = list.filter((m: Mediacion) => ['resuelta', 'cerrada'].includes(m.estado));
-      setMediaciones(list);
-    } catch {
-      setMediaciones([]);
-    } finally {
-      setLoading(false);
-    }
+  const fetchMediaciones = useCallback(() => {
+    return api
+      .get('/mediacion')
+      .then((res) => {
+        const raw = extractData<Mediacion[] | { data?: Mediacion[] } | null>(res);
+        let list = Array.isArray(raw) ? raw : raw?.data || [];
+        if (tab === 'en_proceso') list = list.filter((m) => !['resuelta', 'cerrada'].includes(m.estado));
+        else if (tab === 'resueltas') list = list.filter((m) => ['resuelta', 'cerrada'].includes(m.estado));
+        setMediaciones(list);
+      })
+      .catch(() => setMediaciones([]))
+      .finally(() => setLoading(false));
   }, [tab]);
 
   useEffect(() => { fetchMediaciones(); }, [fetchMediaciones]);
@@ -94,7 +87,7 @@ export default function MediacionPage() {
   const fetchDetalle = async (id: string) => {
     try {
       const res = await api.get(`/mediacion/${id}`);
-      const data = extractData<any>(res);
+      const data = extractData<Mediacion | null>(res);
       setDetalle(data);
       setSelected(id);
       setMsg(null);
@@ -113,10 +106,11 @@ export default function MediacionPage() {
       await api.patch(`/mediacion/${selected}/asignar`, asignarForm);
       setShowAsignar(false);
       await fetchDetalle(selected);
+      setLoading(true);
       await fetchMediaciones();
       setMsg({ type: 'success', text: 'Mediador asignado correctamente' });
-    } catch (err: any) {
-      setMsg({ type: 'error', text: err.response?.data?.message || 'Error al asignar mediador' });
+    } catch (err) {
+      setMsg({ type: 'error', text: mensajeError(err, 'Error al asignar mediador') });
     } finally {
       setSending(false);
     }
@@ -132,8 +126,8 @@ export default function MediacionPage() {
       setShowAudiencia(false);
       await fetchDetalle(selected);
       setMsg({ type: 'success', text: 'Audiencia convocada correctamente' });
-    } catch (err: any) {
-      setMsg({ type: 'error', text: err.response?.data?.message || 'Error al convocar audiencia' });
+    } catch (err) {
+      setMsg({ type: 'error', text: mensajeError(err, 'Error al convocar audiencia') });
     } finally {
       setSending(false);
     }
@@ -148,10 +142,11 @@ export default function MediacionPage() {
       await api.patch(`/reclamos/mediacion/${selected}/resolver`, resolverForm);
       setShowResolver(false);
       await fetchDetalle(selected);
+      setLoading(true);
       await fetchMediaciones();
       setMsg({ type: 'success', text: 'Resolución emitida correctamente' });
-    } catch (err: any) {
-      setMsg({ type: 'error', text: err.response?.data?.message || 'Error al resolver' });
+    } catch (err) {
+      setMsg({ type: 'error', text: mensajeError(err, 'Error al resolver') });
     } finally {
       setSending(false);
     }

@@ -7,6 +7,8 @@ import { Card } from '@/components/ui/Card';
 import { FileText, Eye, Search } from 'lucide-react';
 import type { Contrato } from '@/types';
 
+type RespuestaApi<T> = T & { data?: T };
+
 const estadoColors: Record<string, string> = {
   borrador: 'text-slate-400 bg-slate-500/10',
   pendiente_firma: 'text-yellow-400 bg-yellow-500/10',
@@ -21,22 +23,24 @@ export default function DocumentosPage() {
   const [busqueda, setBusqueda] = useState('');
   const [tab, setTab] = useState<'todos' | 'pendientes' | 'firmados'>('todos');
 
+  const idUsuario = user?.id_usuario;
+
   const fetchContratos = useCallback(async () => {
     setLoading(true);
     try {
-      const params: Record<string, any> = {};
-      if (user?.id_usuario) params.id_usuario = user.id_usuario;
+      const params: Record<string, string> = {};
+      if (idUsuario) params.id_usuario = idUsuario;
       if (tab === 'pendientes') params.estado = 'pendiente_firma';
       if (tab === 'firmados') params.estado = 'firmado';
-      const res = await api.get('/contratos', { params });
-      const data = extractData<any>(res);
+      const res = await api.get<RespuestaApi<Contrato[]>>('/contratos', { params });
+      const data = extractData<RespuestaApi<Contrato[]> | null>(res);
       setContratos(data?.data || data || []);
     } catch {
       setContratos([]);
     } finally {
       setLoading(false);
     }
-  }, [user?.id_usuario, tab]);
+  }, [idUsuario, tab]);
 
   useEffect(() => { fetchContratos(); }, [fetchContratos]);
 

@@ -12,6 +12,17 @@ function clearCookies() {
   document.cookie = 'refresh_token=; path=/; max-age=0';
 }
 
+function mensajeDeError(err: unknown, fallback: string, separador = ', '): string {
+  if (typeof err === 'object' && err !== null && 'response' in err) {
+    const data = (err as { response?: { data?: { message?: unknown } } }).response?.data;
+    const message = data?.message;
+    if (typeof message === 'string' && message) return message;
+    if (Array.isArray(message)) return message.join(separador);
+    if (typeof message === 'number' || typeof message === 'boolean') return String(message);
+  }
+  return fallback;
+}
+
 interface AuthState {
   user: Partial<Usuario> | null;
   isAuthenticated: boolean;
@@ -40,8 +51,8 @@ export const useAuthStore = create<AuthState>((set) => ({
       localStorage.setItem('refresh_token', data.refresh_token);
       setCookies(data.access_token, data.refresh_token);
       set({ user: data.usuario, isAuthenticated: true, isLoading: false });
-    } catch (err: any) {
-      const message = err.response?.data?.message || 'Error al iniciar sesión';
+    } catch (err) {
+      const message = mensajeDeError(err, 'Error al iniciar sesión');
       set({ error: message, isLoading: false });
       throw err;
     }
@@ -56,8 +67,8 @@ export const useAuthStore = create<AuthState>((set) => ({
       localStorage.setItem('refresh_token', data.refresh_token);
       setCookies(data.access_token, data.refresh_token);
       set({ user: data.usuario, isAuthenticated: true, isLoading: false });
-    } catch (err: any) {
-      const message = err.response?.data?.message || 'Error al registrarse';
+    } catch (err) {
+      const message = mensajeDeError(err, 'Error al registrarse');
       set({ error: message, isLoading: false });
       throw err;
     }
@@ -130,9 +141,9 @@ export const useAuthStore = create<AuthState>((set) => ({
       localStorage.setItem('contexto_activo', data.contexto || rol);
       if (data.usuario) set({ user: data.usuario });
       return data.contexto || rol;
-    } catch (err: any) {
-      const message = err.response?.data?.message || 'No se pudo cambiar de rol';
-      set({ error: Array.isArray(message) ? message.join(' — ') : message });
+    } catch (err) {
+      const message = mensajeDeError(err, 'No se pudo cambiar de rol', ' — ');
+      set({ error: message });
       throw err;
     }
   },

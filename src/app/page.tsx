@@ -7,6 +7,7 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 import { Search, Shield, FileText, Star, ArrowRight, ChevronRight, Box } from 'lucide-react';
 import Button from '@/components/ui/Button';
 import { Promocion } from '@/types';
+import type { Servicio } from '@/types';
 import api, { extractData } from '@/lib/api';
 
 const categories = [
@@ -76,9 +77,9 @@ export default function HomePage() {
   const fetchServicios = useCallback(async () => {
     try {
       const res = await api.get('/servicios', { params: { activo: true } });
-      const data = extractData<any>(res);
-      const servs = data?.data || data || [];
-      setServicios(servs.map((s: any) => ({ id_servicio: s.id_servicio, nombre: s.nombre, id_categoria: s.id_categoria })));
+      const data = extractData<Servicio[] | { data?: Servicio[] }>(res);
+      const servs = (Array.isArray(data) ? data : data.data) || [];
+      setServicios(servs.map((s) => ({ id_servicio: s.id_servicio, nombre: s.nombre, id_categoria: s.id_categoria })));
     } catch {}
   }, []);
 
@@ -127,7 +128,7 @@ export default function HomePage() {
   useEffect(() => {
     generateSuggestions();
     setShowSuggestions(heroSearch.length > 0);
-  }, [generateSuggestions]);
+  }, [generateSuggestions, heroSearch.length]);
 
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
@@ -255,7 +256,7 @@ export default function HomePage() {
                         ))}
                         {suggestions.length === 0 && heroSearch && (
                           <div className="px-4 py-3 text-center text-slate-500">
-                            No se encontraron sugerencias para "{heroSearch}"
+                            No se encontraron sugerencias para {'"'}{heroSearch}{'"'}
                           </div>
                         )}
                       </div>

@@ -2,11 +2,12 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
+import Link from 'next/link';
 import { Card, CardTitle } from '@/components/ui/Card';
 import Button from '@/components/ui/Button';
 import api, { extractData } from '@/lib/api';
 import { formatCurrency } from '@/lib/utils';
-import { XCircle, AlertCircle, ArrowLeft, RefreshCw, Shield, HelpCircle, MessageSquare } from 'lucide-react';
+import { XCircle, AlertCircle, ArrowLeft, RefreshCw, Shield, HelpCircle } from 'lucide-react';
 import type { Transaccion } from '@/types';
 import { useFunnelAnalytics } from '@/hooks/useFunnelAnalytics';
 
@@ -30,7 +31,7 @@ export function CheckoutFalloContent() {
     const fetchTransaccion = async () => {
       try {
         const res = await api.get(`/transacciones/${idTransaccion}`);
-        const data = extractData<any>(res);
+        const data = extractData<Transaccion>(res);
         setTransaccion(data);
       } catch {
         router.push('/dashboard/transacciones');
@@ -285,11 +286,11 @@ export function CheckoutFalloContent() {
         <div className="mt-8 text-center">
           <p className="text-slate-500 text-sm">
             ¿Necesitás ayuda?{' '}
-            <a href="/ayuda" className="text-cyan-400 hover:underline">Centro de Ayuda</a>
+            <Link href="/ayuda" className="text-cyan-400 hover:underline">Centro de Ayuda</Link>
             {' '}·{' '}
-            <a href="/dashboard/tickets" className="text-cyan-400 hover:underline">Crear Ticket</a>
+            <Link href="/dashboard/tickets" className="text-cyan-400 hover:underline">Crear Ticket</Link>
             {' '}·{' '}
-            <a href="/ayuda/faq" className="text-cyan-400 hover:underline">Preguntas Frecuentes</a>
+            <Link href="/ayuda/faq" className="text-cyan-400 hover:underline">Preguntas Frecuentes</Link>
           </p>
         </div>
       </div>

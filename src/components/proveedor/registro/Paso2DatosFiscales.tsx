@@ -1,13 +1,13 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useForm } from 'react-hook-form';
+import { useForm, useWatch } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import Input from '@/components/ui/Input';
 import Select from '@/components/ui/Select';
 import Button from '@/components/ui/Button';
-import { CheckCircle, AlertCircle, Loader2, ShieldCheck } from 'lucide-react';
+import { AlertCircle, Loader2, ShieldCheck } from 'lucide-react';
 
 const paso2Schema = z.object({
   dni: z.string().optional(),
@@ -61,8 +61,8 @@ export default function Paso2DatosFiscales({
 
   const {
     register,
+    control,
     handleSubmit,
-    watch,
     setValue,
     formState: { errors, isSubmitting },
   } = useForm<Paso2Form>({
@@ -73,8 +73,8 @@ export default function Paso2DatosFiscales({
     mode: 'onBlur',
   });
 
-  const cuit = watch('cuit_cuil');
-  const dni = watch('dni');
+  const cuit = useWatch({ control, name: 'cuit_cuil' });
+  const dni = useWatch({ control, name: 'dni' });
 
   useEffect(() => {
     if (!cuit || cuit.replace(/[-\s]/g, '').length !== 11) {
@@ -118,7 +118,7 @@ export default function Paso2DatosFiscales({
   };
 
   return (
-    <div className="space-y-5">
+    <form onSubmit={handleSubmit(handleSubmitForm)} className="space-y-5" autoComplete="off">
       <div className="flex items-center justify-between mb-4">
         <Button variant="ghost" size="sm" onClick={onBack} disabled={disabled || isSubmitting || validating}>
           ← Volver
@@ -239,6 +239,6 @@ export default function Paso2DatosFiscales({
           Continuar
         </Button>
       </div>
-    </div>
+    </form>
   );
 }

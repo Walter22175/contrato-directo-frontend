@@ -6,7 +6,7 @@ import { extractData } from '@/lib/api';
 
 export interface PasoData {
   paso: number;
-  datos: Record<string, any>;
+  datos: Record<string, unknown>;
   completado: boolean;
 }
 
@@ -14,16 +14,51 @@ export interface RegistroProveedorDraft {
   id_draft: number;
   id_usuario: string;
   paso_actual: number;
-  datos_paso_1: Record<string, any> | null;
-  datos_paso_2: Record<string, any> | null;
-  datos_paso_3: Record<string, any> | null;
-  datos_paso_4: Record<string, any> | null;
-  datos_paso_5: Record<string, any> | null;
-  datos_paso_6: Record<string, any> | null;
+  datos_paso_1: Record<string, unknown> | null;
+  datos_paso_2: Record<string, unknown> | null;
+  datos_paso_3: Record<string, unknown> | null;
+  datos_paso_4: Record<string, unknown> | null;
+  datos_paso_5: Record<string, unknown> | null;
+  datos_paso_6: Record<string, unknown> | null;
   completado: boolean;
   fecha_completado: string | null;
   fecha_creacion: string;
   fecha_actualizacion: string;
+}
+
+interface ResultadoValidacionPaso {
+  valido: boolean;
+  mensaje?: string;
+}
+
+interface AfipValidationResult {
+  valido: boolean;
+  cuit: string;
+  existe_en_padron: boolean;
+  estado_afip: string;
+  contribuyente?: {
+    denominacion: string;
+    tipo_persona: string;
+    domicilio_fiscal: {
+      direccion: string;
+      localidad: string;
+      provincia: string;
+      codigo_postal: string;
+    };
+    actividades: Array<{ codigo: string; descripcion: string }>;
+  };
+  observaciones: string[];
+}
+
+function mensajeDeError(err: unknown, fallback: string, separador = ', '): string {
+  if (typeof err === 'object' && err !== null && 'response' in err) {
+    const data = (err as { response?: { data?: { message?: unknown } } }).response?.data;
+    const message = data?.message;
+    if (typeof message === 'string' && message) return message;
+    if (Array.isArray(message)) return message.join(separador);
+    if (typeof message === 'number' || typeof message === 'boolean') return String(message);
+  }
+  return fallback;
 }
 
 const STORAGE_KEY = 'registro_proveedor_draft';
@@ -39,7 +74,7 @@ export function useRegistroProveedorDraft() {
     try {
       const stored = localStorage.getItem(STORAGE_KEY);
       if (stored) {
-        const parsed = JSON.parse(stored);
+        const parsed = JSON.parse(stored) as RegistroProveedorDraft;
         setDraft(parsed);
       }
     } catch {
@@ -70,8 +105,8 @@ export function useRegistroProveedorDraft() {
       setDraft(data);
       saveToStorage(data);
       return data;
-    } catch (err: any) {
-      const msg = err.response?.data?.message || 'Error al iniciar registro';
+    } catch (err) {
+      const msg = mensajeDeError(err, 'Error al iniciar registro');
       setError(msg);
       throw new Error(msg);
     } finally {
@@ -88,8 +123,8 @@ export function useRegistroProveedorDraft() {
       setDraft(data);
       saveToStorage(data);
       return data;
-    } catch (err: any) {
-      const msg = err.response?.data?.message || 'Error al obtener progreso';
+    } catch (err) {
+      const msg = mensajeDeError(err, 'Error al obtener progreso');
       setError(msg);
       throw new Error(msg);
     } finally {
@@ -97,7 +132,7 @@ export function useRegistroProveedorDraft() {
     }
   };
 
-  const guardarPaso = async (paso: number, datos: Record<string, any>): Promise<RegistroProveedorDraft> => {
+  const guardarPaso = async (paso: number, datos: Record<string, unknown>): Promise<RegistroProveedorDraft> => {
     setSaving(true);
     setError(null);
     try {
@@ -106,8 +141,8 @@ export function useRegistroProveedorDraft() {
       setDraft(data);
       saveToStorage(data);
       return data;
-    } catch (err: any) {
-      const msg = err.response?.data?.message || `Error al guardar paso ${paso}`;
+    } catch (err) {
+      const msg = mensajeDeError(err, `Error al guardar paso ${paso}`);
       setError(msg);
       throw new Error(msg);
     } finally {
@@ -115,40 +150,40 @@ export function useRegistroProveedorDraft() {
     }
   };
 
-  const validarPaso1 = async (datos: Record<string, any>): Promise<{ valido: boolean; mensaje?: string }> => {
+  const validarPaso1 = async (datos: Record<string, unknown>): Promise<ResultadoValidacionPaso> => {
     setError(null);
     try {
       const res = await api.post('/registro-proveedor/paso/1/validar', datos);
-      return extractData(res);
-    } catch (err: any) {
-      const msg = err.response?.data?.message || 'Error validando paso 1';
+      return extractData<ResultadoValidacionPaso>(res);
+    } catch (err) {
+      const msg = mensajeDeError(err, 'Error validando paso 1');
       setError(msg);
       return { valido: false, mensaje: msg };
     }
   };
 
-  const validarPaso2 = async (datos: Record<string, any>): Promise<{ valido: boolean; mensaje?: string }> => {
+  const validarPaso2 = async (datos: Record<string, unknown>): Promise<ResultadoValidacionPaso> => {
     setError(null);
     try {
       const res = await api.post('/registro-proveedor/paso/2/validar', datos);
-      return extractData(res);
-    } catch (err: any) {
-      const msg = err.response?.data?.message || 'Error validando paso 2';
+      return extractData<ResultadoValidacionPaso>(res);
+    } catch (err) {
+      const msg = mensajeDeError(err, 'Error validando paso 2');
       setError(msg);
       return { valido: false, mensaje: msg };
     }
   };
 
-  const validarCuitAfip = async (cuit: string): Promise<any> => {
+  const validarCuitAfip = async (cuit: string): Promise<AfipValidationResult | null> => {
     try {
       const res = await api.get(`/afip-validation/cuit/${cuit}`);
-      return extractData(res);
+      return extractData<AfipValidationResult>(res);
     } catch {
       return null;
     }
   };
 
-  const completarRegistro = async (dtoPaso6: Record<string, any>): Promise<any> => {
+  const completarRegistro = async (dtoPaso6: Record<string, unknown>): Promise<unknown> => {
     setSaving(true);
     setError(null);
     try {
@@ -159,8 +194,8 @@ export function useRegistroProveedorDraft() {
       }
       setDraft(null);
       return data;
-    } catch (err: any) {
-      const msg = err.response?.data?.message || 'Error completando registro';
+    } catch (err) {
+      const msg = mensajeDeError(err, 'Error completando registro');
       setError(msg);
       throw new Error(msg);
     } finally {
@@ -177,8 +212,8 @@ export function useRegistroProveedorDraft() {
         localStorage.removeItem(STORAGE_KEY);
       }
       setDraft(null);
-    } catch (err: any) {
-      const msg = err.response?.data?.message || 'Error cancelando registro';
+    } catch (err) {
+      const msg = mensajeDeError(err, 'Error cancelando registro');
       setError(msg);
       throw new Error(msg);
     } finally {

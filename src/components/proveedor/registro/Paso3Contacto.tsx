@@ -5,7 +5,6 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import Input from '@/components/ui/Input';
 import Button from '@/components/ui/Button';
-import { MapPin, Phone, Globe } from 'lucide-react';
 
 const paso3Schema = z.object({
   direccion: z.string().min(5, 'Dirección muy corta').max(255),
@@ -40,7 +39,7 @@ export default function Paso3Contacto({ onNext, onBack, initialData, disabled }:
   };
 
   return (
-    <div className="space-y-5">
+    <form onSubmit={handleSubmit(handleSubmitForm)} className="space-y-5" autoComplete="off">
       <div className="flex items-center justify-between mb-4">
         <Button variant="ghost" size="sm" onClick={onBack} disabled={disabled || isSubmitting}>
           ← Volver
@@ -87,6 +86,6 @@ export default function Paso3Contacto({ onNext, onBack, initialData, disabled }:
           Continuar
         </Button>
       </div>
-    </div>
+    </form>
   );
 }

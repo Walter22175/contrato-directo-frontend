@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { useForm } from 'react-hook-form';
+import { useForm, useWatch } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import Input from '@/components/ui/Input';
@@ -42,7 +42,7 @@ export default function Paso6Avales({
   const {
     register,
     handleSubmit,
-    watch,
+    control,
     setValue,
     formState: { errors, isSubmitting },
   } = useForm<Paso6Form>({
@@ -54,7 +54,7 @@ export default function Paso6Avales({
     mode: 'onBlur',
   });
 
-  const aceptaTerminos = watch('acepta_terminos');
+  const aceptaTerminos = useWatch({ control, name: 'acepta_terminos' });
 
   const handleSubmitForm = async (data: Paso6Form) => {
     await onComplete(data);

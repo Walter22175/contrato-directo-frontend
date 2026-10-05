@@ -3,9 +3,11 @@
 import { useState, useEffect, useCallback } from 'react';
 import api, { extractData } from '@/lib/api';
 import { Card, CardTitle } from '@/components/ui/Card';
-import { Users, UserCheck, UserX, BarChart3 } from 'lucide-react';
+import { Users, UserCheck, BarChart3 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import type { AgenteSoporte } from '@/types';
+
+type RespuestaApi<T> = T & { data?: T };
 
 export default function AgentesPage() {
   const [agentes, setAgentes] = useState<AgenteSoporte[]>([]);
@@ -13,8 +15,8 @@ export default function AgentesPage() {
 
   const fetchAgentes = useCallback(async () => {
     try {
-      const res = await api.get('/agentes');
-      const data = extractData<any>(res);
+      const res = await api.get<RespuestaApi<AgenteSoporte[]>>('/agentes');
+      const data = extractData<RespuestaApi<AgenteSoporte[]> | null>(res);
       setAgentes(data?.data || data || []);
     } catch {
       setAgentes([

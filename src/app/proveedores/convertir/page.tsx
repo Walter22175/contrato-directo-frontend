@@ -11,8 +11,9 @@ import Paso3Contacto from '@/components/proveedor/registro/Paso3Contacto';
 import Paso4RubroDescripcion from '@/components/proveedor/registro/Paso4RubroDescripcion';
 import Paso5DocumentacionFiscal from '@/components/proveedor/registro/Paso5DocumentacionFiscal';
 import Paso6Avales from '@/components/proveedor/registro/Paso6Avales';
-import { Check, ChevronRight, Loader2, ArrowLeft } from 'lucide-react';
+import { Check, ArrowLeft } from 'lucide-react';
 import SUSModal from '@/components/ui/SUSModal';
+import type { Usuario } from '@/types';
 
 const STEPS = [
   { key: 1, label: 'Datos Personales', icon: 'user' },
@@ -25,13 +26,91 @@ const STEPS = [
 
 type PasoActual = 1 | 2 | 3 | 4 | 5 | 6;
 
+type CategoriaIva = 'responsable_inscripto' | 'monotributo' | 'no_categorizado';
+type TipoComercio = 'servicio' | 'producto' | 'mixto';
+
+interface Paso1Data {
+  nombre?: string;
+  apellido?: string;
+  email?: string;
+  password?: string;
+  confirmPassword?: string;
+  tipo_persona?: 'fisica' | 'juridica';
+}
+
+interface Paso2Data {
+  dni?: string;
+  cuit_cuil?: string;
+  categoria_iva?: CategoriaIva;
+  tipo_comercio?: TipoComercio;
+}
+
+interface Paso3Data {
+  direccion?: string;
+  telefono?: string;
+  sitio_web?: string;
+}
+
+interface Paso4Data {
+  rubro_principal?: string;
+  descripcion?: string;
+  redes_sociales?: Record<string, string>;
+}
+
+interface Paso5Data {
+  documentacion_fiscal_url?: string;
+  observaciones?: string;
+}
+
+interface AvalData {
+  nombre: string;
+  contacto: string;
+  observaciones?: string;
+}
+
+interface Paso6Data {
+  avales?: AvalData[];
+  acepta_terminos?: boolean;
+}
+
+type DatosPaso =
+  | Paso1Data
+  | Paso2Data
+  | Paso3Data
+  | Paso4Data
+  | Paso5Data
+  | Paso6Data;
+
 interface WizardState {
-  paso1?: any;
-  paso2?: any;
-  paso3?: any;
-  paso4?: any;
-  paso5?: any;
-  paso6?: any;
+  paso1?: Paso1Data;
+  paso2?: Paso2Data;
+  paso3?: Paso3Data;
+  paso4?: Paso4Data;
+  paso5?: Paso5Data;
+  paso6?: Paso6Data;
+}
+
+interface RespuestaUsuario {
+  data?: Partial<Usuario>;
+}
+
+interface RespuestaError {
+  message?: string | string[];
+  data?: { message?: string | string[] };
+}
+
+interface RespuestasSUS {
+  q1: number;
+  q2: number;
+  q3: number;
+  q4: number;
+  q5: number;
+  q6: number;
+  q7: number;
+  q8: number;
+  q9: number;
+  q10: number;
+  comentarios?: string;
 }
 
 export default function ConvertirProveedorPage() {
@@ -41,10 +120,7 @@ export default function ConvertirProveedorPage() {
   const [pasoActual, setPasoActual] = useState<PasoActual>(1);
   const [wizardData, setWizardData] = useState<WizardState>({});
   const [saving, setSaving] = useState(false);
-  const [completing, setCompleting] = useState(false);
   const [showSUS, setShowSUS] = useState(false);
-  const [prefilledData, setPrefilledData] = useState<any>(null);
-  const [clientData, setClientData] = useState<any>(null);
   const [errorCompleting, setErrorCompleting] = useState<string | null>(null);
   const wizardRef = useRef<WizardState>({});
 
@@ -53,67 +129,65 @@ export default function ConvertirProveedorPage() {
       router.push('/auth/login');
       return;
     }
-    if (user?.id_usuario) {
-      fetchClientData();
-    }
-  }, [isAuthenticated, router, user?.id_usuario]);
+    const idUsuario = user?.id_usuario;
+    if (!idUsuario) return;
 
-  const fetchClientData = async () => {
-    if (!user?.id_usuario) return;
-    try {
-      const res = await api.get(`/usuarios/${user.id_usuario}`);
-      const data = res.data?.data || res.data;
-      setClientData(data);
-      buildPrefilledData(data);
-    } catch (err) {
-      console.error('Error fetching client data:', err);
-    }
-  };
-
-  const buildPrefilledData = (data: any) => {
-    const prefilled = {
-      paso1: {
-        nombre: data.nombre || '',
-        apellido: data.apellido || '',
-        email: data.email || '',
-        password: '',
-        confirmPassword: '',
-        tipo_persona: (data.tipo_persona || '').toLowerCase() === 'fisica' ? 'fisica' : 'juridica',
-      },
-      paso2: {
-        dni: (data.dni || '').replace(/\D/g, ''),
-        cuit_cuil: (data.cuit_cuil || '').replace(/\D/g, ''),
-        categoria_iva: '',
-        tipo_comercio: '',
-      },
-      paso3: {
-        direccion: data.direccion || '',
-        telefono: data.telefono || '',
-        sitio_web: '',
-      },
-      paso4: {
-        rubro_principal: '',
-        descripcion: '',
-        redes_sociales: {},
-      },
-      paso5: {
-        documentacion_fiscal_url: '',
-        observaciones: '',
-      },
-      paso6: {
-        avales: [{ nombre: '', contacto: '', observaciones: '' }],
-        acepta_terminos: false,
-      },
+    const buildPrefilledData = (data: Partial<Usuario>) => {
+      const prefilled: WizardState = {
+        paso1: {
+          nombre: data.nombre || '',
+          apellido: data.apellido || '',
+          email: data.email || '',
+          password: '',
+          confirmPassword: '',
+          tipo_persona: (data.tipo_persona || '').toLowerCase() === 'fisica' ? 'fisica' : 'juridica',
+        },
+        paso2: {
+          dni: (data.dni || '').replace(/\D/g, ''),
+          cuit_cuil: (data.cuit_cuil || '').replace(/\D/g, ''),
+          categoria_iva: ('' as string) as CategoriaIva,
+          tipo_comercio: ('' as string) as TipoComercio,
+        },
+        paso3: {
+          direccion: data.direccion || '',
+          telefono: data.telefono || '',
+          sitio_web: '',
+        },
+        paso4: {
+          rubro_principal: '',
+          descripcion: '',
+          redes_sociales: {},
+        },
+        paso5: {
+          documentacion_fiscal_url: '',
+          observaciones: '',
+        },
+        paso6: {
+          avales: [{ nombre: '', contacto: '', observaciones: '' }],
+          acepta_terminos: false,
+        },
+      };
+      setWizardData(prefilled);
     };
-    setPrefilledData(prefilled);
-    setWizardData(prefilled);
-  };
+
+    const fetchClientData = async () => {
+      try {
+        const res = await api.get<Partial<Usuario> & RespuestaUsuario>(`/usuarios/${idUsuario}`);
+        const data = res.data?.data || res.data;
+        buildPrefilledData(data);
+      } catch (err) {
+        console.error('Error fetching client data:', err);
+      }
+    };
+
+    fetchClientData();
+  }, [isAuthenticated, router, user?.id_usuario]);
 
   useEffect(() => {
     wizardRef.current = wizardData;
   }, [wizardData]);
 
-  const handleNext = useCallback(async (paso: PasoActual, data: any) => {
+  const handleNext = useCallback(async (paso: PasoActual, data: DatosPaso) => {
     setSaving(true);
     try {
       setWizardData(prev => ({ ...prev, [paso === 1 ? 'paso1' : paso === 2 ? 'paso2' : paso === 3 ? 'paso3' : paso === 4 ? 'paso4' : paso === 5 ? 'paso5' : 'paso6']: data }));
@@ -129,9 +203,8 @@ export default function ConvertirProveedorPage() {
     setPasoActual(prev => Math.max(1, prev - 1) as PasoActual);
   }, []);
 
-  const handleComplete = useCallback(async (data: any) => {
+  const handleComplete = useCallback(async (data: Paso6Data) => {
     if (!user?.id_usuario) return;
-    setCompleting(true);
     setErrorCompleting(null);
     try {
       const w = wizardRef.current;
@@ -147,19 +220,18 @@ export default function ConvertirProveedorPage() {
       };
       await api.post('/usuarios/convertir-proveedor', dto);
       setShowSUS(true);
-    } catch (err: any) {
+    } catch (err) {
       console.error('Error completando conversión:', err);
+      const cuerpo = (err as { response?: { data?: RespuestaError } } | undefined)?.response?.data;
       const msg =
-        err?.response?.data?.message ||
-        err?.response?.data?.data?.message ||
+        cuerpo?.message ||
+        cuerpo?.data?.message ||
         'No se pudo completar la conversión. Verificá los datos e intentá nuevamente.';
       setErrorCompleting(Array.isArray(msg) ? msg.join(' — ') : msg);
-    } finally {
-      setCompleting(false);
     }
   }, [user?.id_usuario]);
 
-  const handleSUSSubmit = async (score: number, responses: any) => {
+  const handleSUSSubmit = async (score: number, responses: RespuestasSUS) => {
     try {
       await api.post('/metricas/sus/registro', {
         ...responses,
@@ -176,7 +248,7 @@ export default function ConvertirProveedorPage() {
 
   const progress = (pasoActual / 6) * 100;
 
-  const isProveedor = user?.usuario_roles?.some((ur: any) => ur.rol?.nombre === 'proveedor' && ur.activo);
+  const isProveedor = user?.usuario_roles?.some((ur) => ur.rol?.nombre === 'proveedor' && ur.activo);
 
   if (isProveedor) {
     return (

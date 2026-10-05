@@ -4,6 +4,16 @@ import { useState, useEffect, useCallback } from 'react';
 import api, { extractData } from '@/lib/api';
 import { Card } from '@/components/ui/Card';
 import { BarChart3, TrendingUp, Users, DollarSign, AlertTriangle, FileText } from 'lucide-react';
+import type { Reclamo, Usuario } from '@/types';
+
+interface ResumenLista<T> {
+  data?: T[];
+  meta?: { total?: number };
+}
+
+interface TransaccionReporte {
+  monto_total?: number | string;
+}
 
 interface Metrica {
   label: string;
@@ -21,22 +31,22 @@ export default function AdminReportesPage() {
     setLoading(true);
     try {
       const [transRes, usersRes, reclamosRes] = await Promise.allSettled([
-        api.get('/transacciones'),
-        api.get('/usuarios'),
-        api.get('/reclamos'),
+        api.get<ResumenLista<TransaccionReporte>>('/transacciones'),
+        api.get<ResumenLista<Usuario>>('/usuarios'),
+        api.get<ResumenLista<Reclamo>>('/reclamos'),
       ]);
-      const txData = transRes.status === 'fulfilled' ? extractData<any>(transRes.value) : null;
-      const usersData = usersRes.status === 'fulfilled' ? extractData<any>(usersRes.value) : null;
-      const reclamosData = reclamosRes.status === 'fulfilled' ? extractData<any>(reclamosRes.value) : null;
+      const txData = transRes.status === 'fulfilled' ? extractData<ResumenLista<TransaccionReporte> | null>(transRes.value) : null;
+      const usersData = usersRes.status === 'fulfilled' ? extractData<ResumenLista<Usuario> | null>(usersRes.value) : null;
+      const reclamosData = reclamosRes.status === 'fulfilled' ? extractData<ResumenLista<Reclamo> | null>(reclamosRes.value) : null;
 
       const txArr = txData?.data || [];
-      const totalIngresos = txArr.reduce((acc: number, t: any) => acc + (Number(t.monto_total) || 0), 0);
+      const totalIngresos = txArr.reduce((acc: number, t) => acc + (Number(t.monto_total) || 0), 0);
 
       setMetricas([
         { label: 'Total Usuarios', valor: usersData?.meta?.total || usersData?.data?.length || 0, icono: Users, color: 'text-cyan-400' },
         { label: 'Transacciones', valor: txArr.length || 0, icono: TrendingUp, color: 'text-green-400' },
         { label: 'Ingresos Totales', valor: `$${totalIngresos.toLocaleString('es-AR')}`, icono: DollarSign, color: 'text-yellow-400' },
-        { label: 'Reclamos Activos', valor: reclamosData?.data?.filter((r: any) => r.estado !== 'cerrado').length || 0, icono: AlertTriangle, color: 'text-red-400' },
+        { label: 'Reclamos Activos', valor: reclamosData?.data?.filter((r) => r.estado !== 'cerrado').length || 0, icono: AlertTriangle, color: 'text-red-400' },
       ]);
     } catch {} finally {
       setLoading(false);

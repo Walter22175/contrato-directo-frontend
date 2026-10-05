@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { useForm } from 'react-hook-form';
+import type { FieldErrors, UseFormHandleSubmit, UseFormRegister } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import api from '@/lib/api';
@@ -40,10 +41,10 @@ const SentView = (): JSX.Element => {
 
 const NotSentView = ({ error, handleSubmit, onSubmit, register, errors, isSubmitting }: { 
   error: string; 
-  handleSubmit: any; 
-  onSubmit: any;
-  register: any; 
-  errors: any; 
+  handleSubmit: UseFormHandleSubmit<ForgotForm>;
+  onSubmit: (data: ForgotForm) => Promise<void>;
+  register: UseFormRegister<ForgotForm>;
+  errors: FieldErrors<ForgotForm>;
   isSubmitting: boolean;
 }): JSX.Element => {
   return (
@@ -100,8 +101,9 @@ export default function ForgotPasswordPage() {
       setError('');
       await api.post('/auth/forgot-password', data);
       setSent(true);
-    } catch (err: any) {
-      setError(err.response?.data?.message || 'Error al enviar el email');
+    } catch (err) {
+      const mensaje = (err as { response?: { data?: { message?: string } } })?.response?.data?.message;
+      setError(mensaje || 'Error al enviar el email');
     }
   };
 

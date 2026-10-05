@@ -1,11 +1,11 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Card, CardTitle } from '@/components/ui/Card';
+import { Card } from '@/components/ui/Card';
 import Button from '@/components/ui/Button';
 import api, { extractData } from '@/lib/api';
 import { formatDate } from '@/lib/utils';
-import { FileText, Download, Pen, Clock, CheckCircle, XCircle } from 'lucide-react';
+import { FileText, Download, Pen } from 'lucide-react';
 import type { Contrato } from '@/types';
 
 const estadoColors: Record<string, string> = {
@@ -23,8 +23,8 @@ export default function ContratosPage() {
     const fetchContratos = async () => {
       try {
         const res = await api.get('/contratos');
-        const raw = extractData<any>(res);
-        setContratos(raw?.data || raw || []);
+        const raw = extractData<Contrato[] | { data?: Contrato[] } | null>(res);
+        setContratos(Array.isArray(raw) ? raw : raw?.data || []);
       } catch {
         setContratos([]);
       } finally {

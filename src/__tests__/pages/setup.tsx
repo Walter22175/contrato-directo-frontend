@@ -11,7 +11,7 @@ jest.mock('next/navigation', () => {
 });
 
 jest.mock('next/link', () => {
-  const MockLink = ({ children, href, ...props }: any) => (
+  const MockLink = ({ children, href, ...props }: React.AnchorHTMLAttributes<HTMLAnchorElement>) => (
     <a href={href} {...props}>{children}</a>
   );
   MockLink.displayName = 'MockLink';
@@ -49,7 +49,7 @@ const mockStore = {
 
 jest.mock('@/store/auth', () => ({
   useAuthStore: Object.assign(
-    jest.fn((selector?: (state: typeof mockStore) => any) => {
+    jest.fn(<T,>(selector?: (state: typeof mockStore) => T) => {
       return selector ? selector(mockStore) : mockStore;
     }),
     { getState: jest.fn(() => mockStore) }
@@ -57,7 +57,7 @@ jest.mock('@/store/auth', () => ({
 }));
 
 jest.mock('@/lib/api', () => {
-  const mockExtract = (response: { data: any }) => {
+  const mockExtract = (response: { data: unknown }) => {
     const raw = response.data;
     if (raw && typeof raw === 'object' && 'data' in raw && 'timestamp' in raw) {
       return raw.data;

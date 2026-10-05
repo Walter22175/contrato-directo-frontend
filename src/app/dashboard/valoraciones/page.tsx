@@ -4,7 +4,8 @@ import { useState, useEffect, useCallback } from 'react';
 import { useAuthStore } from '@/store/auth';
 import api, { extractData } from '@/lib/api';
 import { Card } from '@/components/ui/Card';
-import { Star, MessageSquare, Filter } from 'lucide-react';
+import { MessageSquare } from 'lucide-react';
+import { LlaveIcon } from '@/components/ui/LlaveIcon';
 import type { Valoracion } from '@/types';
 
 type Tab = 'recibidas' | 'dadas';
@@ -15,20 +16,22 @@ export default function ValoracionesPage() {
   const [valoraciones, setValoraciones] = useState<Valoracion[]>([]);
   const [loading, setLoading] = useState(true);
 
+  const idUsuario = user?.id_usuario;
+
   const fetchValoraciones = useCallback(async () => {
-    if (!user?.id_usuario) return;
+    if (!idUsuario) return;
     setLoading(true);
     try {
       const param = tab === 'recibidas' ? 'id_evaluado' : 'id_evaluador';
-      const res = await api.get('/valoraciones', { params: { [param]: user.id_usuario } });
-      const data = extractData<any>(res);
-      setValoraciones(data?.data || data || []);
+      const res = await api.get('/valoraciones', { params: { [param]: idUsuario } });
+      const data = extractData<Valoracion[] | { data?: Valoracion[] } | null>(res);
+      setValoraciones(Array.isArray(data) ? data : data?.data || []);
     } catch {
       setValoraciones([]);
     } finally {
       setLoading(false);
     }
-  }, [user?.id_usuario, tab]);
+  }, [idUsuario, tab]);
 
   useEffect(() => {
     fetchValoraciones();
@@ -63,7 +66,7 @@ export default function ValoracionesPage() {
                 : 'border-transparent text-slate-400 hover:text-white'
             }`}
           >
-            <Star className="w-4 h-4" />
+            <LlaveIcon className="w-4 h-4" />
             {t === 'recibidas' ? 'Recibidas' : 'Dadas'}
           </button>
         ))}
@@ -75,7 +78,7 @@ export default function ValoracionesPage() {
             <div className="text-4xl font-bold text-white mb-1">{promedio}</div>
             <div className="flex items-center justify-center gap-1 mb-2">
               {[1, 2, 3, 4, 5].map((s) => (
-                <Star
+                <LlaveIcon
                   key={s}
                   className={`w-5 h-5 ${s <= Math.round(parseFloat(promedio)) ? 'text-yellow-400 fill-yellow-400' : 'text-slate-600'}`}
                 />
@@ -90,7 +93,7 @@ export default function ValoracionesPage() {
             {distribucion.map((d) => (
               <div key={d.stars} className="flex items-center gap-3">
                 <span className="text-sm text-slate-400 w-6 text-right">{d.stars}</span>
-                <Star className="w-4 h-4 text-yellow-400 fill-yellow-400" />
+                <LlaveIcon className="w-4 h-4 text-yellow-400 fill-yellow-400" />
                 <div className="flex-1 h-2 bg-slate-700 rounded-full overflow-hidden">
                   <div
                     className="h-full bg-yellow-400 rounded-full transition-all"
@@ -140,7 +143,7 @@ export default function ValoracionesPage() {
                   </div>
                   <div className="flex items-center gap-1">
                     {[1, 2, 3, 4, 5].map((s) => (
-                      <Star
+                      <LlaveIcon
                         key={s}
                         className={`w-4 h-4 ${s <= v.puntuacion ? 'text-yellow-400 fill-yellow-400' : 'text-slate-600'}`}
                       />

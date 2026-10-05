@@ -3,12 +3,14 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { cn } from '@/lib/utils';
+import { useAuthStore } from '@/store/auth';
+import { useUiStore } from '@/store/ui';
 import {
   LayoutDashboard,
   Search,
   FileText,
   CreditCard,
-  Star,
+
   MessageSquare,
   HelpCircle,
   Settings,
@@ -25,14 +27,16 @@ import {
   FileBarChart,
   Image as ImageIcon,
   Briefcase,
+  LogOut,
 } from 'lucide-react';
+import { LlaveIcon } from '@/components/ui/LlaveIcon';
 
 const clientLinks = [
   { href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
   { href: '/servicios', label: 'Buscar Servicios', icon: Search },
   { href: '/dashboard/transacciones', label: 'Mis Transacciones', icon: CreditCard },
   { href: '/dashboard/contratos', label: 'Mis Contratos', icon: FileText },
-  { href: '/dashboard/valoraciones', label: 'Mis Valoraciones', icon: Star },
+  { href: '/dashboard/valoraciones', label: 'Mis Valoraciones', icon: LlaveIcon },
   { href: '/dashboard/reclamos', label: 'Reclamos', icon: AlertTriangle },
   { href: '/dashboard/notificaciones', label: 'Notificaciones', icon: Bell },
   { href: '/dashboard/tickets', label: 'Soporte', icon: MessageSquare },
@@ -47,7 +51,7 @@ const providerLinks = [
   { href: '/dashboard/mis-servicios', label: 'Mis Servicios', icon: Settings },
   { href: '/dashboard/transacciones', label: 'Transacciones', icon: CreditCard },
   { href: '/dashboard/contratos', label: 'Contratos', icon: FileText },
-  { href: '/dashboard/valoraciones', label: 'Valoraciones', icon: Star },
+  { href: '/dashboard/valoraciones', label: 'Valoraciones', icon: LlaveIcon },
   { href: '/dashboard/reclamos', label: 'Reclamos', icon: AlertTriangle },
   { href: '/dashboard/notificaciones', label: 'Notificaciones', icon: Bell },
   { href: '/dashboard/tickets', label: 'Soporte', icon: MessageSquare },
@@ -76,34 +80,63 @@ const adminLinks = [
 
 export default function Sidebar({ role = 'cliente' }: { role?: string }) {
   const pathname = usePathname();
+  const logout = useAuthStore((s) => s.logout);
+  const abierta = useUiStore((s) => s.sidebarAbierta);
+  const cerrar = useUiStore((s) => s.cerrarSidebar);
   const links = role === 'admin' ? adminLinks : role === 'proveedor' ? providerLinks : clientLinks;
 
   return (
-    <aside className="w-64 bg-slate-900 border-r border-slate-800 min-h-[calc(100vh-4rem)] flex flex-col">
-      <nav className="p-4 space-y-1 flex-1 overflow-y-auto">
-        {links.map((link) => {
-          const Icon = link.icon;
-          const isActive = pathname === link.href;
-          return (
-            <Link
-              key={link.href}
-              href={link.href}
-              className={cn(
-                'flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors',
-                isActive
-                  ? 'bg-cyan-500/10 text-cyan-400 border border-cyan-500/20'
-                  : 'text-slate-400 hover:text-white hover:bg-slate-800',
-              )}
-            >
-              <Icon className="w-5 h-5" />
-              {link.label}
-            </Link>
-          );
-        })}
-      </nav>
-      <div className="p-4 border-t border-slate-800">
-        <p className="text-xs text-slate-500 text-center">Contrato Directo</p>
-      </div>
-    </aside>
+    <>
+      {abierta && (
+        <div
+          className="fixed inset-0 z-30 bg-black/50 md:hidden"
+          onClick={cerrar}
+          aria-hidden="true"
+        />
+      )}
+      <aside
+        className={cn(
+          'fixed top-0 bottom-0 left-0 z-40 w-64 bg-slate-900 border-r border-slate-800 flex flex-col pt-28 transition-transform duration-200',
+          abierta ? 'translate-x-0' : '-translate-x-full',
+          'md:static md:z-auto md:pt-0 md:translate-x-0 md:min-h-[calc(100vh-4rem)]',
+        )}
+      >
+        <nav className="p-4 space-y-1 flex-1 overflow-y-auto">
+          {links.map((link) => {
+            const Icon = link.icon;
+            const isActive = pathname === link.href;
+            return (
+              <Link
+                key={link.href}
+                href={link.href}
+                onClick={cerrar}
+                className={cn(
+                  'flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors',
+                  isActive
+                    ? 'bg-cyan-500/10 text-cyan-400 border border-cyan-500/20'
+                    : 'text-slate-400 hover:text-white hover:bg-slate-800',
+                )}
+              >
+                <Icon className="w-5 h-5" />
+                {link.label}
+              </Link>
+            );
+          })}
+        </nav>
+        <div className="p-4 border-t border-slate-800 space-y-3">
+          <p className="text-xs text-slate-500 text-center">Contrato Directo</p>
+          <button
+            onClick={() => {
+              logout();
+              cerrar();
+            }}
+            className="md:hidden w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-slate-400 hover:text-white hover:bg-slate-800 transition-colors"
+          >
+            <LogOut className="w-5 h-5" />
+            Cerrar Sesión
+          </button>
+        </div>
+      </aside>
+    </>
   );
 }

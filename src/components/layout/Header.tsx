@@ -5,9 +5,11 @@ import { useRouter } from 'next/navigation';
 import { usePathname } from 'next/navigation';
 import { useAuthStore } from '@/store/auth';
 import { useNotificationStore } from '@/store/notifications';
+import { useUiStore } from '@/store/ui';
 import { useNotificationsSocket } from '@/hooks/useNotificationsSocket';
 import { useState, useEffect, useRef, useCallback } from 'react';
-import { Menu, Search, Bell, User, LogOut, ChevronDown, Check, X, ChevronRight, Box } from 'lucide-react';
+import { Menu, Search, Bell, User, LogOut, ChevronDown, Check, X, Box } from 'lucide-react';
+import Image from 'next/image';
 import Button from '@/components/ui/Button';
 import api, { extractData } from '@/lib/api';
 
@@ -26,12 +28,19 @@ function formatRelativeTime(dateStr: string): string {
 
 const RECENT_SEARCHES_KEY = 'recent_searches';
 
-interface SearchSuggestion {
-  type: 'categoria' | 'servicio' | 'recent';
-  label: string;
-  value: string;
+interface CategoriaApi {
+  id_categoria: number;
+  nombre: string;
   slug?: string;
 }
+
+interface ServicioApi {
+  id_servicio: number;
+  nombre: string;
+  id_categoria: number;
+}
+
+type RespuestaLista<T> = T[] & { data?: T[] };
 
 export default function Header({ onToggleSidebar }: { onToggleSidebar?: () => void }) {
   const router = useRouter();
@@ -41,21 +50,19 @@ export default function Header({ onToggleSidebar }: { onToggleSidebar?: () => vo
   const logout = useAuthStore((s) => s.logout);
   const { noLeidas, notificaciones, fetchNoLeidas, fetchNotificaciones, marcarLeida, marcarTodasLeidas } = useNotificationStore();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const sidebarAbierta = useUiStore((s) => s.sidebarAbierta);
   const [userMenuOpen, setUserMenuOpen] = useState(false);
   const [notifOpen, setNotifOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [showSearchResults, setShowSearchResults] = useState(false);
-  const [showSuggestions, setShowSuggestions] = useState(false);
   const [recentSearches, setRecentSearches] = useState<string[]>([]);
   const [suggestions, setSuggestions] = useState<Array<{type: 'categoria' | 'servicio' | 'recent'; label: string; value: string; slug?: string}>>([]);
   const [selectedIndex, setSelectedIndex] = useState(-1);
   const [categories, setCategories] = useState<Array<{id_categoria: number; nombre: string; slug: string}>>([]);
   const [services, setServices] = useState<Array<{id_servicio: number; nombre: string; id_categoria: number}>>([]);
-  const [loadingSearchData, setLoadingSearchData] = useState(false);
   const searchRef = useRef<HTMLDivElement>(null);
   const notifRef = useRef<HTMLDivElement>(null);
   const searchInputRef = useRef<HTMLInputElement>(null);
-  const suggestionsRef = useRef<HTMLDivElement>(null);
 
   useNotificationsSocket((event) => {
     useNotificationStore.getState().addNotificacion({
@@ -86,26 +93,27 @@ export default function Header({ onToggleSidebar }: { onToggleSidebar?: () => vo
     } catch {}
   }, []);
 
+  useEffect(() => {
+    useUiStore.getState().cerrarSidebar();
+  }, [pathname]);
+
   // Fetch categories and services for suggestions
   useEffect(() => {
     if (!isAuthenticated) return;
     const fetchData = async () => {
-      setLoadingSearchData(true);
       try {
         const [catRes, servRes] = await Promise.all([
-          api.get('/catalogo/categorias', { params: { activa: true } }),
-          api.get('/servicios', { params: { activo: true } }),
+          api.get<RespuestaLista<CategoriaApi>>('/catalogo/categorias', { params: { activa: true } }),
+          api.get<RespuestaLista<ServicioApi>>('/servicios', { params: { activo: true } }),
         ]);
-        const catsRaw = extractData<any>(catRes);
-        const servsRaw = extractData<any>(servRes);
+        const catsRaw = extractData<RespuestaLista<CategoriaApi>>(catRes);
+        const servsRaw = extractData<RespuestaLista<ServicioApi>>(servRes);
         const cats = catsRaw?.data || catsRaw || [];
         const servs = servsRaw?.data || servsRaw || [];
-        setCategories(cats.map((c: any) => ({ id_categoria: c.id_categoria, nombre: c.nombre, slug: c.slug || c.nombre.toLowerCase().replace(/\s+/g, '-') })));
-        setServices(servs.map((s: any) => ({ id_servicio: s.id_servicio, nombre: s.nombre, id_categoria: s.id_categoria })));
+        setCategories(cats.map((c) => ({ id_categoria: c.id_categoria, nombre: c.nombre, slug: c.slug || c.nombre.toLowerCase().replace(/\s+/g, '-') })));
+        setServices(servs.map((s) => ({ id_servicio: s.id_servicio, nombre: s.nombre, id_categoria: s.id_categoria })));
       } catch (e) {
         console.error('Error fetching search data:', e);
-      } finally {
-        setLoadingSearchData(false);
       }
     };
     fetchData();
@@ -127,7 +135,6 @@ export default function Header({ onToggleSidebar }: { onToggleSidebar?: () => vo
     if (!trimmed) return;
     saveRecentSearch(trimmed);
     setShowSearchResults(false);
-    setShowSuggestions(false);
     router.push(`/servicios?q=${encodeURIComponent(trimmed)}`);
   };
 
@@ -183,7 +190,6 @@ export default function Header({ onToggleSidebar }: { onToggleSidebar?: () => vo
       router.push(`/servicios?q=${encodeURIComponent(suggestion.value)}`);
     }
     setShowSearchResults(false);
-    setShowSuggestions(false);
   };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
@@ -211,7 +217,6 @@ export default function Header({ onToggleSidebar }: { onToggleSidebar?: () => vo
       }
     } else if (e.key === 'Escape') {
       setShowSearchResults(false);
-      setShowSuggestions(false);
       searchInputRef.current?.blur();
     }
   };
@@ -220,7 +225,6 @@ export default function Header({ onToggleSidebar }: { onToggleSidebar?: () => vo
     const handleClickOutside = (e: MouseEvent) => {
       if (searchRef.current && !searchRef.current.contains(e.target as Node)) {
         setShowSearchResults(false);
-        setShowSuggestions(false);
       }
       if (notifRef.current && !notifRef.current.contains(e.target as Node)) {
         setNotifOpen(false);
@@ -247,6 +251,26 @@ export default function Header({ onToggleSidebar }: { onToggleSidebar?: () => vo
     setSearchQuery(e.target.value);
   };
 
+  const conSidebar =
+    pathname.startsWith('/dashboard') ||
+    pathname.startsWith('/servicios') ||
+    pathname.startsWith('/proveedores');
+  const menuAbierto = mobileMenuOpen || (conSidebar && sidebarAbierta);
+
+  const alternarMenuMovil = () => {
+    onToggleSidebar?.();
+    if (menuAbierto) {
+      setMobileMenuOpen(false);
+      useUiStore.getState().cerrarSidebar();
+      return;
+    }
+    if (conSidebar) {
+      useUiStore.getState().alternarSidebar();
+    } else {
+      setMobileMenuOpen(true);
+    }
+  };
+
   return (
     <header className="sticky top-0 z-50 bg-white/95 backdrop-blur-md border-b border-slate-200 shadow-sm">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -255,7 +279,7 @@ export default function Header({ onToggleSidebar }: { onToggleSidebar?: () => vo
           <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-gradient-to-r from-transparent via-cyan-500 to-transparent opacity-60" />
           
             <Link href="/" className="flex items-center gap-2 transition-transform active:scale-90" prefetch={false}>
-              <img src="/logo-institucional.png" alt="Contrato Directo" className="w-24 h-24 transition-transform duration-200" />
+              <Image src="/logo-institucional.png" alt="Contrato Directo" width={96} height={96} className="w-24 h-24 transition-transform duration-200" />
             </Link>
 
           {isAuthenticated && (
@@ -334,7 +358,7 @@ export default function Header({ onToggleSidebar }: { onToggleSidebar?: () => vo
                           className="w-full text-left px-3 py-2 text-sm text-cyan-600 hover:bg-slate-100 rounded transition-colors flex items-center gap-2"
                         >
                           <Search className="w-4 h-4" />
-                          Buscar "{searchQuery}"
+                          Buscar {'"'}{searchQuery}{'"'}
                         </button>
                       </div>
                     )}
@@ -497,13 +521,12 @@ export default function Header({ onToggleSidebar }: { onToggleSidebar?: () => vo
           </nav>
 
           <button
-            onClick={() => {
-              setMobileMenuOpen(false);
-              onToggleSidebar?.();
-            }}
+            onClick={alternarMenuMovil}
             className="md:hidden text-slate-600 hover:text-slate-900"
+            aria-label={menuAbierto ? 'Cerrar menú' : 'Abrir menú'}
+            aria-expanded={menuAbierto}
           >
-            <Menu className="w-6 h-6" />
+            {menuAbierto ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
           </button>
         </div>
 

@@ -15,6 +15,22 @@ import {
   Gavel,
 } from 'lucide-react';
 
+type RespuestaApi<T> = T & { data?: T };
+
+type ErrorApi = { response?: { data?: { message?: string } } };
+
+const mensajeDeError = (error: unknown, fallback: string): string =>
+  (error as ErrorApi | undefined)?.response?.data?.message || fallback;
+
+interface ResultadoEvaluacion {
+  creadas?: number;
+  data?: { creadas?: number };
+}
+
+interface ResultadoRevision {
+  periodo?: string;
+}
+
 interface Categoria {
   id_categoria: number;
   nombre: string;
@@ -176,6 +192,7 @@ export default function AdminServiciosPage() {
   const [revisiones, setRevisiones] = useState<RevisionTrimestral[]>([]);
   const [filtroEstado, setFiltroEstado] = useState<'activas' | 'resueltas'>('activas');
   const [filtroTipo, setFiltroTipo] = useState<'todos' | 'rubro' | 'servicio'>('todos');
+  const [filtroServicios, setFiltroServicios] = useState<'activos' | 'todos'>('activos');
   const [evaluando, setEvaluando] = useState(false);
   const [accionando, setAccionando] = useState<number | null>(null);
   const [msg, setMsg] = useState<{ tipo: 'ok' | 'error'; texto: string } | null>(null);
@@ -185,11 +202,11 @@ export default function AdminServiciosPage() {
     setLoading(true);
     try {
       const [catsRes, servRes] = await Promise.allSettled([
-        api.get('/catalogo/categorias'),
-        api.get('/servicios'),
+        api.get<RespuestaApi<Categoria[]>>('/catalogo/categorias'),
+        api.get<RespuestaApi<Servicio[]>>('/servicios'),
       ]);
-      const catsData = catsRes.status === 'fulfilled' ? extractData<any>(catsRes.value) : null;
-      const servData = servRes.status === 'fulfilled' ? extractData<any>(servRes.value) : null;
+      const catsData = catsRes.status === 'fulfilled' ? extractData<RespuestaApi<Categoria[]> | null>(catsRes.value) : null;
+      const servData = servRes.status === 'fulfilled' ? extractData<RespuestaApi<Servicio[]> | null>(servRes.value) : null;
       setCategorias(catsData?.data || catsData || []);
       setServicios(servData?.data || servData || []);
     } catch {} finally {
@@ -201,30 +218,30 @@ export default function AdminServiciosPage() {
     setLoadingDinamico(true);
     try {
       const [metRes, busRes, temRes, solRes, revRes] = await Promise.allSettled([
-        api.get('/catalogo/metricas'),
-        api.get('/catalogo/busquedas-fallidas', { params: { limit: 100 } }),
-        api.get('/catalogo/busquedas-fallidas/temas'),
-        api.get('/solicitud-rubro'),
-        api.get('/catalogo/revisiones-trimestrales'),
+        api.get<RespuestaApi<MetricasCatalogo>>('/catalogo/metricas'),
+        api.get<RespuestaApi<BusquedaFallida[]>>('/catalogo/busquedas-fallidas', { params: { limit: 100 } }),
+        api.get<RespuestaApi<TemasResponse>>('/catalogo/busquedas-fallidas/temas'),
+        api.get<RespuestaApi<SolicitudRubro[]>>('/solicitud-rubro'),
+        api.get<RespuestaApi<RevisionTrimestral[]>>('/catalogo/revisiones-trimestrales'),
       ]);
       if (metRes.status === 'fulfilled') {
-        const d = extractData<any>(metRes.value);
+        const d = extractData<RespuestaApi<MetricasCatalogo> | null>(metRes.value);
         setMetricas(d?.data || d || null);
       }
       if (busRes.status === 'fulfilled') {
-        const d = extractData<any>(busRes.value);
+        const d = extractData<RespuestaApi<BusquedaFallida[]> | null>(busRes.value);
         setBusquedas(d?.data || d || []);
       }
       if (temRes.status === 'fulfilled') {
-        const d = extractData<any>(temRes.value);
+        const d = extractData<RespuestaApi<TemasResponse> | null>(temRes.value);
         setTemas(d?.data || d || null);
       }
       if (solRes.status === 'fulfilled') {
-        const d = extractData<any>(solRes.value);
+        const d = extractData<RespuestaApi<SolicitudRubro[]> | null>(solRes.value);
         setSolicitudes(d?.data || d || []);
       }
       if (revRes.status === 'fulfilled') {
-        const d = extractData<any>(revRes.value);
+        const d = extractData<RespuestaApi<RevisionTrimestral[]> | null>(revRes.value);
         setRevisiones(d?.data || d || []);
       }
     } catch {} finally {
@@ -239,13 +256,13 @@ export default function AdminServiciosPage() {
     setEvaluando(true);
     setMsg(null);
     try {
-      const res = await api.post('/catalogo/busquedas-fallidas/evaluar-umbrales');
-      const d = extractData<any>(res);
+      const res = await api.post<ResultadoEvaluacion>('/catalogo/busquedas-fallidas/evaluar-umbrales');
+      const d = extractData<ResultadoEvaluacion | null>(res);
       const creadas = d?.creadas ?? d?.data?.creadas ?? 0;
       setMsg({ tipo: 'ok', texto: creadas > 0 ? `${creadas} solicitud(es) creada(s) por umbrales` : 'Umbrales evaluados: sin solicitudes nuevas' });
       await fetchDinamico();
-    } catch (e: any) {
-      setMsg({ tipo: 'error', texto: e?.response?.data?.message || 'Error al evaluar umbrales' });
+    } catch (e) {
+      setMsg({ tipo: 'error', texto: mensajeDeError(e, 'Error al evaluar umbrales') });
     } finally {
       setEvaluando(false);
     }
@@ -261,8 +278,8 @@ export default function AdminServiciosPage() {
       });
       setMsg({ tipo: 'ok', texto: `Solicitud ${accion === 'aprobado' ? 'aprobada' : 'rechazada'}` });
       await fetchDinamico();
-    } catch (e: any) {
-      setMsg({ tipo: 'error', texto: e?.response?.data?.message || 'Error al resolver solicitud' });
+    } catch (e) {
+      setMsg({ tipo: 'error', texto: mensajeDeError(e, 'Error al resolver solicitud') });
     } finally {
       setAccionando(null);
     }
@@ -272,12 +289,12 @@ export default function AdminServiciosPage() {
     setEvaluando(true);
     setMsg(null);
     try {
-      const res = await api.post('/catalogo/revisiones-trimestrales/generar');
-      const d = extractData<any>(res);
+      const res = await api.post<ResultadoRevision>('/catalogo/revisiones-trimestrales/generar');
+      const d = extractData<ResultadoRevision | null>(res);
       setMsg({ tipo: 'ok', texto: `Revisión ${d?.periodo ?? ''} generada correctamente` });
       await fetchDinamico();
-    } catch (e: any) {
-      setMsg({ tipo: 'error', texto: e?.response?.data?.message || 'Error al generar revisión trimestral' });
+    } catch (e) {
+      setMsg({ tipo: 'error', texto: mensajeDeError(e, 'Error al generar revisión trimestral') });
     } finally {
       setEvaluando(false);
     }
@@ -290,8 +307,29 @@ export default function AdminServiciosPage() {
       await api.patch(`/catalogo/revisiones-trimestrales/${id}/revisada`);
       setMsg({ tipo: 'ok', texto: 'Revisión trimestral marcada como revisada' });
       await fetchDinamico();
-    } catch (e: any) {
-      setMsg({ tipo: 'error', texto: e?.response?.data?.message || 'Error al marcar revisión' });
+    } catch (e) {
+      setMsg({ tipo: 'error', texto: mensajeDeError(e, 'Error al marcar revisión') });
+    } finally {
+      setAccionando(null);
+    }
+  };
+
+  const toggleServicioActivo = async (s: Servicio) => {
+    setAccionando(s.id_servicio);
+    setMsg(null);
+    try {
+      await api.patch(`/servicios/${s.id_servicio}`, { activo: !s.activo });
+      setServicios((prev) =>
+        prev.map((x) =>
+          x.id_servicio === s.id_servicio ? { ...x, activo: !x.activo } : x
+        )
+      );
+      setMsg({
+        tipo: 'ok',
+        texto: `Servicio "${s.nombre}" ${s.activo ? 'inactivado' : 'activado'} correctamente`,
+      });
+    } catch (e) {
+      setMsg({ tipo: 'error', texto: mensajeDeError(e, 'Error al actualizar el servicio') });
     } finally {
       setAccionando(null);
     }
@@ -302,7 +340,8 @@ export default function AdminServiciosPage() {
   );
 
   const servFiltrados = servicios.filter((s) =>
-    !busqueda || s.nombre.toLowerCase().includes(busqueda.toLowerCase())
+    (filtroServicios === 'todos' || s.activo) &&
+    (!busqueda || s.nombre.toLowerCase().includes(busqueda.toLowerCase()))
   );
 
   const busquedasFiltradas = busquedas.filter((b) =>
@@ -341,15 +380,34 @@ export default function AdminServiciosPage() {
       </div>
 
       {tab !== 'dinamico' && (
-        <div className="relative max-w-md">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
-          <input
-            type="text"
-            placeholder={`Buscar ${tab}...`}
-            value={busqueda}
-            onChange={(e) => setBusqueda(e.target.value)}
-            className="w-full pl-11 pr-4 py-2.5 bg-slate-800 border border-slate-600 rounded-lg text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-cyan-500"
-          />
+        <div className="flex flex-wrap items-center gap-3">
+          <div className="relative flex-1 min-w-[240px] max-w-md">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
+            <input
+              type="text"
+              placeholder={`Buscar ${tab}...`}
+              value={busqueda}
+              onChange={(e) => setBusqueda(e.target.value)}
+              className="w-full pl-11 pr-4 py-2.5 bg-slate-800 border border-slate-600 rounded-lg text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-cyan-500"
+            />
+          </div>
+          {tab === 'servicios' && (
+            <div className="flex gap-1">
+              {(['activos', 'todos'] as const).map((t) => (
+                <button
+                  key={t}
+                  onClick={() => setFiltroServicios(t)}
+                  className={`px-3 py-1.5 text-xs font-medium rounded-lg transition-colors ${
+                    filtroServicios === t
+                      ? 'bg-cyan-600 text-white'
+                      : 'bg-slate-800 text-slate-400 hover:text-white'
+                  }`}
+                >
+                  {t === 'activos' ? 'Activos' : 'Todos'}
+                </button>
+              ))}
+            </div>
+          )}
         </div>
       )}
 
@@ -404,7 +462,11 @@ export default function AdminServiciosPage() {
           <Card>
             <div className="text-center py-12">
               <Briefcase className="w-12 h-12 text-slate-600 mx-auto mb-3" />
-              <p className="text-slate-400">No se encontraron servicios</p>
+              <p className="text-slate-400">
+                {servicios.length > 0 && filtroServicios === 'activos'
+                  ? 'No hay servicios activos. Usá el filtro "Todos" para ver y activar servicios inactivos.'
+                  : 'No se encontraron servicios'}
+              </p>
             </div>
           </Card>
         ) : (
@@ -421,11 +483,26 @@ export default function AdminServiciosPage() {
                       <p className="text-xs text-slate-500">Categoría #{s.id_categoria}</p>
                     </div>
                   </div>
-                  <span className={`text-xs px-2 py-0.5 rounded ${
-                    s.activo ? 'text-green-400 bg-green-500/10' : 'text-slate-400 bg-slate-500/10'
-                  }`}>
-                    {s.activo ? 'Activo' : 'Inactivo'}
-                  </span>
+                  <div className="flex items-center gap-2 flex-shrink-0">
+                    <span className={`text-xs px-2 py-0.5 rounded ${
+                      s.activo ? 'text-green-400 bg-green-500/10' : 'text-slate-400 bg-slate-500/10'
+                    }`}>
+                      {s.activo ? 'Activo' : 'Inactivo'}
+                    </span>
+                    <button
+                      onClick={() => toggleServicioActivo(s)}
+                      disabled={accionando === s.id_servicio}
+                      className={`flex items-center gap-1 px-2.5 py-1 text-xs font-medium rounded-lg transition-colors disabled:opacity-50 ${
+                        s.activo
+                          ? 'bg-red-500/10 hover:bg-red-500/20 text-red-400'
+                          : 'bg-green-500/10 hover:bg-green-500/20 text-green-400'
+                      }`}
+                      title={s.activo ? 'Inactivar servicio' : 'Activar servicio'}
+                    >
+                      {s.activo ? <XCircle className="w-3.5 h-3.5" /> : <CheckCircle className="w-3.5 h-3.5" />}
+                      {accionando === s.id_servicio ? '...' : s.activo ? 'Inactivar' : 'Activar'}
+                    </button>
+                  </div>
                 </div>
               </Card>
             ))}
@@ -792,7 +869,7 @@ export default function AdminServiciosPage() {
                 {busquedasFiltradas.map((b) => (
                   <div key={b.id_busqueda} className="py-2.5 flex items-center justify-between gap-3">
                     <div className="min-w-0">
-                      <p className="text-sm text-white truncate">"{b.consulta}"</p>
+                      <p className="text-sm text-white truncate">{'"'}{b.consulta}{'"'}</p>
                       <p className="text-xs text-slate-500">
                         {b.categoria?.nombre && `${b.categoria.nombre} · `}
                         {new Date(b.fecha).toLocaleString('es-AR')}

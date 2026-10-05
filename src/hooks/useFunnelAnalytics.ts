@@ -7,7 +7,7 @@ interface FunnelEvent {
   paso: number;
   evento: 'inicio' | 'completado' | 'abandono' | 'error';
   id_transaccion: string;
-  metadata?: Record<string, any>;
+  metadata?: Record<string, unknown>;
   timestamp: string;
 }
 
@@ -28,19 +28,19 @@ export function useFunnelAnalytics(idTransaccion: string | null) {
     }
   }, [idTransaccion]);
 
-  const trackPasoInicio = useCallback((paso: number, metadata?: Record<string, any>) => {
+  const trackPasoInicio = useCallback((paso: number, metadata?: Record<string, unknown>) => {
     enviarEvento({ paso, evento: 'inicio', metadata });
   }, [enviarEvento]);
 
-  const trackPasoCompletado = useCallback((paso: number, metadata?: Record<string, any>) => {
+  const trackPasoCompletado = useCallback((paso: number, metadata?: Record<string, unknown>) => {
     enviarEvento({ paso, evento: 'completado', metadata });
   }, [enviarEvento]);
 
-  const trackAbandono = useCallback((paso: number, metadata?: Record<string, any>) => {
+  const trackAbandono = useCallback((paso: number, metadata?: Record<string, unknown>) => {
     enviarEvento({ paso, evento: 'abandono', metadata });
   }, [enviarEvento]);
 
-  const trackError = useCallback((paso: number, error: string, metadata?: Record<string, any>) => {
+  const trackError = useCallback((paso: number, error: string, metadata?: Record<string, unknown>) => {
     enviarEvento({ paso, evento: 'error', metadata: { ...metadata, error } });
   }, [enviarEvento]);
 

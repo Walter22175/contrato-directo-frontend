@@ -1,8 +1,8 @@
 ﻿'use client';
 
-import { Card, CardTitle } from '@/components/ui/Card';
+import { Card } from '@/components/ui/Card';
 import Link from 'next/link';
-import { FileText, CheckCircle, Shield, PenTool, Clock, ArrowLeft, FileCheck, Users, Search } from 'lucide-react';
+import { FileText, CheckCircle, Shield, Clock, ArrowLeft, FileCheck } from 'lucide-react';
 
 export default function ContratosDigitalesPage() {
   return (

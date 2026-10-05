@@ -7,7 +7,8 @@ import { Card } from '@/components/ui/Card';
 import Select from '@/components/ui/Select';
 import api, { extractData } from '@/lib/api';
 import { reportarBusquedaFallida } from '@/lib/catalogo';
-import { Search, Star, ChevronRight, Box, FilePlus } from 'lucide-react';
+import { Search, ChevronRight, Box, FilePlus } from 'lucide-react';
+import { LlaveIcon } from '@/components/ui/LlaveIcon';
 import type { Servicio, Categoria } from '@/types';
 
 interface SearchSuggestion {
@@ -36,10 +37,10 @@ export default function ServiciosContent() {
           api.get('/servicios', { params: { activo: true } }),
           api.get('/catalogo/categorias', { params: { activa: true } }),
         ]);
-        const servRaw = extractData<any>(servRes);
-        const catRaw = extractData<any>(catRes);
-        setServicios(servRaw?.data || servRaw || []);
-        const cats = catRaw?.data || catRaw || [];
+        const servRaw = extractData<Servicio[] | { data?: Servicio[] }>(servRes);
+        const catRaw = extractData<Categoria[] | { data?: Categoria[] }>(catRes);
+        setServicios((Array.isArray(servRaw) ? servRaw : servRaw.data) || []);
+        const cats = (Array.isArray(catRaw) ? catRaw : catRaw.data) || [];
         setCategorias(cats);
 
         const params = new URLSearchParams(window.location.search);
@@ -49,7 +50,7 @@ export default function ServiciosContent() {
         
         if (catSlug) {
           const norm = (s: string) => s.normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/-/g, ' ').toLowerCase();
-          const match = cats.find((c: any) => {
+          const match = cats.find((c) => {
             const n = norm(c.nombre);
             const slug = norm(catSlug);
             return n === slug || n.startsWith(slug) || slug.startsWith(n);
@@ -134,7 +135,7 @@ export default function ServiciosContent() {
   useEffect(() => {
     generateSuggestions();
     setShowSuggestions(busqueda.length > 0);
-  }, [generateSuggestions]);
+  }, [generateSuggestions, busqueda.length]);
 
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
@@ -229,7 +230,7 @@ export default function ServiciosContent() {
                       ))}
                       {suggestions.length === 0 && busqueda && (
                         <div className="px-4 py-3 text-center text-slate-500">
-                          No se encontraron sugerencias para "{busqueda}"
+                          No se encontraron sugerencias para {'"'}{busqueda}{'"'}
                         </div>
                       )}
                     </div>
@@ -293,7 +294,7 @@ export default function ServiciosContent() {
                       className="inline-flex items-center gap-2 px-5 py-2.5 bg-cyan-600 hover:bg-cyan-500 text-white rounded-xl font-medium transition-colors"
                     >
                       <FilePlus className="w-4 h-4" />
-                      Solicitar "{busqueda.trim()}" como nuevo servicio
+                      Solicitar {'"'}{busqueda.trim()}{'"'} como nuevo servicio
                     </Link>
                     <Link
                       href="/proveedores"
@@ -358,7 +359,7 @@ export default function ServiciosContent() {
                                 </p>
                                 <div className="flex items-center justify-between text-sm">
                                   <div className="flex items-center gap-1 text-slate-400">
-                                    <Star className="w-4 h-4 text-yellow-400" />
+                                    <LlaveIcon className="w-4 h-4 text-yellow-400" />
                                     <span>4.8</span>
                                   </div>
                                   <span className="text-cyan-400 font-medium">

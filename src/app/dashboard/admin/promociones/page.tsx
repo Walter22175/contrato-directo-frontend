@@ -7,8 +7,9 @@ import Input from '@/components/ui/Input';
 import Button from '@/components/ui/Button';
 import Select from '@/components/ui/Select';
 import Textarea from '@/components/ui/Textarea';
+import Image from 'next/image';
 import { Plus, Edit, Trash2, Save, X, Image as ImageIcon, Loader2, Search } from 'lucide-react';
-import { Promocion, CreatePromocionDto, UpdatePromocionDto } from '@/types';
+import { Promocion, CreatePromocionDto } from '@/types';
 
 export default function AdminPromocionesPage() {
   const [promociones, setPromociones] = useState<Promocion[]>([]);
@@ -183,10 +184,13 @@ export default function AdminPromocionesPage() {
           {promocionesFiltradas.map((p) => (
             <Card key={p.id_promocion} className="relative overflow-hidden">
               <div className="relative aspect-video overflow-hidden">
-                <img
+                <Image
+                  fill
+                  unoptimized
                   src={p.imagen_url}
                   alt={p.titulo}
-                  className="w-full h-full object-cover"
+                  className="object-cover"
+                  sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
                   onError={handleImageError}
                 />
                 <div className="absolute top-2 right-2 flex gap-1">
@@ -307,7 +311,7 @@ export default function AdminPromocionesPage() {
                     />
                     {previewUrl && (
                       <div className="mt-2 relative w-32 h-20 rounded-lg overflow-hidden">
-                        <img src={previewUrl} alt="Preview" className="w-full h-full object-cover" />
+                        <Image unoptimized src={previewUrl} alt="Preview" width={128} height={80} className="w-full h-full object-cover" />
                       </div>
                     )}
                   </div>

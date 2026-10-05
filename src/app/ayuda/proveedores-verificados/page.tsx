@@ -1,8 +1,8 @@
 ﻿'use client';
 
-import { Card, CardTitle } from '@/components/ui/Card';
+import { Card } from '@/components/ui/Card';
 import Link from 'next/link';
-import { Star, Shield, CheckCircle, Search, Award, Clock, ArrowLeft, Users, FileText, BadgeCheck, Eye } from 'lucide-react';
+import { Star, Shield, Search, Award, Clock, ArrowLeft, Users, FileText, BadgeCheck, Eye } from 'lucide-react';
 
 export default function ProveedoresVerificadosPage() {
   return (
@@ -145,7 +145,7 @@ export default function ProveedoresVerificadosPage() {
                   </div>
                   <div>
                     <h3 className='font-semibold text-white mb-1'>Calidad</h3>
-                    <p className='text-slate-400 text-sm'>Solo verificados publican. Filtro "Solo verificados" en busqueda. Ranking prioriza verificados.</p>
+                    <p className='text-slate-400 text-sm'>Solo verificados publican. Filtro {'"'}Solo verificados{'"'} en busqueda. Ranking prioriza verificados.</p>
                   </div>
                 </div>
                 <div className='flex items-start gap-3 p-4 bg-slate-800/50 rounded-lg'>

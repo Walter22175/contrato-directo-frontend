@@ -4,14 +4,15 @@
 import './setup';
 import { render, screen, act, fireEvent } from '@testing-library/react';
 import ProveedoresPage from '@/app/proveedores/page';
+import api from '@/lib/api';
 
-const api = require('@/lib/api').default;
+const apiGetMock = api.get as unknown as jest.Mock;
 
 describe('ProveedoresPage', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     localStorage.clear();
-    api.get.mockResolvedValue({
+    apiGetMock.mockResolvedValue({
       data: { statusCode: 200, timestamp: '', data: { data: [], meta: { total: 0 } } },
     });
   });

@@ -1,9 +1,10 @@
 'use client';
 
 import { useState, useCallback, useEffect } from 'react';
-import { useForm } from 'react-hook-form';
+import { useForm, useWatch } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
+import Image from 'next/image';
 import Input from '@/components/ui/Input';
 import Button from '@/components/ui/Button';
 import { FileText, Upload, Eye, CheckCircle, AlertCircle } from 'lucide-react';
@@ -34,9 +35,8 @@ export default function Paso5DocumentacionFiscal({
 
   const {
     register,
+    control,
     handleSubmit,
-    watch,
-    setValue,
     formState: { errors, isSubmitting },
   } = useForm<Paso5Form>({
     resolver: zodResolver(paso5Schema),
@@ -46,7 +46,8 @@ export default function Paso5DocumentacionFiscal({
     mode: 'onBlur',
   });
 
-  const url = watch('documentacion_fiscal_url');
+  const url = useWatch({ control, name: 'documentacion_fiscal_url' });
+  const observaciones = useWatch({ control, name: 'observaciones' });
 
   const checkUrl = useCallback(async (value: string) => {
     if (!value || !value.startsWith('http')) {
@@ -57,7 +58,7 @@ export default function Paso5DocumentacionFiscal({
     setCheckingUrl(true);
     setUrlValid('idle');
     try {
-      const res = await fetch(value, { method: 'HEAD', mode: 'no-cors' });
+      await fetch(value, { method: 'HEAD', mode: 'no-cors' });
       setUrlValid('valid');
       if (value.match(/\.(pdf|jpg|jpeg|png|webp)$/i)) {
         setPreviewUrl(value);
@@ -82,7 +83,7 @@ export default function Paso5DocumentacionFiscal({
   };
 
   return (
-    <div className="space-y-5">
+    <form onSubmit={handleSubmit(handleSubmitForm)} className="space-y-5" autoComplete="off">
       <div className="flex items-center justify-between mb-4">
         <Button variant="ghost" size="sm" onClick={onBack} disabled={disabled || isSubmitting}>
           ← Volver
@@ -135,7 +136,14 @@ export default function Paso5DocumentacionFiscal({
             {previewUrl.match(/\.(pdf)$/i) ? (
               <FileText className="w-16 h-16 text-red-500" />
             ) : (
-              <img src={previewUrl} alt="Preview" className="max-w-full max-h-[400px] object-contain" />
+              <Image
+                src={previewUrl}
+                alt="Preview"
+                width={800}
+                height={450}
+                unoptimized
+                className="max-w-full max-h-[400px] w-auto h-auto object-contain"
+              />
             )}
           </div>
         </div>
@@ -148,7 +156,7 @@ export default function Paso5DocumentacionFiscal({
         maxLength={500}
         disabled={disabled || isSubmitting}
       />
-      <p className="text-xs text-slate-500 text-right">{watch('observaciones')?.length || 0}/500</p>
+      <p className="text-xs text-slate-500 text-right">{observaciones?.length || 0}/500</p>
       {errors.observaciones && <p className="text-sm text-red-400">{errors.observaciones.message}</p>}
 
       <div className="flex justify-end gap-3 pt-2">
@@ -159,6 +167,6 @@ export default function Paso5DocumentacionFiscal({
           Continuar
         </Button>
       </div>
-    </div>
+    </form>
   );
 }

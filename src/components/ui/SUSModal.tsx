@@ -1,11 +1,11 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useForm } from 'react-hook-form';
+import { useForm, useWatch } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import Button from '@/components/ui/Button';
-import { CheckCircle, XCircle, Star } from 'lucide-react';
+import { XCircle } from 'lucide-react';
 
 const susSchema = z.object({
   q1: z.number().min(1).max(5),
@@ -47,14 +47,14 @@ interface SUSModalProps {
   disabled?: boolean;
 }
 
-export default function SUSModal({ open, onClose, onSubmit, context, disabled }: SUSModalProps) {
+export default function SUSModal({ open, onClose, onSubmit, disabled }: SUSModalProps) {
   const [submitting, setSubmitting] = useState(false);
   const [score, setScore] = useState(0);
 
   const {
     register,
     handleSubmit,
-    watch,
+    control,
     setValue,
     formState: { errors },
   } = useForm<SUSForm>({
@@ -67,7 +67,7 @@ export default function SUSModal({ open, onClose, onSubmit, context, disabled }:
     mode: 'onChange',
   });
 
-  const responses = watch();
+  const responses = useWatch({ control });
 
   useEffect(() => {
     let oddSum = 0, evenSum = 0;

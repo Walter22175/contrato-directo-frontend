@@ -75,7 +75,10 @@ describe('VerificacionProveedorPage', () => {
   });
 
   it('ofrece convertirse cuando el usuario no tiene perfil de proveedor', async () => {
-    const error: any = new Error('Not found');
+    interface ErrorConRespuesta extends Error {
+      response?: { status: number };
+    }
+    const error: ErrorConRespuesta = new Error('Not found');
     error.response = { status: 404 };
     (api.get as jest.Mock).mockRejectedValue(error);
 

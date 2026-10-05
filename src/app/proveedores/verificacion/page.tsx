@@ -91,8 +91,8 @@ export default function VerificacionProveedorPage() {
       const res = await api.get('/perfiles/proveedor/verificacion');
       setData(extractData<VerificacionResponse>(res));
       setSinPerfil(false);
-    } catch (err: any) {
-      const status = err?.response?.status;
+    } catch (err) {
+      const status = (err as { response?: { status?: number } } | undefined)?.response?.status;
       if (status === 404) {
         setSinPerfil(true);
       } else if (status === 403) {
@@ -136,8 +136,9 @@ export default function VerificacionProveedorPage() {
       setResubmitTipo(null);
       setResubmitUrl('');
       await fetchDatos();
-    } catch (err: any) {
-      const msg = err?.response?.data?.message || 'No se pudo reenviar la documentación.';
+    } catch (err) {
+      const respuesta = (err as { response?: { data?: { message?: string | string[] } } } | undefined)?.response;
+      const msg = respuesta?.data?.message || 'No se pudo reenviar la documentación.';
       setResubmitError(Array.isArray(msg) ? msg.join(' — ') : String(msg));
     } finally {
       setResubmitting(false);
