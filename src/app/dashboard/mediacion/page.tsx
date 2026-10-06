@@ -50,6 +50,20 @@ const TIPOS_RESOLUCION = [
   { value: 'medidas_correctivas', label: 'Medidas correctivas' },
 ];
 
+const RESOLUCION_ESTADO_LABELS: Record<string, string> = {
+  emitida: 'Emitida',
+  apelada: 'Apelada — en revisión del supervisor',
+  firme: 'Firme e inapelable',
+  cumplida: 'Cumplida',
+};
+
+const RESOLUCION_ESTADO_COLORS: Record<string, string> = {
+  emitida: 'text-green-400 bg-green-500/10 border-green-500/20',
+  apelada: 'text-orange-400 bg-orange-500/10 border-orange-500/20',
+  firme: 'text-cyan-400 bg-cyan-500/10 border-cyan-500/20',
+  cumplida: 'text-blue-400 bg-blue-500/10 border-blue-500/20',
+};
+
 export default function MediacionPage() {
   const [mediaciones, setMediaciones] = useState<Mediacion[]>([]);
   const [loading, setLoading] = useState(true);
@@ -214,7 +228,12 @@ export default function MediacionPage() {
         {detalle.resolucion && (
           <Card>
             <div className="p-6 space-y-3">
-              <h3 className="text-sm font-medium text-slate-400 flex items-center gap-2"><FileText className="w-4 h-4" /> Resolución</h3>
+              <div className="flex items-center justify-between gap-2">
+                <h3 className="text-sm font-medium text-slate-400 flex items-center gap-2"><FileText className="w-4 h-4" /> Resolución</h3>
+                <span className={`text-xs px-2 py-1 rounded border ${RESOLUCION_ESTADO_COLORS[detalle.resolucion.estado] || 'text-slate-400 bg-slate-500/10 border-slate-500/20'}`}>
+                  {RESOLUCION_ESTADO_LABELS[detalle.resolucion.estado] || detalle.resolucion.estado}
+                </span>
+              </div>
               <div className="p-4 bg-green-500/5 border border-green-500/20 rounded-lg space-y-2">
                 <p className="text-sm font-medium text-green-400">{TIPOS_RESOLUCION.find((t) => t.value === detalle.resolucion!.tipo_resolucion)?.label}</p>
                 {detalle.resolucion.fundamentos && <p className="text-sm text-slate-300">{detalle.resolucion.fundamentos}</p>}

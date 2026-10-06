@@ -17,8 +17,9 @@ import {
   FileText,
   Calendar,
   Ban,
+  Gavel,
 } from 'lucide-react';
-import type { Reclamo, CreateReclamoDto, ContestarReclamoDto, Transaccion, DocumentoReclamo } from '@/types';
+import type { Reclamo, CreateReclamoDto, ContestarReclamoDto, CrearApelacionDto, Transaccion, DocumentoReclamo } from '@/types';
 
 const TIPOS_RECLAMO = [
   { value: 'incumplimiento_servicio', label: 'Incumplimiento de servicio' },
@@ -29,6 +30,33 @@ const TIPOS_RECLAMO = [
   { value: 'fraude', label: 'Fraude o mala fe' },
   { value: 'disputa_valoracion', label: 'Disputas sobre valoraciones' },
 ];
+
+const TIPOS_RESOLUCION: Record<string, string> = {
+  desestimacion: 'Desestimación del reclamo',
+  estimacion_total: 'Estimación total del reclamo',
+  reembolso_total: 'Reembolso total',
+  reembolso_parcial: 'Reembolso parcial',
+  liberacion_pago: 'Liberación de pago',
+  retencion_pago: 'Retención de pago',
+  compensacion_economica: 'Compensación económica',
+  reparacion_servicio: 'Reparación del servicio',
+  cancelacion_transaccion: 'Cancelación de la transacción',
+  medidas_correctivas: 'Medidas correctivas',
+};
+
+const RESOLUCION_ESTADO_LABELS: Record<string, string> = {
+  emitida: 'Emitida',
+  apelada: 'Apelada — en revisión del supervisor',
+  firme: 'Firme e inapelable',
+  cumplida: 'Cumplida',
+};
+
+const RESOLUCION_ESTADO_COLORS: Record<string, string> = {
+  emitida: 'text-green-400 bg-green-500/10 border-green-500/20',
+  apelada: 'text-orange-400 bg-orange-500/10 border-orange-500/20',
+  firme: 'text-cyan-400 bg-cyan-500/10 border-cyan-500/20',
+  cumplida: 'text-blue-400 bg-blue-500/10 border-blue-500/20',
+};
 
 const MAX_ADJUNTOS = 6;
 const MAX_TAMANO_BYTES = 10 * 1024 * 1024;
@@ -54,6 +82,11 @@ const STEPS = ['abierto', 'en_revision', 'resuelto', 'en_cumplimiento', 'cerrado
 
 export default function ReclamosPage() {
   const { user } = useAuthStore();
+  const roles = (user?.usuario_roles || [])
+    .filter((ur) => ur.activo)
+    .map((ur) => ur.rol?.nombre)
+    .filter(Boolean);
+  const esSuperAdmin = roles.includes('super_admin');
   const [reclamos, setReclamos] = useState<Reclamo[]>([]);
   const [loading, setLoading] = useState(true);
   const [selected, setSelected] = useState<string | null>(null);
@@ -66,6 +99,10 @@ export default function ReclamosPage() {
   const [transacciones, setTransacciones] = useState<Transaccion[]>([]);
   const [loadingTransacciones, setLoadingTransacciones] = useState(false);
   const [subiendoAdjunto, setSubiendoAdjunto] = useState(false);
+  const [showIniciarMediacion, setShowIniciarMediacion] = useState(false);
+  const [mediadorId, setMediadorId] = useState('');
+  const [showApelar, setShowApelar] = useState(false);
+  const [motivoApelacion, setMotivoApelacion] = useState('');
 
   const idUsuario = user?.id_usuario;
 
@@ -122,6 +159,8 @@ export default function ReclamosPage() {
       setDetalle(data);
       setSelected(id);
       setMsg(null);
+      setShowIniciarMediacion(false);
+      setShowApelar(false);
     } catch {}
   };
 
@@ -193,6 +232,45 @@ export default function ReclamosPage() {
       setMsg({ type: 'success', text: 'Mediación voluntaria ofrecida (3 días hábiles)' });
     } catch (err) {
       setMsg({ type: 'error', text: mensajeError(err, 'Error') });
+    }
+  };
+
+  const handleIniciarMediacion = async (e: FormEvent) => {
+    e.preventDefault();
+    if (!selected || !mediadorId.trim()) return;
+    setSending(true);
+    setMsg(null);
+    try {
+      await api.post(`/reclamos/${selected}/mediacion`, { id_mediador: mediadorId.trim() });
+      setMediadorId('');
+      await fetchDetalle(selected);
+      setMsg({ type: 'success', text: 'Mediación formal iniciada (7 días hábiles para la resolución)' });
+    } catch (err) {
+      setMsg({ type: 'error', text: mensajeError(err, 'Error al iniciar la mediación') });
+    } finally {
+      setSending(false);
+    }
+  };
+
+  const handleApelar = async (e: FormEvent) => {
+    e.preventDefault();
+    if (!selected || !detalle?.mediacion?.resolucion || !motivoApelacion.trim()) return;
+    setSending(true);
+    setMsg(null);
+    try {
+      const dto: CrearApelacionDto = {
+        id_resolucion: detalle.mediacion.resolucion.id_resolucion,
+        id_apelante: user?.id_usuario || '',
+        motivo: motivoApelacion.trim(),
+      };
+      await api.post('/apelaciones', dto);
+      setMotivoApelacion('');
+      await fetchDetalle(selected);
+      setMsg({ type: 'success', text: 'Apelación enviada al mediador supervisor' });
+    } catch (err) {
+      setMsg({ type: 'error', text: mensajeError(err, 'Error al apelar la resolución') });
+    } finally {
+      setSending(false);
     }
   };
 
@@ -392,7 +470,52 @@ export default function ReclamosPage() {
                 {detalle.mediacion.mediador && (
                   <span className="text-sm text-slate-400">Mediador: {detalle.mediacion.mediador.nombre}</span>
                 )}
+                {detalle.mediacion.fecha_limite_resolucion && (
+                  <span className="flex items-center gap-1 text-xs text-yellow-400">
+                    <Clock className="w-3 h-3" /> Límite resolución: {formatearFecha(detalle.mediacion.fecha_limite_resolucion)}
+                  </span>
+                )}
               </div>
+            </div>
+          </Card>
+        )}
+
+        {/* Resolución */}
+        {detalle.mediacion?.resolucion && (
+          <Card>
+            <div className="p-4 space-y-3">
+              <div className="flex items-center justify-between gap-2">
+                <h3 className="text-sm font-medium text-slate-400 flex items-center gap-2"><FileText className="w-4 h-4" /> Resolución</h3>
+                <span className={`text-xs px-2 py-1 rounded border ${RESOLUCION_ESTADO_COLORS[detalle.mediacion.resolucion.estado] || 'text-slate-400 bg-slate-500/10 border-slate-500/20'}`}>
+                  {RESOLUCION_ESTADO_LABELS[detalle.mediacion.resolucion.estado] || detalle.mediacion.resolucion.estado}
+                </span>
+              </div>
+              <div className="p-4 bg-green-500/5 border border-green-500/20 rounded-lg space-y-2">
+                <p className="text-sm font-medium text-green-400">{TIPOS_RESOLUCION[detalle.mediacion.resolucion.tipo_resolucion] || detalle.mediacion.resolucion.tipo_resolucion}</p>
+                {detalle.mediacion.resolucion.fundamentos && <p className="text-sm text-slate-300">{detalle.mediacion.resolucion.fundamentos}</p>}
+                {detalle.mediacion.resolucion.plazo_cumplimiento_dias > 0 && (
+                  <p className="text-xs text-slate-500">Plazo de cumplimiento: {detalle.mediacion.resolucion.plazo_cumplimiento_dias} días hábiles</p>
+                )}
+              </div>
+
+              {detalle.mediacion.resolucion.estado === 'apelada' && (
+                <p className="text-xs text-orange-400">
+                  En revisión del mediador supervisor (7 días hábiles). La resolución del supervisor es definitiva e inapelable.
+                </p>
+              )}
+
+              {!!detalle.mediacion.resolucion.apelaciones?.length && (
+                <div className="space-y-2">
+                  <h4 className="text-xs font-medium text-slate-400">Apelaciones</h4>
+                  {detalle.mediacion.resolucion.apelaciones.map((a) => (
+                    <div key={a.id_apelacion} className="p-3 bg-orange-500/5 border border-orange-500/20 rounded-lg">
+                      <p className="text-sm text-slate-300">{a.motivo}</p>
+                      <p className="text-xs text-slate-500 mt-1">Estado: {a.estado}{a.fecha_resolucion ? ` — ${formatearFecha(a.fecha_resolucion)}` : ''}</p>
+                      {a.resolucion_final && <p className="text-xs text-green-400 mt-1">Resolución final: {a.resolucion_final}</p>}
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
           </Card>
         )}
@@ -415,9 +538,15 @@ export default function ReclamosPage() {
               </button>
             )}
 
-            {detalle.estado === 'en_revision' && !detalle.mediacion_voluntaria_ofrecida && (
+            {detalle.estado === 'en_revision' && !detalle.mediacion_voluntaria_ofrecida && !detalle.mediacion && (
               <button onClick={handleMediacionVoluntaria} className="flex items-center gap-2 px-4 py-2 bg-purple-600/20 text-purple-400 border border-purple-500/30 rounded-lg text-sm hover:bg-purple-600/30 transition-colors">
                 <Scale className="w-4 h-4" /> Mediación Voluntaria
+              </button>
+            )}
+
+            {detalle.estado === 'en_revision' && !detalle.mediacion && esSuperAdmin && !showIniciarMediacion && (
+              <button onClick={() => { setShowIniciarMediacion(true); setMsg(null); }} className="flex items-center gap-2 px-4 py-2 bg-cyan-600/20 text-cyan-400 border border-cyan-500/30 rounded-lg text-sm hover:bg-cyan-600/30 transition-colors">
+                <Scale className="w-4 h-4" /> Iniciar Mediación Formal
               </button>
             )}
 
@@ -426,8 +555,74 @@ export default function ReclamosPage() {
                 <Ban className="w-4 h-4" /> Cerrar Reclamo
               </button>
             )}
+
+            {detalle.estado === 'resuelto' &&
+              detalle.mediacion?.resolucion?.estado === 'emitida' &&
+              (!detalle.fecha_limite_apelacion || new Date(detalle.fecha_limite_apelacion) >= new Date()) &&
+              !showApelar && (
+                <button onClick={() => { setShowApelar(true); setMsg(null); }} className="flex items-center gap-2 px-4 py-2 bg-orange-600/20 text-orange-400 border border-orange-500/30 rounded-lg text-sm hover:bg-orange-600/30 transition-colors">
+                  <Gavel className="w-4 h-4" /> Apelar Resolución
+                </button>
+            )}
           </div>
         </Card>
+
+        {/* Form iniciar mediación formal */}
+        {showIniciarMediacion && (
+          <Card>
+            <form onSubmit={handleIniciarMediacion} className="p-6 space-y-4">
+              <div className="flex items-center justify-between">
+                <h3 className="text-lg font-semibold text-white">Iniciar Mediación Formal</h3>
+                <button type="button" onClick={() => setShowIniciarMediacion(false)} className="text-slate-400 hover:text-white"><X className="w-5 h-5" /></button>
+              </div>
+              <p className="text-xs text-slate-500">
+                El caso se asigna a un mediador del equipo de mediación, con 7 días hábiles para emitir la resolución (etapa 3 del flujo de mediación).
+              </p>
+              <div>
+                <label className={labelCls}>ID del Mediador *</label>
+                <input className={inputCls} value={mediadorId} onChange={(e) => setMediadorId(e.target.value)} required placeholder="UUID del mediador" />
+              </div>
+              <div className="flex justify-end gap-3">
+                <button type="button" onClick={() => setShowIniciarMediacion(false)} className="px-4 py-2.5 text-slate-400 hover:text-white text-sm">Cancelar</button>
+                <button type="submit" disabled={sending || !mediadorId.trim()} className="px-6 py-2.5 bg-cyan-600 hover:bg-cyan-700 disabled:opacity-50 text-white rounded-lg text-sm font-medium transition-colors">
+                  {sending ? 'Iniciando...' : 'Iniciar Mediación'}
+                </button>
+              </div>
+            </form>
+          </Card>
+        )}
+
+        {/* Form apelar resolución */}
+        {showApelar && (
+          <Card>
+            <form onSubmit={handleApelar} className="p-6 space-y-4">
+              <div className="flex items-center justify-between">
+                <h3 className="text-lg font-semibold text-white">Apelar Resolución</h3>
+                <button type="button" onClick={() => setShowApelar(false)} className="text-slate-400 hover:text-white"><X className="w-5 h-5" /></button>
+              </div>
+              <p className="text-xs text-slate-500">
+                Podés apelar dentro de los 5 días hábiles posteriores a la notificación. Un mediador supervisor distinto del original revisará el caso en 7 días hábiles; su resolución es definitiva.
+              </p>
+              <div>
+                <label className={labelCls}>Motivo de la apelación * (máx. 2000 caracteres)</label>
+                <textarea
+                  className={inputCls + ' min-h-[120px] resize-y'}
+                  value={motivoApelacion}
+                  onChange={(e) => setMotivoApelacion(e.target.value.slice(0, 2000))}
+                  required
+                  placeholder="Ej: hubo un error en la interpretación de los hechos, no se consideró evidencia relevante o el proceso no fue imparcial..."
+                />
+                <p className="text-xs text-slate-500 mt-1">{motivoApelacion.length}/2000</p>
+              </div>
+              <div className="flex justify-end gap-3">
+                <button type="button" onClick={() => setShowApelar(false)} className="px-4 py-2.5 text-slate-400 hover:text-white text-sm">Cancelar</button>
+                <button type="submit" disabled={sending || !motivoApelacion.trim()} className="px-6 py-2.5 bg-orange-600 hover:bg-orange-700 disabled:opacity-50 text-white rounded-lg text-sm font-medium transition-colors">
+                  {sending ? 'Enviando...' : 'Enviar Apelación'}
+                </button>
+              </div>
+            </form>
+          </Card>
+        )}
       </div>
     );
   }
