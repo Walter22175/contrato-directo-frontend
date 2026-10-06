@@ -40,11 +40,31 @@ interface MetricaObjetivo2 {
   };
 }
 
+interface MetricaObjetivo9Item {
+  clave: string;
+  nombre: string;
+  valor: number;
+  unidad: string;
+  objetivo: string;
+  cumple: boolean | null;
+}
+
+interface MetricasObjetivo9 {
+  generado_en: string;
+  metricas: MetricaObjetivo9Item[];
+  cumplimiento: {
+    metricas_evaluadas: number;
+    metricas_cumplen: number;
+    pct_cumplimiento: number;
+  };
+}
+
 export default function MetricasPage() {
   const [metricas, setMetricas] = useState<MetricaRow | null>(null);
   const [loading, setLoading] = useState(true);
   const [periodo, setPeriodo] = useState('actual');
   const [obj2, setObj2] = useState<MetricaObjetivo2 | null>(null);
+  const [obj9, setObj9] = useState<MetricasObjetivo9 | null>(null);
 
   useEffect(() => {
     api
@@ -55,6 +75,17 @@ export default function MetricasPage() {
         else setObj2(null);
       })
       .catch(() => setObj2(null));
+  }, []);
+
+  useEffect(() => {
+    api
+      .get('/metricas/objetivo-9')
+      .then((res) => {
+        const d = extractData<MetricasObjetivo9 | null>(res);
+        if (d && Array.isArray(d.metricas) && d.metricas.length > 0) setObj9(d);
+        else setObj9(null);
+      })
+      .catch(() => setObj9(null));
   }, []);
 
   useEffect(() => {
@@ -182,6 +213,52 @@ export default function MetricasPage() {
                   {obj2.totales.pagos_en_custodia} pagos en custodia ·{' '}
                   {obj2.totales.liberaciones} liberaciones · {obj2.totales.reclamos}{' '}
                   reclamos · {obj2.totales.reembolsos} reembolsos
+                </p>
+              )}
+            </div>
+          </Card>
+
+          {/* 10 métricas de éxito del Objetivo 9 (mediación y resolución de reclamos) */}
+          <Card>
+            <div className="p-4">
+              <CardTitle>Objetivo 9 — Mediación y Resolución de Reclamos</CardTitle>
+              <p className="text-sm text-slate-400 mt-1">
+                Las 10 métricas de éxito de la resolución de conflictos (especificación OE9)
+              </p>
+              <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                {obj9 ? (
+                  obj9.metricas.map((m) => (
+                    <div key={m.clave} className="p-4 bg-slate-800/50 rounded-xl border border-slate-700">
+                      <div className="flex items-start justify-between gap-2">
+                        <p className="text-xs text-slate-400">{m.nombre}</p>
+                        <span
+                          className={`w-2 h-2 rounded-full flex-shrink-0 mt-1 ${
+                            m.cumple === true
+                              ? 'bg-green-400'
+                              : m.cumple === false
+                                ? 'bg-red-400'
+                                : 'bg-slate-600'
+                          }`}
+                        />
+                      </div>
+                      <p className="text-2xl font-bold text-cyan-400 mt-1">
+                        {m.unidad === '%' ? `${m.valor}%` : `${m.valor} ${m.unidad}`}
+                      </p>
+                      <p className="text-xs text-slate-500 mt-1">{m.objetivo}</p>
+                    </div>
+                  ))
+                ) : (
+                  <p className="text-sm text-slate-500 col-span-full">
+                    No se pudieron cargar las métricas del Objetivo 9.
+                  </p>
+                )}
+              </div>
+              {obj9 && (
+                <p className="text-xs text-slate-500 mt-3">
+                  Cumplimiento: {obj9.cumplimiento.metricas_cumplen} de{' '}
+                  {obj9.cumplimiento.metricas_evaluadas} métricas evaluadas (
+                  {obj9.cumplimiento.pct_cumplimiento}%) · {obj9.metricas.length} métricas
+                  definidas
                 </p>
               )}
             </div>
