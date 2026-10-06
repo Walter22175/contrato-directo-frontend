@@ -378,7 +378,6 @@ export interface IniciarMediacionDto {
 export interface ResolverMediacionDto {
   tipo_resolucion: string;
   fundamentos?: string;
-  detalle?: string;
   acta_audiencia_url?: string;
   plazo_cumplimiento_dias?: number;
 }
