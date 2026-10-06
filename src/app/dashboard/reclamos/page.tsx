@@ -358,6 +358,21 @@ export default function ReclamosPage() {
     }
   };
 
+  const handleConfirmarCumplimiento = async () => {
+    if (!selected) return;
+    setSending(true);
+    setMsg(null);
+    try {
+      await api.post(`/reclamos/${selected}/cumplimiento`);
+      await fetchDetalle(selected);
+      setMsg({ type: 'success', text: 'Cumplimiento confirmado. El reclamo quedó cerrado formalmente.' });
+    } catch (err) {
+      setMsg({ type: 'error', text: mensajeError(err, 'Error al confirmar el cumplimiento') });
+    } finally {
+      setSending(false);
+    }
+  };
+
   const handleSubirArchivos = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const archivos = Array.from(e.target.files || []);
     e.target.value = '';
@@ -594,6 +609,18 @@ export default function ReclamosPage() {
                 </p>
               )}
 
+              {detalle.estado === 'en_cumplimiento' && (
+                <p className="text-xs text-orange-400">
+                  Plazo de cumplimiento vencido — el mediador debe realizar el seguimiento dentro de los 3 días hábiles (etapa 5).
+                </p>
+              )}
+
+              {detalle.mediacion.resolucion.fecha_seguimiento && (
+                <p className="text-xs text-slate-500">
+                  Seguimiento iniciado: {formatearFecha(detalle.mediacion.resolucion.fecha_seguimiento)}
+                </p>
+              )}
+
               {!!detalle.mediacion.resolucion.apelaciones?.length && (
                 <div className="space-y-2">
                   <h4 className="text-xs font-medium text-slate-400">Apelaciones</h4>
@@ -756,13 +783,20 @@ export default function ReclamosPage() {
               </button>
             )}
 
-            {detalle.estado === 'resuelto' &&
+            {(detalle.estado === 'resuelto' || detalle.estado === 'en_cumplimiento') &&
               (user?.id_usuario === detalle.id_reclamante || user?.id_usuario === detalle.id_reclamado) &&
               detalle.mediacion?.resolucion?.estado === 'emitida' &&
               (!detalle.fecha_limite_apelacion || new Date(detalle.fecha_limite_apelacion) >= new Date()) &&
               !showApelar && (
                 <button onClick={() => { setShowApelar(true); setMsg(null); }} className="flex items-center gap-2 px-4 py-2 bg-orange-600/20 text-orange-400 border border-orange-500/30 rounded-lg text-sm hover:bg-orange-600/30 transition-colors">
                   <Gavel className="w-4 h-4" /> Apelar Resolución
+                </button>
+            )}
+
+            {esSuperAdmin && detalle.estado === 'en_cumplimiento' &&
+              (detalle.mediacion?.resolucion?.estado === 'emitida' || detalle.mediacion?.resolucion?.estado === 'firme') && (
+                <button onClick={handleConfirmarCumplimiento} className="flex items-center gap-2 px-4 py-2 bg-emerald-600/20 text-emerald-400 border border-emerald-500/30 rounded-lg text-sm hover:bg-emerald-600/30 transition-colors">
+                  <CheckCircle className="w-4 h-4" /> Confirmar cumplimiento
                 </button>
             )}
 

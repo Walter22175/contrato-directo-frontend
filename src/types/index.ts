@@ -247,6 +247,8 @@ export interface ResolucionMediacion {
   fundamentos: string;
   plazo_cumplimiento_dias: number;
   fecha_emision: string;
+  fecha_seguimiento?: string | null;
+  notificado_incumplimiento?: boolean;
   estado: string;
   apelaciones?: ApelacionMediacion[];
 }

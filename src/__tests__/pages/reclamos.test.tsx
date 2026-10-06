@@ -408,3 +408,115 @@ describe('ReclamosPage — solicitud de información adicional (48h)', () => {
     expect(screen.queryByText('Solicitar información')).not.toBeInTheDocument();
   });
 });
+
+describe('ReclamosPage — etapa 5: cumplimiento de la resolución', () => {
+  const resolucion = {
+    id_resolucion: 10,
+    id_mediacion: 'uuid-m',
+    tipo_resolucion: 'reembolso_parcial',
+    fundamentos: 'Se ordena reembolso parcial según la evidencia',
+    plazo_cumplimiento_dias: 5,
+    fecha_emision: '2026-09-10T10:00:00Z',
+    fecha_seguimiento: '2026-10-05T10:00:00Z',
+    notificado_incumplimiento: false,
+    estado: 'emitida',
+    apelaciones: [],
+  };
+
+  const base: Reclamo = {
+    id_reclamo: 'uuid-1',
+    id_transaccion: 'uuid-tx',
+    id_reclamante: 'test-user-id',
+    id_reclamado: 'uuid-p',
+    tipo_reclamo: 'incumplimiento_servicio',
+    descripcion: 'El proveedor no realizó el servicio',
+    fecha_incidente: '2026-09-01',
+    estado: 'en_cumplimiento',
+    fecha_apertura: '2026-09-02T10:00:00Z',
+    fecha_limite_apelacion: '2099-01-01T00:00:00Z',
+    prorroga_solicitada: false,
+    mediacion_voluntaria_ofrecida: false,
+    documentos: [],
+    mediacion: {
+      id_mediacion: 'uuid-m',
+      id_reclamo: 'uuid-1',
+      estado: 'en_cumplimiento',
+      fecha_asignacion: '2026-09-03T10:00:00Z',
+      audiencia_virtual: true,
+      prorroga_solicitada: false,
+      mediacion_voluntaria_ofrecida: false,
+      resolucion,
+    },
+  };
+
+  const ok = (data: unknown) =>
+    Promise.resolve({ data: { statusCode: 200, timestamp: '', data } });
+
+  const mockGet = (detalle: Reclamo) => {
+    (api.get as jest.Mock).mockImplementation((url: string) => {
+      if (url === '/reclamos') return ok({ data: [detalle], meta: { total: 1 } });
+      if (url === `/reclamos/${detalle.id_reclamo}`) return ok(detalle);
+      return ok({ data: [] });
+    });
+  };
+
+  const abrirDetalle = async () => {
+    await act(async () => {
+      render(<ReclamosPage />);
+    });
+    await act(async () => {
+      fireEvent.click(screen.getByText('El proveedor no realizó el servicio'));
+    });
+  };
+
+  it('muestra el estado en cumplimiento con la nota de seguimiento y permite apelar', async () => {
+    mockGet(base);
+    await abrirDetalle();
+
+    expect(screen.getByText(/Plazo de cumplimiento vencido/)).toBeInTheDocument();
+    expect(screen.getByText(/Seguimiento iniciado/)).toBeInTheDocument();
+    expect(screen.getByText('Apelar Resolución')).toBeInTheDocument();
+    expect(screen.queryByText('Confirmar cumplimiento')).not.toBeInTheDocument();
+  });
+
+  it('permite al super_admin confirmar el cumplimiento y cerrar el reclamo', async () => {
+    const originalImpl = (useAuthStore as unknown as jest.Mock).getMockImplementation();
+    (useAuthStore as unknown as jest.Mock).mockImplementation(() => ({
+      user: {
+        id_usuario: 'admin-id',
+        usuario_roles: [{ activo: true, rol: { nombre: 'super_admin' } }],
+      },
+      isAuthenticated: true,
+      isLoading: false,
+    }));
+
+    try {
+      mockGet(base);
+      await abrirDetalle();
+
+      expect(screen.getByText('Confirmar cumplimiento')).toBeInTheDocument();
+
+      await act(async () => {
+        fireEvent.click(screen.getByText('Confirmar cumplimiento'));
+      });
+
+      expect(api.post).toHaveBeenCalledWith('/reclamos/uuid-1/cumplimiento');
+      expect(
+        screen.getByText('Cumplimiento confirmado. El reclamo quedó cerrado formalmente.'),
+      ).toBeInTheDocument();
+    } finally {
+      (useAuthStore as unknown as jest.Mock).mockImplementation(originalImpl);
+    }
+  });
+
+  it('permite apelar dentro del plazo estando el reclamo en cumplimiento', async () => {
+    mockGet(base);
+    await abrirDetalle();
+
+    await act(async () => {
+      fireEvent.click(screen.getByText('Apelar Resolución'));
+    });
+
+    expect(screen.getByPlaceholderText(/hubo un error en la interpretación/)).toBeInTheDocument();
+  });
+});
