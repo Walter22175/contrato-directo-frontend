@@ -557,6 +557,7 @@ export default function ReclamosPage() {
             )}
 
             {detalle.estado === 'resuelto' &&
+              (user?.id_usuario === detalle.id_reclamante || user?.id_usuario === detalle.id_reclamado) &&
               detalle.mediacion?.resolucion?.estado === 'emitida' &&
               (!detalle.fecha_limite_apelacion || new Date(detalle.fecha_limite_apelacion) >= new Date()) &&
               !showApelar && (

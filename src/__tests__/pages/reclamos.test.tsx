@@ -132,6 +132,14 @@ describe('ReclamosPage — OE9 detalle, resolución y apelación', () => {
     expect(screen.queryByText('Apelar Resolución')).not.toBeInTheDocument();
   });
 
+  it('no ofrece apelar a usuarios que no son partes del reclamo', async () => {
+    mockGet({ ...base, id_reclamante: 'otro-1', id_reclamado: 'otro-2' });
+    await abrirDetalle();
+
+    expect(screen.getByText('Resolución')).toBeInTheDocument();
+    expect(screen.queryByText('Apelar Resolución')).not.toBeInTheDocument();
+  });
+
   it('muestra "Iniciar Mediación Formal" al super_admin cuando no hay mediación', async () => {
     const originalImpl = (useAuthStore as unknown as jest.Mock).getMockImplementation();
     (useAuthStore as unknown as jest.Mock).mockImplementation(() => ({
