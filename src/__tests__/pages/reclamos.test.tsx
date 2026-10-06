@@ -140,6 +140,69 @@ describe('ReclamosPage — OE9 detalle, resolución y apelación', () => {
     expect(screen.queryByText('Apelar Resolución')).not.toBeInTheDocument();
   });
 
+  it('permite al reclamante desistirse de un reclamo en curso', async () => {
+    mockGet({ ...base, estado: 'abierto', fecha_limite_apelacion: undefined, mediacion: undefined });
+    await abrirDetalle();
+
+    expect(screen.getByText('Desistir del reclamo')).toBeInTheDocument();
+
+    await act(async () => {
+      fireEvent.click(screen.getByText('Desistir del reclamo'));
+    });
+
+    expect(api.post).toHaveBeenCalledWith('/reclamos/uuid-1/desistimiento');
+  });
+
+  it('registra la primera confirmación de acuerdo sin cerrar el reclamo', async () => {
+    mockGet({ ...base, estado: 'en_revision', fecha_limite_apelacion: undefined, mediacion: undefined });
+    (api.post as jest.Mock).mockResolvedValueOnce({
+      data: {
+        statusCode: 200,
+        timestamp: '',
+        data: { ...base, estado: 'en_revision', id_acuerdo_confirmado_por: 'test-user-id' },
+      },
+    });
+
+    await abrirDetalle();
+
+    expect(screen.getByText('Acuerdo entre partes')).toBeInTheDocument();
+
+    await act(async () => {
+      fireEvent.click(screen.getByText('Acuerdo entre partes'));
+    });
+
+    expect(api.post).toHaveBeenCalledWith('/reclamos/uuid-1/acuerdo');
+    expect(
+      screen.getByText('Acuerdo confirmado. Esperando la confirmación de la contraparte.'),
+    ).toBeInTheDocument();
+  });
+
+  it('ofrece confirmar el acuerdo cuando la contraparte ya lo hizo', async () => {
+    mockGet({
+      ...base,
+      estado: 'en_revision',
+      fecha_limite_apelacion: undefined,
+      mediacion: undefined,
+      id_acuerdo_confirmado_por: 'uuid-p',
+    });
+    await abrirDetalle();
+
+    expect(screen.getByText('Confirmar acuerdo')).toBeInTheDocument();
+    expect(screen.queryByText('Acuerdo entre partes')).not.toBeInTheDocument();
+  });
+
+  it('muestra el motivo de cierre del reclamo', async () => {
+    mockGet({
+      ...base,
+      estado: 'cerrado',
+      fecha_limite_apelacion: undefined,
+      motivo_cierre: 'acuerdo',
+    });
+    await abrirDetalle();
+
+    expect(screen.getByText(/Motivo de cierre: Acuerdo entre las partes/)).toBeInTheDocument();
+  });
+
   it('muestra "Iniciar Mediación Formal" al super_admin cuando no hay mediación', async () => {
     const originalImpl = (useAuthStore as unknown as jest.Mock).getMockImplementation();
     (useAuthStore as unknown as jest.Mock).mockImplementation(() => ({

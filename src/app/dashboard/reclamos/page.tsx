@@ -78,6 +78,15 @@ const ESTADO_LABELS: Record<string, string> = {
   cerrado: 'Cerrado',
 };
 
+const MOTIVO_CIERRE_LABELS: Record<string, string> = {
+  cumplimiento: 'Cumplimiento de la resolución',
+  desistimiento: 'Desistimiento del reclamante',
+  acuerdo: 'Acuerdo entre las partes',
+  prescripcion: 'Prescripción (6 meses sin actividad)',
+  falta_respuesta: 'Falta de respuesta del reclamante',
+  apelacion_resuelta: 'Apelación resuelta',
+};
+
 const STEPS = ['abierto', 'en_revision', 'resuelto', 'en_cumplimiento', 'cerrado'];
 
 export default function ReclamosPage() {
@@ -210,6 +219,33 @@ export default function ReclamosPage() {
       setMsg({ type: 'success', text: 'Reclamo cerrado' });
     } catch (err) {
       setMsg({ type: 'error', text: mensajeError(err, 'Error al cerrar') });
+    }
+  };
+
+  const handleDesistir = async () => {
+    if (!selected) return;
+    try {
+      await api.post(`/reclamos/${selected}/desistimiento`);
+      await fetchDetalle(selected);
+      setMsg({ type: 'success', text: 'Te desististe del reclamo. El caso quedó cerrado.' });
+    } catch (err) {
+      setMsg({ type: 'error', text: mensajeError(err, 'Error al desistir') });
+    }
+  };
+
+  const handleAcuerdo = async () => {
+    if (!selected) return;
+    try {
+      const res = await api.post(`/reclamos/${selected}/acuerdo`);
+      const data = extractData<Reclamo | null>(res);
+      await fetchDetalle(selected);
+      if (data?.estado === 'cerrado') {
+        setMsg({ type: 'success', text: 'Acuerdo confirmado por ambas partes. Reclamo cerrado.' });
+      } else {
+        setMsg({ type: 'success', text: 'Acuerdo confirmado. Esperando la confirmación de la contraparte.' });
+      }
+    } catch (err) {
+      setMsg({ type: 'error', text: mensajeError(err, 'Error al registrar el acuerdo') });
     }
   };
 
@@ -393,6 +429,12 @@ export default function ReclamosPage() {
               </span>
             </div>
 
+            {detalle.estado === 'cerrado' && detalle.motivo_cierre && (
+              <div className="text-xs text-slate-400">
+                Motivo de cierre: {MOTIVO_CIERRE_LABELS[detalle.motivo_cierre] || detalle.motivo_cierre}
+              </div>
+            )}
+
             <div>
               <h3 className="text-sm font-medium text-slate-400 mb-1">Descripción</h3>
               <p className="text-slate-300">{detalle.descripcion}</p>
@@ -565,6 +607,38 @@ export default function ReclamosPage() {
                   <Gavel className="w-4 h-4" /> Apelar Resolución
                 </button>
             )}
+
+            {user?.id_usuario === detalle.id_reclamante &&
+              (detalle.estado === 'abierto' || detalle.estado === 'en_revision') && (
+                <button onClick={handleDesistir} className="flex items-center gap-2 px-4 py-2 bg-rose-600/20 text-rose-400 border border-rose-500/30 rounded-lg text-sm hover:bg-rose-600/30 transition-colors">
+                  <Ban className="w-4 h-4" /> Desistir del reclamo
+                </button>
+            )}
+
+            {(user?.id_usuario === detalle.id_reclamante || user?.id_usuario === detalle.id_reclamado) &&
+              (detalle.estado === 'abierto' || detalle.estado === 'en_revision') &&
+              !detalle.id_acuerdo_confirmado_por && (
+                <button onClick={handleAcuerdo} className="flex items-center gap-2 px-4 py-2 bg-emerald-600/20 text-emerald-400 border border-emerald-500/30 rounded-lg text-sm hover:bg-emerald-600/30 transition-colors">
+                  <CheckCircle className="w-4 h-4" /> Acuerdo entre partes
+                </button>
+            )}
+
+            {(user?.id_usuario === detalle.id_reclamante || user?.id_usuario === detalle.id_reclamado) &&
+              (detalle.estado === 'abierto' || detalle.estado === 'en_revision') &&
+              !!detalle.id_acuerdo_confirmado_por &&
+              detalle.id_acuerdo_confirmado_por !== user?.id_usuario && (
+                <button onClick={handleAcuerdo} className="flex items-center gap-2 px-4 py-2 bg-emerald-600/20 text-emerald-400 border border-emerald-500/30 rounded-lg text-sm hover:bg-emerald-600/30 transition-colors">
+                  <CheckCircle className="w-4 h-4" /> Confirmar acuerdo
+                </button>
+            )}
+
+            {(user?.id_usuario === detalle.id_reclamante || user?.id_usuario === detalle.id_reclamado) &&
+              (detalle.estado === 'abierto' || detalle.estado === 'en_revision') &&
+              detalle.id_acuerdo_confirmado_por === user?.id_usuario && (
+                <span className="flex items-center gap-2 px-4 py-2 text-xs text-emerald-400 border border-emerald-500/20 rounded-lg">
+                  <CheckCircle className="w-4 h-4" /> Acuerdo confirmado — a la espera de la contraparte
+                </span>
+              )}
           </div>
         </Card>
 

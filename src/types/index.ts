@@ -172,6 +172,8 @@ export interface Reclamo {
   estado: string;
   fecha_apertura: string;
   fecha_cierre?: string;
+  motivo_cierre?: string | null;
+  id_acuerdo_confirmado_por?: string | null;
   fecha_limite_contestacion?: string;
   fecha_limite_apelacion?: string;
   prorroga_solicitada: boolean;
