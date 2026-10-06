@@ -184,6 +184,20 @@ export interface Reclamo {
   contestacion?: ContestacionReclamo;
   mediacion?: Mediacion;
   documentos?: DocumentoReclamo[];
+  solicitudes_info?: SolicitudInfoReclamo[];
+}
+
+export interface SolicitudInfoReclamo {
+  id_solicitud: number;
+  id_reclamo: string;
+  id_destinatario: string;
+  pregunta: string;
+  fecha_solicitud: string;
+  fecha_limite: string;
+  estado: 'pendiente' | 'respondida';
+  respuesta?: string | null;
+  fecha_respuesta?: string | null;
+  destinatario?: Partial<Usuario>;
 }
 
 export interface ContestacionReclamo {

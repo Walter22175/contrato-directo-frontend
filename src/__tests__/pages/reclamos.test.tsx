@@ -6,7 +6,7 @@ import { render, screen, act, fireEvent } from '@testing-library/react';
 import ReclamosPage from '@/app/dashboard/reclamos/page';
 import api from '@/lib/api';
 import { useAuthStore } from '@/store/auth';
-import type { Reclamo } from '@/types';
+import type { Reclamo, SolicitudInfoReclamo } from '@/types';
 
 describe('ReclamosPage', () => {
   it('renders the page title', async () => {
@@ -249,5 +249,162 @@ describe('ReclamosPage — OE9 detalle, resolución y apelación', () => {
     } finally {
       (useAuthStore as unknown as jest.Mock).mockImplementation(originalImpl);
     }
+  });
+});
+
+describe('ReclamosPage — solicitud de información adicional (48h)', () => {
+  const base: Reclamo = {
+    id_reclamo: 'uuid-1',
+    id_transaccion: 'uuid-tx',
+    id_reclamante: 'test-user-id',
+    id_reclamado: 'uuid-p',
+    tipo_reclamo: 'incumplimiento_servicio',
+    descripcion: 'El proveedor no realizó el servicio',
+    fecha_incidente: '2026-09-01',
+    estado: 'en_revision',
+    fecha_apertura: '2026-09-02T10:00:00Z',
+    prorroga_solicitada: false,
+    mediacion_voluntaria_ofrecida: false,
+    documentos: [],
+    solicitudes_info: [],
+  };
+
+  const solicitud: SolicitudInfoReclamo = {
+    id_solicitud: 5,
+    id_reclamo: 'uuid-1',
+    id_destinatario: 'test-user-id',
+    pregunta: '¿Podés adjuntar la factura del incidente?',
+    fecha_solicitud: '2026-10-01T10:00:00Z',
+    fecha_limite: '2099-01-01T00:00:00Z',
+    estado: 'pendiente',
+    respuesta: null,
+    fecha_respuesta: null,
+  };
+
+  const ok = (data: unknown) =>
+    Promise.resolve({ data: { statusCode: 200, timestamp: '', data } });
+
+  const mockGet = (detalle: Reclamo) => {
+    (api.get as jest.Mock).mockImplementation((url: string) => {
+      if (url === '/reclamos') return ok({ data: [detalle], meta: { total: 1 } });
+      if (url === `/reclamos/${detalle.id_reclamo}`) return ok(detalle);
+      return ok({ data: [] });
+    });
+  };
+
+  const abrirDetalle = async () => {
+    await act(async () => {
+      render(<ReclamosPage />);
+    });
+    await act(async () => {
+      fireEvent.click(screen.getByText('El proveedor no realizó el servicio'));
+    });
+  };
+
+  it('muestra la solicitud pendiente y permite al destinatario responder', async () => {
+    mockGet({ ...base, solicitudes_info: [solicitud] });
+    await abrirDetalle();
+
+    expect(screen.getByText('Información Adicional')).toBeInTheDocument();
+    expect(screen.getByText('¿Podés adjuntar la factura del incidente?')).toBeInTheDocument();
+    expect(screen.getByText('Pendiente')).toBeInTheDocument();
+
+    const input = screen.getByPlaceholderText('Escribí tu respuesta...');
+    await act(async () => {
+      fireEvent.change(input, { target: { value: 'Adjunto la factura 123' } });
+    });
+    await act(async () => {
+      fireEvent.click(screen.getByText('Responder'));
+    });
+
+    expect(api.post).toHaveBeenCalledWith('/reclamos/uuid-1/solicitudes-info/5/responder', {
+      respuesta: 'Adjunto la factura 123',
+    });
+  });
+
+  it('no ofrece responder cuando la parte no es la destinataria', async () => {
+    mockGet({ ...base, solicitudes_info: [{ ...solicitud, id_destinatario: 'uuid-p' }] });
+    await abrirDetalle();
+
+    expect(screen.getByText('¿Podés adjuntar la factura del incidente?')).toBeInTheDocument();
+    expect(screen.queryByPlaceholderText('Escribí tu respuesta...')).not.toBeInTheDocument();
+  });
+
+  it('marca como vencida una solicitud pendiente fuera de plazo', async () => {
+    mockGet({
+      ...base,
+      solicitudes_info: [{ ...solicitud, fecha_limite: '2020-01-01T00:00:00Z' }],
+    });
+    await abrirDetalle();
+
+    expect(screen.getByText('Vencida')).toBeInTheDocument();
+    expect(screen.queryByText('Pendiente')).not.toBeInTheDocument();
+  });
+
+  it('muestra la respuesta registrada de una solicitud respondida', async () => {
+    mockGet({
+      ...base,
+      solicitudes_info: [
+        {
+          ...solicitud,
+          estado: 'respondida',
+          respuesta: 'Acá está la factura',
+          fecha_respuesta: '2026-10-02T10:00:00Z',
+        },
+      ],
+    });
+    await abrirDetalle();
+
+    expect(screen.getByText('Respondida')).toBeInTheDocument();
+    expect(screen.getByText('Acá está la factura')).toBeInTheDocument();
+    expect(screen.queryByPlaceholderText('Escribí tu respuesta...')).not.toBeInTheDocument();
+  });
+
+  it('permite al super_admin solicitar información con plazo de 48 horas', async () => {
+    const originalImpl = (useAuthStore as unknown as jest.Mock).getMockImplementation();
+    (useAuthStore as unknown as jest.Mock).mockImplementation(() => ({
+      user: {
+        id_usuario: 'admin-id',
+        usuario_roles: [{ activo: true, rol: { nombre: 'super_admin' } }],
+      },
+      isAuthenticated: true,
+      isLoading: false,
+    }));
+
+    try {
+      mockGet({ ...base });
+      await abrirDetalle();
+
+      expect(screen.getByText('Solicitar información')).toBeInTheDocument();
+
+      await act(async () => {
+        fireEvent.click(screen.getByText('Solicitar información'));
+      });
+      const select = screen.getByDisplayValue('Seleccionar parte...');
+      await act(async () => {
+        fireEvent.change(select, { target: { value: 'uuid-p' } });
+      });
+      const textarea = screen.getByPlaceholderText('Solicitá la información necesaria...');
+      await act(async () => {
+        fireEvent.change(textarea, { target: { value: '¿Tenés el comprobante de pago?' } });
+      });
+      await act(async () => {
+        fireEvent.click(screen.getByText('Enviar Solicitud'));
+      });
+
+      expect(api.post).toHaveBeenCalledWith('/reclamos/uuid-1/solicitudes-info', {
+        id_destinatario: 'uuid-p',
+        pregunta: '¿Tenés el comprobante de pago?',
+      });
+    } finally {
+      (useAuthStore as unknown as jest.Mock).mockImplementation(originalImpl);
+    }
+  });
+
+  it('no ofrece solicitar información a usuarios que no son super_admin', async () => {
+    mockGet({ ...base });
+    await abrirDetalle();
+
+    expect(screen.queryByText('Solicitar información')).not.toBeInTheDocument();
   });
 });

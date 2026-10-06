@@ -18,8 +18,9 @@ import {
   Calendar,
   Ban,
   Gavel,
+  FileSearch,
 } from 'lucide-react';
-import type { Reclamo, CreateReclamoDto, ContestarReclamoDto, CrearApelacionDto, Transaccion, DocumentoReclamo } from '@/types';
+import type { Reclamo, CreateReclamoDto, ContestarReclamoDto, CrearApelacionDto, Transaccion, DocumentoReclamo, SolicitudInfoReclamo } from '@/types';
 
 const TIPOS_RECLAMO = [
   { value: 'incumplimiento_servicio', label: 'Incumplimiento de servicio' },
@@ -112,6 +113,10 @@ export default function ReclamosPage() {
   const [mediadorId, setMediadorId] = useState('');
   const [showApelar, setShowApelar] = useState(false);
   const [motivoApelacion, setMotivoApelacion] = useState('');
+  const [showSolicitarInfo, setShowSolicitarInfo] = useState(false);
+  const [destinoInfo, setDestinoInfo] = useState('');
+  const [preguntaInfo, setPreguntaInfo] = useState('');
+  const [respuestasInfo, setRespuestasInfo] = useState<Record<number, string>>({});
 
   const idUsuario = user?.id_usuario;
 
@@ -305,6 +310,49 @@ export default function ReclamosPage() {
       setMsg({ type: 'success', text: 'Apelación enviada al mediador supervisor' });
     } catch (err) {
       setMsg({ type: 'error', text: mensajeError(err, 'Error al apelar la resolución') });
+    } finally {
+      setSending(false);
+    }
+  };
+
+  const handleSolicitarInfo = async (e: FormEvent) => {
+    e.preventDefault();
+    if (!selected || !destinoInfo.trim() || !preguntaInfo.trim()) return;
+    setSending(true);
+    setMsg(null);
+    try {
+      await api.post(`/reclamos/${selected}/solicitudes-info`, {
+        id_destinatario: destinoInfo,
+        pregunta: preguntaInfo.trim(),
+      });
+      setDestinoInfo('');
+      setPreguntaInfo('');
+      setShowSolicitarInfo(false);
+      await fetchDetalle(selected);
+      setMsg({ type: 'success', text: 'Solicitud de información enviada (48 horas hábiles para responder)' });
+    } catch (err) {
+      setMsg({ type: 'error', text: mensajeError(err, 'Error al solicitar información') });
+    } finally {
+      setSending(false);
+    }
+  };
+
+  const handleResponderInfo = async (idSolicitud: number) => {
+    const respuesta = (respuestasInfo[idSolicitud] || '').trim();
+    if (!selected || !respuesta) return;
+    setSending(true);
+    setMsg(null);
+    try {
+      await api.post(`/reclamos/${selected}/solicitudes-info/${idSolicitud}/responder`, { respuesta });
+      setRespuestasInfo((prev) => {
+        const next = { ...prev };
+        delete next[idSolicitud];
+        return next;
+      });
+      await fetchDetalle(selected);
+      setMsg({ type: 'success', text: 'Respuesta enviada' });
+    } catch (err) {
+      setMsg({ type: 'error', text: mensajeError(err, 'Error al responder la solicitud') });
     } finally {
       setSending(false);
     }
@@ -561,6 +609,116 @@ export default function ReclamosPage() {
             </div>
           </Card>
         )}
+
+        {/* Información adicional (OE9 etapa 3) */}
+        <Card>
+          <div className="p-4 space-y-3">
+            <div className="flex items-center justify-between">
+              <h3 className="text-sm font-medium text-slate-400 flex items-center gap-2">
+                <FileSearch className="w-4 h-4" /> Información Adicional
+              </h3>
+              {esSuperAdmin && detalle.estado === 'en_revision' && !showSolicitarInfo && (
+                <button onClick={() => { setShowSolicitarInfo(true); setMsg(null); }} className="flex items-center gap-2 px-3 py-1.5 bg-cyan-600/20 text-cyan-400 border border-cyan-500/30 rounded-lg text-xs hover:bg-cyan-600/30 transition-colors">
+                  <Plus className="w-3 h-3" /> Solicitar información
+                </button>
+              )}
+            </div>
+
+            <p className="text-xs text-slate-500">
+              El mediador puede solicitar información adicional a cualquiera de las partes. La parte destinataria dispone de 48 horas hábiles para responder.
+            </p>
+
+            {(detalle.solicitudes_info?.length || 0) === 0 && (
+              <p className="text-xs text-slate-600">No hay solicitudes de información.</p>
+            )}
+
+            {detalle.solicitudes_info?.map((s: SolicitudInfoReclamo) => {
+              const vencida = s.estado === 'pendiente' && new Date(s.fecha_limite) < new Date();
+              const puedeResponder =
+                s.id_destinatario === user?.id_usuario &&
+                s.estado === 'pendiente' &&
+                detalle.estado !== 'resuelto' &&
+                detalle.estado !== 'cerrado';
+              return (
+                <div key={s.id_solicitud} className={`p-4 rounded-xl border ${s.estado === 'respondida' ? 'bg-emerald-500/5 border-emerald-500/20' : vencida ? 'bg-red-500/5 border-red-500/20' : 'bg-slate-800/50 border-slate-700'}`}>
+                  <div className="flex items-center justify-between gap-2">
+                    <span className="text-xs text-slate-500">
+                      Destinatario: <span className="text-slate-300">{s.id_destinatario === detalle.id_reclamante ? 'Reclamante' : 'Reclamado'}</span>
+                    </span>
+                    <span className={`text-xs px-2 py-0.5 rounded border ${s.estado === 'respondida' ? 'text-emerald-400 bg-emerald-500/10 border-emerald-500/20' : vencida ? 'text-red-400 bg-red-500/10 border-red-500/20' : 'text-yellow-400 bg-yellow-500/10 border-yellow-500/20'}`}>
+                      {s.estado === 'respondida' ? 'Respondida' : vencida ? 'Vencida' : 'Pendiente'}
+                    </span>
+                  </div>
+                  <p className="text-sm text-slate-300 mt-2">{s.pregunta}</p>
+                  <div className="flex items-center gap-3 mt-1 text-xs text-slate-500">
+                    <span className="flex items-center gap-1"><Clock className="w-3 h-3" /> Límite: {formatearFecha(s.fecha_limite)}</span>
+                    <span>Solicitada: {formatearFecha(s.fecha_solicitud)}</span>
+                  </div>
+
+                  {s.respuesta && (
+                    <div className="mt-3 p-3 bg-cyan-500/5 border border-cyan-500/20 rounded-lg ml-4">
+                      <p className="text-sm text-slate-300">{s.respuesta}</p>
+                      <p className="text-xs text-slate-500 mt-1">{s.fecha_respuesta ? `Respondida: ${formatearFecha(s.fecha_respuesta)}` : ''}</p>
+                    </div>
+                  )}
+
+                  {puedeResponder && (
+                    <div className="flex gap-2 mt-3">
+                      <input
+                        className={inputCls + ' flex-1 text-sm py-2'}
+                        placeholder="Escribí tu respuesta..."
+                        value={respuestasInfo[s.id_solicitud] || ''}
+                        onChange={(e) => setRespuestasInfo((prev) => ({ ...prev, [s.id_solicitud]: e.target.value }))}
+                      />
+                      <button
+                        onClick={() => handleResponderInfo(s.id_solicitud)}
+                        disabled={sending || !(respuestasInfo[s.id_solicitud] || '').trim()}
+                        className="flex items-center gap-2 px-4 py-2 bg-cyan-600 hover:bg-cyan-700 disabled:opacity-50 text-white rounded-lg text-sm transition-colors"
+                      >
+                        <Send className="w-4 h-4" /> Responder
+                      </button>
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+
+            {showSolicitarInfo && (
+              <form onSubmit={handleSolicitarInfo} className="p-4 bg-slate-800/60 border border-slate-700 rounded-xl space-y-3">
+                <div className="flex items-center justify-between">
+                  <h4 className="text-sm font-medium text-white">Solicitar Información Adicional</h4>
+                  <button type="button" onClick={() => setShowSolicitarInfo(false)} className="text-slate-400 hover:text-white"><X className="w-4 h-4" /></button>
+                </div>
+                <p className="text-xs text-slate-500">La parte destinataria dispone de 48 horas hábiles para responder (etapa 3 del flujo de mediación).</p>
+                <div>
+                  <label className={labelCls}>Destinatario *</label>
+                  <select className={inputCls} value={destinoInfo} onChange={(e) => setDestinoInfo(e.target.value)} required>
+                    <option value="">Seleccionar parte...</option>
+                    <option value={detalle.id_reclamante}>Reclamante{detalle.reclamante?.nombre ? ` — ${detalle.reclamante.nombre}` : ''}</option>
+                    <option value={detalle.id_reclamado}>Reclamado{detalle.reclamado?.nombre ? ` — ${detalle.reclamado.nombre}` : ''}</option>
+                  </select>
+                </div>
+                <div>
+                  <label className={labelCls}>Pregunta * (máx. 800 caracteres)</label>
+                  <textarea
+                    className={inputCls + ' min-h-[80px] resize-y'}
+                    value={preguntaInfo}
+                    onChange={(e) => setPreguntaInfo(e.target.value.slice(0, 800))}
+                    required
+                    placeholder="Solicitá la información necesaria..."
+                  />
+                  <p className="text-xs text-slate-500 mt-1">{preguntaInfo.length}/800</p>
+                </div>
+                <div className="flex justify-end gap-3">
+                  <button type="button" onClick={() => setShowSolicitarInfo(false)} className="px-4 py-2 text-slate-400 hover:text-white text-sm">Cancelar</button>
+                  <button type="submit" disabled={sending || !preguntaInfo.trim() || !destinoInfo} className="px-4 py-2 bg-cyan-600 hover:bg-cyan-700 disabled:opacity-50 text-white rounded-lg text-sm font-medium transition-colors">
+                    {sending ? 'Enviando...' : 'Enviar Solicitud'}
+                  </button>
+                </div>
+              </form>
+            )}
+          </div>
+        </Card>
 
         {/* Acciones */}
         <Card>
