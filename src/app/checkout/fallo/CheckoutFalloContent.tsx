@@ -3,10 +3,12 @@
 import { useEffect, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
+import Image from 'next/image';
 import { Card, CardTitle } from '@/components/ui/Card';
 import Button from '@/components/ui/Button';
 import api, { extractData } from '@/lib/api';
 import { formatCurrency } from '@/lib/utils';
+import { iconoServicio } from '@/lib/iconos';
 import { XCircle, AlertCircle, ArrowLeft, RefreshCw, Shield, HelpCircle } from 'lucide-react';
 import type { Transaccion } from '@/types';
 import { useFunnelAnalytics } from '@/hooks/useFunnelAnalytics';
@@ -161,8 +163,19 @@ export function CheckoutFalloContent() {
           <CardTitle>Detalle de la Transacción</CardTitle>
           <div className="mt-4 space-y-4">
             <div className="flex items-start gap-4">
-              <div className="w-14 h-14 bg-cyan-500/10 border border-cyan-500/20 rounded-xl flex items-center justify-center flex-shrink-0">
-                <span className="text-2xl">🔧</span>
+              <div className="w-28 h-28 bg-cyan-500/10 border border-cyan-500/20 rounded-xl flex items-center justify-center flex-shrink-0">
+                {iconoServicio(transaccion.servicio?.nombre, transaccion.servicio?.categoria?.nombre) ? (
+                  <Image
+                    src={iconoServicio(transaccion.servicio?.nombre, transaccion.servicio?.categoria?.nombre)!}
+                    alt=""
+                    width={64}
+                    height={64}
+                    unoptimized
+                    className="w-16 h-16 object-contain"
+                  />
+                ) : (
+                  <span className="text-5xl">🔧</span>
+                )}
               </div>
               <div className="flex-1">
                 <h3 className="font-semibold text-white">{transaccion.servicio?.nombre || 'Servicio'}</h3>

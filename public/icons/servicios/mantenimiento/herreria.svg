@@ -1,0 +1,69 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400" width="400" height="400" fill="none">
+  <!-- Yunque (Estructura Principal en Azul) -->
+  <!-- Cuerpo superior y cuerno del yunque -->
+  <path 
+    d="M175 185 H325 C325 210 295 240 295 250 H175 Z" 
+    stroke="#0047D4" 
+    stroke-width="16" 
+    stroke-linecap="round" 
+    stroke-linejoin="round" 
+  />
+  <path 
+    d="M165 185 H125 C100 185 100 200 165 240 H175 V185 Z" 
+    stroke="#0047D4" 
+    stroke-width="16" 
+    stroke-linecap="round" 
+    stroke-linejoin="round" 
+  />
+  <!-- Base del yunque -->
+  <path 
+    d="M185 250 C185 290 155 300 155 315 H315 C315 300 285 290 285 250" 
+    stroke="#0047D4" 
+    stroke-width="16" 
+    stroke-linecap="round" 
+    stroke-linejoin="round" 
+  />
+  <rect 
+    x="155" 
+    y="315" 
+    width="160" 
+    height="35" 
+    rx="8" 
+    stroke="#0047D4" 
+    stroke-width="16" 
+    stroke-linecap="round" 
+    stroke-linejoin="round" 
+  />
+
+  <!-- Martillo de Herrero (Acento Cian) -->
+  <!-- Mango -->
+  <path 
+    d="M260 110 L335 185" 
+    stroke="#00C9B7" 
+    stroke-width="16" 
+    stroke-linecap="round" 
+  />
+  <!-- Cabeza del Martillo -->
+  <path 
+    d="M225 130 L270 85 M205 110 L250 65" 
+    stroke="#00C9B7" 
+    stroke-width="16" 
+    stroke-linecap="round" 
+    stroke-linejoin="round" 
+  />
+  <rect 
+    x="215" 
+    y="75" 
+    width="45" 
+    height="45" 
+    transform="rotate(45 237.5 97.5)" 
+    stroke="#00C9B7" 
+    stroke-width="16" 
+    stroke-linecap="round" 
+    stroke-linejoin="round" 
+  />
+
+  <!-- Chispas / Detalle de impacto -->
+  <path d="M195 160 L185 140" stroke="#00C9B7" stroke-width="16" stroke-linecap="round" />
+  <path d="M225 155 L225 135" stroke="#00C9B7" stroke-width="16" stroke-linecap="round" />
+</svg>

@@ -1,0 +1,302 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400" width="100%" height="100%">
+  <defs>
+    <linearGradient id="g1" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0A2A66"/>
+      <stop offset="55%" stop-color="#1E6FE8"/>
+      <stop offset="100%" stop-color="#22C1E0"/>
+    </linearGradient>
+    <linearGradient id="g2" x1="0%" y1="100%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#22C1E0"/>
+      <stop offset="100%" stop-color="#0A2A66"/>
+    </linearGradient>
+    <linearGradient id="g3" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#22C1E0"/>
+      <stop offset="100%" stop-color="#1E6FE8"/>
+    </linearGradient>
+    <radialGradient id="g4" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#22C1E0" stop-opacity="0.55"/>
+      <stop offset="100%" stop-color="#22C1E0" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+
+  <!-- Aro exterior institucional -->
+  <g fill="none" stroke="url(#g2)" stroke-width="7" stroke-linecap="round" opacity="0.85">
+    <path d="M 70 200 A 130 130 0 0 1 200 70" />
+    <path d="M 200 70 A 130 130 0 0 1 330 200" />
+    <path d="M 330 200 A 130 130 0 0 1 200 330" />
+    <path d="M 200 330 A 130 130 0 0 1 70 200" />
+    <animateTransform attributeName="transform" type="rotate"
+      from="0 200 200" to="360 200 200" dur="50s" repeatCount="indefinite"/>
+  </g>
+
+  <!-- Resplandor central -->
+  <circle cx="200" cy="200" r="95" fill="url(#g4)">
+    <animate attributeName="r" values="90;110;90" dur="3s" repeatCount="indefinite"/>
+    <animate attributeName="opacity" values="0.7;0.3;0.7" dur="3s" repeatCount="indefinite"/>
+  </circle>
+
+  <!-- ASPERSOR CENTRAL (nucleo) -->
+  <g transform="translate(200 200) scale(0.95)">
+    <g>
+      <animateTransform attributeName="transform" type="rotate"
+        values="-3 0 0; 3 0 0; -3 0 0" dur="3s" repeatCount="indefinite"/>
+
+      <!-- Base del aspersor -->
+      <rect x="-22" y="28" width="44" height="8" rx="3" fill="url(#g1)"/>
+
+      <!-- Cuerpo del aspersor -->
+      <rect x="-8" y="4" width="16" height="24" rx="3" fill="url(#g1)"/>
+
+      <!-- Cabeza giratoria -->
+      <circle cx="0" cy="-6" r="14" fill="url(#g3)"/>
+      <circle cx="0" cy="-6" r="8" fill="#0A2A66" opacity="0.6"/>
+      <circle cx="0" cy="-6" r="4" fill="#22C1E0"/>
+
+      <!-- Boquillas del aspersor -->
+      <circle cx="-10" cy="-16" r="2" fill="#22C1E0"/>
+      <circle cx="0" cy="-20" r="2" fill="#22C1E0"/>
+      <circle cx="10" cy="-16" r="2" fill="#22C1E0"/>
+
+      <!-- Abanico de agua / spray -->
+      <g fill="#22C1E0" opacity="0.6">
+        <path d="M 0 -20 L -38 -44 Q -30 -36 -22 -28 Z">
+          <animate attributeName="opacity" values="0.6;0.2;0.6" dur="1.6s" repeatCount="indefinite"/>
+        </path>
+        <path d="M 0 -20 L 38 -44 Q 30 -36 22 -28 Z">
+          <animate attributeName="opacity" values="0.6;0.2;0.6" dur="1.6s" begin="0.4s" repeatCount="indefinite"/>
+        </path>
+        <path d="M 0 -20 L 0 -50 Q -8 -40 -6 -30 Z">
+          <animate attributeName="opacity" values="0.6;0.2;0.6" dur="1.6s" begin="0.8s" repeatCount="indefinite"/>
+        </path>
+      </g>
+
+      <!-- Gotas saliendo -->
+      <g fill="#22C1E0">
+        <circle cx="-30" cy="-40" r="2">
+          <animate attributeName="cy" values="-40;-52;-40" dur="1.8s" repeatCount="indefinite"/>
+          <animate attributeName="opacity" values="1;0;1" dur="1.8s" repeatCount="indefinite"/>
+        </circle>
+        <circle cx="30" cy="-40" r="2">
+          <animate attributeName="cy" values="-40;-52;-40" dur="1.8s" begin="0.3s" repeatCount="indefinite"/>
+          <animate attributeName="opacity" values="1;0;1" dur="1.8s" begin="0.3s" repeatCount="indefinite"/>
+        </circle>
+        <circle cx="0" cy="-46" r="2.5">
+          <animate attributeName="cy" values="-46;-58;-46" dur="1.6s" begin="0.6s" repeatCount="indefinite"/>
+          <animate attributeName="opacity" values="1;0;1" dur="1.6s" begin="0.6s" repeatCount="indefinite"/>
+        </circle>
+      </g>
+
+      <!-- Brillo superior -->
+      <ellipse cx="-4" cy="-10" rx="4" ry="2" fill="#ffffff" opacity="0.5"/>
+    </g>
+  </g>
+
+  <!-- SOL / CLIMA (12 en punto) -->
+  <g transform="translate(200 118) scale(0.62)">
+    <g>
+      <animateTransform attributeName="transform" type="rotate"
+        from="0 0 0" to="360 0 0" dur="20s" repeatCount="indefinite"/>
+      <!-- Rayos -->
+      <g stroke="url(#g1)" stroke-width="3.5" stroke-linecap="round">
+        <line x1="0" y1="-22" x2="0" y2="-16"/>
+        <line x1="0" y1="16" x2="0" y2="22"/>
+        <line x1="-22" y1="0" x2="-16" y2="0"/>
+        <line x1="16" y1="0" x2="22" y2="0"/>
+        <line x1="-15" y1="-15" x2="-11" y2="-11"/>
+        <line x1="11" y1="-11" x2="15" y2="-15"/>
+        <line x1="-11" y1="11" x2="-15" y2="15"/>
+        <line x1="11" y1="11" x2="15" y2="15"/>
+      </g>
+      <!-- Circulo central -->
+      <circle r="12" fill="url(#g3)"/>
+      <circle r="6" fill="#ffffff" opacity="0.4"/>
+    </g>
+  </g>
+
+  <!-- BROTE REGADO (6 en punto) -->
+  <g transform="translate(200 288) scale(0.62)">
+    <g>
+      <animateTransform attributeName="transform" type="translate"
+        values="0 0; 0 3; 0 0" dur="2.8s" repeatCount="indefinite"/>
+      <!-- Tierra / cantero -->
+      <ellipse cx="0" cy="16" rx="24" ry="6" fill="url(#g1)" opacity="0.8"/>
+      <!-- Tallo -->
+      <path d="M 0 16 Q 0 4 0 -8" stroke="url(#g1)"
+            stroke-width="4" fill="none" stroke-linecap="round"/>
+      <!-- Hoja izquierda -->
+      <path d="M 0 4 Q -18 0 -14 -12 Q -4 -10 0 4 Z" fill="url(#g3)"/>
+      <!-- Hoja derecha -->
+      <path d="M 0 -6 Q 18 -10 14 -22 Q 4 -20 0 -6 Z" fill="url(#g3)"/>
+      <!-- Gotas de agua cayendo -->
+      <g fill="#22C1E0">
+        <circle cx="-10" cy="-16" r="1.5">
+          <animate attributeName="cy" values="-16;-4;-16" dur="1.6s" repeatCount="indefinite"/>
+          <animate attributeName="opacity" values="1;0.2;1" dur="1.6s" repeatCount="indefinite"/>
+        </circle>
+        <circle cx="8" cy="-14" r="1.5">
+          <animate attributeName="cy" values="-14;-2;-14" dur="1.8s" begin="0.4s" repeatCount="indefinite"/>
+          <animate attributeName="opacity" values="1;0.2;1" dur="1.8s" begin="0.4s" repeatCount="indefinite"/>
+        </circle>
+      </g>
+      <!-- Brillo -->
+      <ellipse cx="-4" cy="-4" rx="3" ry="1.5" fill="#ffffff" opacity="0.4"/>
+    </g>
+  </g>
+
+  <!-- PROGRAMADOR / CONTROL (9 en punto) -->
+  <g transform="translate(118 200) scale(0.62)">
+    <g>
+      <animateTransform attributeName="transform" type="translate"
+        values="0 0; 0 -3; 0 0" dur="2.8s" repeatCount="indefinite"/>
+      <!-- Caja del programador -->
+      <rect x="-20" y="-22" width="40" height="44" rx="4" fill="url(#g1)"/>
+      <!-- Pantalla -->
+      <rect x="-14" y="-16" width="28" height="14" rx="2" fill="#0A2A66" opacity="0.9"/>
+      <!-- Lineas del display -->
+      <rect x="-10" y="-12" width="20" height="2" rx="1" fill="#22C1E0">
+        <animate attributeName="width" values="20;10;20" dur="2s" repeatCount="indefinite"/>
+      </rect>
+      <rect x="-10" y="-7" width="12" height="2" rx="1" fill="#22C1E0" opacity="0.6"/>
+      <!-- Dial / perilla -->
+      <circle cx="0" cy="4" r="6" fill="url(#g3)"/>
+      <circle cx="0" cy="4" r="3" fill="#0A2A66" opacity="0.6"/>
+      <line x1="0" y1="4" x2="0" y2="-1" stroke="#22C1E0" stroke-width="2" stroke-linecap="round">
+        <animateTransform attributeName="transform" type="rotate"
+          values="-30 0 4; 30 0 4; -30 0 4" dur="2.4s" repeatCount="indefinite"/>
+      </line>
+      <!-- LEDs indicadores -->
+      <circle cx="-14" cy="14" r="1.5" fill="#22C1E0">
+        <animate attributeName="opacity" values="1;0.2;1" dur="1.2s" repeatCount="indefinite"/>
+      </circle>
+      <circle cx="-6" cy="14" r="1.5" fill="#22C1E0">
+        <animate attributeName="opacity" values="1;0.2;1" dur="1.4s" begin="0.3s" repeatCount="indefinite"/>
+      </circle>
+      <circle cx="2" cy="14" r="1.5" fill="#22C1E0">
+        <animate attributeName="opacity" values="1;0.2;1" dur="1.3s" begin="0.6s" repeatCount="indefinite"/>
+      </circle>
+      <circle cx="10" cy="14" r="1.5" fill="#22C1E0">
+        <animate attributeName="opacity" values="1;0.2;1" dur="1.5s" begin="0.9s" repeatCount="indefinite"/>
+      </circle>
+      <!-- Brillo -->
+      <rect x="-16" y="-20" width="32" height="2" rx="1" fill="#ffffff" opacity="0.4"/>
+    </g>
+  </g>
+
+  <!-- MICROASPERSOR / GOTERO (3 en punto) -->
+  <g transform="translate(282 200) scale(0.62)">
+    <g>
+      <animateTransform attributeName="transform" type="rotate"
+        values="-6 0 0; 6 0 0; -6 0 0" dur="3s" repeatCount="indefinite"/>
+      <!-- Tubo horizontal -->
+      <rect x="-24" y="-4" width="34" height="8" rx="3" fill="url(#g1)"/>
+      <!-- Codo -->
+      <path d="M 4 -4 L 10 -4 Q 18 -4 18 4 L 18 22 Q 18 28 12 28 L 4 28
+               L 4 22 L 12 22 Q 12 22 12 22 L 12 4 Q 12 4 12 4 L 4 4 Z"
+            fill="url(#g1)"/>
+      <!-- Microaspersor -->
+      <circle cx="8" cy="30" r="6" fill="url(#g3)"/>
+      <circle cx="8" cy="30" r="3" fill="#22C1E0"/>
+      <!-- Spray del microaspersor -->
+      <g fill="#22C1E0" opacity="0.6">
+        <path d="M 8 30 L -4 42 Q 0 38 4 34 Z"/>
+        <path d="M 8 30 L 20 42 Q 16 38 12 34 Z"/>
+        <path d="M 8 30 L 8 46 Q 4 40 4 36 Z"/>
+      </g>
+      <!-- Gotas -->
+      <g fill="#22C1E0">
+        <circle cx="-2" cy="42" r="1.5">
+          <animate attributeName="cy" values="42;52;42" dur="1.6s" repeatCount="indefinite"/>
+          <animate attributeName="opacity" values="1;0;1" dur="1.6s" repeatCount="indefinite"/>
+        </circle>
+        <circle cx="18" cy="42" r="1.5">
+          <animate attributeName="cy" values="42;52;42" dur="1.8s" begin="0.3s" repeatCount="indefinite"/>
+          <animate attributeName="opacity" values="1;0;1" dur="1.8s" begin="0.3s" repeatCount="indefinite"/>
+        </circle>
+        <circle cx="8" cy="46" r="1.5">
+          <animate attributeName="cy" values="46;56;46" dur="1.7s" begin="0.6s" repeatCount="indefinite"/>
+          <animate attributeName="opacity" values="1;0;1" dur="1.7s" begin="0.6s" repeatCount="indefinite"/>
+        </circle>
+      </g>
+      <!-- Brillo -->
+      <rect x="-22" y="-2" width="14" height="3" rx="1.5" fill="#ffffff" opacity="0.35"/>
+    </g>
+  </g>
+
+  <!-- LLAVE / VALVULA (10-11 en punto) -->
+  <g transform="translate(118 118) scale(0.58)">
+    <g>
+      <animateTransform attributeName="transform" type="rotate"
+        values="-6 0 0; 6 0 0; -6 0 0" dur="3s" repeatCount="indefinite"/>
+      <!-- Cuerpo de la valvula -->
+      <rect x="-10" y="-6" width="20" height="20" rx="3" fill="url(#g1)"/>
+      <!-- Tuberia izquierda -->
+      <rect x="-22" y="-2" width="12" height="12" rx="2" fill="url(#g1)"/>
+      <!-- Tuberia derecha -->
+      <rect x="10" y="-2" width="12" height="12" rx="2" fill="url(#g1)"/>
+      <!-- Rueda de la valvula -->
+      <circle cx="0" cy="-10" r="10" fill="none" stroke="url(#g3)" stroke-width="4"/>
+      <line x1="-10" y1="-10" x2="10" y2="-10" stroke="url(#g3)" stroke-width="3" stroke-linecap="round"/>
+      <line x1="0" y1="-20" x2="0" y2="0" stroke="url(#g3)" stroke-width="3" stroke-linecap="round"/>
+      <circle cx="0" cy="-10" r="3" fill="url(#g1)"/>
+      <!-- Gota -->
+      <circle cx="0" cy="14" r="2" fill="#22C1E0">
+        <animate attributeName="cy" values="12;22;12" dur="1.6s" repeatCount="indefinite"/>
+        <animate attributeName="opacity" values="1;0.2;1" dur="1.6s" repeatCount="indefinite"/>
+      </circle>
+      <!-- Brillo -->
+      <rect x="-8" y="-4" width="16" height="2" rx="1" fill="#ffffff" opacity="0.4"/>
+    </g>
+  </g>
+
+  <!-- TUBERIA / CANO (1-2 en punto) -->
+  <g transform="translate(282 118) scale(0.58)">
+    <g>
+      <animateTransform attributeName="transform" type="translate"
+        values="0 0; 0 -3; 0 0" dur="2.6s" repeatCount="indefinite"/>
+      <!-- Tubo horizontal -->
+      <rect x="-24" y="-8" width="36" height="16" rx="3" fill="url(#g1)"/>
+      <!-- Codo -->
+      <path d="M 6 -8 L 14 -8 Q 24 -8 24 2 L 24 18 Q 24 26 16 26 L 6 26
+               L 6 18 L 16 18 Q 16 18 16 18 L 16 2 Q 16 2 16 2 L 6 2 Z"
+            fill="url(#g1)"/>
+      <!-- Union / tuerca -->
+      <rect x="-22" y="-10" width="8" height="20" rx="2" fill="url(#g1)"/>
+      <line x1="-22" y1="-10" x2="-22" y2="10" stroke="#0A2A66" stroke-width="1" opacity="0.5"/>
+      <rect x="2" y="-10" width="6" height="20" rx="2" fill="url(#g1)"/>
+      <!-- Tuberia vertical -->
+      <rect x="12" y="18" width="12" height="8" rx="2" fill="url(#g1)"/>
+      <!-- Agua fluyendo (punto cian moviendose) -->
+      <circle cx="-16" cy="0" r="3" fill="#22C1E0">
+        <animate attributeName="cx" values="-20;0;-20" dur="2s" repeatCount="indefinite"/>
+        <animate attributeName="opacity" values="0.3;1;0.3" dur="2s" repeatCount="indefinite"/>
+      </circle>
+      <circle cx="-16" cy="0" r="2" fill="#ffffff" opacity="0.7">
+        <animate attributeName="cx" values="-20;0;-20" dur="2s" begin="0.3s" repeatCount="indefinite"/>
+        <animate attributeName="opacity" values="0;0.7;0" dur="2s" begin="0.3s" repeatCount="indefinite"/>
+      </circle>
+      <!-- Brillo -->
+      <rect x="-22" y="-6" width="14" height="3" rx="1.5" fill="#ffffff" opacity="0.35"/>
+    </g>
+  </g>
+
+  <!-- Chispas / particulas alrededor -->
+  <g fill="#22C1E0">
+    <circle cx="270" cy="105" r="3.5">
+      <animate attributeName="r" values="2.5;6;2.5" dur="1.2s" repeatCount="indefinite"/>
+      <animate attributeName="opacity" values="1;0.2;1" dur="1.2s" repeatCount="indefinite"/>
+    </circle>
+    <circle cx="130" cy="105" r="3">
+      <animate attributeName="r" values="2;5;2" dur="1.4s" begin="0.3s" repeatCount="indefinite"/>
+      <animate attributeName="opacity" values="1;0.2;1" dur="1.4s" begin="0.3s" repeatCount="indefinite"/>
+    </circle>
+    <circle cx="300" cy="272" r="3">
+      <animate attributeName="r" values="2;5;2" dur="1.3s" begin="0.6s" repeatCount="indefinite"/>
+      <animate attributeName="opacity" values="1;0.2;1" dur="1.3s" begin="0.6s" repeatCount="indefinite"/>
+    </circle>
+    <circle cx="100" cy="272" r="3.5">
+      <animate attributeName="r" values="2.5;6;2.5" dur="1.5s" begin="0.9s" repeatCount="indefinite"/>
+      <animate attributeName="opacity" values="1;0.2;1" dur="1.5s" begin="0.9s" repeatCount="indefinite"/>
+    </circle>
+  </g>
+</svg>

@@ -1,0 +1,242 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg viewBox="0 0 400 400" width="100%" height="100%"
+     xmlns="http://www.w3.org/2000/svg" role="img"
+     aria-label="Icono de Diseño de Jardines - Contrato Directo">
+
+  <defs>
+    <linearGradient id="gradDJ" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%"   stop-color="#0A2A66"/>
+      <stop offset="55%"  stop-color="#1E6FE8"/>
+      <stop offset="100%" stop-color="#22C1E0"/>
+    </linearGradient>
+
+    <linearGradient id="gradAroDJ" x1="0%" y1="100%" x2="100%" y2="0%">
+      <stop offset="0%"   stop-color="#22C1E0"/>
+      <stop offset="100%" stop-color="#0A2A66"/>
+    </linearGradient>
+
+    <linearGradient id="gradCopaDJ" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%"   stop-color="#22C1E0"/>
+      <stop offset="100%" stop-color="#1E6FE8"/>
+    </linearGradient>
+
+    <radialGradient id="glowDJ" cx="50%" cy="50%" r="50%">
+      <stop offset="0%"   stop-color="#22C1E0" stop-opacity="0.55"/>
+      <stop offset="100%" stop-color="#22C1E0" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+
+  <!-- Aro exterior institucional -->
+  <g fill="none" stroke="url(#gradAroDJ)" stroke-width="7"
+     stroke-linecap="round" opacity="0.85">
+    <path d="M 70 200 A 130 130 0 0 1 200 70" />
+    <path d="M 200 70 A 130 130 0 0 1 330 200" />
+    <path d="M 330 200 A 130 130 0 0 1 200 330" />
+    <path d="M 200 330 A 130 130 0 0 1 70 200" />
+    <animateTransform attributeName="transform" type="rotate"
+      from="0 200 200" to="360 200 200" dur="50s" repeatCount="indefinite"/>
+  </g>
+
+  <!-- Resplandor central -->
+  <circle cx="200" cy="200" r="95" fill="url(#glowDJ)">
+    <animate attributeName="r" values="90;110;90" dur="3s" repeatCount="indefinite"/>
+    <animate attributeName="opacity" values="0.7;0.3;0.7" dur="3s" repeatCount="indefinite"/>
+  </circle>
+
+  <!-- 🌳 ÁRBOL CENTRAL (núcleo) -->
+  <g transform="translate(200 200) scale(0.95)">
+    <g>
+      <!-- Animación: el árbol se balancea suavemente -->
+      <animateTransform attributeName="transform" type="rotate"
+        values="-2 0 40; 2 0 40; -2 0 40" dur="3.5s" repeatCount="indefinite"/>
+
+      <!-- Tronco -->
+      <path d="M -8 40 L -5 0 Q -3 -6 0 -8 Q 3 -6 5 0 L 8 40 Z"
+            fill="url(#gradDJ)"/>
+
+      <!-- Raíces -->
+      <path d="M -18 40 Q -12 34 -8 40 M 18 40 Q 12 34 8 40"
+            fill="none" stroke="url(#gradDJ)" stroke-width="4"
+            stroke-linecap="round"/>
+
+      <!-- Copa del árbol (3 círculos superpuestos) -->
+      <circle cx="-18" cy="-14" r="20" fill="url(#gradCopaDJ)"/>
+      <circle cx="18"  cy="-14" r="20" fill="url(#gradCopaDJ)"/>
+      <circle cx="0"   cy="-30" r="22" fill="url(#gradCopaDJ)"/>
+
+      <!-- Brillo superior de la copa -->
+      <ellipse cx="-8" cy="-36" rx="12" ry="6" fill="#ffffff" opacity="0.4">
+        <animate attributeName="opacity" values="0.4;0.15;0.4" dur="3s" repeatCount="indefinite"/>
+      </ellipse>
+
+      <!-- Detalles de hojas (puntitos) -->
+      <circle cx="-14" cy="-22" r="2.5" fill="#ffffff" opacity="0.5"/>
+      <circle cx="14" cy="-18" r="2.5" fill="#ffffff" opacity="0.5"/>
+      <circle cx="6" cy="-36" r="2.5" fill="#ffffff" opacity="0.5"/>
+      <circle cx="-18" cy="-10" r="2" fill="#ffffff" opacity="0.4"/>
+      <circle cx="20" cy="-8" r="2" fill="#ffffff" opacity="0.4"/>
+    </g>
+  </g>
+
+  <!-- 📐 PLANO / BOCETO (12 en punto) -->
+  <g transform="translate(200 118) scale(0.62)">
+    <g>
+      <animateTransform attributeName="transform" type="translate"
+        values="0 0; 0 -3; 0 0" dur="2.6s" repeatCount="indefinite"/>
+      <!-- Hoja del plano -->
+      <path d="M -22 -22 L 14 -22 L 22 -14 L 22 22 L -22 22 Z"
+            fill="url(#gradDJ)"/>
+      <!-- Esquina doblada -->
+      <path d="M 14 -22 L 14 -14 L 22 -14 Z" fill="#0A2A66" opacity="0.5"/>
+      <!-- Cuadrícula del plano -->
+      <g stroke="#ffffff" stroke-width="0.8" opacity="0.5">
+        <line x1="-18" y1="-14" x2="18" y2="-14"/>
+        <line x1="-18" y1="-6" x2="18" y2="-6"/>
+        <line x1="-18" y1="2" x2="18" y2="2"/>
+        <line x1="-18" y1="10" x2="18" y2="10"/>
+        <line x1="-14" y1="-18" x2="-14" y2="18"/>
+        <line x1="-6" y1="-18" x2="-6" y2="18"/>
+        <line x1="2" y1="-18" x2="2" y2="18"/>
+        <line x1="10" y1="-18" x2="10" y2="18"/>
+      </g>
+      <!-- Dibujo de jardín (curvas) -->
+      <path d="M -14 14 Q -6 0 4 4 Q 12 6 16 14"
+            fill="none" stroke="#22C1E0" stroke-width="2.5" stroke-linecap="round"/>
+      <circle cx="-8" cy="-2" r="3" fill="#22C1E0"/>
+      <circle cx="6" cy="2" r="2.5" fill="#22C1E0"/>
+      <circle cx="-2" cy="12" r="2" fill="#22C1E0" opacity="0.7"/>
+      <!-- Brillo -->
+      <path d="M -20 -20 L 12 -20 L 10 -18 L -18 -18 Z" fill="#ffffff" opacity="0.4"/>
+    </g>
+  </g>
+
+  <!-- 🌱 BROTE / SEMILLA (6 en punto) -->
+  <g transform="translate(200 288) scale(0.62)">
+    <g>
+      <animateTransform attributeName="transform" type="translate"
+        values="0 0; 0 3; 0 0" dur="2.8s" repeatCount="indefinite"/>
+      <!-- Tallo -->
+      <path d="M 0 22 Q 0 8 0 -6" stroke="url(#gradDJ)"
+            stroke-width="5" fill="none" stroke-linecap="round"/>
+      <!-- Hoja izquierda -->
+      <path d="M 0 4 Q -20 0 -16 -14 Q -6 -12 0 4 Z"
+            fill="url(#gradDJ)"/>
+      <!-- Hoja derecha -->
+      <path d="M 0 -6 Q 20 -10 16 -24 Q 6 -22 0 -6 Z"
+            fill="url(#gradDJ)"/>
+      <!-- Tierra -->
+      <ellipse cx="0" cy="22" rx="18" ry="5" fill="url(#gradDJ)" opacity="0.6"/>
+      <!-- Semillas / puntitos -->
+      <circle cx="-10" cy="20" r="1.5" fill="#22C1E0" opacity="0.7"/>
+      <circle cx="8" cy="22" r="1.5" fill="#22C1E0" opacity="0.7"/>
+      <!-- Brillo -->
+      <ellipse cx="-6" cy="-4" rx="3" ry="1.5" fill="#ffffff" opacity="0.4"/>
+    </g>
+  </g>
+
+  <!-- 🪴 MACETA / PLANTA (9 en punto) -->
+  <g transform="translate(118 200) scale(0.62)">
+    <g>
+      <animateTransform attributeName="transform" type="rotate"
+        values="-4; 4; -4" dur="3s" repeatCount="indefinite"/>
+      <!-- Planta en la maceta -->
+      <path d="M 0 -8 Q -8 -22 -4 -30 Q 4 -26 0 -8 Z" fill="url(#gradDJ)"/>
+      <path d="M 0 -8 Q 8 -22 4 -30 Q -4 -26 0 -8 Z" fill="url(#gradDJ)"/>
+      <circle cx="0" cy="-30" r="3" fill="url(#gradDJ)"/>
+      <!-- Maceta (trapecio) -->
+      <path d="M -18 -4 L 18 -4 L 14 22 L -14 22 Z" fill="url(#gradDJ)"/>
+      <!-- Borde superior -->
+      <rect x="-20" y="-8" width="40" height="6" rx="2" fill="url(#gradDJ)"/>
+      <!-- Brillo -->
+      <path d="M -10 0 L -6 18 L -2 18 L -6 0 Z" fill="#ffffff" opacity="0.3"/>
+    </g>
+  </g>
+
+  <!-- 🪨 SENDERO / PIEDRAS (3 en punto) -->
+  <g transform="translate(282 200) scale(0.62)">
+    <g>
+      <animateTransform attributeName="transform" type="translate"
+        values="0 0; 0 -3; 0 0" dur="2.8s" repeatCount="indefinite"/>
+      <!-- Sendero con piedras (curvo) -->
+      <path d="M -22 18 Q -6 10 2 0 Q 10 -10 22 -18"
+            fill="none" stroke="#0A2A66" stroke-width="8" opacity="0.4" stroke-linecap="round"/>
+      <!-- Piedras redondas -->
+      <ellipse cx="-16" cy="14" rx="7" ry="5" fill="url(#gradDJ)"/>
+      <ellipse cx="-4" cy="6" rx="8" ry="6" fill="url(#gradDJ)"/>
+      <ellipse cx="8" cy="-6" rx="7" ry="5" fill="url(#gradDJ)"/>
+      <ellipse cx="18" cy="-16" rx="6" ry="4.5" fill="url(#gradDJ)"/>
+      <!-- Detalles de las piedras -->
+      <circle cx="-14" cy="12" r="1.5" fill="#ffffff" opacity="0.4"/>
+      <circle cx="-2" cy="4" r="1.5" fill="#ffffff" opacity="0.4"/>
+      <circle cx="10" cy="-8" r="1.5" fill="#ffffff" opacity="0.4"/>
+      <!-- Pastito a los costados -->
+      <path d="M -22 22 L -20 16 M -22 22 L -18 18 M 22 -22 L 20 -16 M 22 -22 L 18 -18"
+            stroke="#22C1E0" stroke-width="1.5" stroke-linecap="round" opacity="0.7"/>
+    </g>
+  </g>
+
+  <!-- 📏 CINTA MÉTRICA / REGLA (10-11 en punto) -->
+  <g transform="translate(118 118) scale(0.58)">
+    <g transform="rotate(-15)">
+      <animateTransform attributeName="transform" type="rotate"
+        values="-15; -8; -15" dur="3s" repeatCount="indefinite" additive="replace"/>
+      <!-- Cinta enrollada -->
+      <circle r="14" fill="url(#gradDJ)"/>
+      <circle r="8" fill="#0A2A66" opacity="0.6"/>
+      <circle r="3" fill="#22C1E0"/>
+      <!-- Cinta saliendo -->
+      <path d="M 14 -6 L 26 -4 L 26 4 L 14 6 Z" fill="url(#gradDJ)"/>
+      <!-- Marcas de la cinta -->
+      <g stroke="#ffffff" stroke-width="1.2" opacity="0.8">
+        <line x1="16" y1="-3" x2="16" y2="3"/>
+        <line x1="19" y1="-3" x2="19" y2="3"/>
+        <line x1="22" y1="-3" x2="22" y2="3"/>
+      </g>
+      <!-- Gancho -->
+      <rect x="26" y="-8" width="4" height="16" rx="1.5" fill="url(#gradDJ)"/>
+      <!-- Brillo -->
+      <ellipse cx="-6" cy="-8" rx="4" ry="2" fill="#ffffff" opacity="0.4"/>
+    </g>
+  </g>
+
+  <!-- ✂️ TIJERAS DE PODAR (1-2 en punto) -->
+  <g transform="translate(282 118) scale(0.58)">
+    <g transform="rotate(20)">
+      <animateTransform attributeName="transform" type="rotate"
+        values="20; 12; 20" dur="2.6s" repeatCount="indefinite" additive="replace"/>
+      <!-- Hoja superior -->
+      <path d="M -4 -22 L 3 -22 L 1 -2 L -3 -2 Z" fill="url(#gradDJ)"/>
+      <!-- Hoja inferior -->
+      <path d="M -3 2 L 1 2 L 3 22 L -4 22 Z" fill="url(#gradDJ)"/>
+      <!-- Perno central -->
+      <circle r="3" fill="url(#gradDJ)"/>
+      <circle r="1.2" fill="#ffffff"/>
+      <!-- Anillo superior -->
+      <circle cx="-9" cy="-28" r="6" fill="none" stroke="url(#gradDJ)" stroke-width="3"/>
+      <!-- Anillo inferior -->
+      <circle cx="9" cy="28" r="6" fill="none" stroke="url(#gradDJ)" stroke-width="3"/>
+      <!-- Brillo -->
+      <rect x="-2" y="-18" width="1.5" height="14" rx="0.75" fill="#ffffff" opacity="0.4"/>
+    </g>
+  </g>
+
+  <!-- CHISPAS / partículas alrededor (polen) -->
+  <g fill="#22C1E0">
+    <circle cx="270" cy="105" r="3.5">
+      <animate attributeName="r" values="2.5;6;2.5" dur="1.2s" repeatCount="indefinite"/>
+      <animate attributeName="opacity" values="1;0.2;1" dur="1.2s" repeatCount="indefinite"/>
+    </circle>
+    <circle cx="130" cy="105" r="3">
+      <animate attributeName="r" values="2;5;2" dur="1.4s" begin="0.3s" repeatCount="indefinite"/>
+      <animate attributeName="opacity" values="1;0.2;1" dur="1.4s" begin="0.3s" repeatCount="indefinite"/>
+    </circle>
+    <circle cx="300" cy="272" r="3">
+      <animate attributeName="r" values="2;5;2" dur="1.3s" begin="0.6s" repeatCount="indefinite"/>
+      <animate attributeName="opacity" values="1;0.2;1" dur="1.3s" begin="0.6s" repeatCount="indefinite"/>
+    </circle>
+    <circle cx="100" cy="272" r="3.5">
+      <animate attributeName="r" values="2.5;6;2.5" dur="1.5s" begin="0.9s" repeatCount="indefinite"/>
+      <animate attributeName="opacity" values="1;0.2;1" dur="1.5s" begin="0.9s" repeatCount="indefinite"/>
+    </circle>
+  </g>
+</svg>

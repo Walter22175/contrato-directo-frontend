@@ -2,10 +2,12 @@
 
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
+import Image from 'next/image';
 import { Card, CardTitle } from '@/components/ui/Card';
 import Button from '@/components/ui/Button';
 import api, { extractData } from '@/lib/api';
 import { formatCurrency, formatDate } from '@/lib/utils';
+import { iconoServicio } from '@/lib/iconos';
 import { CreditCard, Banknote, Shield, AlertCircle, Loader2, CheckCircle, ArrowLeft } from 'lucide-react';
 import type { Transaccion } from '@/types';
 import { useStepTimer } from '@/hooks/useStepTimer';
@@ -293,12 +295,23 @@ export function CheckoutContent() {
               </div>
 
               <div className="flex items-start gap-4">
-                <div className="w-16 h-16 bg-cyan-500/10 border border-cyan-500/20 rounded-xl flex items-center justify-center flex-shrink-0">
-                  <span className="text-2xl">🔧</span>
+                <div className="w-32 h-32 bg-cyan-500/10 border border-cyan-500/20 rounded-xl flex items-center justify-center flex-shrink-0">
+                  {iconoServicio(transaccion.servicio?.nombre, transaccion.servicio?.categoria?.nombre) ? (
+                    <Image
+                      src={iconoServicio(transaccion.servicio?.nombre, transaccion.servicio?.categoria?.nombre)!}
+                      alt=""
+                      width={72}
+                      height={72}
+                      unoptimized
+                      className="w-18 h-18 object-contain"
+                    />
+                  ) : (
+                    <span className="text-5xl">🔧</span>
+                  )}
                 </div>
                 <div className="flex-1">
                   <h3 className="font-semibold text-white">{transaccion.servicio?.nombre || 'Servicio'}</h3>
-                  <p className="text-sm text-slate-400">{transaccion.descripcion || transaccion.servicio?.descripcion || 'Servicio profesional'}</p>
+                  <p className="text-sm text-slate-400">{transaccion.descripcion || 'Servicio profesional'}</p>
                   <div className="flex items-center gap-4 mt-2 text-sm text-slate-400">
                     <span>{transaccion.servicio?.categoria?.nombre || 'Servicio'}</span>
                     <span>Proveedor: {transaccion.proveedor?.nombre} {transaccion.proveedor?.apellido}</span>

@@ -1,0 +1,49 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400" width="400" height="400" fill="none">
+  <!-- Placa de Durlock / Yeso con Corte en Ángulo (Estructura Principal) -->
+  <path 
+    d="M80 320 V120 L240 80 V280 Z" 
+    stroke="#0047D4" 
+    stroke-width="16" 
+    stroke-linecap="round" 
+    stroke-linejoin="round" 
+  />
+  <path 
+    d="M80 320 L160 320 L240 280" 
+    stroke="#0047D4" 
+    stroke-width="16" 
+    stroke-linecap="round" 
+    stroke-linejoin="round" 
+  />
+
+  <!-- Perfil Montante / Estructura Metálica posterior -->
+  <path 
+    d="M240 120 H320 V320 H240" 
+    stroke="#0047D4" 
+    stroke-width="16" 
+    stroke-linecap="round" 
+    stroke-linejoin="round" 
+  />
+  <path d="M280 120 V320" stroke="#0047D4" stroke-width="16" stroke-linecap="round" />
+
+  <!-- Espátula para Masillado y Juntas (Acento Cian) -->
+  <!-- Hoja metálica de la espátula -->
+  <path 
+    d="M130 140 L190 125 L175 190 H145 Z" 
+    stroke="#00C9B7" 
+    stroke-width="16" 
+    stroke-linecap="round" 
+    stroke-linejoin="round" 
+  />
+  <!-- Mango de la espátula -->
+  <path 
+    d="M160 190 V240" 
+    stroke="#00C9B7" 
+    stroke-width="16" 
+    stroke-linecap="round" 
+  />
+
+  <!-- Tornillos / Fijaciones de Placa -->
+  <circle cx="110" cy="150" r="4" fill="#00C9B7" />
+  <circle cx="110" cy="270" r="4" fill="#00C9B7" />
+  <circle cx="210" cy="240" r="4" fill="#00C9B7" />
+</svg>

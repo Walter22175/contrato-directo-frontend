@@ -1,0 +1,270 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg viewBox="0 0 400 400" width="100%" height="100%"
+     xmlns="http://www.w3.org/2000/svg" role="img"
+     aria-label="Icono de Reparación de PCs - Contrato Directo">
+
+  <defs>
+    <linearGradient id="gradRPC" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%"   stop-color="#0A2A66"/>
+      <stop offset="55%"  stop-color="#1E6FE8"/>
+      <stop offset="100%" stop-color="#22C1E0"/>
+    </linearGradient>
+
+    <linearGradient id="gradAroRPC" x1="0%" y1="100%" x2="100%" y2="0%">
+      <stop offset="0%"   stop-color="#22C1E0"/>
+      <stop offset="100%" stop-color="#0A2A66"/>
+    </linearGradient>
+
+    <linearGradient id="gradTorre" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%"   stop-color="#22C1E0"/>
+      <stop offset="100%" stop-color="#1E6FE8"/>
+    </linearGradient>
+
+    <radialGradient id="glowRPC" cx="50%" cy="50%" r="50%">
+      <stop offset="0%"   stop-color="#22C1E0" stop-opacity="0.55"/>
+      <stop offset="100%" stop-color="#22C1E0" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+
+  <!-- Aro exterior institucional -->
+  <g fill="none" stroke="url(#gradAroRPC)" stroke-width="7"
+     stroke-linecap="round" opacity="0.85">
+    <path d="M 70 200 A 130 130 0 0 1 200 70" />
+    <path d="M 200 70 A 130 130 0 0 1 330 200" />
+    <path d="M 330 200 A 130 130 0 0 1 200 330" />
+    <path d="M 200 330 A 130 130 0 0 1 70 200" />
+    <animateTransform attributeName="transform" type="rotate"
+      from="0 200 200" to="360 200 200" dur="50s" repeatCount="indefinite"/>
+  </g>
+
+  <!-- Resplandor central -->
+  <circle cx="200" cy="200" r="95" fill="url(#glowRPC)">
+    <animate attributeName="r" values="90;110;90" dur="3s" repeatCount="indefinite"/>
+    <animate attributeName="opacity" values="0.7;0.3;0.7" dur="3s" repeatCount="indefinite"/>
+  </circle>
+
+  <!-- 🖥️ PC / TORRE CENTRAL (núcleo) -->
+  <g transform="translate(200 200) scale(0.95)">
+    <g>
+      <!-- Animación: la torre vibra levemente -->
+      <animateTransform attributeName="transform" type="translate"
+        values="0 0; 1 -1; 0 0; -1 1; 0 0" dur="1.2s" repeatCount="indefinite"/>
+
+      <!-- Cuerpo de la torre -->
+      <rect x="-42" y="-62" width="84" height="124" rx="6" fill="url(#gradRPC)"/>
+
+      <!-- Panel frontal (interior) -->
+      <rect x="-36" y="-56" width="72" height="112" rx="4" fill="#0A2A66" opacity="0.8"/>
+
+      <!-- Unidad óptica (lectora CD/DVD) -->
+      <rect x="-30" y="-48" width="60" height="10" rx="2" fill="url(#gradTorre)"/>
+      <rect x="-22" y="-44" width="30" height="2" rx="1" fill="#ffffff" opacity="0.5"/>
+      <circle cx="22" cy="-43" r="2" fill="#22C1E0">
+        <animate attributeName="opacity" values="1;0.2;1" dur="1.6s" repeatCount="indefinite"/>
+      </circle>
+
+      <!-- Ranura de disquete / lector SD -->
+      <rect x="-30" y="-32" width="60" height="6" rx="1" fill="url(#gradTorre)"/>
+      <rect x="-30" y="-22" width="20" height="4" rx="1" fill="url(#gradTorre)"/>
+
+      <!-- Botón de encendido -->
+      <circle cx="0" cy="26" r="10" fill="url(#gradRPC)"/>
+      <circle cx="0" cy="26" r="6" fill="#0A2A66" opacity="0.6"/>
+      <!-- Símbolo de encendido -->
+      <path d="M 0 20 L 0 26 M -3 22 Q -5 24 -5 26 Q -5 31 0 31 Q 5 31 5 26 Q 5 24 3 22"
+            fill="none" stroke="#22C1E0" stroke-width="1.8" stroke-linecap="round">
+        <animate attributeName="opacity" values="1;0.4;1" dur="2s" repeatCount="indefinite"/>
+      </path>
+
+      <!-- LEDs de actividad -->
+      <circle cx="-30" cy="42" r="2" fill="#22C1E0">
+        <animate attributeName="opacity" values="1;0.2;1" dur="0.8s" repeatCount="indefinite"/>
+      </circle>
+      <circle cx="-22" cy="42" r="2" fill="#22C1E0">
+        <animate attributeName="opacity" values="1;0.2;1" dur="1.2s" begin="0.3s" repeatCount="indefinite"/>
+      </circle>
+
+      <!-- Rejillas de ventilación -->
+      <g stroke="#0A2A66" stroke-width="1.5" opacity="0.4">
+        <line x1="20" y1="-30" x2="32" y2="-30"/>
+        <line x1="20" y1="-22" x2="32" y2="-22"/>
+        <line x1="20" y1="-14" x2="32" y2="-14"/>
+        <line x1="20" y1="-6" x2="32" y2="-6"/>
+      </g>
+
+      <!-- Brillo superior -->
+      <rect x="-38" y="-60" width="76" height="2" rx="1" fill="#ffffff" opacity="0.4"/>
+    </g>
+  </g>
+
+  <!-- 🔧 DESTORNILLADOR (12 en punto) -->
+  <g transform="translate(200 118) scale(0.62)">
+    <g transform="rotate(-25)">
+      <animateTransform attributeName="transform" type="rotate"
+        values="-25; -15; -25" dur="2.8s" repeatCount="indefinite" additive="replace"/>
+      <!-- Mango -->
+      <rect x="-6" y="-38" width="12" height="44" rx="6" fill="url(#gradRPC)"/>
+      <!-- Detalles del mango -->
+      <rect x="-6" y="-30" width="12" height="2" rx="1" fill="#ffffff" opacity="0.3"/>
+      <rect x="-6" y="-22" width="12" height="2" rx="1" fill="#ffffff" opacity="0.3"/>
+      <!-- Vástago -->
+      <rect x="-2" y="6" width="4" height="28" rx="2" fill="url(#gradRPC)"/>
+      <!-- Punta estrella -->
+      <path d="M -4 34 L 4 34 L 3 42 L -3 42 Z" fill="url(#gradRPC)"/>
+      <line x1="0" y1="34" x2="0" y2="42" stroke="#0A2A66" stroke-width="1" opacity="0.6"/>
+      <line x1="-3" y1="38" x2="3" y2="38" stroke="#0A2A66" stroke-width="1" opacity="0.6"/>
+      <!-- Brillo -->
+      <rect x="-3" y="-34" width="2" height="36" rx="1" fill="#ffffff" opacity="0.4"/>
+    </g>
+  </g>
+
+  <!-- 🧠 CPU / PROCESADOR (6 en punto) -->
+  <g transform="translate(200 288) scale(0.62)">
+    <g>
+      <animateTransform attributeName="transform" type="translate"
+        values="0 0; 0 3; 0 0" dur="2.8s" repeatCount="indefinite"/>
+      <!-- Pines laterales -->
+      <g fill="url(#gradRPC)">
+        <rect x="-26" y="-4" width="10" height="3" rx="1"/>
+        <rect x="-26" y="3" width="10" height="3" rx="1"/>
+        <rect x="16" y="-4" width="10" height="3" rx="1"/>
+        <rect x="16" y="3" width="10" height="3" rx="1"/>
+        <rect x="-4" y="-26" width="3" height="10" rx="1"/>
+        <rect x="3" y="-26" width="3" height="10" rx="1"/>
+        <rect x="-4" y="16" width="3" height="10" rx="1"/>
+        <rect x="3" y="16" width="3" height="10" rx="1"/>
+      </g>
+      <!-- Cuerpo del procesador -->
+      <rect x="-16" y="-16" width="32" height="32" rx="4" fill="url(#gradRPC)"/>
+      <!-- Núcleo interior -->
+      <rect x="-9" y="-9" width="18" height="18" rx="2" fill="#0A2A66" opacity="0.7"/>
+      <!-- Circuito interior brillante -->
+      <rect x="-5" y="-5" width="10" height="10" rx="1" fill="#22C1E0">
+        <animate attributeName="opacity" values="1;0.5;1" dur="1.5s" repeatCount="indefinite"/>
+      </rect>
+      <!-- Brillo -->
+      <path d="M -12 -12 L 12 -12 L 10 -14 L -10 -14 Z" fill="#ffffff" opacity="0.4"/>
+    </g>
+  </g>
+
+  <!-- 🔌 FUENTE / CABLE (9 en punto) -->
+  <g transform="translate(118 200) scale(0.62)">
+    <g>
+      <animateTransform attributeName="transform" type="rotate"
+        values="-6; 6; -6" dur="3s" repeatCount="indefinite"/>
+      <!-- Conector de fuente -->
+      <rect x="-16" y="-12" width="28" height="24" rx="3" fill="url(#gradRPC)"/>
+      <!-- Cables saliendo -->
+      <path d="M 12 -6 Q 22 -6 24 0 Q 22 6 12 6"
+            fill="none" stroke="url(#gradRPC)" stroke-width="5"
+            stroke-linecap="round"/>
+      <!-- Conector de pared -->
+      <rect x="-24" y="-8" width="10" height="16" rx="2" fill="url(#gradRPC)"/>
+      <!-- Pines -->
+      <g fill="#0A2A66" opacity="0.7">
+        <rect x="-8" y="-6" width="3" height="12" rx="1"/>
+        <rect x="-2" y="-6" width="3" height="12" rx="1"/>
+        <rect x="4" y="-6" width="3" height="12" rx="1"/>
+      </g>
+      <!-- Rayo de energía -->
+      <path d="M 16 -10 L 12 -4 L 15 -4 L 12 2 L 18 -6 L 15 -6 Z" fill="#22C1E0">
+        <animate attributeName="opacity" values="1;0.3;1" dur="1.4s" repeatCount="indefinite"/>
+      </path>
+      <!-- Brillo -->
+      <rect x="-14" y="-10" width="24" height="2" rx="1" fill="#ffffff" opacity="0.4"/>
+    </g>
+  </g>
+
+  <!-- 💾 RAM / MEMORIA (3 en punto) -->
+  <g transform="translate(282 200) scale(0.62)">
+    <g>
+      <animateTransform attributeName="transform" type="translate"
+        values="0 0; 0 -3; 0 0" dur="2.8s" repeatCount="indefinite"/>
+      <!-- Placa de memoria -->
+      <rect x="-28" y="-14" width="56" height="28" rx="3" fill="url(#gradRPC)"/>
+      <!-- Chips de memoria (4) -->
+      <g fill="#0A2A66" opacity="0.6">
+        <rect x="-22" y="-10" width="10" height="20" rx="1"/>
+        <rect x="-10" y="-10" width="10" height="20" rx="1"/>
+        <rect x="2" y="-10" width="10" height="20" rx="1"/>
+        <rect x="14" y="-10" width="10" height="20" rx="1"/>
+      </g>
+      <!-- Contactos dorados en la base -->
+      <g fill="#22C1E0">
+        <rect x="-24" y="12" width="4" height="3" rx="0.5"/>
+        <rect x="-18" y="12" width="4" height="3" rx="0.5"/>
+        <rect x="-12" y="12" width="4" height="3" rx="0.5"/>
+        <rect x="-6" y="12" width="4" height="3" rx="0.5"/>
+        <rect x="0" y="12" width="4" height="3" rx="0.5"/>
+        <rect x="6" y="12" width="4" height="3" rx="0.5"/>
+        <rect x="12" y="12" width="4" height="3" rx="0.5"/>
+        <rect x="18" y="12" width="4" height="3" rx="0.5"/>
+      </g>
+      <!-- LED de actividad -->
+      <circle cx="24" cy="-10" r="2" fill="#22C1E0">
+        <animate attributeName="opacity" values="1;0.2;1" dur="1.2s" repeatCount="indefinite"/>
+      </circle>
+      <!-- Brillo -->
+      <rect x="-24" y="-12" width="48" height="2" rx="1" fill="#ffffff" opacity="0.4"/>
+    </g>
+  </g>
+
+  <!-- ⚙️ ENGRANAJE / CONFIGURACIÓN (10-11 en punto) -->
+  <g transform="translate(118 118) scale(0.58)">
+    <g>
+      <animateTransform attributeName="transform" type="rotate"
+        from="0 0 0" to="360 0 0" dur="6s" repeatCount="indefinite"/>
+      <!-- Dientes -->
+      <path d="M 0 -22 L 5 -22 L 5 -17 L -5 -17 L -5 -22 Z
+               M 0 22 L 5 22 L 5 17 L -5 17 L -5 22 Z
+               M -22 0 L -22 -5 L -17 -5 L -17 5 L -22 5 Z
+               M 22 0 L 22 -5 L 17 -5 L 17 5 L 22 5 Z
+               M -15 -15 L -12 -18 L -15 -21 L -18 -18 Z
+               M 15 -15 L 18 -18 L 15 -21 L 12 -18 Z
+               M -15 15 L -18 18 L -15 21 L -12 18 Z
+               M 15 15 L 12 18 L 15 21 L 18 18 Z"
+            fill="url(#gradRPC)"/>
+      <circle r="15" fill="url(#gradRPC)"/>
+      <circle r="6" fill="#ffffff" opacity="0.9"/>
+      <circle r="3" fill="#22C1E0">
+        <animate attributeName="opacity" values="1;0.5;1" dur="1.4s" repeatCount="indefinite"/>
+      </circle>
+    </g>
+  </g>
+
+  <!-- 🛡️ ANTIVIRUS / SEGURIDAD (1-2 en punto) -->
+  <g transform="translate(282 118) scale(0.58)">
+    <g>
+      <animateTransform attributeName="transform" type="translate"
+        values="0 0; 0 -3; 0 0" dur="2.8s" repeatCount="indefinite"/>
+      <!-- Escudo -->
+      <path d="M 0 -24 L 20 -16 L 20 4 Q 20 18 0 26 Q -20 18 -20 4 L -20 -16 Z"
+            fill="url(#gradRPC)"/>
+      <!-- Check dentro -->
+      <path d="M -8 0 L -3 6 L 8 -8" fill="none"
+            stroke="#ffffff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+      <!-- Brillo -->
+      <path d="M -12 -12 L 12 -12 L 10 -14 L -10 -14 Z" fill="#ffffff" opacity="0.35"/>
+    </g>
+  </g>
+
+  <!-- CHISPAS / partículas alrededor -->
+  <g fill="#22C1E0">
+    <circle cx="270" cy="105" r="3.5">
+      <animate attributeName="r" values="2.5;6;2.5" dur="1.2s" repeatCount="indefinite"/>
+      <animate attributeName="opacity" values="1;0.2;1" dur="1.2s" repeatCount="indefinite"/>
+    </circle>
+    <circle cx="130" cy="105" r="3">
+      <animate attributeName="r" values="2;5;2" dur="1.4s" begin="0.3s" repeatCount="indefinite"/>
+      <animate attributeName="opacity" values="1;0.2;1" dur="1.4s" begin="0.3s" repeatCount="indefinite"/>
+    </circle>
+    <circle cx="300" cy="272" r="3">
+      <animate attributeName="r" values="2;5;2" dur="1.3s" begin="0.6s" repeatCount="indefinite"/>
+      <animate attributeName="opacity" values="1;0.2;1" dur="1.3s" begin="0.6s" repeatCount="indefinite"/>
+    </circle>
+    <circle cx="100" cy="272" r="3.5">
+      <animate attributeName="r" values="2.5;6;2.5" dur="1.5s" begin="0.9s" repeatCount="indefinite"/>
+      <animate attributeName="opacity" values="1;0.2;1" dur="1.5s" begin="0.9s" repeatCount="indefinite"/>
+    </circle>
+  </g>
+</svg>

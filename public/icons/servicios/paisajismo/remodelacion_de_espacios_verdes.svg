@@ -1,0 +1,240 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400" width="100%" height="100%">
+  <defs>
+    <linearGradient id="g1" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0A2A66"/>
+      <stop offset="55%" stop-color="#1E6FE8"/>
+      <stop offset="100%" stop-color="#22C1E0"/>
+    </linearGradient>
+    <linearGradient id="g2" x1="0%" y1="100%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#22C1E0"/>
+      <stop offset="100%" stop-color="#0A2A66"/>
+    </linearGradient>
+    <linearGradient id="g3" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#22C1E0"/>
+      <stop offset="100%" stop-color="#1E6FE8"/>
+    </linearGradient>
+    <radialGradient id="g4" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#22C1E0" stop-opacity="0.55"/>
+      <stop offset="100%" stop-color="#22C1E0" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+
+  <!-- Aro exterior institucional -->
+  <g fill="none" stroke="url(#g2)" stroke-width="7" stroke-linecap="round" opacity="0.85">
+    <path d="M 70 200 A 130 130 0 0 1 200 70" />
+    <path d="M 200 70 A 130 130 0 0 1 330 200" />
+    <path d="M 330 200 A 130 130 0 0 1 200 330" />
+    <path d="M 200 330 A 130 130 0 0 1 70 200" />
+    <animateTransform attributeName="transform" type="rotate"
+      from="0 200 200" to="360 200 200" dur="50s" repeatCount="indefinite"/>
+  </g>
+
+  <!-- Resplandor central -->
+  <circle cx="200" cy="200" r="95" fill="url(#g4)">
+    <animate attributeName="r" values="90;110;90" dur="3s" repeatCount="indefinite"/>
+    <animate attributeName="opacity" values="0.7;0.3;0.7" dur="3s" repeatCount="indefinite"/>
+  </circle>
+
+  <!-- FLECHAS DE RENOVACION CENTRALES (nucleo) -->
+  <g transform="translate(200 200) scale(0.95)">
+    <g>
+      <animateTransform attributeName="transform" type="rotate"
+        from="0 0 0" to="360 0 0" dur="8s" repeatCount="indefinite"/>
+
+      <!-- Flecha circular 1 (arriba) -->
+      <path d="M -40 -20 A 45 45 0 0 1 40 -20" fill="none"
+            stroke="url(#g3)" stroke-width="8" stroke-linecap="round"/>
+      <path d="M 40 -20 L 30 -30 L 48 -30 Z" fill="#22C1E0"/>
+
+      <!-- Flecha circular 2 (abajo) -->
+      <path d="M 40 20 A 45 45 0 0 1 -40 20" fill="none"
+            stroke="url(#g1)" stroke-width="8" stroke-linecap="round"/>
+      <path d="M -40 20 L -30 30 L -48 30 Z" fill="#1E6FE8"/>
+
+      <!-- Centro de las flechas -->
+      <circle r="12" fill="url(#g1)"/>
+      <circle r="6" fill="#ffffff" opacity="0.9"/>
+      <circle r="3" fill="#22C1E0">
+        <animate attributeName="r" values="3;5;3" dur="1.4s" repeatCount="indefinite"/>
+      </circle>
+
+      <!-- Destello de renovacion -->
+      <ellipse cx="-14" cy="-14" rx="4" ry="2" fill="#ffffff" opacity="0.5"/>
+    </g>
+  </g>
+
+  <!-- ARBOL NUEVO (12 en punto) -->
+  <g transform="translate(200 118) scale(0.62)">
+    <g>
+      <animateTransform attributeName="transform" type="rotate"
+        values="-2 0 30; 2 0 30; -2 0 30" dur="3.5s" repeatCount="indefinite"/>
+      <!-- Tronco joven -->
+      <rect x="-3" y="-4" width="6" height="28" fill="url(#g1)"/>
+      <!-- Copa nueva -->
+      <circle cx="-12" cy="-14" r="12" fill="url(#g3)"/>
+      <circle cx="12" cy="-14" r="12" fill="url(#g3)"/>
+      <circle cx="0" cy="-24" r="14" fill="url(#g3)"/>
+      <!-- Brotes nuevos -->
+      <circle cx="-14" cy="-6" r="3" fill="#22C1E0" opacity="0.9">
+        <animate attributeName="opacity" values="0.9;0.4;0.9" dur="2s" repeatCount="indefinite"/>
+      </circle>
+      <circle cx="14" cy="-6" r="3" fill="#22C1E0" opacity="0.9">
+        <animate attributeName="opacity" values="0.9;0.4;0.9" dur="2s" begin="0.5s" repeatCount="indefinite"/>
+      </circle>
+      <circle cx="0" cy="-34" r="3" fill="#22C1E0" opacity="0.9">
+        <animate attributeName="opacity" values="0.9;0.4;0.9" dur="2s" begin="1s" repeatCount="indefinite"/>
+      </circle>
+      <!-- Brillo -->
+      <ellipse cx="-6" cy="-28" rx="7" ry="3" fill="#ffffff" opacity="0.4"/>
+    </g>
+  </g>
+
+  <!-- SENDERO REDISENADO (6 en punto) -->
+  <g transform="translate(200 288) scale(0.62)">
+    <g>
+      <animateTransform attributeName="transform" type="translate"
+        values="0 0; 0 3; 0 0" dur="2.8s" repeatCount="indefinite"/>
+      <!-- Sendero curvo nuevo -->
+      <path d="M -24 16 Q -8 8 0 -2 Q 10 -12 24 -18"
+            fill="none" stroke="#0A2A66" stroke-width="10" opacity="0.35" stroke-linecap="round"/>
+      <path d="M -24 16 Q -8 8 0 -2 Q 10 -12 24 -18"
+            fill="none" stroke="url(#g3)" stroke-width="6" stroke-linecap="round" opacity="0.7"/>
+      <!-- Piedras decorativas -->
+      <ellipse cx="-16" cy="12" rx="6" ry="4" fill="url(#g1)"/>
+      <ellipse cx="-4" cy="4" rx="7" ry="5" fill="url(#g1)"/>
+      <ellipse cx="8" cy="-6" rx="6" ry="4" fill="url(#g1)"/>
+      <ellipse cx="18" cy="-14" rx="5" ry="3.5" fill="url(#g1)"/>
+      <!-- Cesped nuevo a los costados -->
+      <path d="M -26 20 L -22 12 M -20 16 L -16 8 M 22 -22 L 18 -14 M 26 -20 L 22 -12"
+            stroke="#22C1E0" stroke-width="2" stroke-linecap="round" opacity="0.8"/>
+      <!-- Brillo -->
+      <circle cx="-8" cy="0" r="1.5" fill="#ffffff" opacity="0.4"/>
+      <circle cx="6" cy="-8" r="1.5" fill="#ffffff" opacity="0.4"/>
+    </g>
+  </g>
+
+  <!-- MACETA DECORATIVA NUEVA (9 en punto) -->
+  <g transform="translate(118 200) scale(0.62)">
+    <g>
+      <animateTransform attributeName="transform" type="rotate"
+        values="-4 0 20; 4 0 20; -4 0 20" dur="3.2s" repeatCount="indefinite"/>
+      <!-- Planta nueva -->
+      <path d="M 0 -6 Q -12 -20 -8 -32 Q 6 -28 0 -6 Z" fill="url(#g1)"/>
+      <path d="M 0 -6 Q 12 -20 8 -32 Q -6 -28 0 -6 Z" fill="url(#g1)"/>
+      <circle cx="0" cy="-34" r="5" fill="url(#g3)"/>
+      <!-- Maceta moderna -->
+      <path d="M -18 -4 L 18 -4 L 14 22 L -14 22 Z" fill="url(#g1)"/>
+      <rect x="-20" y="-8" width="40" height="6" rx="2" fill="url(#g3)"/>
+      <ellipse cx="0" cy="-4" rx="16" ry="3" fill="#0A2A66" opacity="0.5"/>
+      <!-- Detalle geometrico -->
+      <path d="M -12 4 L 12 4" stroke="#22C1E0" stroke-width="1.5" opacity="0.6"/>
+      <path d="M -10 14 L 10 14" stroke="#22C1E0" stroke-width="1.5" opacity="0.6"/>
+      <!-- Brillo -->
+      <path d="M -10 0 L -6 18 L -2 18 L -6 0 Z" fill="#ffffff" opacity="0.3"/>
+    </g>
+  </g>
+
+  <!-- SETO / ARBUSTO (3 en punto) -->
+  <g transform="translate(282 200) scale(0.62)">
+    <g>
+      <animateTransform attributeName="transform" type="translate"
+        values="0 0; 0 -3; 0 0" dur="2.8s" repeatCount="indefinite"/>
+      <!-- Base del seto -->
+      <rect x="-22" y="10" width="44" height="14" rx="3" fill="url(#g1)"/>
+      <!-- Forma del seto curvo -->
+      <path d="M -22 10 Q -22 -10 -10 -14 Q 0 -18 10 -14 Q 22 -10 22 10 Z"
+            fill="url(#g3)"/>
+      <!-- Textura -->
+      <g fill="#ffffff" opacity="0.4">
+        <circle cx="-14" cy="2" r="1.5"/>
+        <circle cx="-6" cy="-4" r="1.5"/>
+        <circle cx="2" cy="-6" r="1.5"/>
+        <circle cx="10" cy="-2" r="1.5"/>
+        <circle cx="16" cy="4" r="1.5"/>
+        <circle cx="-10" cy="6" r="1.5"/>
+        <circle cx="6" cy="4" r="1.5"/>
+      </g>
+      <!-- Brillo superior -->
+      <path d="M -18 -4 Q 0 -12 18 -4" fill="none"
+            stroke="#ffffff" stroke-width="2" opacity="0.4"/>
+    </g>
+  </g>
+
+  <!-- PLANO / BOCETO (10-11 en punto) -->
+  <g transform="translate(118 118) scale(0.58)">
+    <g>
+      <animateTransform attributeName="transform" type="translate"
+        values="0 0; 0 -3; 0 0" dur="2.6s" repeatCount="indefinite"/>
+      <path d="M -20 -22 L 12 -22 L 20 -14 L 20 22 L -20 22 Z" fill="url(#g1)"/>
+      <path d="M 12 -22 L 12 -14 L 20 -14 Z" fill="#0A2A66" opacity="0.5"/>
+      <g stroke="#ffffff" stroke-width="0.8" opacity="0.5">
+        <line x1="-16" y1="-14" x2="16" y2="-14"/>
+        <line x1="-16" y1="-6" x2="16" y2="-6"/>
+        <line x1="-16" y1="2" x2="16" y2="2"/>
+        <line x1="-16" y1="10" x2="16" y2="10"/>
+        <line x1="-12" y1="-18" x2="-12" y2="18"/>
+        <line x1="-4" y1="-18" x2="-4" y2="18"/>
+        <line x1="4" y1="-18" x2="4" y2="18"/>
+        <line x1="12" y1="-18" x2="12" y2="18"/>
+      </g>
+      <!-- Curvas del rediseno -->
+      <path d="M -12 14 Q -4 0 4 4 Q 10 6 14 14"
+            fill="none" stroke="#22C1E0" stroke-width="2.5" stroke-linecap="round"/>
+      <circle cx="-6" cy="-2" r="3" fill="#22C1E0"/>
+      <circle cx="6" cy="2" r="2.5" fill="#22C1E0"/>
+      <circle cx="0" cy="12" r="2" fill="#22C1E0" opacity="0.7"/>
+      <!-- Brillo -->
+      <path d="M -18 -20 L 10 -20 L 8 -18 L -16 -18 Z" fill="#ffffff" opacity="0.4"/>
+    </g>
+  </g>
+
+  <!-- HERRAMIENTA / PALA (1-2 en punto) -->
+  <g transform="translate(282 118) scale(0.58)">
+    <g transform="rotate(-20)">
+      <animateTransform attributeName="transform" type="rotate"
+        values="-20; -10; -20" dur="2.8s" repeatCount="indefinite" additive="replace"/>
+      <!-- Mango -->
+      <rect x="-4" y="-28" width="8" height="40" rx="4" fill="url(#g1)"/>
+      <!-- Empunadura superior -->
+      <rect x="-8" y="-32" width="16" height="6" rx="2" fill="url(#g3)"/>
+      <!-- Hoja de la pala -->
+      <path d="M -12 12 Q -16 22 -8 30 Q 0 36 8 30 Q 16 22 12 12 Q 0 6 -12 12 Z"
+            fill="url(#g1)"/>
+      <!-- Brillo de la hoja -->
+      <path d="M -8 14 Q -10 22 -4 28 Q 0 30 2 28 Q -2 22 -2 14 Z"
+            fill="#ffffff" opacity="0.35"/>
+      <!-- Tierra / cesped que se levanta -->
+      <g fill="#22C1E0" opacity="0.7">
+        <circle cx="14" cy="18" r="2">
+          <animate attributeName="cy" values="18;10;18" dur="1.6s" repeatCount="indefinite"/>
+          <animate attributeName="opacity" values="0.7;0.2;0.7" dur="1.6s" repeatCount="indefinite"/>
+        </circle>
+        <circle cx="-14" cy="22" r="1.5">
+          <animate attributeName="cy" values="22;14;22" dur="1.8s" begin="0.3s" repeatCount="indefinite"/>
+          <animate attributeName="opacity" values="0.7;0.2;0.7" dur="1.8s" begin="0.3s" repeatCount="indefinite"/>
+        </circle>
+      </g>
+    </g>
+  </g>
+
+  <!-- Chispas / particulas alrededor -->
+  <g fill="#22C1E0">
+    <circle cx="270" cy="105" r="3.5">
+      <animate attributeName="r" values="2.5;6;2.5" dur="1.2s" repeatCount="indefinite"/>
+      <animate attributeName="opacity" values="1;0.2;1" dur="1.2s" repeatCount="indefinite"/>
+    </circle>
+    <circle cx="130" cy="105" r="3">
+      <animate attributeName="r" values="2;5;2" dur="1.4s" begin="0.3s" repeatCount="indefinite"/>
+      <animate attributeName="opacity" values="1;0.2;1" dur="1.4s" begin="0.3s" repeatCount="indefinite"/>
+    </circle>
+    <circle cx="300" cy="272" r="3">
+      <animate attributeName="r" values="2;5;2" dur="1.3s" begin="0.6s" repeatCount="indefinite"/>
+      <animate attributeName="opacity" values="1;0.2;1" dur="1.3s" begin="0.6s" repeatCount="indefinite"/>
+    </circle>
+    <circle cx="100" cy="272" r="3.5">
+      <animate attributeName="r" values="2.5;6;2.5" dur="1.5s" begin="0.9s" repeatCount="indefinite"/>
+      <animate attributeName="opacity" values="1;0.2;1" dur="1.5s" begin="0.9s" repeatCount="indefinite"/>
+    </circle>
+  </g>
+</svg>

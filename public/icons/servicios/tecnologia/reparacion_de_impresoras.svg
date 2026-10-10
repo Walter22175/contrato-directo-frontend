@@ -1,0 +1,291 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg viewBox="0 0 400 400" width="100%" height="100%"
+     xmlns="http://www.w3.org/2000/svg" role="img"
+     aria-label="Icono de Reparación de Impresoras - Contrato Directo">
+
+  <defs>
+    <linearGradient id="gradRIM" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%"   stop-color="#0A2A66"/>
+      <stop offset="55%"  stop-color="#1E6FE8"/>
+      <stop offset="100%" stop-color="#22C1E0"/>
+    </linearGradient>
+
+    <linearGradient id="gradAroRIM" x1="0%" y1="100%" x2="100%" y2="0%">
+      <stop offset="0%"   stop-color="#22C1E0"/>
+      <stop offset="100%" stop-color="#0A2A66"/>
+    </linearGradient>
+
+    <linearGradient id="gradImpresora" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%"   stop-color="#22C1E0"/>
+      <stop offset="100%" stop-color="#1E6FE8"/>
+    </linearGradient>
+
+    <radialGradient id="glowRIM" cx="50%" cy="50%" r="50%">
+      <stop offset="0%"   stop-color="#22C1E0" stop-opacity="0.55"/>
+      <stop offset="100%" stop-color="#22C1E0" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+
+  <!-- Aro exterior institucional -->
+  <g fill="none" stroke="url(#gradAroRIM)" stroke-width="7"
+     stroke-linecap="round" opacity="0.85">
+    <path d="M 70 200 A 130 130 0 0 1 200 70" />
+    <path d="M 200 70 A 130 130 0 0 1 330 200" />
+    <path d="M 330 200 A 130 130 0 0 1 200 330" />
+    <path d="M 200 330 A 130 130 0 0 1 70 200" />
+    <animateTransform attributeName="transform" type="rotate"
+      from="0 200 200" to="360 200 200" dur="50s" repeatCount="indefinite"/>
+  </g>
+
+  <!-- Resplandor central -->
+  <circle cx="200" cy="200" r="95" fill="url(#glowRIM)">
+    <animate attributeName="r" values="90;110;90" dur="3s" repeatCount="indefinite"/>
+    <animate attributeName="opacity" values="0.7;0.3;0.7" dur="3s" repeatCount="indefinite"/>
+  </circle>
+
+  <!-- 🖨️ IMPRESORA CENTRAL (núcleo) -->
+  <g transform="translate(200 200) scale(0.95)">
+    <g>
+      <!-- Animación: la impresora vibra -->
+      <animateTransform attributeName="transform" type="translate"
+        values="0 0; 1 -1; 0 0; -1 1; 0 0" dur="1.2s" repeatCount="indefinite"/>
+
+      <!-- Bandeja de papel superior (con hoja) -->
+      <rect x="-42" y="-58" width="84" height="14" rx="3" fill="#0A2A66" opacity="0.7"/>
+      <!-- Hoja de papel saliendo -->
+      <rect x="-34" y="-54" width="68" height="8" rx="1" fill="#ffffff" opacity="0.95">
+        <animate attributeName="y" values="-54;-58;-54" dur="2.4s" repeatCount="indefinite"/>
+      </rect>
+      <!-- Líneas de texto en la hoja -->
+      <g fill="#0A2A66" opacity="0.6">
+        <rect x="-28" y="-52" width="20" height="1.5" rx="0.75">
+          <animate attributeName="y" values="-52;-56;-52" dur="2.4s" repeatCount="indefinite"/>
+        </rect>
+        <rect x="-28" y="-49" width="36" height="1.5" rx="0.75">
+          <animate attributeName="y" values="-49;-53;-49" dur="2.4s" repeatCount="indefinite"/>
+        </rect>
+      </g>
+
+      <!-- Cuerpo principal de la impresora -->
+      <rect x="-48" y="-42" width="96" height="70" rx="6" fill="url(#gradRIM)"/>
+
+      <!-- Panel de control / pantalla -->
+      <rect x="-36" y="-34" width="30" height="14" rx="2" fill="#0A2A66" opacity="0.85"/>
+      <rect x="-32" y="-30" width="20" height="2" rx="1" fill="#22C1E0">
+        <animate attributeName="width" values="20;10;20" dur="2s" repeatCount="indefinite"/>
+      </rect>
+      <rect x="-32" y="-25" width="14" height="2" rx="1" fill="#22C1E0" opacity="0.6"/>
+
+      <!-- Botones del panel -->
+      <circle cx="4" cy="-30" r="3" fill="#22C1E0">
+        <animate attributeName="opacity" values="1;0.3;1" dur="1.2s" repeatCount="indefinite"/>
+      </circle>
+      <circle cx="14" cy="-30" r="3" fill="#0A2A66" opacity="0.7"/>
+      <circle cx="24" cy="-30" r="3" fill="#0A2A66" opacity="0.7"/>
+
+      <!-- Ranura de salida de papel -->
+      <rect x="-40" y="-6" width="80" height="4" rx="2" fill="#0A2A66" opacity="0.7"/>
+
+      <!-- Papel saliendo por la ranura -->
+      <rect x="-32" y="-2" width="64" height="14" rx="1" fill="#ffffff" opacity="0.95">
+        <animate attributeName="y" values="-2;2;-2" dur="2.4s" repeatCount="indefinite"/>
+      </rect>
+      <g fill="#0A2A66" opacity="0.5">
+        <rect x="-26" y="2" width="22" height="1.5" rx="0.75">
+          <animate attributeName="y" values="2;6;2" dur="2.4s" repeatCount="indefinite"/>
+        </rect>
+        <rect x="-26" y="6" width="40" height="1.5" rx="0.75">
+          <animate attributeName="y" values="6;10;6" dur="2.4s" repeatCount="indefinite"/>
+        </rect>
+        <rect x="-26" y="10" width="30" height="1.5" rx="0.75">
+          <animate attributeName="y" values="10;14;10" dur="2.4s" repeatCount="indefinite"/>
+        </rect>
+      </g>
+
+      <!-- Bandeja inferior de recogida -->
+      <rect x="-44" y="20" width="88" height="10" rx="3" fill="#0A2A66" opacity="0.8"/>
+      <rect x="-38" y="22" width="76" height="6" rx="2" fill="url(#gradRIM)"/>
+
+      <!-- LED de estado -->
+      <circle cx="-38" cy="-20" r="2.5" fill="#22C1E0">
+        <animate attributeName="opacity" values="1;0.2;1" dur="1s" repeatCount="indefinite"/>
+      </circle>
+      <circle cx="-38" cy="-12" r="2.5" fill="#22C1E0">
+        <animate attributeName="opacity" values="1;0.2;1" dur="1.4s" begin="0.3s" repeatCount="indefinite"/>
+      </circle>
+
+      <!-- Brillo superior -->
+      <rect x="-44" y="-40" width="88" height="2" rx="1" fill="#ffffff" opacity="0.4"/>
+    </g>
+  </g>
+
+  <!-- 📄 HOJA / DOCUMENTO (12 en punto) -->
+  <g transform="translate(200 118) scale(0.62)">
+    <g>
+      <animateTransform attributeName="transform" type="translate"
+        values="0 0; 0 -3; 0 0" dur="2.6s" repeatCount="indefinite"/>
+      <!-- Hoja de papel -->
+      <path d="M -18 -22 L 12 -22 L 18 -16 L 18 22 L -18 22 Z" fill="url(#gradRIM)"/>
+      <!-- Esquina doblada -->
+      <path d="M 12 -22 L 12 -16 L 18 -16 Z" fill="#0A2A66" opacity="0.5"/>
+      <!-- Líneas de texto -->
+      <g fill="#ffffff" opacity="0.85">
+        <rect x="-12" y="-14" width="24" height="2" rx="1"/>
+        <rect x="-12" y="-8" width="18" height="2" rx="1"/>
+        <rect x="-12" y="-2" width="22" height="2" rx="1"/>
+        <rect x="-12" y="4" width="14" height="2" rx="1"/>
+        <rect x="-12" y="10" width="20" height="2" rx="1"/>
+        <rect x="-12" y="16" width="16" height="2" rx="1"/>
+      </g>
+      <!-- Brillo -->
+      <path d="M -16 -20 L 8 -20 L 6 -18 L -14 -18 Z" fill="#ffffff" opacity="0.3"/>
+    </g>
+  </g>
+
+  <!-- 🔧 DESTORNILLADOR (6 en punto) -->
+  <g transform="translate(200 288) scale(0.62)">
+    <g transform="rotate(-25)">
+      <animateTransform attributeName="transform" type="rotate"
+        values="-25; -15; -25" dur="2.8s" repeatCount="indefinite" additive="replace"/>
+      <!-- Mango -->
+      <rect x="-6" y="-38" width="12" height="44" rx="6" fill="url(#gradRIM)"/>
+      <!-- Detalles del mango -->
+      <rect x="-6" y="-30" width="12" height="2" rx="1" fill="#ffffff" opacity="0.3"/>
+      <rect x="-6" y="-22" width="12" height="2" rx="1" fill="#ffffff" opacity="0.3"/>
+      <!-- Vástago -->
+      <rect x="-2" y="6" width="4" height="28" rx="2" fill="url(#gradRIM)"/>
+      <!-- Punta plana -->
+      <rect x="-4" y="34" width="8" height="10" rx="1" fill="url(#gradRIM)"/>
+      <!-- Brillo -->
+      <rect x="-3" y="-34" width="2" height="36" rx="1" fill="#ffffff" opacity="0.4"/>
+    </g>
+  </g>
+
+  <!-- 🎨 CARTUCHO / TINTA (9 en punto) -->
+  <g transform="translate(118 200) scale(0.62)">
+    <g>
+      <animateTransform attributeName="transform" type="translate"
+        values="0 0; 0 -3; 0 0" dur="2.8s" repeatCount="indefinite"/>
+      <!-- Cuerpo del cartucho -->
+      <rect x="-22" y="-22" width="44" height="44" rx="5" fill="url(#gradRIM)"/>
+      <!-- Tapa superior -->
+      <rect x="-18" y="-28" width="36" height="8" rx="2" fill="url(#gradRIM)"/>
+      <!-- Etiqueta con colores -->
+      <rect x="-16" y="-14" width="32" height="20" rx="2" fill="#ffffff" opacity="0.95"/>
+      <!-- Puntos de colores (CMYK) -->
+      <circle cx="-10" cy="-4" r="3" fill="#22C1E0"/>
+      <circle cx="-2" cy="-4" r="3" fill="#1E6FE8"/>
+      <circle cx="6" cy="-4" r="3" fill="#0A2A66"/>
+      <circle cx="14" cy="-4" r="3" fill="#22C1E0" opacity="0.5"/>
+      <rect x="-12" y="2" width="24" height="2" rx="1" fill="#0A2A66" opacity="0.7"/>
+      <!-- Chip del cartucho -->
+      <rect x="-8" y="10" width="16" height="6" rx="1" fill="#0A2A66" opacity="0.7"/>
+      <g fill="#22C1E0">
+        <circle cx="-6" cy="13" r="0.8"/>
+        <circle cx="-2" cy="13" r="0.8"/>
+        <circle cx="2" cy="13" r="0.8"/>
+        <circle cx="6" cy="13" r="0.8"/>
+      </g>
+      <!-- Gota de tinta -->
+      <circle cx="0" cy="26" r="3" fill="#22C1E0">
+        <animate attributeName="cy" values="24;32;24" dur="1.8s" repeatCount="indefinite"/>
+        <animate attributeName="opacity" values="1;0.2;1" dur="1.8s" repeatCount="indefinite"/>
+      </circle>
+    </g>
+  </g>
+
+  <!-- 🧻 RODILLO / PAPEL (3 en punto) -->
+  <g transform="translate(282 200) scale(0.62)">
+    <g>
+      <animateTransform attributeName="transform" type="rotate"
+        from="0 0 0" to="360 0 0" dur="4s" repeatCount="indefinite"/>
+      <!-- Rodillo cilíndrico -->
+      <ellipse cx="0" cy="-10" rx="14" ry="5" fill="url(#gradRIM)"/>
+      <rect x="-14" y="-10" width="28" height="20" fill="url(#gradRIM)"/>
+      <ellipse cx="0" cy="10" rx="14" ry="5" fill="url(#gradRIM)"/>
+      <!-- Eje del rodillo -->
+      <rect x="-2" y="-18" width="4" height="36" rx="2" fill="#0A2A66" opacity="0.7"/>
+      <!-- Textura del rodillo -->
+      <g stroke="#ffffff" stroke-width="1" opacity="0.5">
+        <line x1="-10" y1="-4" x2="10" y2="-4"/>
+        <line x1="-10" y1="2" x2="10" y2="2"/>
+        <line x1="-10" y1="8" x2="10" y2="8"/>
+      </g>
+      <!-- Brillo -->
+      <ellipse cx="-6" cy="-6" rx="4" ry="2" fill="#ffffff" opacity="0.4"/>
+    </g>
+  </g>
+
+  <!-- ⚙️ ENGRANAJE (10-11 en punto) -->
+  <g transform="translate(118 118) scale(0.58)">
+    <g>
+      <animateTransform attributeName="transform" type="rotate"
+        from="0 0 0" to="360 0 0" dur="6s" repeatCount="indefinite"/>
+      <!-- Dientes -->
+      <path d="M 0 -22 L 5 -22 L 5 -17 L -5 -17 L -5 -22 Z
+               M 0 22 L 5 22 L 5 17 L -5 17 L -5 22 Z
+               M -22 0 L -22 -5 L -17 -5 L -17 5 L -22 5 Z
+               M 22 0 L 22 -5 L 17 -5 L 17 5 L 22 5 Z
+               M -15 -15 L -12 -18 L -15 -21 L -18 -18 Z
+               M 15 -15 L 18 -18 L 15 -21 L 12 -18 Z
+               M -15 15 L -18 18 L -15 21 L -12 18 Z
+               M 15 15 L 12 18 L 15 21 L 18 18 Z"
+            fill="url(#gradRIM)"/>
+      <circle r="15" fill="url(#gradRIM)"/>
+      <circle r="6" fill="#ffffff" opacity="0.9"/>
+      <!-- Engranaje pequeño interior -->
+      <circle r="3" fill="#22C1E0">
+        <animate attributeName="opacity" values="1;0.5;1" dur="1.4s" repeatCount="indefinite"/>
+      </circle>
+    </g>
+  </g>
+
+  <!-- ⚡ CHIP / ELECTRÓNICA (1-2 en punto) -->
+  <g transform="translate(282 118) scale(0.58)">
+    <g>
+      <animateTransform attributeName="transform" type="rotate"
+        values="-6; 6; -6" dur="3.2s" repeatCount="indefinite"/>
+      <!-- Pines laterales -->
+      <g fill="url(#gradRIM)">
+        <rect x="-26" y="-4" width="10" height="3" rx="1"/>
+        <rect x="-26" y="3" width="10" height="3" rx="1"/>
+        <rect x="16" y="-4" width="10" height="3" rx="1"/>
+        <rect x="16" y="3" width="10" height="3" rx="1"/>
+        <rect x="-4" y="-26" width="3" height="10" rx="1"/>
+        <rect x="3" y="-26" width="3" height="10" rx="1"/>
+        <rect x="-4" y="16" width="3" height="10" rx="1"/>
+        <rect x="3" y="16" width="3" height="10" rx="1"/>
+      </g>
+      <!-- Cuerpo del chip -->
+      <rect x="-16" y="-16" width="32" height="32" rx="4" fill="url(#gradRIM)"/>
+      <!-- Núcleo interior -->
+      <rect x="-9" y="-9" width="18" height="18" rx="2" fill="#0A2A66" opacity="0.7"/>
+      <!-- Circuito -->
+      <rect x="-5" y="-5" width="10" height="10" rx="1" fill="#22C1E0">
+        <animate attributeName="opacity" values="1;0.5;1" dur="1.5s" repeatCount="indefinite"/>
+      </rect>
+      <!-- Brillo -->
+      <path d="M -12 -12 L 12 -12 L 10 -14 L -10 -14 Z" fill="#ffffff" opacity="0.4"/>
+    </g>
+  </g>
+
+  <!-- CHISPAS / partículas alrededor (puntos de tinta) -->
+  <g fill="#22C1E0">
+    <circle cx="270" cy="105" r="3.5">
+      <animate attributeName="r" values="2.5;6;2.5" dur="1.2s" repeatCount="indefinite"/>
+      <animate attributeName="opacity" values="1;0.2;1" dur="1.2s" repeatCount="indefinite"/>
+    </circle>
+    <circle cx="130" cy="105" r="3">
+      <animate attributeName="r" values="2;5;2" dur="1.4s" begin="0.3s" repeatCount="indefinite"/>
+      <animate attributeName="opacity" values="1;0.2;1" dur="1.4s" begin="0.3s" repeatCount="indefinite"/>
+    </circle>
+    <circle cx="300" cy="272" r="3">
+      <animate attributeName="r" values="2;5;2" dur="1.3s" begin="0.6s" repeatCount="indefinite"/>
+      <animate attributeName="opacity" values="1;0.2;1" dur="1.3s" begin="0.6s" repeatCount="indefinite"/>
+    </circle>
+    <circle cx="100" cy="272" r="3.5">
+      <animate attributeName="r" values="2.5;6;2.5" dur="1.5s" begin="0.9s" repeatCount="indefinite"/>
+      <animate attributeName="opacity" values="1;0.2;1" dur="1.5s" begin="0.9s" repeatCount="indefinite"/>
+    </circle>
+  </g>
+</svg>

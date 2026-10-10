@@ -1,0 +1,252 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg viewBox="0 0 400 400" width="100%" height="100%"
+     xmlns="http://www.w3.org/2000/svg" role="img"
+     aria-label="Icono de Reparación de Celulares - Contrato Directo">
+
+  <defs>
+    <linearGradient id="gradRC" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%"   stop-color="#0A2A66"/>
+      <stop offset="55%"  stop-color="#1E6FE8"/>
+      <stop offset="100%" stop-color="#22C1E0"/>
+    </linearGradient>
+
+    <linearGradient id="gradAroRC" x1="0%" y1="100%" x2="100%" y2="0%">
+      <stop offset="0%"   stop-color="#22C1E0"/>
+      <stop offset="100%" stop-color="#0A2A66"/>
+    </linearGradient>
+
+    <linearGradient id="gradPantalla" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%"   stop-color="#22C1E0"/>
+      <stop offset="100%" stop-color="#1E6FE8"/>
+    </linearGradient>
+
+    <radialGradient id="glowRC" cx="50%" cy="50%" r="50%">
+      <stop offset="0%"   stop-color="#22C1E0" stop-opacity="0.55"/>
+      <stop offset="100%" stop-color="#22C1E0" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+
+  <!-- Aro exterior institucional -->
+  <g fill="none" stroke="url(#gradAroRC)" stroke-width="7"
+     stroke-linecap="round" opacity="0.85">
+    <path d="M 70 200 A 130 130 0 0 1 200 70" />
+    <path d="M 200 70 A 130 130 0 0 1 330 200" />
+    <path d="M 330 200 A 130 130 0 0 1 200 330" />
+    <path d="M 200 330 A 130 130 0 0 1 70 200" />
+    <animateTransform attributeName="transform" type="rotate"
+      from="0 200 200" to="360 200 200" dur="50s" repeatCount="indefinite"/>
+  </g>
+
+  <!-- Resplandor central -->
+  <circle cx="200" cy="200" r="95" fill="url(#glowRC)">
+    <animate attributeName="r" values="90;110;90" dur="3s" repeatCount="indefinite"/>
+    <animate attributeName="opacity" values="0.7;0.3;0.7" dur="3s" repeatCount="indefinite"/>
+  </circle>
+
+  <!-- 📱 CELULAR CENTRAL (núcleo) -->
+  <g transform="translate(200 200) scale(0.95)">
+    <g>
+      <!-- Animación: el celular vibra levemente -->
+      <animateTransform attributeName="transform" type="translate"
+        values="0 0; 1 -1; 0 0; -1 1; 0 0" dur="1.2s" repeatCount="indefinite"/>
+
+      <!-- Cuerpo del celular -->
+      <rect x="-42" y="-64" width="84" height="128" rx="12" fill="url(#gradRC)"/>
+
+      <!-- Pantalla interior -->
+      <rect x="-34" y="-54" width="68" height="106" rx="8" fill="#0A2A66" opacity="0.85"/>
+
+      <!-- Contenido de la pantalla (interfaz) -->
+      <rect x="-28" y="-46" width="56" height="8" rx="3" fill="#22C1E0" opacity="0.9"/>
+      <rect x="-28" y="-34" width="34" height="4" rx="2" fill="#22C1E0" opacity="0.6"/>
+      <rect x="-28" y="-26" width="44" height="4" rx="2" fill="#22C1E0" opacity="0.5"/>
+      <rect x="-28" y="-18" width="28" height="4" rx="2" fill="#22C1E0" opacity="0.4"/>
+      <rect x="-28" y="-4" width="56" height="16" rx="4" fill="#22C1E0" opacity="0.85"/>
+      <rect x="-28" y="18" width="56" height="6" rx="3" fill="#22C1E0" opacity="0.5"/>
+      <rect x="-28" y="30" width="40" height="6" rx="3" fill="#22C1E0" opacity="0.4"/>
+
+      <!-- Cursor de reparación parpadeante -->
+      <rect x="-20" y="-4" width="3" height="10" fill="#ffffff">
+        <animate attributeName="opacity" values="1;0;1" dur="0.8s" repeatCount="indefinite"/>
+      </rect>
+
+      <!-- Altavoz superior -->
+      <rect x="-12" y="-60" width="24" height="3" rx="1.5" fill="#ffffff" opacity="0.7"/>
+
+      <!-- Botón home -->
+      <circle cx="0" cy="56" r="4" fill="#ffffff" opacity="0.85"/>
+
+      <!-- Cámara frontal -->
+      <circle cx="14" cy="-59" r="2" fill="#ffffff" opacity="0.9"/>
+
+      <!-- Brillo superior -->
+      <rect x="-38" y="-62" width="76" height="2" rx="1" fill="#ffffff" opacity="0.4"/>
+    </g>
+  </g>
+
+  <!-- 🔧 DESTORNILLADOR (12 en punto) -->
+  <g transform="translate(200 118) scale(0.62)">
+    <g transform="rotate(-25)">
+      <animateTransform attributeName="transform" type="rotate"
+        values="-25; -15; -25" dur="2.8s" repeatCount="indefinite" additive="replace"/>
+      <!-- Mango -->
+      <rect x="-6" y="-38" width="12" height="44" rx="6" fill="url(#gradRC)"/>
+      <!-- Detalles del mango -->
+      <rect x="-6" y="-30" width="12" height="2" rx="1" fill="#ffffff" opacity="0.3"/>
+      <rect x="-6" y="-22" width="12" height="2" rx="1" fill="#ffffff" opacity="0.3"/>
+      <!-- Vástago -->
+      <rect x="-2" y="6" width="4" height="28" rx="2" fill="url(#gradRC)"/>
+      <!-- Punta estrella -->
+      <path d="M -4 34 L 4 34 L 3 42 L -3 42 Z" fill="url(#gradRC)"/>
+      <line x1="0" y1="34" x2="0" y2="42" stroke="#0A2A66" stroke-width="1" opacity="0.6"/>
+      <line x1="-3" y1="38" x2="3" y2="38" stroke="#0A2A66" stroke-width="1" opacity="0.6"/>
+      <!-- Brillo -->
+      <rect x="-3" y="-34" width="2" height="36" rx="1" fill="#ffffff" opacity="0.4"/>
+    </g>
+  </g>
+
+  <!-- 🔋 BATERÍA (6 en punto) -->
+  <g transform="translate(200 288) scale(0.62)">
+    <g>
+      <animateTransform attributeName="transform" type="translate"
+        values="0 0; 0 3; 0 0" dur="2.8s" repeatCount="indefinite"/>
+      <!-- Cuerpo de la batería -->
+      <rect x="-26" y="-14" width="52" height="30" rx="4" fill="url(#gradRC)"/>
+      <!-- Terminal superior -->
+      <rect x="-8" y="-20" width="16" height="6" rx="2" fill="url(#gradRC)"/>
+      <!-- Indicador de carga -->
+      <rect x="-20" y="-8" width="40" height="18" rx="2" fill="#0A2A66" opacity="0.5"/>
+      <rect x="-18" y="-6" width="30" height="14" rx="2" fill="#22C1E0" opacity="0.9">
+        <animate attributeName="width" values="30;10;30" dur="2.5s" repeatCount="indefinite"/>
+      </rect>
+      <!-- Rayo de la batería -->
+      <path d="M 2 -2 L -3 4 L 0 4 L -2 10 L 3 2 L 0 2 Z" fill="#ffffff"/>
+      <!-- Etiqueta -->
+      <rect x="-18" y="14" width="36" height="6" rx="2" fill="#ffffff" opacity="0.9"/>
+      <rect x="-12" y="16" width="24" height="2" rx="1" fill="#0A2A66"/>
+    </g>
+  </g>
+
+  <!-- 🖥️ PANTALLA / DISPLAY (9 en punto) -->
+  <g transform="translate(118 200) scale(0.62)">
+    <g>
+      <animateTransform attributeName="transform" type="translate"
+        values="0 0; 0 -3; 0 0" dur="2.8s" repeatCount="indefinite"/>
+      <!-- Marco de la pantalla -->
+      <rect x="-22" y="-34" width="44" height="68" rx="6" fill="url(#gradRC)"/>
+      <!-- Pantalla interior -->
+      <rect x="-18" y="-30" width="36" height="60" rx="4" fill="url(#gradPantalla)"/>
+      <!-- Brillo diagonal -->
+      <path d="M -16 -28 L -8 -28 L -16 -20 Z" fill="#ffffff" opacity="0.6">
+        <animate attributeName="opacity" values="0.6;0.2;0.6" dur="2.4s" repeatCount="indefinite"/>
+      </path>
+      <!-- Contenido (widgets) -->
+      <rect x="-14" y="-24" width="28" height="4" rx="2" fill="#ffffff" opacity="0.7"/>
+      <rect x="-14" y="-16" width="18" height="3" rx="1.5" fill="#ffffff" opacity="0.5"/>
+      <rect x="-14" y="-10" width="24" height="3" rx="1.5" fill="#ffffff" opacity="0.5"/>
+      <rect x="-14" y="-2" width="28" height="12" rx="2" fill="#0A2A66" opacity="0.5"/>
+      <rect x="-14" y="14" width="28" height="4" rx="2" fill="#ffffff" opacity="0.6"/>
+      <rect x="-14" y="22" width="20" height="4" rx="2" fill="#ffffff" opacity="0.5"/>
+      <!-- Brillo del marco -->
+      <rect x="-20" y="-32" width="40" height="2" rx="1" fill="#ffffff" opacity="0.4"/>
+    </g>
+  </g>
+
+  <!-- 🪛 PINZA / HERRAMIENTA DE PRECISIÓN (3 en punto) -->
+  <g transform="translate(282 200) scale(0.62)">
+    <g transform="rotate(20)">
+      <animateTransform attributeName="transform" type="rotate"
+        values="20; 10; 20" dur="3s" repeatCount="indefinite" additive="replace"/>
+      <!-- Brazo superior -->
+      <path d="M -3 -34 Q -8 -20 -6 -4 Q -4 8 -8 20 L -2 22 Q 2 10 0 -4 Q -2 -20 3 -34 Z"
+            fill="url(#gradRC)"/>
+      <!-- Brazo inferior -->
+      <path d="M 3 -34 Q 8 -20 6 -4 Q 4 8 8 20 L 2 22 Q -2 10 0 -4 Q 2 -20 -3 -34 Z"
+            fill="url(#gradRC)"/>
+      <!-- Perno central -->
+      <circle r="4" fill="url(#gradRC)"/>
+      <circle r="2" fill="#22C1E0"/>
+      <!-- Puntas estriadas -->
+      <line x1="-8" y1="22" x2="-10" y2="30" stroke="url(#gradRC)" stroke-width="2.5" stroke-linecap="round"/>
+      <line x1="8" y1="22" x2="10" y2="30" stroke="url(#gradRC)" stroke-width="2.5" stroke-linecap="round"/>
+      <!-- Brillo -->
+      <path d="M -2 -30 L 0 -30 L 0 -6 L -2 -6 Z" fill="#ffffff" opacity="0.4"/>
+    </g>
+  </g>
+
+  <!-- 🔌 CABLE / CARGADOR (10-11 en punto) -->
+  <g transform="translate(118 118) scale(0.58)">
+    <g>
+      <animateTransform attributeName="transform" type="rotate"
+        values="-6; 6; -6" dur="3s" repeatCount="indefinite"/>
+      <!-- Conector USB -->
+      <rect x="-14" y="-10" width="24" height="20" rx="3" fill="url(#gradRC)"/>
+      <rect x="-10" y="-16" width="16" height="6" rx="2" fill="url(#gradRC)"/>
+      <!-- Pines USB -->
+      <g fill="#0A2A66" opacity="0.7">
+        <rect x="-8" y="-6" width="3" height="12" rx="1"/>
+        <rect x="-3" y="-6" width="3" height="12" rx="1"/>
+        <rect x="2" y="-6" width="3" height="12" rx="1"/>
+      </g>
+      <!-- Cable saliendo -->
+      <path d="M 10 0 Q 18 0 20 8 Q 22 16 16 20 Q 12 22 8 20"
+            fill="none" stroke="url(#gradRC)" stroke-width="4"
+            stroke-linecap="round"/>
+      <!-- Rayo de carga -->
+      <path d="M 4 -4 L 0 2 L 3 2 L 0 8 L 6 0 L 3 0 Z" fill="#22C1E0">
+        <animate attributeName="opacity" values="1;0.3;1" dur="1.4s" repeatCount="indefinite"/>
+      </path>
+      <!-- Brillo -->
+      <rect x="-12" y="-8" width="20" height="2" rx="1" fill="#ffffff" opacity="0.4"/>
+    </g>
+  </g>
+
+  <!-- ⚡ CHIP / CIRCUITO (1-2 en punto) -->
+  <g transform="translate(282 118) scale(0.58)">
+    <g>
+      <animateTransform attributeName="transform" type="rotate"
+        values="-6; 6; -6" dur="3.2s" repeatCount="indefinite"/>
+      <!-- Pines laterales -->
+      <g fill="url(#gradRC)">
+        <rect x="-26" y="-4" width="10" height="3" rx="1"/>
+        <rect x="-26" y="3" width="10" height="3" rx="1"/>
+        <rect x="16" y="-4" width="10" height="3" rx="1"/>
+        <rect x="16" y="3" width="10" height="3" rx="1"/>
+        <rect x="-4" y="-26" width="3" height="10" rx="1"/>
+        <rect x="3" y="-26" width="3" height="10" rx="1"/>
+        <rect x="-4" y="16" width="3" height="10" rx="1"/>
+        <rect x="3" y="16" width="3" height="10" rx="1"/>
+      </g>
+      <!-- Cuerpo del chip -->
+      <rect x="-16" y="-16" width="32" height="32" rx="4" fill="url(#gradRC)"/>
+      <!-- Núcleo interior -->
+      <rect x="-9" y="-9" width="18" height="18" rx="2" fill="#0A2A66" opacity="0.7"/>
+      <!-- Circuito -->
+      <rect x="-5" y="-5" width="10" height="10" rx="1" fill="#22C1E0">
+        <animate attributeName="opacity" values="1;0.5;1" dur="1.5s" repeatCount="indefinite"/>
+      </rect>
+      <!-- Brillo -->
+      <path d="M -12 -12 L 12 -12 L 10 -14 L -10 -14 Z" fill="#ffffff" opacity="0.4"/>
+    </g>
+  </g>
+
+  <!-- CHISPAS / partículas alrededor (señal) -->
+  <g fill="#22C1E0">
+    <circle cx="270" cy="105" r="3.5">
+      <animate attributeName="r" values="2.5;6;2.5" dur="1.2s" repeatCount="indefinite"/>
+      <animate attributeName="opacity" values="1;0.2;1" dur="1.2s" repeatCount="indefinite"/>
+    </circle>
+    <circle cx="130" cy="105" r="3">
+      <animate attributeName="r" values="2;5;2" dur="1.4s" begin="0.3s" repeatCount="indefinite"/>
+      <animate attributeName="opacity" values="1;0.2;1" dur="1.4s" begin="0.3s" repeatCount="indefinite"/>
+    </circle>
+    <circle cx="300" cy="272" r="3">
+      <animate attributeName="r" values="2;5;2" dur="1.3s" begin="0.6s" repeatCount="indefinite"/>
+      <animate attributeName="opacity" values="1;0.2;1" dur="1.3s" begin="0.6s" repeatCount="indefinite"/>
+    </circle>
+    <circle cx="100" cy="272" r="3.5">
+      <animate attributeName="r" values="2.5;6;2.5" dur="1.5s" begin="0.9s" repeatCount="indefinite"/>
+      <animate attributeName="opacity" values="1;0.2;1" dur="1.5s" begin="0.9s" repeatCount="indefinite"/>
+    </circle>
+  </g>
+</svg>

@@ -1,0 +1,250 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg viewBox="0 0 400 400" width="100%" height="100%"
+     xmlns="http://www.w3.org/2000/svg" role="img"
+     aria-label="Icono de Cloud Computing - Contrato Directo">
+
+  <defs>
+    <linearGradient id="gradCC" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%"   stop-color="#0A2A66"/>
+      <stop offset="55%"  stop-color="#1E6FE8"/>
+      <stop offset="100%" stop-color="#22C1E0"/>
+    </linearGradient>
+
+    <linearGradient id="gradAroCC" x1="0%" y1="100%" x2="100%" y2="0%">
+      <stop offset="0%"   stop-color="#22C1E0"/>
+      <stop offset="100%" stop-color="#0A2A66"/>
+    </linearGradient>
+
+    <linearGradient id="gradNube" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%"   stop-color="#22C1E0"/>
+      <stop offset="100%" stop-color="#1E6FE8"/>
+    </linearGradient>
+
+    <radialGradient id="glowCC" cx="50%" cy="50%" r="50%">
+      <stop offset="0%"   stop-color="#22C1E0" stop-opacity="0.55"/>
+      <stop offset="100%" stop-color="#22C1E0" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+
+  <!-- Aro exterior institucional -->
+  <g fill="none" stroke="url(#gradAroCC)" stroke-width="7"
+     stroke-linecap="round" opacity="0.85">
+    <path d="M 70 200 A 130 130 0 0 1 200 70" />
+    <path d="M 200 70 A 130 130 0 0 1 330 200" />
+    <path d="M 330 200 A 130 130 0 0 1 200 330" />
+    <path d="M 200 330 A 130 130 0 0 1 70 200" />
+    <animateTransform attributeName="transform" type="rotate"
+      from="0 200 200" to="360 200 200" dur="50s" repeatCount="indefinite"/>
+  </g>
+
+  <!-- Resplandor central -->
+  <circle cx="200" cy="200" r="95" fill="url(#glowCC)">
+    <animate attributeName="r" values="90;110;90" dur="3s" repeatCount="indefinite"/>
+    <animate attributeName="opacity" values="0.7;0.3;0.7" dur="3s" repeatCount="indefinite"/>
+  </circle>
+
+  <!-- ☁️ NUBE CENTRAL (núcleo) -->
+  <g transform="translate(200 200) scale(0.95)">
+    <g>
+      <!-- Animación: la nube flota -->
+      <animateTransform attributeName="transform" type="translate"
+        values="0 0; 0 -5; 0 0" dur="3.5s" repeatCount="indefinite"/>
+
+      <!-- Cuerpo de la nube -->
+      <path d="M -48 8
+               Q -58 8 -58 0
+               Q -58 -10 -48 -10
+               Q -46 -26 -30 -26
+               Q -16 -26 -10 -16
+               Q -4 -22 8 -22
+               Q 22 -22 26 -10
+               Q 34 -12 42 -6
+               Q 52 -4 52 6
+               Q 52 14 42 14
+               L -48 14 Z"
+            fill="url(#gradNube)"/>
+
+      <!-- Brillo superior -->
+      <path d="M -46 -8 Q -34 -20 -20 -20 Q -10 -20 -4 -14 L -8 -12 Q -14 -18 -22 -18 Q -34 -18 -44 -6 Z"
+            fill="#ffffff" opacity="0.4"/>
+
+      <!-- Símbolo de red dentro de la nube -->
+      <g fill="#ffffff">
+        <circle cx="-16" cy="2" r="3"/>
+        <circle cx="0" cy="-4" r="3"/>
+        <circle cx="16" cy="2" r="3"/>
+        <line x1="-16" y1="2" x2="0" y2="-4" stroke="#ffffff" stroke-width="1.5"/>
+        <line x1="0" y1="-4" x2="16" y2="2" stroke="#ffffff" stroke-width="1.5"/>
+        <line x1="-16" y1="2" x2="16" y2="2" stroke="#ffffff" stroke-width="1.5" opacity="0.6"/>
+      </g>
+
+      <!-- Flecha de subida / bajada -->
+      <path d="M 0 6 L 0 14 M -4 10 L 0 14 L 4 10"
+            stroke="#ffffff" stroke-width="2" fill="none"
+            stroke-linecap="round" stroke-linejoin="round" opacity="0.8">
+        <animate attributeName="opacity" values="0.8;0.3;0.8" dur="2s" repeatCount="indefinite"/>
+      </path>
+    </g>
+  </g>
+
+  <!-- 🖥️ SERVIDOR (12 en punto) -->
+  <g transform="translate(200 118) scale(0.62)">
+    <g>
+      <animateTransform attributeName="transform" type="translate"
+        values="0 0; 0 -3; 0 0" dur="2.6s" repeatCount="indefinite"/>
+      <!-- Rack de servidores (3 unidades) -->
+      <rect x="-22" y="-22" width="44" height="14" rx="3" fill="url(#gradCC)"/>
+      <rect x="-22" y="-6" width="44" height="14" rx="3" fill="url(#gradCC)"/>
+      <rect x="-22" y="10" width="44" height="14" rx="3" fill="url(#gradCC)"/>
+      <!-- LEDs de actividad -->
+      <circle cx="16" cy="-15" r="1.5" fill="#22C1E0">
+        <animate attributeName="opacity" values="1;0.2;1" dur="1.2s" repeatCount="indefinite"/>
+      </circle>
+      <circle cx="16" cy="1" r="1.5" fill="#22C1E0">
+        <animate attributeName="opacity" values="1;0.2;1" dur="1.4s" begin="0.3s" repeatCount="indefinite"/>
+      </circle>
+      <circle cx="16" cy="17" r="1.5" fill="#22C1E0">
+        <animate attributeName="opacity" values="1;0.2;1" dur="1.3s" begin="0.6s" repeatCount="indefinite"/>
+      </circle>
+      <!-- Líneas de datos -->
+      <g stroke="#ffffff" stroke-width="1" opacity="0.4">
+        <line x1="-16" y1="-15" x2="8" y2="-15"/>
+        <line x1="-16" y1="1" x2="8" y2="1"/>
+        <line x1="-16" y1="17" x2="8" y2="17"/>
+      </g>
+      <!-- Brillo -->
+      <rect x="-18" y="-20" width="36" height="2" rx="1" fill="#ffffff" opacity="0.4"/>
+    </g>
+  </g>
+
+  <!-- 💾 BASE DE DATOS (6 en punto) -->
+  <g transform="translate(200 288) scale(0.62)">
+    <g>
+      <animateTransform attributeName="transform" type="translate"
+        values="0 0; 0 3; 0 0" dur="2.8s" repeatCount="indefinite"/>
+      <!-- Discos apilados -->
+      <ellipse cx="0" cy="-16" rx="24" ry="6" fill="url(#gradCC)"/>
+      <rect x="-24" y="-16" width="48" height="10" fill="url(#gradCC)"/>
+      <ellipse cx="0" cy="-6" rx="24" ry="6" fill="#22C1E0" opacity="0.85"/>
+      <rect x="-24" y="-6" width="48" height="10" fill="url(#gradCC)"/>
+      <ellipse cx="0" cy="4" rx="24" ry="6" fill="#22C1E0" opacity="0.85"/>
+      <rect x="-24" y="4" width="48" height="10" fill="url(#gradCC)"/>
+      <ellipse cx="0" cy="14" rx="24" ry="6" fill="url(#gradCC)"/>
+      <!-- Brillo -->
+      <ellipse cx="-8" cy="-16" rx="6" ry="2" fill="#ffffff" opacity="0.4"/>
+      <!-- LED de actividad -->
+      <circle cx="16" cy="-16" r="2" fill="#22C1E0">
+        <animate attributeName="opacity" values="1;0.2;1" dur="1.2s" repeatCount="indefinite"/>
+      </circle>
+    </g>
+  </g>
+
+  <!-- 🔗 NODOS CONECTADOS (9 en punto) -->
+  <g transform="translate(118 200) scale(0.62)">
+    <g>
+      <animateTransform attributeName="transform" type="rotate"
+        values="-6; 6; -6" dur="3.2s" repeatCount="indefinite"/>
+      <!-- Líneas -->
+      <line x1="0" y1="0" x2="-20" y2="-20" stroke="url(#gradCC)" stroke-width="2.5" stroke-linecap="round"/>
+      <line x1="0" y1="0" x2="-20" y2="20" stroke="url(#gradCC)" stroke-width="2.5" stroke-linecap="round"/>
+      <line x1="0" y1="0" x2="20" y2="-20" stroke="url(#gradCC)" stroke-width="2.5" stroke-linecap="round"/>
+      <line x1="0" y1="0" x2="20" y2="20" stroke="url(#gradCC)" stroke-width="2.5" stroke-linecap="round"/>
+      <!-- Nodos -->
+      <circle cx="-20" cy="-20" r="6" fill="url(#gradCC)"/>
+      <circle cx="-20" cy="20" r="6" fill="url(#gradCC)"/>
+      <circle cx="20" cy="-20" r="6" fill="url(#gradCC)"/>
+      <circle cx="20" cy="20" r="6" fill="url(#gradCC)"/>
+      <!-- Nodo central -->
+      <circle r="9" fill="url(#gradCC)"/>
+      <circle r="4" fill="#ffffff" opacity="0.95">
+        <animate attributeName="r" values="4;6;4" dur="1.8s" repeatCount="indefinite"/>
+      </circle>
+    </g>
+  </g>
+
+  <!-- 🔒 CANDADO / SEGURIDAD (3 en punto) -->
+  <g transform="translate(282 200) scale(0.62)">
+    <g>
+      <animateTransform attributeName="transform" type="translate"
+        values="0 0; 0 -3; 0 0" dur="2.8s" repeatCount="indefinite"/>
+      <!-- Arco del candado -->
+      <path d="M -12 -6 L -12 -16 Q -12 -28 0 -28 Q 12 -28 12 -16 L 12 -6"
+            fill="none" stroke="url(#gradCC)" stroke-width="6" stroke-linecap="round"/>
+      <!-- Cuerpo -->
+      <rect x="-18" y="-6" width="36" height="30" rx="5" fill="url(#gradCC)"/>
+      <!-- Ojo -->
+      <circle cx="0" cy="6" r="4" fill="#0A2A66"/>
+      <path d="M 0 6 L 0 14" stroke="#0A2A66" stroke-width="3" stroke-linecap="round"/>
+      <!-- Brillo -->
+      <rect x="-14" y="-4" width="28" height="3" rx="1.5" fill="#ffffff" opacity="0.35"/>
+    </g>
+  </g>
+
+  <!-- 📱 DISPOSITIVOS (10-11 en punto) -->
+  <g transform="translate(118 118) scale(0.58)">
+    <g>
+      <animateTransform attributeName="transform" type="translate"
+        values="0 0; 0 -3; 0 0" dur="2.8s" repeatCount="indefinite"/>
+      <!-- Monitor -->
+      <rect x="-20" y="-18" width="26" height="20" rx="2" fill="url(#gradCC)"/>
+      <rect x="-17" y="-15" width="20" height="14" rx="1" fill="#0A2A66" opacity="0.8"/>
+      <rect x="-14" y="2" width="10" height="4" rx="1" fill="url(#gradCC)"/>
+      <rect x="-18" y="5" width="18" height="3" rx="1" fill="url(#gradCC)"/>
+      <!-- Celular -->
+      <rect x="6" y="-10" width="14" height="26" rx="3" fill="url(#gradCC)"/>
+      <rect x="8" y="-8" width="10" height="20" rx="1" fill="#0A2A66" opacity="0.8"/>
+      <circle cx="13" cy="13" r="1.5" fill="#ffffff"/>
+      <!-- Tablet -->
+      <rect x="-20" y="10" width="26" height="16" rx="2" fill="url(#gradCC)"/>
+      <rect x="-17" y="12" width="20" height="12" rx="1" fill="#0A2A66" opacity="0.8"/>
+      <!-- Conexión entre dispositivos -->
+      <g stroke="#22C1E0" stroke-width="1.5" stroke-dasharray="3 2" opacity="0.7" fill="none">
+        <line x1="-7" y1="2" x2="6" y2="-4"/>
+        <line x1="-7" y1="8" x2="-7" y2="10"/>
+      </g>
+    </g>
+  </g>
+
+  <!-- ⚙️ ENGRANAJE / CONFIGURACIÓN (1-2 en punto) -->
+  <g transform="translate(282 118) scale(0.58)">
+    <g>
+      <animateTransform attributeName="transform" type="rotate"
+        from="0 0 0" to="360 0 0" dur="8s" repeatCount="indefinite"/>
+      <!-- Dientes -->
+      <path d="M 0 -22 L 5 -22 L 5 -17 L -5 -17 L -5 -22 Z
+               M 0 22 L 5 22 L 5 17 L -5 17 L -5 22 Z
+               M -22 0 L -22 -5 L -17 -5 L -17 5 L -22 5 Z
+               M 22 0 L 22 -5 L 17 -5 L 17 5 L 22 5 Z
+               M -15 -15 L -12 -18 L -15 -21 L -18 -18 Z
+               M 15 -15 L 18 -18 L 15 -21 L 12 -18 Z
+               M -15 15 L -18 18 L -15 21 L -12 18 Z
+               M 15 15 L 12 18 L 15 21 L 18 18 Z"
+            fill="url(#gradCC)"/>
+      <circle r="15" fill="url(#gradCC)"/>
+      <circle r="6" fill="#ffffff" opacity="0.9"/>
+      <!-- Nube pequeña dentro -->
+      <path d="M -3 1 Q -5 1 -5 -1 Q -5 -3 -3 -3 Q -3 -5 0 -5 Q 3 -5 3 -3 Q 5 -3 5 -1 Q 5 1 3 1 Z"
+            fill="#22C1E0"/>
+    </g>
+  </g>
+
+  <!-- CHISPAS / partículas alrededor (datos) -->
+  <g fill="#22C1E0">
+    <circle cx="270" cy="105" r="3.5">
+      <animate attributeName="r" values="2.5;6;2.5" dur="1.2s" repeatCount="indefinite"/>
+      <animate attributeName="opacity" values="1;0.2;1" dur="1.2s" repeatCount="indefinite"/>
+    </circle>
+    <circle cx="130" cy="105" r="3">
+      <animate attributeName="r" values="2;5;2" dur="1.4s" begin="0.3s" repeatCount="indefinite"/>
+      <animate attributeName="opacity" values="1;0.2;1" dur="1.4s" begin="0.3s" repeatCount="indefinite"/>
+    </circle>
+    <circle cx="300" cy="272" r="3">
+      <animate attributeName="r" values="2;5;2" dur="1.3s" begin="0.6s" repeatCount="indefinite"/>
+      <animate attributeName="opacity" values="1;0.2;1" dur="1.3s" begin="0.6s" repeatCount="indefinite"/>
+    </circle>
+    <circle cx="100" cy="272" r="3.5">
+      <animate attributeName="r" values="2.5;6;2.5" dur="1.5s" begin="0.9s" repeatCount="indefinite"/>
+      <animate attributeName="opacity" values="1;0.2;1" dur="1.5s" begin="0.9s" repeatCount="indefinite"/>
+    </circle>
+  </g>
+</svg>

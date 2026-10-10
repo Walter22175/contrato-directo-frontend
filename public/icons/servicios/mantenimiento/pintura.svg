@@ -1,0 +1,47 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400" width="400" height="400" fill="none">
+  <!-- Rodillo de Pintura (Estructura Principal en Azul) -->
+  <!-- Esponja / Cilindro del rodillo -->
+  <rect 
+    x="110" 
+    y="70" 
+    width="180" 
+    height="70" 
+    rx="20" 
+    stroke="#0047D4" 
+    stroke-width="16" 
+    stroke-linecap="round" 
+    stroke-linejoin="round" 
+  />
+  <!-- Soporte metálico del rodillo -->
+  <path 
+    d="M290 105 H320 V170 H200 V230" 
+    stroke="#0047D4" 
+    stroke-width="16" 
+    stroke-linecap="round" 
+    stroke-linejoin="round" 
+  />
+  <!-- Mango del rodillo -->
+  <path 
+    d="M200 230 V340" 
+    stroke="#0047D4" 
+    stroke-width="16" 
+    stroke-linecap="round" 
+  />
+
+  <!-- Trazo / Pared pintada (Acento Cian) -->
+  <path 
+    d="M80 160 V220 C80 230 90 240 100 240 C110 240 120 230 120 220 V180 C120 170 130 160 140 160 C150 160 160 170 160 180 V250 C160 260 170 270 180 270 C190 270 200 260 200 250 V160" 
+    stroke="#00C9B7" 
+    stroke-width="16" 
+    stroke-linecap="round" 
+    stroke-linejoin="round" 
+  />
+  
+  <!-- Gota de pintura fresca -->
+  <path 
+    d="M100 280 C100 288 93 295 85 295 C77 295 70 288 70 280 C70 272 85 255 85 255 C85 255 100 272 100 280 Z" 
+    stroke="#00C9B7" 
+    stroke-width="16" 
+    stroke-linejoin="round" 
+  />
+</svg>

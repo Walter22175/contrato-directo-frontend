@@ -1,0 +1,126 @@
+<svg viewBox="0 0 400 400" width="100%" height="100%"
+     xmlns="http://www.w3.org/2000/svg" role="img"
+     aria-label="Icono de App Móvil">
+
+  <defs>
+    <linearGradient id="gradApp" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%"   stop-color="#0A2A66"/>
+      <stop offset="55%"  stop-color="#1E6FE8"/>
+      <stop offset="100%" stop-color="#22C1E0"/>
+    </linearGradient>
+
+    <linearGradient id="gradAroApp" x1="0%" y1="100%" x2="100%" y2="0%">
+      <stop offset="0%"   stop-color="#22C1E0"/>
+      <stop offset="100%" stop-color="#0A2A66"/>
+    </linearGradient>
+
+    <linearGradient id="gradPantalla" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%"   stop-color="#1E6FE8" stop-opacity="0.15"/>
+      <stop offset="100%" stop-color="#22C1E0" stop-opacity="0.35"/>
+    </linearGradient>
+
+    <radialGradient id="glowApp" cx="50%" cy="50%" r="50%">
+      <stop offset="0%"   stop-color="#22C1E0" stop-opacity="0.5"/>
+      <stop offset="100%" stop-color="#22C1E0" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+
+  <!-- Aro exterior giratorio -->
+  <g fill="none" stroke="url(#gradAroApp)" stroke-width="8"
+     stroke-linecap="round" opacity="0.85">
+    <path d="M 110 200 A 90 90 0 0 1 200 110" />
+    <path d="M 200 110 A 90 90 0 0 1 290 200" />
+    <path d="M 290 200 A 90 90 0 0 1 200 290" />
+    <path d="M 200 290 A 90 90 0 0 1 110 200" />
+    <animateTransform attributeName="transform" type="rotate"
+      from="0 200 200" to="360 200 200" dur="40s" repeatCount="indefinite"/>
+  </g>
+
+  <!-- Resplandor pulsante -->
+  <circle cx="200" cy="200" r="75" fill="url(#glowApp)">
+    <animate attributeName="r" values="70;85;70" dur="3s" repeatCount="indefinite"/>
+    <animate attributeName="opacity" values="0.8;0.35;0.8" dur="3s" repeatCount="indefinite"/>
+  </circle>
+
+  <!-- Cuerpo del teléfono -->
+  <g>
+    <rect x="150" y="100" width="100" height="200" rx="18" ry="18" fill="url(#gradApp)"/>
+    <rect x="160" y="115" width="80" height="170" rx="12" ry="12" fill="url(#gradPantalla)"/>
+    <rect x="188" y="107" width="24" height="4" rx="2" ry="2" fill="#ffffff" opacity="0.9"/>
+    <circle cx="200" cy="293" r="4" fill="#ffffff" opacity="0.9"/>
+  </g>
+
+  <!-- UI animada en pantalla -->
+  <g>
+    <rect x="168" y="125" width="64" height="8" rx="4" fill="#0A2A66" opacity="0.7"/>
+    <rect x="168" y="142" width="64" height="26" rx="6" fill="#1E6FE8" opacity="0.85">
+      <animate attributeName="opacity" values="0.85;0.5;0.85" dur="2.5s" repeatCount="indefinite"/>
+    </rect>
+    <rect x="168" y="175" width="50" height="5" rx="2.5" fill="#0A2A66" opacity="0.6"/>
+    <rect x="168" y="186" width="64" height="5" rx="2.5" fill="#0A2A66" opacity="0.4"/>
+    <rect x="168" y="197" width="40" height="5" rx="2.5" fill="#0A2A66" opacity="0.4"/>
+    <rect x="168" y="212" width="64" height="18" rx="9" fill="url(#gradApp)">
+      <animate attributeName="opacity" values="1;0.7;1" dur="1.8s" repeatCount="indefinite"/>
+    </rect>
+    <rect x="168" y="238" width="64" height="22" rx="6" fill="#22C1E0" opacity="0.75">
+      <animate attributeName="opacity" values="0.75;0.4;0.75" dur="2.5s" begin="0.8s" repeatCount="indefinite"/>
+    </rect>
+    <rect x="168" y="268" width="64" height="6" rx="3" fill="#0A2A66" opacity="0.2"/>
+    <rect x="168" y="268" width="20" height="6" rx="3" fill="#22C1E0">
+      <animate attributeName="width" values="20;64;20" dur="2.5s" repeatCount="indefinite"/>
+    </rect>
+  </g>
+
+  <!-- Señal WiFi -->
+  <g fill="none" stroke="#22C1E0" stroke-width="4" stroke-linecap="round">
+    <path d="M 185 85 A 25 25 0 0 1 215 85">
+      <animate attributeName="opacity" values="1;0.3;1" dur="2s" repeatCount="indefinite"/>
+    </path>
+    <path d="M 175 75 A 40 40 0 0 1 225 75">
+      <animate attributeName="opacity" values="0.3;1;0.3" dur="2s" repeatCount="indefinite"/>
+    </path>
+    <path d="M 165 65 A 55 55 0 0 1 235 65">
+      <animate attributeName="opacity" values="1;0.3;1" dur="2s" begin="0.5s" repeatCount="indefinite"/>
+    </path>
+  </g>
+  <circle cx="200" cy="92" r="4" fill="#22C1E0"/>
+
+  <!-- Badges de notificación -->
+  <g>
+    <circle cx="252" cy="118" r="14" fill="#22C1E0">
+      <animate attributeName="r" values="14;17;14" dur="1.8s" repeatCount="indefinite"/>
+    </circle>
+    <text x="252" y="123" text-anchor="middle" font-family="sans-serif"
+          font-size="14" font-weight="700" fill="#ffffff">3</text>
+  </g>
+  <g>
+    <circle cx="148" cy="278" r="11" fill="#1E6FE8">
+      <animate attributeName="r" values="11;13;11" dur="2.2s" begin="0.5s" repeatCount="indefinite"/>
+    </circle>
+    <circle cx="148" cy="278" r="4" fill="#ffffff"/>
+  </g>
+
+  <!-- Nodos orbitando -->
+  <g>
+    <circle cx="200" cy="105" r="5" fill="#22C1E0">
+      <animateTransform attributeName="transform" type="rotate"
+        from="0 200 200" to="360 200 200" dur="20s" repeatCount="indefinite"/>
+    </circle>
+    <circle cx="295" cy="200" r="4" fill="#1E6FE8">
+      <animateTransform attributeName="transform" type="rotate"
+        from="0 200 200" to="-360 200 200" dur="25s" repeatCount="indefinite"/>
+    </circle>
+    <circle cx="105" cy="200" r="5" fill="#0A2A66">
+      <animateTransform attributeName="transform" type="rotate"
+        from="0 200 200" to="360 200 200" dur="18s" repeatCount="indefinite"/>
+    </circle>
+  </g>
+
+  <!-- Ondas de transmisión -->
+  <g fill="none" stroke="#22C1E0" stroke-width="3" stroke-linecap="round" opacity="0.5">
+    <circle cx="200" cy="200" r="95">
+      <animate attributeName="r" values="90;115;90" dur="4s" repeatCount="indefinite"/>
+      <animate attributeName="opacity" values="0.5;0;0.5" dur="4s" repeatCount="indefinite"/>
+    </circle>
+  </g>
+</svg>

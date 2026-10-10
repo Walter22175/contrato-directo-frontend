@@ -2,6 +2,7 @@
 
 import PromocionCarousel from '@/components/layout/PromocionCarousel';
 import Link from 'next/link';
+import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { Search, Shield, FileText, Star, ArrowRight, ChevronRight, Box } from 'lucide-react';
@@ -9,15 +10,16 @@ import Button from '@/components/ui/Button';
 import { Promocion } from '@/types';
 import type { Servicio } from '@/types';
 import api, { extractData } from '@/lib/api';
+import { iconoCategoria } from '@/lib/iconos';
 
 const categories = [
-  { name: 'Mantenimiento', icon: '🔧', slug: 'mantenimiento' },
-  { name: 'Automóviles', icon: '🚗', slug: 'automoviles' },
-  { name: 'Mascotas', icon: '🐾', slug: 'mascotas' },
-  { name: 'Tecnología', icon: '💻', slug: 'tecnologia' },
-  { name: 'Community Manager', icon: '📱', slug: 'community-manager' },
-  { name: 'Software', icon: '⚙️', slug: 'software' },
-  { name: 'Paisajismo', icon: '🌿', slug: 'paisajismo' },
+  { name: 'Mantenimiento', icon: iconoCategoria('Mantenimiento y Reparaciones Domiciliarias'), fallback: '🔧', slug: 'mantenimiento' },
+  { name: 'Automóviles', icon: iconoCategoria('Automóviles'), fallback: '🚗', slug: 'automoviles' },
+  { name: 'Mascotas', icon: iconoCategoria('Mascotas'), fallback: '🐾', slug: 'mascotas' },
+  { name: 'Tecnología', icon: iconoCategoria('Tecnología'), fallback: '💻', slug: 'tecnologia' },
+  { name: 'Community Manager', icon: iconoCategoria('Community Manager'), fallback: '📱', slug: 'community-manager' },
+  { name: 'Software', icon: iconoCategoria('Software'), fallback: '⚙️', slug: 'software' },
+  { name: 'Paisajismo', icon: iconoCategoria('Paisajismo'), fallback: '🌿', slug: 'paisajismo' },
 ];
 
 const features = [
@@ -233,13 +235,24 @@ export default function HomePage() {
                               i === selectedIndex ? 'bg-slate-700' : ''
                             }`}
                           >
-                            <div className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 
+                            <div className="w-16 h-16 rounded-lg flex items-center justify-center flex-shrink-0 
                               {sug.type === 'categoria' ? 'bg-purple-500/20 text-purple-400' : 'bg-cyan-500/20 text-cyan-400'}
                             ">
                               {sug.type === 'categoria' ? (
-                                <Box className="w-4 h-4" />
+                                categories.find((c) => c.name === sug.label)?.icon ? (
+                                  <Image
+                                    src={categories.find((c) => c.name === sug.label)!.icon!}
+                                    alt=""
+                                    width={32}
+                                    height={32}
+                                    unoptimized
+                                    className="w-8 h-8 object-contain"
+                                  />
+                                ) : (
+                                  <Box className="w-8 h-8" />
+                                )
                               ) : (
-                                <Search className="w-4 h-4" />
+                                <Search className="w-8 h-8" />
                               )}
                             </div>
                             <div className="flex-1 min-w-0">
@@ -287,10 +300,16 @@ export default function HomePage() {
                 <Link
                   key={cat.slug}
                   href={`/servicios?categoria=${cat.slug}`}
-                  className="flex flex-col items-center gap-2 p-4 bg-slate-800/50 border border-slate-700 rounded-xl hover:border-cyan-500/50 transition-colors"
+                  className="group relative flex flex-col items-center justify-center gap-2 min-h-[9rem] p-4 overflow-hidden bg-slate-800/50 border border-slate-700 rounded-xl hover:border-cyan-500/50 transition-colors"
                 >
-                  <span className="text-3xl">{cat.icon}</span>
-                  <span className="text-sm text-slate-300 text-center">{cat.name}</span>
+                  {cat.icon ? (
+                    <div className="absolute inset-0 flex items-center justify-center pointer-events-none transition-transform duration-300 group-hover:scale-110">
+                      <Image src={cat.icon} alt="" width={96} height={96} unoptimized className="w-24 h-24 object-contain" />
+                    </div>
+                  ) : (
+                    <span className="absolute inset-0 flex items-center justify-center text-[6rem] pointer-events-none">{cat.fallback}</span>
+                  )}
+                  <span className="relative text-sm font-medium text-slate-300 text-center">{cat.name}</span>
                 </Link>
               ))}
             </div>

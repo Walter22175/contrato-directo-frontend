@@ -1,0 +1,64 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400" width="400" height="400" fill="none">
+  <!-- Banco de Trabajo / Madera (Estructura Base) -->
+  <path 
+    d="M60 300 H340 M60 300 V340 H340 V300" 
+    stroke="#0047D4" 
+    stroke-width="16" 
+    stroke-linecap="round" 
+    stroke-linejoin="round" 
+  />
+  <path d="M100 340 V360 M300 340 V360" stroke="#0047D4" stroke-width="16" stroke-linecap="round" />
+
+  <!-- Serrucho (Herramienta Principal) -->
+  <path 
+    d="M110 240 L250 100" 
+    stroke="#0047D4" 
+    stroke-width="16" 
+    stroke-linecap="round" 
+  />
+  <!-- Dientes del Serrucho -->
+  <path 
+    d="M110 240 L125 240 L130 225 L145 225 L150 210 L165 210 L170 195 L185 195 L190 180 L205 180 L210 165 L225 165 L230 150 L250 150" 
+    stroke="#0047D4" 
+    stroke-width="16" 
+    stroke-linecap="round" 
+    stroke-linejoin="round" 
+  />
+  <!-- Mango del Serrucho -->
+  <path 
+    d="M250 100 C270 80 290 80 310 100 L330 120 C350 140 350 160 330 180 L310 200 C290 220 270 200 250 180" 
+    stroke="#0047D4" 
+    stroke-width="16" 
+    stroke-linecap="round" 
+    stroke-linejoin="round" 
+  />
+  <!-- Agujero del Mango -->
+  <path 
+    d="M290 135 C295 130 305 130 310 135 C315 140 315 150 310 155 C305 160 295 160 290 155 C285 150 285 140 290 135 Z" 
+    stroke="#0047D4" 
+    stroke-width="16" 
+    stroke-linecap="round" 
+    stroke-linejoin="round" 
+  />
+
+  <!-- Martillo (Herramienta de Acento) -->
+  <!-- Mango del Martillo -->
+  <path 
+    d="M120 250 L195 175" 
+    stroke="#00C9B7" 
+    stroke-width="16" 
+    stroke-linecap="round" 
+  />
+  <!-- Cabeza del Martillo -->
+  <path 
+    d="M175 145 L215 185 M190 130 C175 135 165 145 165 155 L180 170 C190 170 200 160 205 145 L190 130 Z" 
+    stroke="#00C9B7" 
+    stroke-width="16" 
+    stroke-linecap="round" 
+    stroke-linejoin="round" 
+  />
+
+  <!-- Virutas / Detalles de Corte (Movimiento) -->
+  <path d="M80 220 A15 15 0 0 1 100 205" stroke="#00C9B7" stroke-width="16" stroke-linecap="round" />
+  <path d="M110 160 A12 12 0 0 1 125 150" stroke="#00C9B7" stroke-width="16" stroke-linecap="round" />
+</svg>

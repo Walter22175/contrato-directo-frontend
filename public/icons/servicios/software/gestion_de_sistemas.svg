@@ -1,0 +1,276 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg viewBox="0 0 400 400" width="100%" height="100%"
+     xmlns="http://www.w3.org/2000/svg" role="img"
+     aria-label="Icono de Gestión de Sistemas - Contrato Directo">
+
+  <defs>
+    <linearGradient id="gradGS" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%"   stop-color="#0A2A66"/>
+      <stop offset="55%"  stop-color="#1E6FE8"/>
+      <stop offset="100%" stop-color="#22C1E0"/>
+    </linearGradient>
+
+    <linearGradient id="gradAroGS" x1="0%" y1="100%" x2="100%" y2="0%">
+      <stop offset="0%"   stop-color="#22C1E0"/>
+      <stop offset="100%" stop-color="#0A2A66"/>
+    </linearGradient>
+
+    <linearGradient id="gradRack" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%"   stop-color="#22C1E0"/>
+      <stop offset="100%" stop-color="#1E6FE8"/>
+    </linearGradient>
+
+    <radialGradient id="glowGS" cx="50%" cy="50%" r="50%">
+      <stop offset="0%"   stop-color="#22C1E0" stop-opacity="0.55"/>
+      <stop offset="100%" stop-color="#22C1E0" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+
+  <!-- Aro exterior institucional -->
+  <g fill="none" stroke="url(#gradAroGS)" stroke-width="7"
+     stroke-linecap="round" opacity="0.85">
+    <path d="M 70 200 A 130 130 0 0 1 200 70" />
+    <path d="M 200 70 A 130 130 0 0 1 330 200" />
+    <path d="M 330 200 A 130 130 0 0 1 200 330" />
+    <path d="M 200 330 A 130 130 0 0 1 70 200" />
+    <animateTransform attributeName="transform" type="rotate"
+      from="0 200 200" to="360 200 200" dur="50s" repeatCount="indefinite"/>
+  </g>
+
+  <!-- Resplandor central -->
+  <circle cx="200" cy="200" r="95" fill="url(#glowGS)">
+    <animate attributeName="r" values="90;110;90" dur="3s" repeatCount="indefinite"/>
+    <animate attributeName="opacity" values="0.7;0.3;0.7" dur="3s" repeatCount="indefinite"/>
+  </circle>
+
+  <!-- 🖥️ RACK DE SERVIDORES CENTRAL (núcleo) -->
+  <g transform="translate(200 200) scale(0.95)">
+    <g>
+      <!-- Animación: los LEDs parpadean -->
+      <animateTransform attributeName="transform" type="translate"
+        values="0 0; 0 -2; 0 0" dur="3s" repeatCount="indefinite"/>
+
+      <!-- Gabinete del rack -->
+      <rect x="-38" y="-52" width="76" height="104" rx="6" fill="url(#gradGS)"/>
+
+      <!-- Unidades del servidor (4) -->
+      <g>
+        <!-- Servidor 1 -->
+        <rect x="-32" y="-46" width="64" height="20" rx="3" fill="url(#gradRack)"/>
+        <rect x="-28" y="-42" width="20" height="3" rx="1.5" fill="#ffffff" opacity="0.7"/>
+        <rect x="-28" y="-37" width="28" height="3" rx="1.5" fill="#ffffff" opacity="0.5"/>
+        <circle cx="22" cy="-40" r="2" fill="#22C1E0">
+          <animate attributeName="opacity" values="1;0.2;1" dur="1.2s" repeatCount="indefinite"/>
+        </circle>
+        <circle cx="22" cy="-34" r="2" fill="#22C1E0">
+          <animate attributeName="opacity" values="1;0.2;1" dur="1.4s" begin="0.3s" repeatCount="indefinite"/>
+        </circle>
+
+        <!-- Servidor 2 -->
+        <rect x="-32" y="-22" width="64" height="20" rx="3" fill="url(#gradRack)"/>
+        <rect x="-28" y="-18" width="20" height="3" rx="1.5" fill="#ffffff" opacity="0.7"/>
+        <rect x="-28" y="-13" width="28" height="3" rx="1.5" fill="#ffffff" opacity="0.5"/>
+        <circle cx="22" cy="-16" r="2" fill="#22C1E0">
+          <animate attributeName="opacity" values="1;0.2;1" dur="1.3s" begin="0.6s" repeatCount="indefinite"/>
+        </circle>
+        <circle cx="22" cy="-10" r="2" fill="#22C1E0">
+          <animate attributeName="opacity" values="1;0.2;1" dur="1.5s" begin="0.9s" repeatCount="indefinite"/>
+        </circle>
+
+        <!-- Servidor 3 -->
+        <rect x="-32" y="2" width="64" height="20" rx="3" fill="url(#gradRack)"/>
+        <rect x="-28" y="6" width="20" height="3" rx="1.5" fill="#ffffff" opacity="0.7"/>
+        <rect x="-28" y="11" width="28" height="3" rx="1.5" fill="#ffffff" opacity="0.5"/>
+        <circle cx="22" cy="8" r="2" fill="#22C1E0">
+          <animate attributeName="opacity" values="1;0.2;1" dur="1.2s" begin="0.2s" repeatCount="indefinite"/>
+        </circle>
+        <circle cx="22" cy="14" r="2" fill="#22C1E0">
+          <animate attributeName="opacity" values="1;0.2;1" dur="1.4s" begin="0.5s" repeatCount="indefinite"/>
+        </circle>
+
+        <!-- Servidor 4 -->
+        <rect x="-32" y="26" width="64" height="20" rx="3" fill="url(#gradRack)"/>
+        <rect x="-28" y="30" width="20" height="3" rx="1.5" fill="#ffffff" opacity="0.7"/>
+        <rect x="-28" y="35" width="28" height="3" rx="1.5" fill="#ffffff" opacity="0.5"/>
+        <circle cx="22" cy="32" r="2" fill="#22C1E0">
+          <animate attributeName="opacity" values="1;0.2;1" dur="1.3s" begin="0.8s" repeatCount="indefinite"/>
+        </circle>
+        <circle cx="22" cy="38" r="2" fill="#22C1E0">
+          <animate attributeName="opacity" values="1;0.2;1" dur="1.5s" begin="0.1s" repeatCount="indefinite"/>
+        </circle>
+      </g>
+
+      <!-- Brillo superior -->
+      <rect x="-34" y="-50" width="68" height="2" rx="1" fill="#ffffff" opacity="0.4"/>
+    </g>
+  </g>
+
+  <!-- 📊 MONITOREO / DASHBOARD (12 en punto) -->
+  <g transform="translate(200 118) scale(0.62)">
+    <g>
+      <animateTransform attributeName="transform" type="translate"
+        values="0 0; 0 -3; 0 0" dur="2.6s" repeatCount="indefinite"/>
+      <!-- Panel del dashboard -->
+      <rect x="-24" y="-18" width="48" height="34" rx="4" fill="url(#gradGS)"/>
+      <!-- Pantalla -->
+      <rect x="-20" y="-14" width="40" height="26" rx="2" fill="#0A2A66" opacity="0.9"/>
+      <!-- Barras del gráfico -->
+      <rect x="-16" y="2" width="4" height="6" rx="1" fill="#22C1E0">
+        <animate attributeName="height" values="6;10;6" dur="1.6s" repeatCount="indefinite"/>
+        <animate attributeName="y" values="2;-2;2" dur="1.6s" repeatCount="indefinite"/>
+      </rect>
+      <rect x="-9" y="-2" width="4" height="10" rx="1" fill="#22C1E0">
+        <animate attributeName="height" values="10;4;10" dur="1.6s" begin="0.2s" repeatCount="indefinite"/>
+        <animate attributeName="y" values="-2;4;-2" dur="1.6s" begin="0.2s" repeatCount="indefinite"/>
+      </rect>
+      <rect x="-2" y="0" width="4" height="8" rx="1" fill="#22C1E0">
+        <animate attributeName="height" values="8;12;8" dur="1.6s" begin="0.4s" repeatCount="indefinite"/>
+        <animate attributeName="y" values="0;-4;0" dur="1.6s" begin="0.4s" repeatCount="indefinite"/>
+      </rect>
+      <rect x="5" y="-4" width="4" height="12" rx="1" fill="#22C1E0">
+        <animate attributeName="height" values="12;6;12" dur="1.6s" begin="0.6s" repeatCount="indefinite"/>
+        <animate attributeName="y" values="-4;2;-4" dur="1.6s" begin="0.6s" repeatCount="indefinite"/>
+      </rect>
+      <rect x="12" y="0" width="4" height="8" rx="1" fill="#22C1E0">
+        <animate attributeName="height" values="8;12;8" dur="1.6s" begin="0.8s" repeatCount="indefinite"/>
+        <animate attributeName="y" values="0;-4;0" dur="1.6s" begin="0.8s" repeatCount="indefinite"/>
+      </rect>
+      <!-- Línea superior -->
+      <rect x="-16" y="-10" width="32" height="2" rx="1" fill="#22C1E0" opacity="0.6"/>
+      <!-- Base del monitor -->
+      <rect x="-6" y="16" width="12" height="4" rx="2" fill="url(#gradGS)"/>
+      <rect x="-12" y="19" width="24" height="3" rx="1.5" fill="url(#gradGS)"/>
+    </g>
+  </g>
+
+  <!-- ⚙️ ENGRANAJE / CONFIGURACIÓN (6 en punto) -->
+  <g transform="translate(200 288) scale(0.62)">
+    <g>
+      <animateTransform attributeName="transform" type="rotate"
+        from="0 0 0" to="360 0 0" dur="6s" repeatCount="indefinite"/>
+      <!-- Dientes -->
+      <path d="M 0 -24 L 6 -24 L 6 -18 L -6 -18 L -6 -24 Z
+               M 0 24 L 6 24 L 6 18 L -6 18 L -6 24 Z
+               M -24 0 L -24 -6 L -18 -6 L -18 6 L -24 6 Z
+               M 24 0 L 24 -6 L 18 -6 L 18 6 L 24 6 Z
+               M -17 -17 L -13 -21 L -17 -25 L -21 -21 Z
+               M 17 -17 L 21 -21 L 17 -25 L 13 -21 Z
+               M -17 17 L -21 21 L -17 25 L -13 21 Z
+               M 17 17 L 13 21 L 17 25 L 21 21 Z"
+            fill="url(#gradGS)"/>
+      <circle r="17" fill="url(#gradGS)"/>
+      <circle r="7" fill="#ffffff" opacity="0.9"/>
+      <!-- Símbolo de sistema -->
+      <rect x="-3" y="-3" width="6" height="6" rx="1" fill="#22C1E0"/>
+    </g>
+  </g>
+
+  <!-- 🔄 SINCRONIZACIÓN / BACKUP (9 en punto) -->
+  <g transform="translate(118 200) scale(0.62)">
+    <g>
+      <!-- Flechas circulares girando -->
+      <g>
+        <animateTransform attributeName="transform" type="rotate"
+          from="0 0 0" to="360 0 0" dur="4s" repeatCount="indefinite"/>
+        <!-- Flecha 1 -->
+        <path d="M -22 -6 A 22 22 0 0 1 22 -6" fill="none"
+              stroke="url(#gradGS)" stroke-width="5" stroke-linecap="round"/>
+        <path d="M 22 -6 L 16 -12 L 26 -12 Z" fill="url(#gradGS)"/>
+        <!-- Flecha 2 -->
+        <path d="M 22 6 A 22 22 0 0 1 -22 6" fill="none"
+              stroke="url(#gradGS)" stroke-width="5" stroke-linecap="round"/>
+        <path d="M -22 6 L -16 12 L -26 12 Z" fill="url(#gradGS)"/>
+      </g>
+      <!-- Centro -->
+      <circle r="7" fill="url(#gradGS)"/>
+      <circle r="3" fill="#22C1E0"/>
+    </g>
+  </g>
+
+  <!-- 🔐 SEGURIDAD / ACCESO (3 en punto) -->
+  <g transform="translate(282 200) scale(0.62)">
+    <g>
+      <animateTransform attributeName="transform" type="translate"
+        values="0 0; 0 -3; 0 0" dur="2.8s" repeatCount="indefinite"/>
+      <!-- Escudo -->
+      <path d="M 0 -24 L 20 -16 L 20 4 Q 20 18 0 26 Q -20 18 -20 4 L -20 -16 Z"
+            fill="url(#gradGS)"/>
+      <!-- Candado dentro -->
+      <rect x="-8" y="-4" width="16" height="14" rx="2" fill="#ffffff" opacity="0.95"/>
+      <path d="M -5 -4 L -5 -8 Q -5 -12 0 -12 Q 5 -12 5 -8 L 5 -4"
+            fill="none" stroke="#ffffff" stroke-width="3" stroke-linecap="round"/>
+      <circle cx="0" cy="2" r="2" fill="#0A2A66"/>
+      <rect x="-0.75" y="2" width="1.5" height="4" fill="#0A2A66"/>
+      <!-- Brillo -->
+      <path d="M -12 -12 L 12 -12 L 10 -14 L -10 -14 Z"
+            fill="#ffffff" opacity="0.35"/>
+    </g>
+  </g>
+
+  <!-- 🖧 RED / NODOS (10-11 en punto) -->
+  <g transform="translate(118 118) scale(0.58)">
+    <g>
+      <animateTransform attributeName="transform" type="rotate"
+        values="-6; 6; -6" dur="3.2s" repeatCount="indefinite"/>
+      <!-- Líneas de conexión -->
+      <line x1="0" y1="0" x2="-20" y2="-20" stroke="url(#gradGS)" stroke-width="2.5" stroke-linecap="round"/>
+      <line x1="0" y1="0" x2="-20" y2="20" stroke="url(#gradGS)" stroke-width="2.5" stroke-linecap="round"/>
+      <line x1="0" y1="0" x2="20" y2="-20" stroke="url(#gradGS)" stroke-width="2.5" stroke-linecap="round"/>
+      <line x1="0" y1="0" x2="20" y2="20" stroke="url(#gradGS)" stroke-width="2.5" stroke-linecap="round"/>
+      <!-- Nodos -->
+      <circle cx="-20" cy="-20" r="6" fill="url(#gradGS)"/>
+      <circle cx="-20" cy="20" r="6" fill="url(#gradGS)"/>
+      <circle cx="20" cy="-20" r="6" fill="url(#gradGS)"/>
+      <circle cx="20" cy="20" r="6" fill="url(#gradGS)"/>
+      <!-- Nodo central -->
+      <circle r="9" fill="url(#gradGS)"/>
+      <circle r="4" fill="#ffffff" opacity="0.95">
+        <animate attributeName="r" values="4;6;4" dur="1.8s" repeatCount="indefinite"/>
+      </circle>
+    </g>
+  </g>
+
+  <!-- 📈 MÉTRICAS / RENDIMIENTO (1-2 en punto) -->
+  <g transform="translate(282 118) scale(0.58)">
+    <g>
+      <animateTransform attributeName="transform" type="translate"
+        values="0 0; 0 -3; 0 0" dur="2.6s" repeatCount="indefinite"/>
+      <!-- Panel de métricas -->
+      <rect x="-22" y="-18" width="44" height="36" rx="4" fill="url(#gradGS)"/>
+      <!-- Gráfico de línea -->
+      <path d="M -16 10 L -10 2 L -4 6 L 2 -6 L 8 -2 L 14 -10"
+            fill="none" stroke="#22C1E0" stroke-width="2.5"
+            stroke-linecap="round" stroke-linejoin="round">
+        <animate attributeName="stroke-dasharray" values="0 100;50 0" dur="2s" repeatCount="indefinite"/>
+      </path>
+      <!-- Puntos de la línea -->
+      <circle cx="-10" cy="2" r="1.5" fill="#ffffff"/>
+      <circle cx="2" cy="-6" r="1.5" fill="#ffffff"/>
+      <circle cx="14" cy="-10" r="1.5" fill="#22C1E0">
+        <animate attributeName="r" values="1.5;3;1.5" dur="1.4s" repeatCount="indefinite"/>
+      </circle>
+      <!-- Eje -->
+      <line x1="-16" y1="12" x2="16" y2="12" stroke="#ffffff" stroke-width="1" opacity="0.4"/>
+    </g>
+  </g>
+
+  <!-- CHISPAS / partículas alrededor (datos) -->
+  <g fill="#22C1E0">
+    <circle cx="270" cy="105" r="3.5">
+      <animate attributeName="r" values="2.5;6;2.5" dur="1.2s" repeatCount="indefinite"/>
+      <animate attributeName="opacity" values="1;0.2;1" dur="1.2s" repeatCount="indefinite"/>
+    </circle>
+    <circle cx="130" cy="105" r="3">
+      <animate attributeName="r" values="2;5;2" dur="1.4s" begin="0.3s" repeatCount="indefinite"/>
+      <animate attributeName="opacity" values="1;0.2;1" dur="1.4s" begin="0.3s" repeatCount="indefinite"/>
+    </circle>
+    <circle cx="300" cy="272" r="3">
+      <animate attributeName="r" values="2;5;2" dur="1.3s" begin="0.6s" repeatCount="indefinite"/>
+      <animate attributeName="opacity" values="1;0.2;1" dur="1.3s" begin="0.6s" repeatCount="indefinite"/>
+    </circle>
+    <circle cx="100" cy="272" r="3.5">
+      <animate attributeName="r" values="2.5;6;2.5" dur="1.5s" begin="0.9s" repeatCount="indefinite"/>
+      <animate attributeName="opacity" values="1;0.2;1" dur="1.5s" begin="0.9s" repeatCount="indefinite"/>
+    </circle>
+  </g>
+</svg>

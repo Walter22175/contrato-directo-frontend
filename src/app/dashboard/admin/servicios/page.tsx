@@ -2,7 +2,9 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import api, { extractData } from '@/lib/api';
+import { iconoCategoria, iconoServicio } from '@/lib/iconos';
 import { Card } from '@/components/ui/Card';
+import Image from 'next/image';
 import {
   Briefcase,
   Search,
@@ -439,8 +441,12 @@ export default function AdminServiciosPage() {
               <Card key={c.id_categoria}>
                 <div className="p-4 flex items-center justify-between">
                   <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 bg-cyan-500/10 rounded-lg flex items-center justify-center">
-                      <Briefcase className="w-5 h-5 text-cyan-400" />
+                    <div className="w-20 h-20 bg-cyan-500/10 rounded-lg flex items-center justify-center">
+                      {iconoCategoria(c.nombre) ? (
+                        <Image src={iconoCategoria(c.nombre)!} alt="" width={48} height={48} unoptimized className="w-12 h-12 object-contain" />
+                      ) : (
+                        <Briefcase className="w-10 h-10 text-cyan-400" />
+                      )}
                     </div>
                     <div>
                       <h3 className="text-sm font-medium text-white">{c.nombre}</h3>
@@ -475,8 +481,12 @@ export default function AdminServiciosPage() {
               <Card key={s.id_servicio}>
                 <div className="p-4 flex items-center justify-between">
                   <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 bg-slate-700 rounded-lg flex items-center justify-center">
-                      <Briefcase className="w-5 h-5 text-slate-300" />
+                    <div className="w-20 h-20 bg-slate-700 rounded-lg flex items-center justify-center">
+                      {iconoServicio(s.nombre) ? (
+                        <Image src={iconoServicio(s.nombre)!} alt="" width={48} height={48} unoptimized className="w-12 h-12 object-contain" />
+                      ) : (
+                        <Briefcase className="w-10 h-10 text-slate-300" />
+                      )}
                     </div>
                     <div>
                       <h3 className="text-sm font-medium text-white">{s.nombre}</h3>

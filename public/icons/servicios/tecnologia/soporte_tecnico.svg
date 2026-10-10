@@ -1,0 +1,254 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg viewBox="0 0 400 400" width="100%" height="100%"
+     xmlns="http://www.w3.org/2000/svg" role="img"
+     aria-label="Icono de Soporte Técnico - Contrato Directo">
+
+  <defs>
+    <linearGradient id="gradST" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%"   stop-color="#0A2A66"/>
+      <stop offset="55%"  stop-color="#1E6FE8"/>
+      <stop offset="100%" stop-color="#22C1E0"/>
+    </linearGradient>
+
+    <linearGradient id="gradAroST" x1="0%" y1="100%" x2="100%" y2="0%">
+      <stop offset="0%"   stop-color="#22C1E0"/>
+      <stop offset="100%" stop-color="#0A2A66"/>
+    </linearGradient>
+
+    <linearGradient id="gradAuri" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%"   stop-color="#22C1E0"/>
+      <stop offset="100%" stop-color="#1E6FE8"/>
+    </linearGradient>
+
+    <radialGradient id="glowST" cx="50%" cy="50%" r="50%">
+      <stop offset="0%"   stop-color="#22C1E0" stop-opacity="0.55"/>
+      <stop offset="100%" stop-color="#22C1E0" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+
+  <!-- Aro exterior institucional -->
+  <g fill="none" stroke="url(#gradAroST)" stroke-width="7"
+     stroke-linecap="round" opacity="0.85">
+    <path d="M 70 200 A 130 130 0 0 1 200 70" />
+    <path d="M 200 70 A 130 130 0 0 1 330 200" />
+    <path d="M 330 200 A 130 130 0 0 1 200 330" />
+    <path d="M 200 330 A 130 130 0 0 1 70 200" />
+    <animateTransform attributeName="transform" type="rotate"
+      from="0 200 200" to="360 200 200" dur="50s" repeatCount="indefinite"/>
+  </g>
+
+  <!-- Resplandor central -->
+  <circle cx="200" cy="200" r="95" fill="url(#glowST)">
+    <animate attributeName="r" values="90;110;90" dur="3s" repeatCount="indefinite"/>
+    <animate attributeName="opacity" values="0.7;0.3;0.7" dur="3s" repeatCount="indefinite"/>
+  </circle>
+
+  <!-- 🎧 AURICULARES CON MICRÓFONO CENTRAL (núcleo) -->
+  <g transform="translate(200 200) scale(0.95)">
+    <g>
+      <!-- Animación: la diadema pulsa -->
+      <animateTransform attributeName="transform" type="translate"
+        values="0 0; 0 -2; 0 0" dur="2.5s" repeatCount="indefinite"/>
+
+      <!-- Diadema superior -->
+      <path d="M -50 -10 Q -50 -50 0 -50 Q 50 -50 50 -10"
+            fill="none" stroke="url(#gradST)" stroke-width="10"
+            stroke-linecap="round"/>
+
+      <!-- Auricular izquierdo -->
+      <rect x="-58" y="-14" width="20" height="34" rx="8" fill="url(#gradAuri)"/>
+      <rect x="-54" y="-10" width="12" height="26" rx="5" fill="#0A2A66" opacity="0.6"/>
+      <ellipse cx="-48" cy="3" rx="4" ry="10" fill="#22C1E0" opacity="0.8"/>
+
+      <!-- Auricular derecho -->
+      <rect x="38" y="-14" width="20" height="34" rx="8" fill="url(#gradAuri)"/>
+      <rect x="42" y="-10" width="12" height="26" rx="5" fill="#0A2A66" opacity="0.6"/>
+      <ellipse cx="48" cy="3" rx="4" ry="10" fill="#22C1E0" opacity="0.8"/>
+
+      <!-- Micrófono (brazo + capsula) -->
+      <path d="M -48 20 Q -48 40 -30 46 Q -20 50 -14 46"
+            fill="none" stroke="url(#gradST)" stroke-width="5"
+            stroke-linecap="round"/>
+      <!-- Cápsula del micrófono -->
+      <ellipse cx="-10" cy="46" rx="8" ry="6" fill="url(#gradST)"/>
+      <ellipse cx="-10" cy="46" rx="4" ry="3" fill="#0A2A66" opacity="0.6"/>
+      <!-- Onda de voz -->
+      <g stroke="#22C1E0" stroke-width="2" stroke-linecap="round" fill="none">
+        <path d="M -2 42 Q 4 46 -2 50">
+          <animate attributeName="opacity" values="1;0.2;1" dur="1.2s" repeatCount="indefinite"/>
+        </path>
+        <path d="M 4 38 Q 12 46 4 54">
+          <animate attributeName="opacity" values="0.6;0.1;0.6" dur="1.4s" repeatCount="indefinite"/>
+        </path>
+      </g>
+
+      <!-- Conector / cable del micrófono -->
+      <path d="M -48 20 Q -60 24 -60 34"
+            fill="none" stroke="url(#gradST)" stroke-width="4"
+            stroke-linecap="round"/>
+
+      <!-- Brillo de la diadema -->
+      <path d="M -40 -40 Q -20 -46 0 -46 Q 20 -46 40 -40"
+            fill="none" stroke="#ffffff" stroke-width="2" opacity="0.5"/>
+    </g>
+  </g>
+
+  <!-- 💬 BURBUJA DE CHAT (12 en punto) -->
+  <g transform="translate(200 118) scale(0.62)">
+    <g>
+      <animateTransform attributeName="transform" type="translate"
+        values="0 0; 0 -3; 0 0" dur="2.6s" repeatCount="indefinite"/>
+      <!-- Burbuja de chat -->
+      <path d="M -22 -10 h 44 a 8 8 0 0 1 8 8 v 14 a 8 8 0 0 1 -8 8 h -26
+               l -12 10 v -10 h -6 a 8 8 0 0 1 -8 -8 v -14 a 8 8 0 0 1 8 -8 z"
+            fill="url(#gradST)"/>
+      <!-- Puntitos animados -->
+      <g fill="#ffffff">
+        <circle cx="-8" cy="5" r="2.5">
+          <animate attributeName="opacity" values="1;0.3;1" dur="1s" repeatCount="indefinite"/>
+        </circle>
+        <circle cx="0" cy="5" r="2.5">
+          <animate attributeName="opacity" values="1;0.3;1" dur="1s" begin="0.2s" repeatCount="indefinite"/>
+        </circle>
+        <circle cx="8" cy="5" r="2.5">
+          <animate attributeName="opacity" values="1;0.3;1" dur="1s" begin="0.4s" repeatCount="indefinite"/>
+        </circle>
+      </g>
+      <!-- Brillo -->
+      <rect x="-16" y="-7" width="32" height="2" rx="1" fill="#ffffff" opacity="0.35"/>
+    </g>
+  </g>
+
+  <!-- 🖥️ MONITOR REMOTO (6 en punto) -->
+  <g transform="translate(200 288) scale(0.62)">
+    <g>
+      <animateTransform attributeName="transform" type="translate"
+        values="0 0; 0 3; 0 0" dur="2.8s" repeatCount="indefinite"/>
+      <!-- Monitor -->
+      <rect x="-24" y="-18" width="48" height="34" rx="4" fill="url(#gradST)"/>
+      <rect x="-20" y="-14" width="40" height="26" rx="2" fill="#0A2A66" opacity="0.9"/>
+      <!-- Base del monitor -->
+      <rect x="-8" y="16" width="16" height="5" rx="2" fill="url(#gradST)"/>
+      <rect x="-14" y="20" width="28" height="4" rx="2" fill="url(#gradST)"/>
+      <!-- Líneas de código / asistencia -->
+      <rect x="-16" y="-10" width="14" height="2" rx="1" fill="#22C1E0"/>
+      <rect x="-16" y="-5" width="24" height="2" rx="1" fill="#22C1E0" opacity="0.7"/>
+      <rect x="-16" y="0" width="18" height="2" rx="1" fill="#22C1E0" opacity="0.6"/>
+      <rect x="-16" y="5" width="28" height="2" rx="1" fill="#22C1E0" opacity="0.5"/>
+      <!-- Cursor remoto -->
+      <path d="M 6 4 L 6 12 L 9 9 L 11 13 L 13 12 L 11 8 L 14 8 Z"
+            fill="#ffffff"/>
+      <!-- LED -->
+      <circle cx="18" cy="14" r="1.5" fill="#22C1E0">
+        <animate attributeName="opacity" values="1;0.2;1" dur="1.2s" repeatCount="indefinite"/>
+      </circle>
+    </g>
+  </g>
+
+  <!-- 🔧 HERRAMIENTA / LLAVE (9 en punto) -->
+  <g transform="translate(118 200) scale(0.62)">
+    <g transform="rotate(-25)">
+      <animateTransform attributeName="transform" type="rotate"
+        values="-25; -18; -25" dur="3s" repeatCount="indefinite" additive="replace"/>
+      <!-- Mango -->
+      <rect x="-5" y="-38" width="10" height="60" rx="5" fill="url(#gradST)"/>
+      <!-- Detalles del mango -->
+      <rect x="-5" y="-30" width="10" height="2" rx="1" fill="#ffffff" opacity="0.3"/>
+      <rect x="-5" y="-22" width="10" height="2" rx="1" fill="#ffffff" opacity="0.3"/>
+      <!-- Cabeza superior -->
+      <path d="M -14 -38 Q -16 -52 -6 -55 L 6 -55 Q 16 -52 14 -38 L 8 -38
+               Q 8 -46 0 -46 Q -8 -46 -8 -38 Z" fill="url(#gradST)"/>
+      <!-- Cabeza inferior -->
+      <path d="M -14 28 Q -16 42 -6 45 L 6 45 Q 16 42 14 28 L 8 28
+               Q 8 36 0 36 Q -8 36 -8 28 Z" fill="url(#gradST)"/>
+      <!-- Brillo -->
+      <rect x="-3" y="-34" width="2" height="44" rx="1" fill="#ffffff" opacity="0.4"/>
+    </g>
+  </g>
+
+  <!-- 📞 TELÉFONO (3 en punto) -->
+  <g transform="translate(282 200) scale(0.62)">
+    <g>
+      <animateTransform attributeName="transform" type="rotate"
+        values="-8; 8; -8" dur="2.4s" repeatCount="indefinite"/>
+      <!-- Cuerpo del teléfono -->
+      <rect x="-16" y="-22" width="32" height="44" rx="5" fill="url(#gradST)"/>
+      <!-- Pantalla -->
+      <rect x="-12" y="-18" width="24" height="34" rx="2" fill="#0A2A66" opacity="0.9"/>
+      <!-- Icono de llamada -->
+      <path d="M -4 -8 Q -8 -6 -8 -2 Q -8 4 0 10 Q 6 14 10 10 Q 12 8 10 6 L 6 4 Q 4 2 2 4 L 0 6 Q -2 4 -4 2 Q -6 0 -4 -2 L -2 -4 Q 0 -6 -2 -8 Z"
+            fill="#22C1E0"/>
+      <!-- Botón home -->
+      <circle cx="0" cy="18" r="2" fill="#22C1E0"/>
+      <!-- Ondas de llamada -->
+      <g fill="none" stroke="#22C1E0" stroke-width="2" stroke-linecap="round">
+        <path d="M 20 -8 A 8 8 0 0 1 20 8">
+          <animate attributeName="opacity" values="1;0.2;1" dur="1.4s" repeatCount="indefinite"/>
+        </path>
+        <path d="M 24 -14 A 16 16 0 0 1 24 14">
+          <animate attributeName="opacity" values="0.4;1;0.4" dur="1.4s" begin="0.3s" repeatCount="indefinite"/>
+        </path>
+      </g>
+      <!-- Brillo -->
+      <rect x="-12" y="-20" width="24" height="2" rx="1" fill="#ffffff" opacity="0.4"/>
+    </g>
+  </g>
+
+  <!-- ⚙️ ENGRANAJE / CONFIGURACIÓN (10-11 en punto) -->
+  <g transform="translate(118 118) scale(0.58)">
+    <g>
+      <animateTransform attributeName="transform" type="rotate"
+        from="0 0 0" to="360 0 0" dur="6s" repeatCount="indefinite"/>
+      <!-- Dientes -->
+      <path d="M 0 -22 L 5 -22 L 5 -17 L -5 -17 L -5 -22 Z
+               M 0 22 L 5 22 L 5 17 L -5 17 L -5 22 Z
+               M -22 0 L -22 -5 L -17 -5 L -17 5 L -22 5 Z
+               M 22 0 L 22 -5 L 17 -5 L 17 5 L 22 5 Z
+               M -15 -15 L -12 -18 L -15 -21 L -18 -18 Z
+               M 15 -15 L 18 -18 L 15 -21 L 12 -18 Z
+               M -15 15 L -18 18 L -15 21 L -12 18 Z
+               M 15 15 L 12 18 L 15 21 L 18 18 Z"
+            fill="url(#gradST)"/>
+      <circle r="15" fill="url(#gradST)"/>
+      <circle r="6" fill="#ffffff" opacity="0.9"/>
+      <circle r="3" fill="#22C1E0">
+        <animate attributeName="opacity" values="1;0.5;1" dur="1.4s" repeatCount="indefinite"/>
+      </circle>
+    </g>
+  </g>
+
+  <!-- ✅ CHECK / SOLUCIÓN (1-2 en punto) -->
+  <g transform="translate(282 118) scale(0.58)">
+    <g>
+      <animateTransform attributeName="transform" type="scale"
+        values="1 1; 1.08 1.08; 1 1" dur="1.4s" repeatCount="indefinite"/>
+      <!-- Círculo de fondo -->
+      <circle r="22" fill="url(#gradST)"/>
+      <!-- Check grande -->
+      <path d="M -12 2 L -4 10 L 12 -8" fill="none"
+            stroke="#ffffff" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+      <!-- Brillo -->
+      <ellipse cx="-8" cy="-10" rx="5" ry="3" fill="#ffffff" opacity="0.4"/>
+    </g>
+  </g>
+
+  <!-- CHISPAS / partículas alrededor -->
+  <g fill="#22C1E0">
+    <circle cx="270" cy="105" r="3.5">
+      <animate attributeName="r" values="2.5;6;2.5" dur="1.2s" repeatCount="indefinite"/>
+      <animate attributeName="opacity" values="1;0.2;1" dur="1.2s" repeatCount="indefinite"/>
+    </circle>
+    <circle cx="130" cy="105" r="3">
+      <animate attributeName="r" values="2;5;2" dur="1.4s" begin="0.3s" repeatCount="indefinite"/>
+      <animate attributeName="opacity" values="1;0.2;1" dur="1.4s" begin="0.3s" repeatCount="indefinite"/>
+    </circle>
+    <circle cx="300" cy="272" r="3">
+      <animate attributeName="r" values="2;5;2" dur="1.3s" begin="0.6s" repeatCount="indefinite"/>
+      <animate attributeName="opacity" values="1;0.2;1" dur="1.3s" begin="0.6s" repeatCount="indefinite"/>
+    </circle>
+    <circle cx="100" cy="272" r="3.5">
+      <animate attributeName="r" values="2.5;6;2.5" dur="1.5s" begin="0.9s" repeatCount="indefinite"/>
+      <animate attributeName="opacity" values="1;0.2;1" dur="1.5s" begin="0.9s" repeatCount="indefinite"/>
+    </circle>
+  </g>
+</svg>

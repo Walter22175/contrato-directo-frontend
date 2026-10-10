@@ -1,0 +1,247 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg viewBox="0 0 400 400" width="100%" height="100%"
+     xmlns="http://www.w3.org/2000/svg" role="img"
+     aria-label="Icono de Veterinaria - Contrato Directo">
+
+  <defs>
+    <linearGradient id="gradVET" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%"   stop-color="#0A2A66"/>
+      <stop offset="55%"  stop-color="#1E6FE8"/>
+      <stop offset="100%" stop-color="#22C1E0"/>
+    </linearGradient>
+
+    <linearGradient id="gradAroVET" x1="0%" y1="100%" x2="100%" y2="0%">
+      <stop offset="0%"   stop-color="#22C1E0"/>
+      <stop offset="100%" stop-color="#0A2A66"/>
+    </linearGradient>
+
+    <linearGradient id="gradEstetoscopio" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%"   stop-color="#22C1E0"/>
+      <stop offset="100%" stop-color="#1E6FE8"/>
+    </linearGradient>
+
+    <radialGradient id="glowVET" cx="50%" cy="50%" r="50%">
+      <stop offset="0%"   stop-color="#22C1E0" stop-opacity="0.55"/>
+      <stop offset="100%" stop-color="#22C1E0" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+
+  <!-- Aro exterior institucional -->
+  <g fill="none" stroke="url(#gradAroVET)" stroke-width="7"
+     stroke-linecap="round" opacity="0.85">
+    <path d="M 70 200 A 130 130 0 0 1 200 70" />
+    <path d="M 200 70 A 130 130 0 0 1 330 200" />
+    <path d="M 330 200 A 130 130 0 0 1 200 330" />
+    <path d="M 200 330 A 130 130 0 0 1 70 200" />
+    <animateTransform attributeName="transform" type="rotate"
+      from="0 200 200" to="360 200 200" dur="50s" repeatCount="indefinite"/>
+  </g>
+
+  <!-- Resplandor central -->
+  <circle cx="200" cy="200" r="95" fill="url(#glowVET)">
+    <animate attributeName="r" values="90;110;90" dur="3s" repeatCount="indefinite"/>
+    <animate attributeName="opacity" values="0.7;0.3;0.7" dur="3s" repeatCount="indefinite"/>
+  </circle>
+
+  <!-- 🩺 ESTETOSCOPIO CENTRAL (núcleo) -->
+  <g transform="translate(200 200) scale(0.95)">
+    <g>
+      <!-- Auriculares (parte superior) -->
+      <!-- Auricular izquierdo -->
+      <circle cx="-26" cy="-46" r="6" fill="url(#gradVET)"/>
+      <circle cx="-26" cy="-46" r="2.5" fill="#0A2A66"/>
+      <!-- Auricular derecho -->
+      <circle cx="26" cy="-46" r="6" fill="url(#gradVET)"/>
+      <circle cx="26" cy="-46" r="2.5" fill="#0A2A66"/>
+
+      <!-- Tubos que bajan -->
+      <path d="M -26 -40 Q -30 -10 -14 10 Q -6 20 0 30"
+            fill="none" stroke="url(#gradEstetoscopio)" stroke-width="6"
+            stroke-linecap="round"/>
+      <path d="M 26 -40 Q 30 -10 14 10 Q 6 20 0 30"
+            fill="none" stroke="url(#gradEstetoscopio)" stroke-width="6"
+            stroke-linecap="round"/>
+
+      <!-- Tubo inferior (hacia el paciente) -->
+      <path d="M 0 30 Q 0 42 0 50"
+            fill="none" stroke="url(#gradVET)" stroke-width="6"
+            stroke-linecap="round"/>
+      <!-- Animación: latido del tubo -->
+      <animate attributeName="opacity" values="1;0.7;1" dur="1.8s" repeatCount="indefinite"/>
+
+      <!-- Campana / diafragma (parte inferior) -->
+      <circle cx="0" cy="58" r="12" fill="url(#gradVET)"/>
+      <circle cx="0" cy="58" r="7" fill="#0A2A66" opacity="0.7"/>
+      <circle cx="0" cy="58" r="3" fill="#ffffff" opacity="0.9">
+        <animate attributeName="r" values="3;5;3" dur="1.2s" repeatCount="indefinite"/>
+        <animate attributeName="opacity" values="0.9;0.4;0.9" dur="1.2s" repeatCount="indefinite"/>
+      </circle>
+
+      <!-- Corazón latiendo en el centro del estetoscopio -->
+      <path d="M 0 -6 Q -6 -14 -12 -10 Q -16 -6 -12 0 Q -6 6 0 12 Q 6 6 12 0 Q 16 -6 12 -10 Q 6 -14 0 -6 Z"
+            fill="#22C1E0" opacity="0.9">
+        <animate attributeName="opacity" values="0.9;0.4;0.9" dur="1.2s" repeatCount="indefinite"/>
+        <animateTransform attributeName="transform" type="scale"
+          values="1 1; 1.1 1.1; 1 1" dur="1.2s" repeatCount="indefinite"/>
+      </path>
+    </g>
+  </g>
+
+  <!-- 🐾 HUELLA / MASCOTA (12 en punto) -->
+  <g transform="translate(200 118) scale(0.62)">
+    <g>
+      <animateTransform attributeName="transform" type="translate"
+        values="0 0; 0 -3; 0 0" dur="2.6s" repeatCount="indefinite"/>
+      <!-- Almohadilla principal -->
+      <ellipse cx="0" cy="6" rx="16" ry="13" fill="url(#gradVET)"/>
+      <!-- Dedos -->
+      <ellipse cx="-12" cy="-8" rx="6" ry="8" fill="url(#gradVET)"/>
+      <ellipse cx="-4" cy="-14" rx="6" ry="8" fill="url(#gradVET)"/>
+      <ellipse cx="4" cy="-14" rx="6" ry="8" fill="url(#gradVET)"/>
+      <ellipse cx="12" cy="-8" rx="6" ry="8" fill="url(#gradVET)"/>
+      <!-- Brillo -->
+      <ellipse cx="-6" cy="2" rx="4" ry="2" fill="#ffffff" opacity="0.4"/>
+    </g>
+  </g>
+
+  <!-- 💉 VACUNA / JERINGA (6 en punto) -->
+  <g transform="translate(200 288) scale(0.62)">
+    <g transform="rotate(-25)">
+      <animateTransform attributeName="transform" type="rotate"
+        values="-25; -15; -25" dur="2.8s" repeatCount="indefinite" additive="replace"/>
+      <!-- Cuerpo de la jeringa -->
+      <rect x="-10" y="-20" width="20" height="36" rx="3" fill="url(#gradVET)"/>
+      <!-- Émbolo -->
+      <rect x="-6" y="-28" width="12" height="10" rx="2" fill="url(#gradVET)"/>
+      <rect x="-2" y="-32" width="4" height="6" rx="1" fill="url(#gradVET)"/>
+      <!-- Líquido dentro -->
+      <rect x="-8" y="-10" width="16" height="22" rx="2" fill="#22C1E0" opacity="0.85">
+        <animate attributeName="opacity" values="0.85;0.5;0.85" dur="2s" repeatCount="indefinite"/>
+      </rect>
+      <!-- Aguja -->
+      <rect x="-1.5" y="16" width="3" height="20" fill="url(#gradVET)"/>
+      <path d="M -1.5 36 L 1.5 36 L 0 42 Z" fill="url(#gradVET)"/>
+      <!-- Gota saliendo -->
+      <circle cx="0" cy="46" r="2" fill="#22C1E0">
+        <animate attributeName="cy" values="44;54;44" dur="1.6s" repeatCount="indefinite"/>
+        <animate attributeName="opacity" values="1;0.2;1" dur="1.6s" repeatCount="indefinite"/>
+      </circle>
+      <!-- Brillo -->
+      <rect x="-8" y="-18" width="3" height="32" rx="1.5" fill="#ffffff" opacity="0.3"/>
+    </g>
+  </g>
+
+  <!-- 💊 MEDICAMENTO / PASTILLA (9 en punto) -->
+  <g transform="translate(118 200) scale(0.62)">
+    <g>
+      <animateTransform attributeName="transform" type="rotate"
+        values="-6; 6; -6" dur="3s" repeatCount="indefinite"/>
+      <!-- Cápsula principal -->
+      <rect x="-20" y="-10" width="40" height="20" rx="10" fill="url(#gradVET)"/>
+      <!-- Mitad de la cápsula en cian -->
+      <path d="M 0 -10 L 10 -10 Q 20 -10 20 0 Q 20 10 10 10 L 0 10 Z"
+            fill="#22C1E0"/>
+      <!-- Brillo -->
+      <rect x="-16" y="-7" width="30" height="3" rx="1.5" fill="#ffffff" opacity="0.4"/>
+      <!-- Pastilla secundaria -->
+      <ellipse cx="0" cy="20" rx="10" ry="5" fill="url(#gradVET)"/>
+      <line x1="0" y1="15" x2="0" y2="25" stroke="#ffffff" stroke-width="1" opacity="0.6"/>
+    </g>
+  </g>
+
+  <!-- ❤️ CORAZÓN / SALUD (3 en punto) -->
+  <g transform="translate(282 200) scale(0.62)">
+    <g>
+      <animateTransform attributeName="transform" type="scale"
+        values="1 1; 1.08 1.08; 1 1" dur="1.4s" repeatCount="indefinite"/>
+      <!-- Corazón -->
+      <path d="M 0 -14
+               Q -12 -26 -22 -16
+               Q -30 -6 -22 4
+               Q -12 16 0 26
+               Q 12 16 22 4
+               Q 30 -6 22 -16
+               Q 12 -26 0 -14 Z"
+            fill="url(#gradVET)"/>
+      <!-- Cruz médica dentro -->
+      <rect x="-3" y="-8" width="6" height="18" rx="2" fill="#ffffff"/>
+      <rect x="-9" y="-2" width="18" height="6" rx="2" fill="#ffffff"/>
+      <!-- Brillo -->
+      <ellipse cx="-8" cy="-10" rx="4" ry="2" fill="#ffffff" opacity="0.5"/>
+    </g>
+  </g>
+
+  <!-- 🏥 CRUZ MÉDICA (10-11 en punto) -->
+  <g transform="translate(118 118) scale(0.58)">
+    <g>
+      <animateTransform attributeName="transform" type="translate"
+        values="0 0; 0 -3; 0 0" dur="2.8s" repeatCount="indefinite"/>
+      <!-- Círculo de fondo -->
+      <circle r="22" fill="url(#gradVET)"/>
+      <!-- Cruz médica -->
+      <rect x="-6" y="-18" width="12" height="36" rx="3" fill="#ffffff"/>
+      <rect x="-18" y="-6" width="36" height="12" rx="3" fill="#ffffff"/>
+      <!-- Brillo -->
+      <ellipse cx="-8" cy="-12" rx="4" ry="2" fill="#ffffff" opacity="0.4"/>
+    </g>
+  </g>
+
+  <!-- 🐕🐈 PERRO Y GATO (1-2 en punto) -->
+  <g transform="translate(282 118) scale(0.58)">
+    <g>
+      <animateTransform attributeName="transform" type="translate"
+        values="0 0; 0 -3; 0 0" dur="2.6s" repeatCount="indefinite"/>
+      <!-- Círculo de fondo -->
+      <circle r="22" fill="url(#gradVET)"/>
+
+      <!-- Silueta de perro (izquierda) -->
+      <g fill="#ffffff" opacity="0.95">
+        <!-- Cabeza -->
+        <ellipse cx="-8" cy="-2" rx="5" ry="5"/>
+        <!-- Orejas caídas -->
+        <ellipse cx="-12" cy="-6" rx="2" ry="3.5"/>
+        <ellipse cx="-4" cy="-6" rx="2" ry="3.5"/>
+        <!-- Hocico -->
+        <ellipse cx="-8" cy="2" rx="3" ry="2"/>
+        <!-- Ojos -->
+        <circle cx="-10" cy="-2" r="0.8" fill="#0A2A66"/>
+        <circle cx="-6" cy="-2" r="0.8" fill="#0A2A66"/>
+      </g>
+
+      <!-- Silueta de gato (derecha) -->
+      <g fill="#ffffff" opacity="0.95">
+        <!-- Cabeza -->
+        <ellipse cx="8" cy="-2" rx="5" ry="5"/>
+        <!-- Orejas puntiagudas -->
+        <path d="M 4 -6 L 3 -12 L 7 -8 Z"/>
+        <path d="M 12 -6 L 13 -12 L 9 -8 Z"/>
+        <!-- Ojos -->
+        <circle cx="6" cy="-2" r="0.8" fill="#0A2A66"/>
+        <circle cx="10" cy="-2" r="0.8" fill="#0A2A66"/>
+        <!-- Bigotes -->
+        <line x1="10" y1="0" x2="14" y2="-1" stroke="#0A2A66" stroke-width="0.5"/>
+        <line x1="10" y1="1" x2="14" y2="2" stroke="#0A2A66" stroke-width="0.5"/>
+      </g>
+    </g>
+  </g>
+
+  <!-- CHISPAS / partículas alrededor (latidos) -->
+  <g fill="#22C1E0">
+    <circle cx="270" cy="105" r="3.5">
+      <animate attributeName="r" values="2.5;6;2.5" dur="1.2s" repeatCount="indefinite"/>
+      <animate attributeName="opacity" values="1;0.2;1" dur="1.2s" repeatCount="indefinite"/>
+    </circle>
+    <circle cx="130" cy="105" r="3">
+      <animate attributeName="r" values="2;5;2" dur="1.4s" begin="0.3s" repeatCount="indefinite"/>
+      <animate attributeName="opacity" values="1;0.2;1" dur="1.4s" begin="0.3s" repeatCount="indefinite"/>
+    </circle>
+    <circle cx="300" cy="272" r="3">
+      <animate attributeName="r" values="2;5;2" dur="1.3s" begin="0.6s" repeatCount="indefinite"/>
+      <animate attributeName="opacity" values="1;0.2;1" dur="1.3s" begin="0.6s" repeatCount="indefinite"/>
+    </circle>
+    <circle cx="100" cy="272" r="3.5">
+      <animate attributeName="r" values="2.5;6;2.5" dur="1.5s" begin="0.9s" repeatCount="indefinite"/>
+      <animate attributeName="opacity" values="1;0.2;1" dur="1.5s" begin="0.9s" repeatCount="indefinite"/>
+    </circle>
+  </g>
+</svg>

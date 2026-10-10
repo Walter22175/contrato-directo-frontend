@@ -1,0 +1,56 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400" width="400" height="400" fill="none">
+  <!-- Estructura Principal: Garrafa / Tubería de Gas (Azul) -->
+  <!-- Cuerpo de la garrafa de gas -->
+  <rect 
+    x="120" 
+    y="160" 
+    width="160" 
+    height="180" 
+    rx="30" 
+    stroke="#0047D4" 
+    stroke-width="16" 
+    stroke-linecap="round" 
+    stroke-linejoin="round" 
+  />
+  <!-- ASA / Protector superior -->
+  <path 
+    d="M150 160 V120 C150 100 250 100 250 120 V160" 
+    stroke="#0047D4" 
+    stroke-width="16" 
+    stroke-linecap="round" 
+    stroke-linejoin="round" 
+  />
+  <!-- Base de la garrafa -->
+  <path 
+    d="M140 340 V360 H260 V340" 
+    stroke="#0047D4" 
+    stroke-width="16" 
+    stroke-linecap="round" 
+    stroke-linejoin="round" 
+  />
+
+  <!-- Válvula / Perilla central (Azul) -->
+  <path 
+    d="M185 100 H215 M200 100 V120" 
+    stroke="#0047D4" 
+    stroke-width="16" 
+    stroke-linecap="round" 
+  />
+
+  <!-- Llama de Fuego / Gas (Acento Cian) -->
+  <path 
+    d="M200 190 C200 190 235 230 235 255 C235 274.33 219.33 290 200 290 C180.67 290 165 274.33 165 255 C165 230 200 190 200 190 Z" 
+    stroke="#00C9B7" 
+    stroke-width="16" 
+    stroke-linecap="round" 
+    stroke-linejoin="round" 
+  />
+  <!-- Llama interna / Detalle -->
+  <path 
+    d="M200 240 C200 240 212 252 212 262 C212 268.63 206.63 274 200 274 C193.37 274 188 268.63 188 262 C188 252 200 240 200 240 Z" 
+    stroke="#00C9B7" 
+    stroke-width="16" 
+    stroke-linecap="round" 
+    stroke-linejoin="round" 
+  />
+</svg>

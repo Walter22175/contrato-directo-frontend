@@ -2,11 +2,13 @@
 
 import { useState, useEffect, useMemo, useRef, useCallback } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { Card } from '@/components/ui/Card';
 import Select from '@/components/ui/Select';
 import api, { extractData } from '@/lib/api';
 import { reportarBusquedaFallida } from '@/lib/catalogo';
+import { iconoCategoria, iconoServicio } from '@/lib/iconos';
 import { Search, ChevronRight, Box, FilePlus } from 'lucide-react';
 import { LlaveIcon } from '@/components/ui/LlaveIcon';
 import type { Servicio, Categoria } from '@/types';
@@ -207,13 +209,17 @@ export default function ServiciosContent() {
                           onClick={() => handleSuggestionClick(sug)}
                           className="w-full px-4 py-3 text-left hover:bg-slate-700 transition-colors flex items-center gap-3 border-b border-slate-700/50 last:border-0"
                         >
-                          <div className={`w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 ${
+                          <div className={`w-16 h-16 rounded-lg flex items-center justify-center flex-shrink-0 ${
                             sug.type === 'categoria' ? 'bg-purple-500/20 text-purple-400' : 'bg-cyan-500/20 text-cyan-400'
                           }`}>
                             {sug.type === 'categoria' ? (
-                              <Box className="w-4 h-4" />
+                              iconoCategoria(sug.label) ? (
+                                <Image src={iconoCategoria(sug.label)!} alt="" width={32} height={32} unoptimized className="w-8 h-8 object-contain" />
+                              ) : (
+                                <Box className="w-8 h-8" />
+                              )
                             ) : (
-                              <Search className="w-4 h-4" />
+                              <Search className="w-8 h-8" />
                             )}
                           </div>
                           <div className="flex-1 min-w-0">
@@ -319,12 +325,16 @@ export default function ServiciosContent() {
                           const catHref = '/servicios?categoria=' + cat.id_categoria;
                           return (
                             <Link key={cat.id_categoria} href={catHref} className="group">
-                              <Card className="p-4 text-center hover:border-purple-500/50 hover:shadow-lg hover:shadow-purple-500/10 transition-all duration-300 bg-slate-800/50 border-slate-700">
-                                <div className="w-14 h-14 mx-auto mb-3 bg-purple-500/10 border border-purple-500/20 rounded-xl flex items-center justify-center group-hover:scale-105 transition-transform">
-                                  <Box className="w-7 h-7 text-purple-400" />
+                              <Card className="p-4 text-center relative overflow-hidden min-h-[12rem] flex flex-col justify-end hover:border-purple-500/50 hover:shadow-lg hover:shadow-purple-500/10 transition-all duration-300 bg-slate-800/50 border-slate-700">
+                                {iconoCategoria(cat.nombre) && (
+                                  <div className="absolute inset-0 flex items-center justify-center pointer-events-none transition-transform duration-300 group-hover:scale-110">
+                                    <Image src={iconoCategoria(cat.nombre)!} alt="" width={96} height={96} unoptimized className="w-24 h-24 object-contain" />
+                                  </div>
+                                )}
+                                <div className="relative">
+                                  <h4 className="font-medium text-white mb-1">{cat.nombre}</h4>
+                                  <p className="text-xs text-slate-400">{count} servicio{count === 1 ? '' : 's'}</p>
                                 </div>
-                                <h4 className="font-medium text-white mb-1">{cat.nombre}</h4>
-                                <p className="text-xs text-slate-400">{count} servicio{count === 1 ? '' : 's'}</p>
                               </Card>
                             </Link>
                           );
@@ -342,29 +352,28 @@ export default function ServiciosContent() {
                       <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
                         {filtered.map((s) => {
                           const servHref = '/servicios/' + s.id_servicio;
+                          const icono = iconoServicio(s.nombre, s.categoria?.nombre);
                           return (
-                            <Link key={s.id_servicio} href={servHref}>
-                              <Card hover className="h-full">
-                                <div className="flex items-start justify-between mb-3">
-                                  <div className="w-10 h-10 bg-cyan-500/10 border border-cyan-500/20 rounded-lg flex items-center justify-center">
-                                    <span className="text-cyan-400 text-lg">🔧</span>
+                            <Link key={s.id_servicio} href={servHref} className="group">
+                              <Card hover className="h-full relative overflow-hidden">
+                                  <div className="absolute inset-0 flex items-center justify-center pointer-events-none transition-transform duration-300 group-hover:scale-105">
+                                    {icono ? (
+                                      <Image src={icono} alt="" width={96} height={96} unoptimized className="w-24 h-24 object-contain" />
+                                    ) : (
+                                      <span className="text-[6rem] leading-none">🔧</span>
+                                    )}
                                   </div>
-                                  <span className="text-xs text-slate-500 bg-slate-700/50 px-2 py-1 rounded">
-                                    {s.categoria?.nombre || 'Servicio'}
-                                  </span>
-                                </div>
-                                <h3 className="text-lg font-semibold text-white mb-2">{s.nombre}</h3>
-                                <p className="text-sm text-slate-400 mb-4 line-clamp-2">
-                                  {s.descripcion || 'Sin descripción'}
-                                </p>
-                                <div className="flex items-center justify-between text-sm">
-                                  <div className="flex items-center gap-1 text-slate-400">
-                                    <LlaveIcon className="w-4 h-4 text-yellow-400" />
-                                    <span>4.8</span>
+                                <div className="relative">
+                                  <h3 className="text-sm font-semibold text-white mb-2">{s.nombre}</h3>
+                                  <div className="flex items-center justify-between text-sm mt-6">
+                                    <div className="flex items-center gap-1 text-slate-400">
+                                      <LlaveIcon className="w-4 h-4 text-yellow-400" />
+                                      <span>4.8</span>
+                                    </div>
+                                    <span className="text-cyan-400 font-medium">
+                                      {s.servicios_proveedor?.length || 0} proveedores
+                                    </span>
                                   </div>
-                                  <span className="text-cyan-400 font-medium">
-                                    {s.servicios_proveedor?.length || 0} proveedores
-                                  </span>
                                 </div>
                               </Card>
                             </Link>

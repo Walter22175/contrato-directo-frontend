@@ -1,0 +1,255 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400" width="100%" height="100%">
+  <defs>
+    <linearGradient id="g1" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0A2A66"/>
+      <stop offset="55%" stop-color="#1E6FE8"/>
+      <stop offset="100%" stop-color="#22C1E0"/>
+    </linearGradient>
+    <linearGradient id="g2" x1="0%" y1="100%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#22C1E0"/>
+      <stop offset="100%" stop-color="#0A2A66"/>
+    </linearGradient>
+    <linearGradient id="g3" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#22C1E0"/>
+      <stop offset="100%" stop-color="#1E6FE8"/>
+    </linearGradient>
+    <radialGradient id="g4" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#22C1E0" stop-opacity="0.55"/>
+      <stop offset="100%" stop-color="#22C1E0" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+
+  <!-- Aro exterior institucional -->
+  <g fill="none" stroke="url(#g2)" stroke-width="7" stroke-linecap="round" opacity="0.85">
+    <path d="M 70 200 A 130 130 0 0 1 200 70" />
+    <path d="M 200 70 A 130 130 0 0 1 330 200" />
+    <path d="M 330 200 A 130 130 0 0 1 200 330" />
+    <path d="M 200 330 A 130 130 0 0 1 70 200" />
+    <animateTransform attributeName="transform" type="rotate"
+      from="0 200 200" to="360 200 200" dur="50s" repeatCount="indefinite"/>
+  </g>
+
+  <!-- Resplandor central -->
+  <circle cx="200" cy="200" r="95" fill="url(#g4)">
+    <animate attributeName="r" values="90;110;90" dur="3s" repeatCount="indefinite"/>
+    <animate attributeName="opacity" values="0.7;0.3;0.7" dur="3s" repeatCount="indefinite"/>
+  </circle>
+
+  <!-- LLAVE CON MANDO CENTRAL (nucleo) -->
+  <g transform="translate(200 200) scale(0.95)">
+    <g transform="rotate(-35)">
+      <animateTransform attributeName="transform" type="rotate"
+        values="-35; -26; -35" dur="3s" repeatCount="indefinite" additive="replace"/>
+
+      <!-- Cabeza / mando de la llave -->
+      <rect x="-16" y="-52" width="32" height="42" rx="6" fill="url(#g1)"/>
+      <rect x="-12" y="-48" width="24" height="4" rx="2" fill="#ffffff" opacity="0.4"/>
+
+      <!-- Botones del mando -->
+      <circle cx="-6" cy="-38" r="3" fill="#0A2A66"/>
+      <circle cx="6" cy="-38" r="3" fill="#0A2A66"/>
+      <circle cx="-6" cy="-26" r="3" fill="#22C1E0">
+        <animate attributeName="opacity" values="1;0.3;1" dur="1.6s" repeatCount="indefinite"/>
+      </circle>
+      <circle cx="6" cy="-26" r="3" fill="#0A2A66"/>
+
+      <!-- LED indicador -->
+      <circle cx="0" cy="-48" r="1.5" fill="#22C1E0">
+        <animate attributeName="opacity" values="1;0.2;1" dur="1.4s" repeatCount="indefinite"/>
+      </circle>
+
+      <!-- Espadin de la llave -->
+      <rect x="-4" y="-10" width="8" height="58" rx="2" fill="url(#g3)"/>
+      <rect x="2" y="-10" width="2" height="58" fill="#ffffff" opacity="0.4"/>
+
+      <!-- Dientes del espadin -->
+      <rect x="4" y="20" width="8" height="5" rx="1" fill="url(#g3)"/>
+      <rect x="4" y="30" width="10" height="5" rx="1" fill="url(#g3)"/>
+      <rect x="4" y="40" width="8" height="5" rx="1" fill="url(#g3)"/>
+
+      <!-- Chip visible -->
+      <rect x="-12" y="-20" width="10" height="6" rx="1" fill="#0A2A66" opacity="0.8"/>
+      <circle cx="-9" cy="-17" r="1" fill="#22C1E0"/>
+      <circle cx="-5" cy="-17" r="1" fill="#22C1E0"/>
+    </g>
+  </g>
+
+  <!-- AUTO DEPORTIVO (12 en punto) -->
+  <g transform="translate(200 118) scale(0.65)">
+    <g>
+      <animateTransform attributeName="transform" type="translate"
+        values="0 0; 3 0; 0 0; -3 0; 0 0" dur="3.5s" repeatCount="indefinite"/>
+      <ellipse cx="0" cy="14" rx="38" ry="3" fill="#0A2A66" opacity="0.35"/>
+      <path d="M -36 8 L -36 2 Q -36 -3 -32 -5 L -22 -6
+               Q -16 -15 -4 -17 Q 8 -17 14 -13 Q 20 -10 26 -5
+               L 34 -4 Q 38 -3 38 2 L 38 8 Q 38 12 34 12
+               L -34 12 Q -38 12 -38 8 Z" fill="url(#g1)"/>
+      <path d="M -32 3 L 34 3" stroke="#0A2A66" stroke-width="1.2" opacity="0.4" fill="none"/>
+      <path d="M -16 -6 Q -10 -13 0 -14 Q 8 -14 14 -11 L 18 -6 Z" fill="url(#g3)"/>
+      <line x1="-2" y1="-14" x2="-2" y2="-6" stroke="#0A2A66" stroke-width="1.5" opacity="0.6"/>
+      <path d="M 8 -10 L 18 -10 L 19 -7 L 7 -7 Z" fill="#0A2A66" opacity="0.7"/>
+      <path d="M 30 -2 L 37 -2 L 38 1 L 30 2 Z" fill="#22C1E0">
+        <animate attributeName="opacity" values="1;0.5;1" dur="1.8s" repeatCount="indefinite"/>
+      </path>
+      <rect x="-38" y="-3" width="6" height="2.5" rx="1" fill="#22C1E0"/>
+      <rect x="-38" y="1" width="6" height="2.5" rx="1" fill="#22C1E0"/>
+      <path d="M 30 12 L 42 12 L 40 15 L 28 15 Z" fill="#0A2A66" opacity="0.85"/>
+      <path d="M -42 12 L -30 12 L -28 15 L -40 15 Z" fill="#0A2A66" opacity="0.85"/>
+      <circle cx="-22" cy="12" r="8" fill="#0A2A66"/>
+      <circle cx="-22" cy="12" r="4" fill="url(#g1)">
+        <animateTransform attributeName="transform" type="rotate"
+          from="0 -22 12" to="360 -22 12" dur="1.2s" repeatCount="indefinite"/>
+      </circle>
+      <line x1="-26" y1="12" x2="-18" y2="12" stroke="#ffffff" stroke-width="1" opacity="0.85">
+        <animateTransform attributeName="transform" type="rotate"
+          from="0 -22 12" to="360 -22 12" dur="1.2s" repeatCount="indefinite"/>
+      </line>
+      <line x1="-22" y1="8" x2="-22" y2="16" stroke="#ffffff" stroke-width="1" opacity="0.85">
+        <animateTransform attributeName="transform" type="rotate"
+          from="0 -22 12" to="360 -22 12" dur="1.2s" repeatCount="indefinite"/>
+      </line>
+      <circle cx="24" cy="12" r="8" fill="#0A2A66"/>
+      <circle cx="24" cy="12" r="4" fill="url(#g1)">
+        <animateTransform attributeName="transform" type="rotate"
+          from="0 24 12" to="360 24 12" dur="1.2s" repeatCount="indefinite"/>
+      </circle>
+      <line x1="20" y1="12" x2="28" y2="12" stroke="#ffffff" stroke-width="1" opacity="0.85">
+        <animateTransform attributeName="transform" type="rotate"
+          from="0 24 12" to="360 24 12" dur="1.2s" repeatCount="indefinite"/>
+      </line>
+      <line x1="24" y1="8" x2="24" y2="16" stroke="#ffffff" stroke-width="1" opacity="0.85">
+        <animateTransform attributeName="transform" type="rotate"
+          from="0 24 12" to="360 24 12" dur="1.2s" repeatCount="indefinite"/>
+      </line>
+      <path d="M -26 -4 Q -12 -8 0 -8 Q 12 -8 22 -4 L 18 -6 Q 6 -9 -6 -9 Q -20 -9 -26 -6 Z"
+            fill="#ffffff" opacity="0.35"/>
+    </g>
+  </g>
+
+  <!-- CERRADURA DE PUERTA (6 en punto) -->
+  <g transform="translate(200 288) scale(0.62)">
+    <g>
+      <animateTransform attributeName="transform" type="translate"
+        values="0 0; 0 3; 0 0" dur="2.8s" repeatCount="indefinite"/>
+      <rect x="-22" y="-20" width="44" height="40" rx="6" fill="url(#g1)"/>
+      <circle cx="0" cy="0" r="13" fill="#0A2A66" opacity="0.8"/>
+      <circle cx="0" cy="0" r="8" fill="url(#g1)"/>
+      <rect x="-1.5" y="-6" width="3" height="9" fill="#0A2A66"/>
+      <rect x="-3" y="20" width="6" height="10" rx="2" fill="url(#g1)"/>
+      <rect x="-12" y="28" width="24" height="6" rx="3" fill="url(#g1)"/>
+      <circle cx="-16" cy="-14" r="2" fill="#0A2A66"/>
+      <circle cx="16" cy="-14" r="2" fill="#0A2A66"/>
+      <circle cx="-16" cy="14" r="2" fill="#0A2A66"/>
+      <circle cx="16" cy="14" r="2" fill="#0A2A66"/>
+      <circle cx="0" cy="-14" r="2" fill="#22C1E0">
+        <animate attributeName="opacity" values="1;0.2;1" dur="1.5s" repeatCount="indefinite"/>
+      </circle>
+    </g>
+  </g>
+
+  <!-- GANZUA / EXTRACTOR (9 en punto) -->
+  <g transform="translate(118 200) scale(0.62)">
+    <g transform="rotate(-25)">
+      <animateTransform attributeName="transform" type="rotate"
+        values="-25; -18; -25" dur="3s" repeatCount="indefinite" additive="replace"/>
+      <rect x="-4" y="-40" width="8" height="50" rx="4" fill="url(#g1)"/>
+      <rect x="-4" y="-32" width="8" height="2" rx="1" fill="#ffffff" opacity="0.3"/>
+      <rect x="-4" y="-24" width="8" height="2" rx="1" fill="#ffffff" opacity="0.3"/>
+      <path d="M -4 10 Q -4 24 0 28 Q 4 32 10 32"
+            fill="none" stroke="url(#g1)" stroke-width="5" stroke-linecap="round"/>
+      <path d="M 10 32 Q 16 32 16 26 Q 16 22 12 22"
+            fill="none" stroke="url(#g1)" stroke-width="4" stroke-linecap="round"/>
+      <rect x="-2" y="-36" width="1.5" height="42" rx="0.75" fill="#ffffff" opacity="0.4"/>
+    </g>
+  </g>
+
+  <!-- CODIFICADOR / CHIP (3 en punto) -->
+  <g transform="translate(282 200) scale(0.62)">
+    <g>
+      <animateTransform attributeName="transform" type="translate"
+        values="0 0; 0 -3; 0 0" dur="2.8s" repeatCount="indefinite"/>
+      <rect x="-20" y="-24" width="40" height="48" rx="5" fill="url(#g1)"/>
+      <rect x="-14" y="-18" width="28" height="20" rx="2" fill="#0A2A66" opacity="0.9"/>
+      <rect x="-10" y="-14" width="18" height="2" rx="1" fill="#22C1E0">
+        <animate attributeName="width" values="18;24;18" dur="2s" repeatCount="indefinite"/>
+      </rect>
+      <rect x="-10" y="-9" width="14" height="2" rx="1" fill="#22C1E0" opacity="0.7"/>
+      <rect x="-10" y="-4" width="20" height="2" rx="1" fill="#22C1E0" opacity="0.5"/>
+      <circle cx="-10" cy="10" r="3" fill="#22C1E0"/>
+      <circle cx="0" cy="10" r="3" fill="#0A2A66" opacity="0.6"/>
+      <circle cx="10" cy="10" r="3" fill="#0A2A66" opacity="0.6"/>
+      <path d="M 24 -14 A 10 10 0 0 1 24 6" fill="none"
+            stroke="#22C1E0" stroke-width="2.5" stroke-linecap="round">
+        <animate attributeName="opacity" values="1;0.2;1" dur="1.6s" repeatCount="indefinite"/>
+      </path>
+      <path d="M 30 -20 A 18 18 0 0 1 30 12" fill="none"
+            stroke="#22C1E0" stroke-width="2.5" stroke-linecap="round">
+        <animate attributeName="opacity" values="0.3;1;0.3" dur="1.6s" repeatCount="indefinite"/>
+      </path>
+    </g>
+  </g>
+
+  <!-- PILA / BATERIA DEL MANDO (10-11 en punto) -->
+  <g transform="translate(118 118) scale(0.58)">
+    <g>
+      <animateTransform attributeName="transform" type="translate"
+        values="0 0; 0 -3; 0 0" dur="2.6s" repeatCount="indefinite"/>
+      <rect x="-14" y="-20" width="28" height="42" rx="4" fill="url(#g1)"/>
+      <rect x="-5" y="-24" width="10" height="6" rx="2" fill="url(#g1)"/>
+      <rect x="-10" y="-14" width="20" height="16" rx="2" fill="#ffffff" opacity="0.9"/>
+      <rect x="-6" y="-10" width="12" height="2" rx="1" fill="#0A2A66"/>
+      <rect x="-6" y="-5" width="8" height="2" rx="1" fill="#0A2A66"/>
+      <rect x="-10" y="6" width="20" height="4" rx="2" fill="#ffffff" opacity="0.2"/>
+      <rect x="-10" y="6" width="14" height="4" rx="2" fill="#22C1E0">
+        <animate attributeName="width" values="14;6;14" dur="2.5s" repeatCount="indefinite"/>
+      </rect>
+      <rect x="-12" y="-18" width="3" height="36" rx="1.5" fill="#ffffff" opacity="0.25"/>
+    </g>
+  </g>
+
+  <!-- ESCANER / DIAGNOSTICO (1-2 en punto) -->
+  <g transform="translate(282 118) scale(0.58)">
+    <g>
+      <animateTransform attributeName="transform" type="translate"
+        values="0 0; 0 -3; 0 0" dur="2.6s" repeatCount="indefinite"/>
+      <rect x="-20" y="-22" width="40" height="44" rx="5" fill="url(#g1)"/>
+      <rect x="-16" y="-18" width="32" height="24" rx="2" fill="#0A2A66" opacity="0.9"/>
+      <rect x="-12" y="-14" width="20" height="2" rx="1" fill="#22C1E0">
+        <animate attributeName="width" values="20;28;20" dur="2s" repeatCount="indefinite"/>
+      </rect>
+      <rect x="-12" y="-9" width="14" height="2" rx="1" fill="#22C1E0" opacity="0.7"/>
+      <rect x="-12" y="-4" width="24" height="2" rx="1" fill="#22C1E0" opacity="0.5"/>
+      <path d="M -12 2 L -6 2 L -4 -2 L -1 6 L 2 -2 L 4 2 L 12 2"
+            fill="none" stroke="#22C1E0" stroke-width="1.5" stroke-linecap="round">
+        <animate attributeName="opacity" values="1;0.4;1" dur="1.4s" repeatCount="indefinite"/>
+      </path>
+      <circle cx="-8" cy="14" r="3" fill="#22C1E0"/>
+      <circle cx="0" cy="14" r="3" fill="#0A2A66" opacity="0.6"/>
+      <circle cx="8" cy="14" r="3" fill="#0A2A66" opacity="0.6"/>
+      <path d="M 20 10 Q 28 10 28 2 Q 28 -6 24 -6"
+            fill="none" stroke="url(#g1)" stroke-width="3" stroke-linecap="round"/>
+      <circle cx="24" cy="-6" r="2.5" fill="url(#g1)"/>
+    </g>
+  </g>
+
+  <!-- Chispas / particulas alrededor -->
+  <g fill="#22C1E0">
+    <circle cx="270" cy="105" r="3.5">
+      <animate attributeName="r" values="2.5;6;2.5" dur="1.2s" repeatCount="indefinite"/>
+      <animate attributeName="opacity" values="1;0.2;1" dur="1.2s" repeatCount="indefinite"/>
+    </circle>
+    <circle cx="130" cy="105" r="3">
+      <animate attributeName="r" values="2;5;2" dur="1.4s" begin="0.3s" repeatCount="indefinite"/>
+      <animate attributeName="opacity" values="1;0.2;1" dur="1.4s" begin="0.3s" repeatCount="indefinite"/>
+    </circle>
+    <circle cx="300" cy="272" r="3">
+      <animate attributeName="r" values="2;5;2" dur="1.3s" begin="0.6s" repeatCount="indefinite"/>
+      <animate attributeName="opacity" values="1;0.2;1" dur="1.3s" begin="0.6s" repeatCount="indefinite"/>
+    </circle>
+    <circle cx="100" cy="272" r="3.5">
+      <animate attributeName="r" values="2.5;6;2.5" dur="1.5s" begin="0.9s" repeatCount="indefinite"/>
+      <animate attributeName="opacity" values="1;0.2;1" dur="1.5s" begin="0.9s" repeatCount="indefinite"/>
+    </circle>
+  </g>
+</svg>

@@ -1,0 +1,38 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400" width="400" height="400" fill="none">
+  <!-- Estructura del Techo y la Casa (Azul) -->
+  <!-- Fachada de la casa -->
+  <path d="M100 295 V340 H310 V295" stroke="#0047D4" stroke-width="16" stroke-linecap="round" stroke-linejoin="round" />
+  
+  <!-- Estructura interior / Ventana buhardilla -->
+  <path d="M148 295 H188 V255 C188 232.9 170.1 215 148 215 C125.9 215 108 232.9 108 255 V295 Z" stroke="#0047D4" stroke-width="16" stroke-linecap="round" stroke-linejoin="round" />
+  <path d="M148 215 V295" stroke="#0047D4" stroke-width="16" stroke-linecap="round" />
+  <path d="M108 255 H188" stroke="#0047D4" stroke-width="16" stroke-linecap="round" />
+
+  <!-- Techo Principal a Dos Aguas -->
+  <path d="M72 295 L180 148 L320 148 L212 295 Z" stroke="#0047D4" stroke-width="16" stroke-linecap="round" stroke-linejoin="round" />
+  <!-- Líneas de caída / Tejas -->
+  <path d="M215 148 L142 248" stroke="#0047D4" stroke-width="16" stroke-linecap="round" />
+  <path d="M250 148 L177 248" stroke="#0047D4" stroke-width="16" stroke-linecap="round" />
+  <path d="M285 148 L212 248" stroke="#0047D4" stroke-width="16" stroke-linecap="round" />
+
+  <!-- Cumbrera y Aleros -->
+  <path d="M50 310 L180 133 L342 133" stroke="#0047D4" stroke-width="16" stroke-linecap="round" stroke-linejoin="round" />
+
+  <!-- Detalles de Reparación y Clima (Cian) -->
+  <!-- Chimenea en el techo -->
+  <path d="M250 133 V105 H275 V133" stroke="#00C9B7" stroke-width="16" stroke-linecap="round" stroke-linejoin="round" />
+
+  <!-- Martillo de Obra (Diagonal) -->
+  <path d="M305 100 L260 145" stroke="#00C9B7" stroke-width="16" stroke-linecap="round" /> <!-- Mango -->
+  <path d="M245 130 L275 100" stroke="#00C9B7" stroke-width="16" stroke-linecap="round" /> <!-- Cabeza trasera -->
+  <path d="M250 90 L268 72 C285 70 295 80 295 90 Z" stroke="#00C9B7" stroke-width="16" stroke-linecap="round" stroke-linejoin="round" /> <!-- Garra -->
+
+  <!-- Gotas de lluvia (Izquierda) -->
+  <path d="M85 110 C85 110 93 125 93 133 C93 140 85 145 77 145 C69 145 61 140 61 133 C61 125 85 110 85 110 Z" stroke="#00C9B7" stroke-width="16" stroke-linejoin="round" />
+  <path d="M125 150 C125 150 133 165 133 173 C133 180 125 185 117 185 C109 185 101 180 101 173 C101 165 125 150 125 150 Z" stroke="#00C9B7" stroke-width="16" stroke-linejoin="round" />
+  <path d="M57 180 C57 180 65 195 65 203 C65 210 57 215 49 215 C41 215 33 210 33 203 C33 195 57 180 57 180 Z" stroke="#00C9B7" stroke-width="16" stroke-linejoin="round" />
+  
+  <!-- Líneas de impacto de agua/reparación -->
+  <path d="M130 115 L145 95" stroke="#00C9B7" stroke-width="16" stroke-linecap="round" />
+  <path d="M165 115 L180 95" stroke="#00C9B7" stroke-width="16" stroke-linecap="round" />
+</svg>

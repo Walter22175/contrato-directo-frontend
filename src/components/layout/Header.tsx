@@ -12,6 +12,7 @@ import { Menu, Search, Bell, User, LogOut, ChevronDown, Check, X, Box } from 'lu
 import Image from 'next/image';
 import Button from '@/components/ui/Button';
 import api, { extractData } from '@/lib/api';
+import { iconoCategoria } from '@/lib/iconos';
 
 function formatRelativeTime(dateStr: string): string {
   const now = new Date();
@@ -331,14 +332,20 @@ export default function Header({ onToggleSidebar }: { onToggleSidebar?: () => vo
                                 i === selectedIndex ? 'bg-slate-50' : ''
                               }`}
                             >
-                              <div className="w-6 h-6 rounded flex items-center justify-center flex-shrink-0 
+                              <div className="w-12 h-12 rounded flex items-center justify-center flex-shrink-0 
                                 {sug.type === 'categoria' ? 'bg-purple-100 text-purple-600' : 
                                  sug.type === 'servicio' ? 'bg-cyan-100 text-cyan-600' : 
                                  'bg-slate-100 text-slate-500'}
                               ">
-                                {sug.type === 'categoria' && <Box className="w-4 h-4" />}
-                                {sug.type === 'servicio' && <Search className="w-4 h-4" />}
-                                {sug.type === 'recent' && <Search className="w-4 h-4 text-slate-400" />}
+                                {sug.type === 'categoria' && (
+                                  iconoCategoria(sug.label) ? (
+                                    <Image src={iconoCategoria(sug.label)!} alt="" width={32} height={32} unoptimized className="w-8 h-8 object-contain" />
+                                  ) : (
+                                    <Box className="w-8 h-8" />
+                                  )
+                                )}
+                                {sug.type === 'servicio' && <Search className="w-8 h-8" />}
+                                {sug.type === 'recent' && <Search className="w-8 h-8 text-slate-400" />}
                               </div>
                               <span className="text-slate-900 font-medium truncate flex-1">{sug.label}</span>
                               <div className="text-xs text-slate-500">

@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400" width="400" height="400" fill="none">
+  <!-- Ventana / Marcación de Vidrio (Estructura Principal en Azul) -->
+  <!-- Marco exterior de la ventana -->
+  <rect 
+    x="80" 
+    y="60" 
+    width="240" 
+    height="280" 
+    rx="20" 
+    stroke="#0047D4" 
+    stroke-width="16" 
+    stroke-linecap="round" 
+    stroke-linejoin="round" 
+  />
+  
+  <!-- División de paneles de vidrio (Ventanal) -->
+  <path d="M200 60 V340" stroke="#0047D4" stroke-width="16" stroke-linecap="round" />
+  <path d="M80 200 H320" stroke="#0047D4" stroke-width="16" stroke-linecap="round" />
+
+  <!-- Brillos y Reflejos de Cristal (Acento Cian) -->
+  <!-- Diagonal panel superior izquierdo -->
+  <path d="M110 170 L170 110" stroke="#00C9B7" stroke-width="16" stroke-linecap="round" />
+  <path d="M110 130 L130 110" stroke="#00C9B7" stroke-width="16" stroke-linecap="round" />
+  
+  <!-- Diagonal panel inferior derecho -->
+  <path d="M230 310 L290 250" stroke="#00C9B7" stroke-width="16" stroke-linecap="round" />
+  <path d="M270 310 L290 290" stroke="#00C9B7" stroke-width="16" stroke-linecap="round" />
+
+  <!-- Cortavidrios / Ventosa de Vidriero (Herramienta en Cian) -->
+  <!-- Ventosa de sujeción -->
+  <path d="M235 150 C235 130 285 130 285 150 Z" stroke="#00C9B7" stroke-width="16" stroke-linecap="round" stroke-linejoin="round" />
+  <!-- Mango del cortavidrios -->
+  <path d="M260 130 V85" stroke="#00C9B7" stroke-width="16" stroke-linecap="round" />
+  <path d="M245 85 H275" stroke="#00C9B7" stroke-width="16" stroke-linecap="round" />
+</svg>

@@ -1,0 +1,283 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg viewBox="0 0 400 400" width="100%" height="100%"
+     xmlns="http://www.w3.org/2000/svg" role="img"
+     aria-label="Icono de Estrategia Digital - Contrato Directo">
+
+  <defs>
+    <linearGradient id="gradED" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%"   stop-color="#0A2A66"/>
+      <stop offset="55%"  stop-color="#1E6FE8"/>
+      <stop offset="100%" stop-color="#22C1E0"/>
+    </linearGradient>
+
+    <linearGradient id="gradAroED" x1="0%" y1="100%" x2="100%" y2="0%">
+      <stop offset="0%"   stop-color="#22C1E0"/>
+      <stop offset="100%" stop-color="#0A2A66"/>
+    </linearGradient>
+
+    <linearGradient id="gradDiana" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%"   stop-color="#22C1E0"/>
+      <stop offset="100%" stop-color="#1E6FE8"/>
+    </linearGradient>
+
+    <radialGradient id="glowED" cx="50%" cy="50%" r="50%">
+      <stop offset="0%"   stop-color="#22C1E0" stop-opacity="0.55"/>
+      <stop offset="100%" stop-color="#22C1E0" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+
+  <!-- Aro exterior institucional -->
+  <g fill="none" stroke="url(#gradAroED)" stroke-width="7"
+     stroke-linecap="round" opacity="0.85">
+    <path d="M 70 200 A 130 130 0 0 1 200 70" />
+    <path d="M 200 70 A 130 130 0 0 1 330 200" />
+    <path d="M 330 200 A 130 130 0 0 1 200 330" />
+    <path d="M 200 330 A 130 130 0 0 1 70 200" />
+    <animateTransform attributeName="transform" type="rotate"
+      from="0 200 200" to="360 200 200" dur="50s" repeatCount="indefinite"/>
+  </g>
+
+  <!-- Resplandor central -->
+  <circle cx="200" cy="200" r="95" fill="url(#glowED)">
+    <animate attributeName="r" values="90;110;90" dur="3s" repeatCount="indefinite"/>
+    <animate attributeName="opacity" values="0.7;0.3;0.7" dur="3s" repeatCount="indefinite"/>
+  </circle>
+
+  <!-- 🎯 DIANA / OBJETIVO CENTRAL (núcleo) -->
+  <g transform="translate(200 200) scale(0.95)">
+    <g>
+      <!-- Animación: la diana pulsa -->
+      <animateTransform attributeName="transform" type="scale"
+        values="1 1; 1.03 1.03; 1 1" dur="2s" repeatCount="indefinite"/>
+
+      <!-- Aro exterior de la diana -->
+      <circle r="52" fill="url(#gradDiana)"/>
+      <!-- Aro blanco -->
+      <circle r="40" fill="#ffffff" opacity="0.95"/>
+      <!-- Aro cian -->
+      <circle r="28" fill="url(#gradDiana)"/>
+      <!-- Aro blanco interior -->
+      <circle r="16" fill="#ffffff" opacity="0.95"/>
+      <!-- Centro (diana) -->
+      <circle r="8" fill="#22C1E0">
+        <animate attributeName="r" values="8;10;8" dur="1.4s" repeatCount="indefinite"/>
+      </circle>
+
+      <!-- Flecha acertando en el centro -->
+      <path d="M -38 -38 L 0 0" stroke="#0A2A66" stroke-width="3"
+            stroke-linecap="round" fill="none"/>
+      <path d="M -38 -38 L -30 -40 M -38 -38 L -40 -30"
+            stroke="#0A2A66" stroke-width="3" stroke-linecap="round"/>
+      <!-- Punta de la flecha -->
+      <path d="M -2 -2 L 4 -6 L 6 -4 L 2 2 Z" fill="#0A2A66"/>
+
+      <!-- Brillo superior -->
+      <ellipse cx="-18" cy="-22" rx="12" ry="5" fill="#ffffff" opacity="0.4"/>
+
+      <!-- Pulso de expansión -->
+      <circle r="52" fill="none" stroke="#22C1E0" stroke-width="2" opacity="0.5">
+        <animate attributeName="r" values="50;62;50" dur="2.5s" repeatCount="indefinite"/>
+        <animate attributeName="opacity" values="0.5;0;0.5" dur="2.5s" repeatCount="indefinite"/>
+      </circle>
+    </g>
+  </g>
+
+  <!-- 📊 DASHBOARD / MÉTRICAS (12 en punto) -->
+  <g transform="translate(200 118) scale(0.62)">
+    <g>
+      <animateTransform attributeName="transform" type="translate"
+        values="0 0; 0 -3; 0 0" dur="2.6s" repeatCount="indefinite"/>
+      <!-- Panel del dashboard -->
+      <rect x="-24" y="-18" width="48" height="34" rx="4" fill="url(#gradED)"/>
+      <!-- Pantalla -->
+      <rect x="-20" y="-14" width="40" height="26" rx="2" fill="#0A2A66" opacity="0.9"/>
+      <!-- Barras del gráfico -->
+      <rect x="-16" y="2" width="4" height="6" rx="1" fill="#22C1E0">
+        <animate attributeName="height" values="6;10;6" dur="1.6s" repeatCount="indefinite"/>
+        <animate attributeName="y" values="2;-2;2" dur="1.6s" repeatCount="indefinite"/>
+      </rect>
+      <rect x="-9" y="-2" width="4" height="10" rx="1" fill="#22C1E0">
+        <animate attributeName="height" values="10;4;10" dur="1.6s" begin="0.2s" repeatCount="indefinite"/>
+        <animate attributeName="y" values="-2;4;-2" dur="1.6s" begin="0.2s" repeatCount="indefinite"/>
+      </rect>
+      <rect x="-2" y="0" width="4" height="8" rx="1" fill="#22C1E0">
+        <animate attributeName="height" values="8;12;8" dur="1.6s" begin="0.4s" repeatCount="indefinite"/>
+        <animate attributeName="y" values="0;-4;0" dur="1.6s" begin="0.4s" repeatCount="indefinite"/>
+      </rect>
+      <rect x="5" y="-4" width="4" height="12" rx="1" fill="#22C1E0">
+        <animate attributeName="height" values="12;6;12" dur="1.6s" begin="0.6s" repeatCount="indefinite"/>
+        <animate attributeName="y" values="-4;2;-4" dur="1.6s" begin="0.6s" repeatCount="indefinite"/>
+      </rect>
+      <rect x="12" y="0" width="4" height="8" rx="1" fill="#22C1E0">
+        <animate attributeName="height" values="8;12;8" dur="1.6s" begin="0.8s" repeatCount="indefinite"/>
+        <animate attributeName="y" values="0;-4;0" dur="1.6s" begin="0.8s" repeatCount="indefinite"/>
+      </rect>
+      <!-- Línea superior -->
+      <rect x="-16" y="-10" width="32" height="2" rx="1" fill="#22C1E0" opacity="0.6"/>
+      <!-- Base del monitor -->
+      <rect x="-6" y="16" width="12" height="4" rx="2" fill="url(#gradED)"/>
+      <rect x="-12" y="19" width="24" height="3" rx="1.5" fill="url(#gradED)"/>
+    </g>
+  </g>
+
+  <!-- 🚀 COHETE / LANZAMIENTO (6 en punto) -->
+  <g transform="translate(200 288) scale(0.62)">
+    <g>
+      <animateTransform attributeName="transform" type="translate"
+        values="0 0; 0 -4; 0 0" dur="2.2s" repeatCount="indefinite"/>
+      <!-- Cuerpo del cohete -->
+      <path d="M 0 -26 Q -10 -14 -10 4 L 10 4 Q 10 -14 0 -26 Z"
+            fill="url(#gradED)"/>
+      <!-- Ventana del cohete -->
+      <circle cx="0" cy="-10" r="4" fill="#ffffff" opacity="0.9"/>
+      <circle cx="0" cy="-10" r="2" fill="#22C1E0"/>
+      <!-- Aletas -->
+      <path d="M -10 -4 L -16 8 L -10 6 Z" fill="url(#gradED)"/>
+      <path d="M 10 -4 L 16 8 L 10 6 Z" fill="url(#gradED)"/>
+      <!-- Llama del cohete -->
+      <path d="M -6 6 Q -4 16 0 22 Q 4 16 6 6 Z" fill="#22C1E0">
+        <animate attributeName="opacity" values="1;0.5;1" dur="0.8s" repeatCount="indefinite"/>
+      </path>
+      <path d="M -3 6 Q -2 14 0 18 Q 2 14 3 6 Z" fill="#ffffff" opacity="0.85">
+        <animate attributeName="opacity" values="0.85;0.3;0.85" dur="0.8s" repeatCount="indefinite"/>
+      </path>
+      <!-- Estela -->
+      <circle cx="0" cy="26" r="2" fill="#22C1E0" opacity="0.5">
+        <animate attributeName="cy" values="24;34;24" dur="1.4s" repeatCount="indefinite"/>
+        <animate attributeName="opacity" values="0.5;0;0.5" dur="1.4s" repeatCount="indefinite"/>
+      </circle>
+      <!-- Brillo -->
+      <rect x="-8" y="-24" width="3" height="20" rx="1.5" fill="#ffffff" opacity="0.4"/>
+    </g>
+  </g>
+
+  <!-- 🧭 BRÚJULA / DIRECCIÓN (9 en punto) -->
+  <g transform="translate(118 200) scale(0.62)">
+    <g>
+      <animateTransform attributeName="transform" type="rotate"
+        values="-8; 8; -8" dur="3s" repeatCount="indefinite"/>
+      <!-- Cuerpo de la brújula -->
+      <circle r="22" fill="url(#gradED)"/>
+      <circle r="18" fill="#0A2A66" opacity="0.6"/>
+      <!-- Marcas cardinales -->
+      <g stroke="#ffffff" stroke-width="1.5" opacity="0.7">
+        <line x1="0" y1="-18" x2="0" y2="-14"/>
+        <line x1="0" y1="14" x2="0" y2="18"/>
+        <line x1="-18" y1="0" x2="-14" y2="0"/>
+        <line x1="14" y1="0" x2="18" y2="0"/>
+      </g>
+      <!-- Aguja norte-sur -->
+      <path d="M 0 -14 L -3 0 L 3 0 Z" fill="#22C1E0"/>
+      <path d="M 0 14 L -3 0 L 3 0 Z" fill="#ffffff" opacity="0.8"/>
+      <!-- Centro de la brújula -->
+      <circle r="3" fill="#0A2A66"/>
+      <!-- Punto cardinal N -->
+      <text x="0" y="-22" text-anchor="middle" font-family="sans-serif"
+            font-size="6" font-weight="700" fill="#22C1E0">N</text>
+      <!-- Brillo -->
+      <ellipse cx="-8" cy="-10" rx="4" ry="2" fill="#ffffff" opacity="0.4"/>
+    </g>
+  </g>
+
+  <!-- 💡 IDEA / BOMBILLA (3 en punto) -->
+  <g transform="translate(282 200) scale(0.62)">
+    <g>
+      <animateTransform attributeName="transform" type="translate"
+        values="0 0; 0 -3; 0 0" dur="2.6s" repeatCount="indefinite"/>
+      <!-- Casquillo -->
+      <rect x="-8" y="14" width="16" height="10" rx="2" fill="url(#gradED)"/>
+      <rect x="-6" y="24" width="12" height="4" rx="2" fill="url(#gradED)"/>
+      <!-- Vidrio de la bombilla -->
+      <path d="M -12 14 Q -16 4 -14 -4 Q -12 -20 0 -22 Q 12 -20 14 -4 Q 16 4 12 14 Z"
+            fill="url(#gradED)"/>
+      <!-- Filamento -->
+      <path d="M -5 0 Q -3 6 0 4 Q 3 2 5 -2"
+            fill="none" stroke="#ffffff" stroke-width="2"
+            stroke-linecap="round"/>
+      <!-- Destello (idea) -->
+      <ellipse cx="0" cy="-4" rx="7" ry="9" fill="#ffffff" opacity="0.4">
+        <animate attributeName="opacity" values="0.4;0.15;0.4" dur="2s" repeatCount="indefinite"/>
+      </ellipse>
+      <!-- Rayos de luz -->
+      <g stroke="#22C1E0" stroke-width="2" stroke-linecap="round" opacity="0.8">
+        <line x1="-20" y1="-8" x2="-24" y2="-12">
+          <animate attributeName="opacity" values="0.8;0.2;0.8" dur="1.8s" repeatCount="indefinite"/>
+        </line>
+        <line x1="20" y1="-8" x2="24" y2="-12">
+          <animate attributeName="opacity" values="0.8;0.2;0.8" dur="1.8s" begin="0.3s" repeatCount="indefinite"/>
+        </line>
+        <line x1="0" y1="-26" x2="0" y2="-30">
+          <animate attributeName="opacity" values="0.8;0.2;0.8" dur="1.8s" begin="0.6s" repeatCount="indefinite"/>
+        </line>
+      </g>
+    </g>
+  </g>
+
+  <!-- 📱 CANALES DIGITALES (10-11 en punto) -->
+  <g transform="translate(118 118) scale(0.58)">
+    <g>
+      <animateTransform attributeName="transform" type="translate"
+        values="0 0; 0 -3; 0 0" dur="2.8s" repeatCount="indefinite"/>
+      <!-- Celular -->
+      <rect x="-14" y="-22" width="28" height="44" rx="4" fill="url(#gradED)"/>
+      <!-- Pantalla -->
+      <rect x="-11" y="-18" width="22" height="36" rx="2" fill="#0A2A66" opacity="0.9"/>
+      <!-- Iconos de canales (grid) -->
+      <g fill="#22C1E0">
+        <rect x="-8" y="-14" width="6" height="6" rx="1"/>
+        <rect x="2" y="-14" width="6" height="6" rx="1" opacity="0.7"/>
+        <rect x="-8" y="-6" width="6" height="6" rx="1" opacity="0.7"/>
+        <rect x="2" y="-6" width="6" height="6" rx="1"/>
+        <rect x="-8" y="2" width="6" height="6" rx="1" opacity="0.5"/>
+        <rect x="2" y="2" width="6" height="6" rx="1" opacity="0.7"/>
+      </g>
+      <!-- Botón home -->
+      <circle cx="0" cy="18" r="1.5" fill="#22C1E0"/>
+      <!-- Notificación -->
+      <circle cx="10" cy="-18" r="3.5" fill="#22C1E0">
+        <animate attributeName="r" values="3.5;5;3.5" dur="1.4s" repeatCount="indefinite"/>
+      </circle>
+    </g>
+  </g>
+
+  <!-- 🎯 CONVERSIÓN / KPI (1-2 en punto) -->
+  <g transform="translate(282 118) scale(0.58)">
+    <g>
+      <animateTransform attributeName="transform" type="scale"
+        values="1 1; 1.08 1.08; 1 1" dur="1.4s" repeatCount="indefinite"/>
+      <!-- Círculo de fondo -->
+      <circle r="22" fill="url(#gradED)"/>
+      <!-- Símbolo de porcentaje -->
+      <circle cx="-8" cy="-8" r="3" fill="none" stroke="#ffffff" stroke-width="2"/>
+      <circle cx="8" cy="8" r="3" fill="none" stroke="#ffffff" stroke-width="2"/>
+      <line x1="-10" y1="10" x2="10" y2="-10" stroke="#ffffff" stroke-width="2.5" stroke-linecap="round"/>
+      <!-- Brillo -->
+      <ellipse cx="-8" cy="-10" rx="5" ry="3" fill="#ffffff" opacity="0.4"/>
+      <!-- Pulso -->
+      <circle r="22" fill="none" stroke="#22C1E0" stroke-width="2" opacity="0.6">
+        <animate attributeName="r" values="20;30;20" dur="2s" repeatCount="indefinite"/>
+        <animate attributeName="opacity" values="0.6;0;0.6" dur="2s" repeatCount="indefinite"/>
+      </circle>
+    </g>
+  </g>
+
+  <!-- CHISPAS / partículas alrededor -->
+  <g fill="#22C1E0">
+    <circle cx="270" cy="105" r="3.5">
+      <animate attributeName="r" values="2.5;6;2.5" dur="1.2s" repeatCount="indefinite"/>
+      <animate attributeName="opacity" values="1;0.2;1" dur="1.2s" repeatCount="indefinite"/>
+    </circle>
+    <circle cx="130" cy="105" r="3">
+      <animate attributeName="r" values="2;5;2" dur="1.4s" begin="0.3s" repeatCount="indefinite"/>
+      <animate attributeName="opacity" values="1;0.2;1" dur="1.4s" begin="0.3s" repeatCount="indefinite"/>
+    </circle>
+    <circle cx="300" cy="272" r="3">
+      <animate attributeName="r" values="2;5;2" dur="1.3s" begin="0.6s" repeatCount="indefinite"/>
+      <animate attributeName="opacity" values="1;0.2;1" dur="1.3s" begin="0.6s" repeatCount="indefinite"/>
+    </circle>
+    <circle cx="100" cy="272" r="3.5">
+      <animate attributeName="r" values="2.5;6;2.5" dur="1.5s" begin="0.9s" repeatCount="indefinite"/>
+      <animate attributeName="opacity" values="1;0.2;1" dur="1.5s" begin="0.9s" repeatCount="indefinite"/>
+    </circle>
+  </g>
+</svg>

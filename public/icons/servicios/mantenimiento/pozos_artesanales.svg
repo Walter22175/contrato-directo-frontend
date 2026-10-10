@@ -1,0 +1,52 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400" width="400" height="400" fill="none">
+  <!-- Estructura del Pozo Tradicional (Azul) -->
+  <!-- Techo / Cubierta en V -->
+  <path 
+    d="M120 140 L200 80 L280 140" 
+    stroke="#0047D4" 
+    stroke-width="16" 
+    stroke-linecap="round" 
+    stroke-linejoin="round" 
+  />
+  <!-- Vigas / Soportes laterales -->
+  <path d="M150 117 V200" stroke="#0047D4" stroke-width="16" stroke-linecap="round" />
+  <path d="M250 117 V200" stroke="#0047D4" stroke-width="16" stroke-linecap="round" />
+  
+  <!-- Brocal / Muro cilíndrico del pozo -->
+  <rect 
+    x="110" 
+    y="200" 
+    width="180" 
+    height="120" 
+    rx="16" 
+    stroke="#0047D4" 
+    stroke-width="16" 
+    stroke-linecap="round" 
+    stroke-linejoin="round" 
+  />
+  <!-- Textura / Línea de ladrillo central -->
+  <path d="M110 260 H290" stroke="#0047D4" stroke-width="16" stroke-linecap="round" />
+
+  <!-- Sistema de Extracción / Polea y Agua (Acento Cian) -->
+  <!-- Eje / Manivela superior -->
+  <path d="M180 150 H220" stroke="#00C9B7" stroke-width="16" stroke-linecap="round" />
+  <!-- Cuerda / Cable -->
+  <path d="M200 150 V210" stroke="#00C9B7" stroke-width="16" stroke-linecap="round" />
+  
+  <!-- Balde / Caldero de agua -->
+  <path 
+    d="M175 210 H225 L215 250 H185 Z" 
+    stroke="#00C9B7" 
+    stroke-width="16" 
+    stroke-linecap="round" 
+    stroke-linejoin="round" 
+  />
+  
+  <!-- Gota de agua limpia -->
+  <path 
+    d="M200 280 C200 288 193 295 185 295 C177 295 170 288 170 280 C170 272 185 255 185 255 C185 255 200 272 200 280 Z" 
+    stroke="#00C9B7" 
+    stroke-width="16" 
+    stroke-linejoin="round" 
+  />
+</svg>

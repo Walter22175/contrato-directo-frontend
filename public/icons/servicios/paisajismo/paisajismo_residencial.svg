@@ -1,0 +1,276 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400" width="100%" height="100%">
+  <defs>
+    <linearGradient id="g1" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0A2A66"/>
+      <stop offset="55%" stop-color="#1E6FE8"/>
+      <stop offset="100%" stop-color="#22C1E0"/>
+    </linearGradient>
+    <linearGradient id="g2" x1="0%" y1="100%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#22C1E0"/>
+      <stop offset="100%" stop-color="#0A2A66"/>
+    </linearGradient>
+    <linearGradient id="g3" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#22C1E0"/>
+      <stop offset="100%" stop-color="#1E6FE8"/>
+    </linearGradient>
+    <radialGradient id="g4" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#22C1E0" stop-opacity="0.55"/>
+      <stop offset="100%" stop-color="#22C1E0" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+
+  <!-- Aro exterior institucional -->
+  <g fill="none" stroke="url(#g2)" stroke-width="7" stroke-linecap="round" opacity="0.85">
+    <path d="M 70 200 A 130 130 0 0 1 200 70" />
+    <path d="M 200 70 A 130 130 0 0 1 330 200" />
+    <path d="M 330 200 A 130 130 0 0 1 200 330" />
+    <path d="M 200 330 A 130 130 0 0 1 70 200" />
+    <animateTransform attributeName="transform" type="rotate"
+      from="0 200 200" to="360 200 200" dur="50s" repeatCount="indefinite"/>
+  </g>
+
+  <!-- Resplandor central -->
+  <circle cx="200" cy="200" r="95" fill="url(#g4)">
+    <animate attributeName="r" values="90;110;90" dur="3s" repeatCount="indefinite"/>
+    <animate attributeName="opacity" values="0.7;0.3;0.7" dur="3s" repeatCount="indefinite"/>
+  </circle>
+
+  <!-- CASA RESIDENCIAL CENTRAL (nucleo) -->
+  <g transform="translate(200 200) scale(0.95)">
+    <g>
+      <animateTransform attributeName="transform" type="translate"
+        values="0 0; 0 -2; 0 0" dur="3s" repeatCount="indefinite"/>
+
+      <!-- Cuerpo de la casa -->
+      <rect x="-40" y="-14" width="80" height="50" rx="3" fill="url(#g1)"/>
+
+      <!-- Techo a dos aguas -->
+      <path d="M -46 -14 L 0 -46 L 46 -14 Z" fill="url(#g3)"/>
+      <path d="M -46 -14 L 0 -46 L 0 -14 Z" fill="url(#g1)" opacity="0.5"/>
+
+      <!-- Chimenea -->
+      <rect x="18" y="-42" width="10" height="18" fill="url(#g1)"/>
+      <rect x="16" y="-44" width="14" height="4" rx="1" fill="url(#g3)"/>
+
+      <!-- Humo de la chimenea -->
+      <circle cx="23" cy="-50" r="3" fill="#22C1E0" opacity="0.6">
+        <animate attributeName="cy" values="-48;-58;-48" dur="2.4s" repeatCount="indefinite"/>
+        <animate attributeName="opacity" values="0.6;0.15;0.6" dur="2.4s" repeatCount="indefinite"/>
+      </circle>
+      <circle cx="27" cy="-56" r="2.5" fill="#22C1E0" opacity="0.5">
+        <animate attributeName="cy" values="-54;-64;-54" dur="3s" begin="0.5s" repeatCount="indefinite"/>
+        <animate attributeName="opacity" values="0.5;0.1;0.5" dur="3s" begin="0.5s" repeatCount="indefinite"/>
+      </circle>
+
+      <!-- Ventanas -->
+      <rect x="-30" y="-4" width="18" height="18" rx="2" fill="#0A2A66" opacity="0.7"/>
+      <rect x="-30" y="-4" width="18" height="18" rx="2" fill="none" stroke="#ffffff" stroke-width="1.5" opacity="0.6"/>
+      <line x1="-21" y1="-4" x2="-21" y2="14" stroke="#ffffff" stroke-width="1" opacity="0.6"/>
+      <line x1="-30" y1="5" x2="-12" y2="5" stroke="#ffffff" stroke-width="1" opacity="0.6"/>
+      <rect x="-26" y="-1" width="10" height="12" rx="1" fill="#22C1E0" opacity="0.5">
+        <animate attributeName="opacity" values="0.5;0.15;0.5" dur="2.6s" repeatCount="indefinite"/>
+      </rect>
+
+      <!-- Ventana derecha -->
+      <rect x="14" y="-4" width="18" height="18" rx="2" fill="#0A2A66" opacity="0.7"/>
+      <rect x="14" y="-4" width="18" height="18" rx="2" fill="none" stroke="#ffffff" stroke-width="1.5" opacity="0.6"/>
+      <line x1="23" y1="-4" x2="23" y2="14" stroke="#ffffff" stroke-width="1" opacity="0.6"/>
+      <line x1="14" y1="5" x2="32" y2="5" stroke="#ffffff" stroke-width="1" opacity="0.6"/>
+      <rect x="18" y="-1" width="10" height="12" rx="1" fill="#22C1E0" opacity="0.4">
+        <animate attributeName="opacity" values="0.4;0.1;0.4" dur="3s" begin="0.8s" repeatCount="indefinite"/>
+      </rect>
+
+      <!-- Puerta de entrada -->
+      <rect x="-8" y="4" width="16" height="32" rx="2" fill="#0A2A66" opacity="0.85"/>
+      <rect x="-6" y="6" width="12" height="28" rx="1" fill="url(#g1)"/>
+      <circle cx="3" cy="20" r="1.5" fill="#22C1E0"/>
+
+      <!-- Césped del jardín frontal -->
+      <path d="M -46 36 L 46 36 L 44 42 L -44 42 Z" fill="url(#g3)" opacity="0.8"/>
+
+      <!-- Base de la casa -->
+      <rect x="-48" y="34" width="96" height="6" rx="2" fill="#0A2A66" opacity="0.7"/>
+
+      <!-- Brillo superior del techo -->
+      <path d="M -40 -18 L 0 -42 L 0 -40 L -38 -16 Z" fill="#ffffff" opacity="0.4"/>
+    </g>
+  </g>
+
+  <!-- ARBOL FRONDOSO (12 en punto) -->
+  <g transform="translate(200 118) scale(0.62)">
+    <g>
+      <animateTransform attributeName="transform" type="rotate"
+        values="-2 0 30; 2 0 30; -2 0 30" dur="3.5s" repeatCount="indefinite"/>
+      <rect x="-4" y="-4" width="8" height="30" fill="url(#g1)"/>
+      <circle cx="-14" cy="-14" r="14" fill="url(#g3)"/>
+      <circle cx="14" cy="-14" r="14" fill="url(#g3)"/>
+      <circle cx="0" cy="-26" r="16" fill="url(#g3)"/>
+      <ellipse cx="-6" cy="-30" rx="8" ry="4" fill="#ffffff" opacity="0.4">
+        <animate attributeName="opacity" values="0.4;0.15;0.4" dur="3s" repeatCount="indefinite"/>
+      </ellipse>
+      <circle cx="-8" cy="-18" r="2" fill="#ffffff" opacity="0.5"/>
+      <circle cx="8" cy="-22" r="2" fill="#ffffff" opacity="0.5"/>
+      <circle cx="0" cy="-32" r="2" fill="#ffffff" opacity="0.5"/>
+    </g>
+  </g>
+
+  <!-- MACIZO DE FLORES (6 en punto) -->
+  <g transform="translate(200 288) scale(0.62)">
+    <g>
+      <animateTransform attributeName="transform" type="translate"
+        values="0 0; 0 3; 0 0" dur="2.8s" repeatCount="indefinite"/>
+      <!-- Tierra / cantero -->
+      <ellipse cx="0" cy="14" rx="24" ry="6" fill="url(#g1)" opacity="0.8"/>
+      <!-- Tallos -->
+      <line x1="-12" y1="14" x2="-12" y2="-4" stroke="url(#g1)" stroke-width="2" stroke-linecap="round"/>
+      <line x1="0" y1="14" x2="0" y2="-8" stroke="url(#g1)" stroke-width="2" stroke-linecap="round"/>
+      <line x1="12" y1="14" x2="12" y2="-4" stroke="url(#g1)" stroke-width="2" stroke-linecap="round"/>
+      <!-- Flores -->
+      <g>
+        <circle cx="-12" cy="-8" r="5" fill="#22C1E0"/>
+        <circle cx="-12" cy="-8" r="2" fill="#ffffff"/>
+      </g>
+      <g>
+        <circle cx="0" cy="-12" r="6" fill="#22C1E0"/>
+        <circle cx="0" cy="-12" r="2.5" fill="#ffffff"/>
+      </g>
+      <g>
+        <circle cx="12" cy="-8" r="5" fill="#22C1E0"/>
+        <circle cx="12" cy="-8" r="2" fill="#ffffff"/>
+      </g>
+      <!-- Hojas -->
+      <path d="M -14 6 Q -20 4 -18 0 Q -14 2 -12 6 Z" fill="url(#g3)"/>
+      <path d="M 14 6 Q 20 4 18 0 Q 14 2 12 6 Z" fill="url(#g3)"/>
+      <!-- Brillo -->
+      <ellipse cx="-6" cy="-16" rx="3" ry="1.5" fill="#ffffff" opacity="0.5"/>
+    </g>
+  </g>
+
+  <!-- MACETA DECORATIVA (9 en punto) -->
+  <g transform="translate(118 200) scale(0.62)">
+    <g>
+      <animateTransform attributeName="transform" type="rotate"
+        values="-4 0 20; 4 0 20; -4 0 20" dur="3.2s" repeatCount="indefinite"/>
+      <!-- Planta en la maceta -->
+      <path d="M 0 -6 Q -10 -20 -6 -30 Q 6 -26 0 -6 Z" fill="url(#g1)"/>
+      <path d="M 0 -6 Q 10 -20 6 -30 Q -6 -26 0 -6 Z" fill="url(#g1)"/>
+      <circle cx="0" cy="-32" r="4" fill="url(#g1)"/>
+      <!-- Maceta -->
+      <path d="M -18 -4 L 18 -4 L 14 22 L -14 22 Z" fill="url(#g1)"/>
+      <rect x="-20" y="-8" width="40" height="6" rx="2" fill="url(#g3)"/>
+      <ellipse cx="0" cy="-4" rx="16" ry="3" fill="#0A2A66" opacity="0.5"/>
+      <!-- Brillo -->
+      <path d="M -10 0 L -6 18 L -2 18 L -6 0 Z" fill="#ffffff" opacity="0.3"/>
+    </g>
+  </g>
+
+  <!-- SENDERO / PIEDRAS (3 en punto) -->
+  <g transform="translate(282 200) scale(0.62)">
+    <g>
+      <animateTransform attributeName="transform" type="translate"
+        values="0 0; 0 -3; 0 0" dur="2.8s" repeatCount="indefinite"/>
+      <!-- Sendero curvo -->
+      <path d="M -22 20 Q -6 10 2 0 Q 10 -10 22 -20"
+            fill="none" stroke="#0A2A66" stroke-width="8" opacity="0.4" stroke-linecap="round"/>
+      <!-- Piedras redondas -->
+      <ellipse cx="-16" cy="16" rx="7" ry="5" fill="url(#g3)"/>
+      <ellipse cx="-4" cy="6" rx="8" ry="6" fill="url(#g3)"/>
+      <ellipse cx="8" cy="-6" rx="7" ry="5" fill="url(#g3)"/>
+      <ellipse cx="18" cy="-16" rx="6" ry="4.5" fill="url(#g3)"/>
+      <!-- Detalles de las piedras -->
+      <circle cx="-14" cy="14" r="1.5" fill="#ffffff" opacity="0.4"/>
+      <circle cx="-2" cy="4" r="1.5" fill="#ffffff" opacity="0.4"/>
+      <circle cx="10" cy="-8" r="1.5" fill="#ffffff" opacity="0.4"/>
+      <!-- Pastito a los costados -->
+      <path d="M -22 24 L -20 18 M -22 24 L -18 20 M 22 -24 L 20 -18 M 22 -24 L 18 -20"
+            stroke="#22C1E0" stroke-width="1.5" stroke-linecap="round" opacity="0.7"/>
+    </g>
+  </g>
+
+  <!-- PLANO / BOCETO (10-11 en punto) -->
+  <g transform="translate(118 118) scale(0.58)">
+    <g>
+      <animateTransform attributeName="transform" type="translate"
+        values="0 0; 0 -3; 0 0" dur="2.6s" repeatCount="indefinite"/>
+      <path d="M -20 -22 L 12 -22 L 20 -14 L 20 22 L -20 22 Z" fill="url(#g1)"/>
+      <path d="M 12 -22 L 12 -14 L 20 -14 Z" fill="#0A2A66" opacity="0.5"/>
+      <g stroke="#ffffff" stroke-width="0.8" opacity="0.5">
+        <line x1="-16" y1="-14" x2="16" y2="-14"/>
+        <line x1="-16" y1="-6" x2="16" y2="-6"/>
+        <line x1="-16" y1="2" x2="16" y2="2"/>
+        <line x1="-16" y1="10" x2="16" y2="10"/>
+        <line x1="-12" y1="-18" x2="-12" y2="18"/>
+        <line x1="-4" y1="-18" x2="-4" y2="18"/>
+        <line x1="4" y1="-18" x2="4" y2="18"/>
+        <line x1="12" y1="-18" x2="12" y2="18"/>
+      </g>
+      <!-- Dibujo de casa y jardin -->
+      <rect x="-10" y="-10" width="12" height="10" fill="none" stroke="#22C1E0" stroke-width="1.5"/>
+      <path d="M -12 -10 L -4 -16 L 4 -10" fill="none" stroke="#22C1E0" stroke-width="1.5"/>
+      <circle cx="-14" cy="8" r="3" fill="none" stroke="#22C1E0" stroke-width="1.5"/>
+      <circle cx="-6" cy="12" r="2.5" fill="none" stroke="#22C1E0" stroke-width="1.5"/>
+      <circle cx="8" cy="14" r="2" fill="#22C1E0" opacity="0.7"/>
+      <!-- Brillo -->
+      <path d="M -18 -20 L 10 -20 L 8 -18 L -16 -18 Z" fill="#ffffff" opacity="0.4"/>
+    </g>
+  </g>
+
+  <!-- RIEGO / MANGUERA (1-2 en punto) -->
+  <g transform="translate(282 118) scale(0.58)">
+    <g>
+      <animateTransform attributeName="transform" type="rotate"
+        values="-5 0 0; 5 0 0; -5 0 0" dur="3s" repeatCount="indefinite"/>
+      <!-- Aspersor de jardín -->
+      <rect x="-4" y="8" width="8" height="18" rx="2" fill="url(#g1)"/>
+      <rect x="-12" y="2" width="24" height="8" rx="3" fill="url(#g3)"/>
+      <circle cx="0" cy="-2" r="8" fill="url(#g1)"/>
+      <circle cx="0" cy="-2" r="3" fill="#22C1E0"/>
+      <!-- Gotas de agua -->
+      <g fill="#22C1E0">
+        <circle cx="-14" cy="-8" r="2">
+          <animate attributeName="cy" values="-8;-22;-8" dur="1.6s" repeatCount="indefinite"/>
+          <animate attributeName="opacity" values="1;0;1" dur="1.6s" repeatCount="indefinite"/>
+        </circle>
+        <circle cx="0" cy="-10" r="2.5">
+          <animate attributeName="cy" values="-10;-26;-10" dur="1.4s" repeatCount="indefinite"/>
+          <animate attributeName="opacity" values="1;0;1" dur="1.4s" repeatCount="indefinite"/>
+        </circle>
+        <circle cx="14" cy="-8" r="2">
+          <animate attributeName="cy" values="-8;-22;-8" dur="1.8s" repeatCount="indefinite"/>
+          <animate attributeName="opacity" values="1;0;1" dur="1.8s" repeatCount="indefinite"/>
+        </circle>
+        <circle cx="-8" cy="-4" r="1.5">
+          <animate attributeName="cy" values="-4;-18;-4" dur="2s" begin="0.3s" repeatCount="indefinite"/>
+          <animate attributeName="opacity" values="1;0;1" dur="2s" begin="0.3s" repeatCount="indefinite"/>
+        </circle>
+        <circle cx="8" cy="-4" r="1.5">
+          <animate attributeName="cy" values="-4;-18;-4" dur="2s" begin="0.6s" repeatCount="indefinite"/>
+          <animate attributeName="opacity" values="1;0;1" dur="2s" begin="0.6s" repeatCount="indefinite"/>
+        </circle>
+      </g>
+      <!-- Base -->
+      <rect x="-10" y="26" width="20" height="4" rx="2" fill="url(#g1)"/>
+    </g>
+  </g>
+
+  <!-- Chispas / particulas alrededor -->
+  <g fill="#22C1E0">
+    <circle cx="270" cy="105" r="3.5">
+      <animate attributeName="r" values="2.5;6;2.5" dur="1.2s" repeatCount="indefinite"/>
+      <animate attributeName="opacity" values="1;0.2;1" dur="1.2s" repeatCount="indefinite"/>
+    </circle>
+    <circle cx="130" cy="105" r="3">
+      <animate attributeName="r" values="2;5;2" dur="1.4s" begin="0.3s" repeatCount="indefinite"/>
+      <animate attributeName="opacity" values="1;0.2;1" dur="1.4s" begin="0.3s" repeatCount="indefinite"/>
+    </circle>
+    <circle cx="300" cy="272" r="3">
+      <animate attributeName="r" values="2;5;2" dur="1.3s" begin="0.6s" repeatCount="indefinite"/>
+      <animate attributeName="opacity" values="1;0.2;1" dur="1.3s" begin="0.6s" repeatCount="indefinite"/>
+    </circle>
+    <circle cx="100" cy="272" r="3.5">
+      <animate attributeName="r" values="2.5;6;2.5" dur="1.5s" begin="0.9s" repeatCount="indefinite"/>
+      <animate attributeName="opacity" values="1;0.2;1" dur="1.5s" begin="0.9s" repeatCount="indefinite"/>
+    </circle>
+  </g>
+</svg>

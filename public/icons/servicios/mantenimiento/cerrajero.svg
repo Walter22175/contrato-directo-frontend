@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400" width="400" height="400" fill="none">
+  <!-- Candado (Estructura Principal) -->
+  <!-- Arco del candado -->
+  <path 
+    d="M140 180 V130 C140 96.86 166.86 70 200 70 C233.14 70 260 96.86 260 130 V180" 
+    stroke="#0047D4" 
+    stroke-width="16" 
+    stroke-linecap="round" 
+    stroke-linejoin="round" 
+  />
+  <!-- Cuerpo del candado -->
+  <rect 
+    x="110" 
+    y="180" 
+    width="180" 
+    height="150" 
+    rx="24" 
+    stroke="#0047D4" 
+    stroke-width="16" 
+    stroke-linecap="round" 
+    stroke-linejoin="round" 
+  />
+
+  <!-- Ojo de la cerradura -->
+  <circle cx="200" cy="235" r="16" stroke="#0047D4" stroke-width="16" />
+  <path d="M200 251 V285" stroke="#0047D4" stroke-width="16" stroke-linecap="round" />
+
+  <!-- Llave en diagonal (Acento Cian) -->
+  <!-- Cabeza de la llave -->
+  <circle cx="290" cy="110" r="28" stroke="#00C9B7" stroke-width="16" />
+  <!-- Espada / Vástago de la llave -->
+  <path d="M270 130 L180 220" stroke="#00C9B7" stroke-width="16" stroke-linecap="round" />
+  <!-- Dientes de la llave -->
+  <path d="M210 190 L225 205 M228 172 L243 187" stroke="#00C9B7" stroke-width="16" stroke-linecap="round" />
+</svg>

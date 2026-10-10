@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400" width="400" height="400" fill="none">
+  <defs>
+    <!-- Gradiente lineal con la paleta seleccionada (#0047D4 a #00C9B7) -->
+    <linearGradient id="electricGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0047D4" />
+      <stop offset="100%" stop-color="#00C9B7" />
+    </linearGradient>
+  </defs>
+
+  <!-- Ícono de Rayo / Electricidad -->
+  <path 
+    d="M215 50 L110 220 H205 L185 350 L290 180 H195 L215 50 Z" 
+    stroke="url(#electricGradient)" 
+    stroke-width="16" 
+    stroke-linecap="round" 
+    stroke-linejoin="round" 
+  />
+</svg>

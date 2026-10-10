@@ -1,0 +1,288 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg viewBox="0 0 400 400" width="100%" height="100%"
+     xmlns="http://www.w3.org/2000/svg" role="img"
+     aria-label="Icono de Iluminación Paisajista - Contrato Directo">
+
+  <defs>
+    <linearGradient id="gradIP" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%"   stop-color="#0A2A66"/>
+      <stop offset="55%"  stop-color="#1E6FE8"/>
+      <stop offset="100%" stop-color="#22C1E0"/>
+    </linearGradient>
+
+    <linearGradient id="gradAroIP" x1="0%" y1="100%" x2="100%" y2="0%">
+      <stop offset="0%"   stop-color="#22C1E0"/>
+      <stop offset="100%" stop-color="#0A2A66"/>
+    </linearGradient>
+
+    <linearGradient id="gradLuz" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%"   stop-color="#22C1E0"/>
+      <stop offset="100%" stop-color="#1E6FE8"/>
+    </linearGradient>
+
+    <radialGradient id="glowIP" cx="50%" cy="50%" r="50%">
+      <stop offset="0%"   stop-color="#22C1E0" stop-opacity="0.55"/>
+      <stop offset="100%" stop-color="#22C1E0" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+
+  <!-- Aro exterior institucional -->
+  <g fill="none" stroke="url(#gradAroIP)" stroke-width="7"
+     stroke-linecap="round" opacity="0.85">
+    <path d="M 70 200 A 130 130 0 0 1 200 70" />
+    <path d="M 200 70 A 130 130 0 0 1 330 200" />
+    <path d="M 330 200 A 130 130 0 0 1 200 330" />
+    <path d="M 200 330 A 130 130 0 0 1 70 200" />
+    <animateTransform attributeName="transform" type="rotate"
+      from="0 200 200" to="360 200 200" dur="50s" repeatCount="indefinite"/>
+  </g>
+
+  <!-- Resplandor central -->
+  <circle cx="200" cy="200" r="95" fill="url(#glowIP)">
+    <animate attributeName="r" values="90;110;90" dur="3s" repeatCount="indefinite"/>
+    <animate attributeName="opacity" values="0.7;0.3;0.7" dur="3s" repeatCount="indefinite"/>
+  </circle>
+
+  <!-- 💡 REFLECTOR / PROYECTOR CENTRAL (núcleo) -->
+  <g transform="translate(200 200) scale(0.95)">
+    <g>
+      <!-- Animación: el proyector gira levemente -->
+      <animateTransform attributeName="transform" type="rotate"
+        values="-3 0 20; 3 0 20; -3 0 20" dur="3s" repeatCount="indefinite"/>
+
+      <!-- Haz de luz principal (saliendo hacia arriba) -->
+      <path d="M -20 -10 L -50 -60 L 50 -60 L 20 -10 Z"
+            fill="url(#gradLuz)" opacity="0.5">
+        <animate attributeName="opacity" values="0.5;0.25;0.5" dur="2s" repeatCount="indefinite"/>
+      </path>
+      <!-- Haz de luz interior más brillante -->
+      <path d="M -12 -10 L -30 -55 L 30 -55 L 12 -10 Z"
+            fill="#22C1E0" opacity="0.5">
+        <animate attributeName="opacity" values="0.5;0.2;0.5" dur="2s" begin="0.3s" repeatCount="indefinite"/>
+      </path>
+
+      <!-- Cuerpo del proyector -->
+      <rect x="-22" y="-12" width="44" height="24" rx="4" fill="url(#gradIP)"/>
+
+      <!-- Lente frontal (cara del proyector) -->
+      <ellipse cx="0" cy="-14" rx="20" ry="6" fill="url(#gradLuz)"/>
+      <ellipse cx="0" cy="-14" rx="14" ry="4" fill="#ffffff" opacity="0.95">
+        <animate attributeName="opacity" values="0.95;0.6;0.95" dur="1.6s" repeatCount="indefinite"/>
+      </ellipse>
+      <ellipse cx="0" cy="-14" rx="6" ry="2" fill="#22C1E0"/>
+
+      <!-- Sombra / cuerpo inferior -->
+      <rect x="-18" y="8" width="36" height="8" rx="3" fill="#0A2A66" opacity="0.6"/>
+
+      <!-- Estaca / piqueta para el suelo -->
+      <rect x="-3" y="16" width="6" height="22" rx="2" fill="url(#gradIP)"/>
+      <path d="M -3 38 L 3 38 L 0 46 Z" fill="url(#gradIP)"/>
+
+      <!-- Ondas de luz emitida -->
+      <g stroke="#22C1E0" stroke-width="2" stroke-linecap="round" fill="none">
+        <path d="M -32 -20 Q -36 -14 -32 -8">
+          <animate attributeName="opacity" values="1;0.2;1" dur="1.4s" repeatCount="indefinite"/>
+        </path>
+        <path d="M 32 -20 Q 36 -14 32 -8">
+          <animate attributeName="opacity" values="0.3;1;0.3" dur="1.4s" repeatCount="indefinite"/>
+        </path>
+      </g>
+
+      <!-- Brillo superior del cuerpo -->
+      <rect x="-18" y="-10" width="36" height="2" rx="1" fill="#ffffff" opacity="0.5"/>
+    </g>
+  </g>
+
+  <!-- 🌟 HAZ DE LUZ (12 en punto) -->
+  <g transform="translate(200 118) scale(0.62)">
+    <g>
+      <animateTransform attributeName="transform" type="translate"
+        values="0 0; 0 -3; 0 0" dur="2.6s" repeatCount="indefinite"/>
+      <!-- Estrella de luz / destello -->
+      <path d="M 0 -26 L 4 -8 L 22 -6 L 8 4 L 12 22 L 0 12 L -12 22 L -8 4 L -22 -6 L -4 -8 Z"
+            fill="url(#gradIP)"/>
+      <!-- Brillo interior -->
+      <path d="M 0 -18 L 2 -4 L 14 -3 L 4 2 L 7 14 L 0 8 L -7 14 L -4 2 L -14 -3 L -2 -4 Z"
+            fill="#ffffff" opacity="0.7">
+        <animate attributeName="opacity" values="0.7;0.3;0.7" dur="1.8s" repeatCount="indefinite"/>
+      </path>
+      <!-- Puntos de destello -->
+      <circle cx="-30" cy="-10" r="2.5" fill="#22C1E0">
+        <animate attributeName="r" values="2.5;4;2.5" dur="1.4s" repeatCount="indefinite"/>
+      </circle>
+      <circle cx="30" cy="-10" r="2.5" fill="#22C1E0">
+        <animate attributeName="r" values="2.5;4;2.5" dur="1.4s" begin="0.7s" repeatCount="indefinite"/>
+      </circle>
+    </g>
+  </g>
+
+  <!-- 🌿 PLANTA ILUMINADA (6 en punto) -->
+  <g transform="translate(200 288) scale(0.62)">
+    <g>
+      <animateTransform attributeName="transform" type="translate"
+        values="0 0; 0 3; 0 0" dur="2.8s" repeatCount="indefinite"/>
+      <!-- Tallo -->
+      <path d="M 0 22 Q 0 8 0 -6" stroke="url(#gradIP)"
+            stroke-width="5" fill="none" stroke-linecap="round"/>
+      <!-- Hoja izquierda -->
+      <path d="M 0 4 Q -20 0 -16 -14 Q -6 -12 0 4 Z" fill="url(#gradIP)"/>
+      <!-- Hoja derecha -->
+      <path d="M 0 -6 Q 20 -10 16 -24 Q 6 -22 0 -6 Z" fill="url(#gradIP)"/>
+      <!-- Luz de la planta (brillo) -->
+      <ellipse cx="0" cy="-8" rx="22" ry="14" fill="#22C1E0" opacity="0.25">
+        <animate attributeName="opacity" values="0.25;0.1;0.25" dur="2s" repeatCount="indefinite"/>
+      </ellipse>
+      <!-- Tierra -->
+      <ellipse cx="0" cy="22" rx="18" ry="5" fill="url(#gradIP)" opacity="0.6"/>
+      <!-- Foco / uplight pequeño -->
+      <circle cx="0" cy="14" r="3" fill="#22C1E0">
+        <animate attributeName="opacity" values="1;0.4;1" dur="1.6s" repeatCount="indefinite"/>
+      </circle>
+    </g>
+  </g>
+
+  <!-- 🪨 PIEDRA / ROCA (9 en punto) -->
+  <g transform="translate(118 200) scale(0.62)">
+    <g>
+      <animateTransform attributeName="transform" type="translate"
+        values="0 0; 0 -3; 0 0" dur="2.8s" repeatCount="indefinite"/>
+      <!-- Roca principal -->
+      <path d="M -22 8 Q -24 -6 -14 -12 Q -2 -18 10 -12 Q 22 -6 20 8 Q 18 14 0 14 Q -18 14 -22 8 Z"
+            fill="url(#gradIP)"/>
+      <!-- Detalles de la roca -->
+      <path d="M -14 -6 Q -6 -10 2 -8" stroke="#0A2A66" stroke-width="1.2" opacity="0.5" fill="none"/>
+      <path d="M -6 6 Q 4 4 12 6" stroke="#0A2A66" stroke-width="1.2" opacity="0.4" fill="none"/>
+      <!-- Roca secundaria -->
+      <path d="M -20 20 Q -22 12 -14 10 Q -6 8 -2 14 Q 0 20 -8 20 Z"
+            fill="url(#gradIP)" opacity="0.8"/>
+      <!-- Luz desde la roca (uplight) -->
+      <ellipse cx="0" cy="-16" rx="18" ry="8" fill="#22C1E0" opacity="0.3">
+        <animate attributeName="opacity" values="0.3;0.1;0.3" dur="2.4s" repeatCount="indefinite"/>
+      </ellipse>
+      <!-- Brillo -->
+      <ellipse cx="-8" cy="-6" rx="4" ry="2" fill="#ffffff" opacity="0.4"/>
+    </g>
+  </g>
+
+  <!-- 🌳 ÁRBOL CON LUZ (3 en punto) -->
+  <g transform="translate(282 200) scale(0.62)">
+    <g>
+      <animateTransform attributeName="transform" type="rotate"
+        values="-2 0 40; 2 0 40; -2 0 40" dur="3.5s" repeatCount="indefinite"/>
+      <!-- Tronco -->
+      <path d="M -4 40 L -3 8 Q -2 2 0 0 Q 2 2 3 8 L 4 40 Z" fill="url(#gradIP)"/>
+      <!-- Copa del árbol -->
+      <circle cx="-10" cy="-6" r="14" fill="url(#gradIP)"/>
+      <circle cx="10" cy="-6" r="14" fill="url(#gradIP)"/>
+      <circle cx="0" cy="-16" r="15" fill="url(#gradIP)"/>
+      <!-- Puntos de luz en la copa -->
+      <g fill="#22C1E0">
+        <circle cx="-8" cy="-10" r="2">
+          <animate attributeName="opacity" values="1;0.3;1" dur="1.4s" repeatCount="indefinite"/>
+        </circle>
+        <circle cx="6" cy="-14" r="2">
+          <animate attributeName="opacity" values="1;0.3;1" dur="1.4s" begin="0.3s" repeatCount="indefinite"/>
+        </circle>
+        <circle cx="-2" cy="-20" r="2">
+          <animate attributeName="opacity" values="1;0.3;1" dur="1.4s" begin="0.6s" repeatCount="indefinite"/>
+        </circle>
+        <circle cx="10" cy="-4" r="2">
+          <animate attributeName="opacity" values="1;0.3;1" dur="1.4s" begin="0.9s" repeatCount="indefinite"/>
+        </circle>
+        <circle cx="-12" cy="0" r="2">
+          <animate attributeName="opacity" values="1;0.3;1" dur="1.4s" begin="0.5s" repeatCount="indefinite"/>
+        </circle>
+      </g>
+      <!-- Resplandor alrededor del árbol -->
+      <ellipse cx="0" cy="-8" rx="24" ry="20" fill="#22C1E0" opacity="0.15">
+        <animate attributeName="opacity" values="0.15;0.05;0.15" dur="2.2s" repeatCount="indefinite"/>
+      </ellipse>
+    </g>
+  </g>
+
+  <!-- 🔌 CABLE / CONEXIÓN (10-11 en punto) -->
+  <g transform="translate(118 118) scale(0.58)">
+    <g>
+      <animateTransform attributeName="transform" type="rotate"
+        values="-6; 6; -6" dur="3s" repeatCount="indefinite"/>
+      <!-- Cable en espiral -->
+      <path d="M -20 -10 Q -8 -22 0 -10 Q 8 2 20 -10"
+            fill="none" stroke="url(#gradIP)" stroke-width="4"
+            stroke-linecap="round"/>
+      <!-- Conector izquierdo -->
+      <rect x="-26" y="-16" width="10" height="14" rx="2" fill="url(#gradIP)"/>
+      <g fill="#0A2A66" opacity="0.7">
+        <rect x="-24" y="-13" width="2" height="8"/>
+        <rect x="-20" y="-13" width="2" height="8"/>
+      </g>
+      <!-- Conector derecho -->
+      <rect x="16" y="-16" width="10" height="14" rx="2" fill="url(#gradIP)"/>
+      <g fill="#0A2A66" opacity="0.7">
+        <rect x="18" y="-13" width="2" height="8"/>
+        <rect x="22" y="-13" width="2" height="8"/>
+      </g>
+      <!-- Chispa de energía -->
+      <circle cx="0" cy="-10" r="3" fill="#22C1E0">
+        <animate attributeName="r" values="3;5;3" dur="1.4s" repeatCount="indefinite"/>
+      </circle>
+      <!-- Brillo -->
+      <rect x="-24" y="-14" width="6" height="2" rx="1" fill="#ffffff" opacity="0.4"/>
+    </g>
+  </g>
+
+  <!-- ⚡ PANEL / CONTROL (1-2 en punto) -->
+  <g transform="translate(282 118) scale(0.58)">
+    <g>
+      <animateTransform attributeName="transform" type="translate"
+        values="0 0; 0 -3; 0 0" dur="2.6s" repeatCount="indefinite"/>
+      <!-- Caja del panel -->
+      <rect x="-20" y="-22" width="40" height="44" rx="4" fill="url(#gradIP)"/>
+      <!-- Pantalla / display -->
+      <rect x="-14" y="-16" width="28" height="14" rx="2" fill="#0A2A66" opacity="0.9"/>
+      <!-- Números del display -->
+      <rect x="-10" y="-12" width="20" height="2" rx="1" fill="#22C1E0">
+        <animate attributeName="width" values="20;10;20" dur="2s" repeatCount="indefinite"/>
+      </rect>
+      <rect x="-10" y="-7" width="12" height="2" rx="1" fill="#22C1E0" opacity="0.6"/>
+      <!-- Dial / perilla -->
+      <circle cx="0" cy="4" r="6" fill="url(#gradIP)"/>
+      <circle cx="0" cy="4" r="3" fill="#0A2A66" opacity="0.6"/>
+      <line x1="0" y1="4" x2="0" y2="-1" stroke="#22C1E0" stroke-width="2" stroke-linecap="round">
+        <animateTransform attributeName="transform" type="rotate"
+          values="-30 0 4; 30 0 4; -30 0 4" dur="2.4s" repeatCount="indefinite"/>
+      </line>
+      <!-- LEDs indicadores -->
+      <circle cx="-14" cy="14" r="1.5" fill="#22C1E0">
+        <animate attributeName="opacity" values="1;0.2;1" dur="1.2s" repeatCount="indefinite"/>
+      </circle>
+      <circle cx="-6" cy="14" r="1.5" fill="#22C1E0">
+        <animate attributeName="opacity" values="1;0.2;1" dur="1.4s" begin="0.3s" repeatCount="indefinite"/>
+      </circle>
+      <circle cx="2" cy="14" r="1.5" fill="#22C1E0">
+        <animate attributeName="opacity" values="1;0.2;1" dur="1.3s" begin="0.6s" repeatCount="indefinite"/>
+      </circle>
+      <!-- Brillo -->
+      <rect x="-16" y="-20" width="32" height="2" rx="1" fill="#ffffff" opacity="0.4"/>
+    </g>
+  </g>
+
+  <!-- CHISPAS / partículas alrededor (destellos) -->
+  <g fill="#22C1E0">
+    <circle cx="270" cy="105" r="3.5">
+      <animate attributeName="r" values="2.5;6;2.5" dur="1.2s" repeatCount="indefinite"/>
+      <animate attributeName="opacity" values="1;0.2;1" dur="1.2s" repeatCount="indefinite"/>
+    </circle>
+    <circle cx="130" cy="105" r="3">
+      <animate attributeName="r" values="2;5;2" dur="1.4s" begin="0.3s" repeatCount="indefinite"/>
+      <animate attributeName="opacity" values="1;0.2;1" dur="1.4s" begin="0.3s" repeatCount="indefinite"/>
+    </circle>
+    <circle cx="300" cy="272" r="3">
+      <animate attributeName="r" values="2;5;2" dur="1.3s" begin="0.6s" repeatCount="indefinite"/>
+      <animate attributeName="opacity" values="1;0.2;1" dur="1.3s" begin="0.6s" repeatCount="indefinite"/>
+    </circle>
+    <circle cx="100" cy="272" r="3.5">
+      <animate attributeName="r" values="2.5;6;2.5" dur="1.5s" begin="0.9s" repeatCount="indefinite"/>
+      <animate attributeName="opacity" values="1;0.2;1" dur="1.5s" begin="0.9s" repeatCount="indefinite"/>
+    </circle>
+  </g>
+</svg>

@@ -1,0 +1,356 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<svg viewBox="0 0 400 400" width="100%" height="100%"
+     xmlns="http://www.w3.org/2000/svg" role="img"
+     aria-label="Icono de Mecánico Motor - Contrato Directo">
+
+  <defs>
+    <linearGradient id="gradMEC" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%"   stop-color="#0A2A66"/>
+      <stop offset="55%"  stop-color="#1E6FE8"/>
+      <stop offset="100%" stop-color="#22C1E0"/>
+    </linearGradient>
+
+    <linearGradient id="gradAroMEC" x1="0%" y1="100%" x2="100%" y2="0%">
+      <stop offset="0%"   stop-color="#22C1E0"/>
+      <stop offset="100%" stop-color="#0A2A66"/>
+    </linearGradient>
+
+    <linearGradient id="gradMotor" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%"   stop-color="#22C1E0"/>
+      <stop offset="100%" stop-color="#1E6FE8"/>
+    </linearGradient>
+
+    <linearGradient id="gradCarroceriaMEC" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%"   stop-color="#22C1E0"/>
+      <stop offset="50%"  stop-color="#1E6FE8"/>
+      <stop offset="100%" stop-color="#0A2A66"/>
+    </linearGradient>
+
+    <linearGradient id="gradCristalMEC" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%"   stop-color="#22C1E0" stop-opacity="0.9"/>
+      <stop offset="100%" stop-color="#1E6FE8" stop-opacity="0.6"/>
+    </linearGradient>
+
+    <radialGradient id="glowMEC" cx="50%" cy="50%" r="50%">
+      <stop offset="0%"   stop-color="#22C1E0" stop-opacity="0.55"/>
+      <stop offset="100%" stop-color="#22C1E0" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+
+  <!-- Aro exterior institucional -->
+  <g fill="none" stroke="url(#gradAroMEC)" stroke-width="7"
+     stroke-linecap="round" opacity="0.85">
+    <path d="M 70 200 A 130 130 0 0 1 200 70" />
+    <path d="M 200 70 A 130 130 0 0 1 330 200" />
+    <path d="M 330 200 A 130 130 0 0 1 200 330" />
+    <path d="M 200 330 A 130 130 0 0 1 70 200" />
+    <animateTransform attributeName="transform" type="rotate"
+      from="0 200 200" to="360 200 200" dur="50s" repeatCount="indefinite"/>
+  </g>
+
+  <!-- Resplandor central -->
+  <circle cx="200" cy="200" r="95" fill="url(#glowMEC)">
+    <animate attributeName="r" values="90;110;90" dur="3s" repeatCount="indefinite"/>
+    <animate attributeName="opacity" values="0.7;0.3;0.7" dur="3s" repeatCount="indefinite"/>
+  </circle>
+
+  <!-- 🔧 MOTOR CENTRAL (núcleo) -->
+  <g transform="translate(200 200) scale(0.95)">
+    <g>
+      <!-- Animación: el motor vibra -->
+      <animateTransform attributeName="transform" type="translate"
+        values="0 0; 1 -1; 0 0; -1 1; 0 0" dur="0.8s" repeatCount="indefinite"/>
+
+      <!-- Bloque del motor -->
+      <rect x="-44" y="-28" width="88" height="56" rx="6" fill="url(#gradMotor)"/>
+
+      <!-- Tapa de válvulas (superior) -->
+      <rect x="-38" y="-38" width="76" height="12" rx="4" fill="url(#gradMotor)"/>
+      <rect x="-34" y="-42" width="68" height="6" rx="3" fill="url(#gradMotor)"/>
+
+      <!-- Cárter (inferior) -->
+      <rect x="-38" y="26" width="76" height="14" rx="4" fill="url(#gradMotor)"/>
+      <rect x="-30" y="38" width="60" height="6" rx="3" fill="url(#gradMotor)"/>
+
+      <!-- Cilindros (4) -->
+      <g fill="#0A2A66" opacity="0.7">
+        <rect x="-30" y="-22" width="12" height="44" rx="3"/>
+        <rect x="-12" y="-22" width="12" height="44" rx="3"/>
+        <rect x="6" y="-22" width="12" height="44" rx="3"/>
+        <rect x="24" y="-22" width="12" height="44" rx="3"/>
+      </g>
+
+      <!-- Bujías (4) -->
+      <g fill="url(#gradMEC)">
+        <rect x="-26" y="-48" width="4" height="10" rx="1"/>
+        <rect x="-8" y="-48" width="4" height="10" rx="1"/>
+        <rect x="10" y="-48" width="4" height="10" rx="1"/>
+        <rect x="28" y="-48" width="4" height="10" rx="1"/>
+      </g>
+      <!-- Chispas de las bujías -->
+      <g fill="#22C1E0">
+        <circle cx="-24" cy="-52" r="1.5">
+          <animate attributeName="opacity" values="1;0;1" dur="0.6s" repeatCount="indefinite"/>
+        </circle>
+        <circle cx="-6" cy="-52" r="1.5">
+          <animate attributeName="opacity" values="1;0;1" dur="0.6s" begin="0.15s" repeatCount="indefinite"/>
+        </circle>
+        <circle cx="12" cy="-52" r="1.5">
+          <animate attributeName="opacity" values="1;0;1" dur="0.6s" begin="0.3s" repeatCount="indefinite"/>
+        </circle>
+        <circle cx="30" cy="-52" r="1.5">
+          <animate attributeName="opacity" values="1;0;1" dur="0.6s" begin="0.45s" repeatCount="indefinite"/>
+        </circle>
+      </g>
+
+      <!-- Correa / polea lateral -->
+      <circle cx="-48" cy="0" r="10" fill="none" stroke="url(#gradMEC)" stroke-width="4">
+        <animateTransform attributeName="transform" type="rotate"
+          from="0 -48 0" to="360 -48 0" dur="2s" repeatCount="indefinite"/>
+      </circle>
+      <circle cx="-48" cy="0" r="3" fill="url(#gradMEC)"/>
+
+      <!-- Brillo superior -->
+      <rect x="-34" y="-42" width="68" height="2" rx="1" fill="#ffffff" opacity="0.4"/>
+    </g>
+  </g>
+
+  <!-- 🏎️ AUTO DEPORTIVO (12 en punto) -->
+  <g transform="translate(200 118) scale(0.65)">
+    <g>
+      <animateTransform attributeName="transform" type="translate"
+        values="0 0; 3 0; 0 0; -3 0; 0 0" dur="3.5s" repeatCount="indefinite"/>
+
+      <!-- Sombra -->
+      <ellipse cx="0" cy="14" rx="38" ry="3" fill="#0A2A66" opacity="0.35"/>
+
+      <!-- Carrocería deportiva -->
+      <path d="M -36 8
+               L -36 2
+               Q -36 -3 -32 -5
+               L -22 -6
+               Q -16 -15 -4 -17
+               Q 8 -17 14 -13
+               Q 20 -10 26 -5
+               L 34 -4
+               Q 38 -3 38 2
+               L 38 8
+               Q 38 12 34 12
+               L -34 12
+               Q -38 12 -38 8 Z"
+            fill="url(#gradCarroceriaMEC)"/>
+
+      <!-- Línea de carácter -->
+      <path d="M -32 3 L 34 3" stroke="#0A2A66" stroke-width="1.2" opacity="0.4" fill="none"/>
+
+      <!-- Cristales -->
+      <path d="M -16 -6 Q -10 -13 0 -14 Q 8 -14 14 -11 L 18 -6 Z"
+            fill="url(#gradCristalMEC)"/>
+      <line x1="-2" y1="-14" x2="-2" y2="-6" stroke="#0A2A66" stroke-width="1.5" opacity="0.6"/>
+
+      <!-- Hood scoop -->
+      <path d="M 8 -10 L 18 -10 L 19 -7 L 7 -7 Z" fill="#0A2A66" opacity="0.7"/>
+
+      <!-- Faro delantero -->
+      <path d="M 30 -2 L 37 -2 L 38 1 L 30 2 Z" fill="#22C1E0">
+        <animate attributeName="opacity" values="1;0.5;1" dur="1.8s" repeatCount="indefinite"/>
+      </path>
+
+      <!-- Faros traseros -->
+      <rect x="-38" y="-3" width="6" height="2.5" rx="1" fill="#22C1E0"/>
+      <rect x="-38" y="1" width="6" height="2.5" rx="1" fill="#22C1E0"/>
+
+      <!-- Splitter -->
+      <path d="M 30 12 L 42 12 L 40 15 L 28 15 Z" fill="#0A2A66" opacity="0.85"/>
+      <path d="M -42 12 L -30 12 L -28 15 L -40 15 Z" fill="#0A2A66" opacity="0.85"/>
+
+      <!-- Rueda trasera -->
+      <circle cx="-22" cy="12" r="8" fill="#0A2A66"/>
+      <circle cx="-22" cy="12" r="4" fill="url(#gradMEC)">
+        <animateTransform attributeName="transform" type="rotate"
+          from="0 -22 12" to="360 -22 12" dur="1.2s" repeatCount="indefinite"/>
+      </circle>
+      <line x1="-26" y1="12" x2="-18" y2="12" stroke="#ffffff" stroke-width="1" opacity="0.85">
+        <animateTransform attributeName="transform" type="rotate"
+          from="0 -22 12" to="360 -22 12" dur="1.2s" repeatCount="indefinite"/>
+      </line>
+      <line x1="-22" y1="8" x2="-22" y2="16" stroke="#ffffff" stroke-width="1" opacity="0.85">
+        <animateTransform attributeName="transform" type="rotate"
+          from="0 -22 12" to="360 -22 12" dur="1.2s" repeatCount="indefinite"/>
+      </line>
+
+      <!-- Rueda delantera -->
+      <circle cx="24" cy="12" r="8" fill="#0A2A66"/>
+      <circle cx="24" cy="12" r="4" fill="url(#gradMEC)">
+        <animateTransform attributeName="transform" type="rotate"
+          from="0 24 12" to="360 24 12" dur="1.2s" repeatCount="indefinite"/>
+      </circle>
+      <line x1="20" y1="12" x2="28" y2="12" stroke="#ffffff" stroke-width="1" opacity="0.85">
+        <animateTransform attributeName="transform" type="rotate"
+          from="0 24 12" to="360 24 12" dur="1.2s" repeatCount="indefinite"/>
+      </line>
+      <line x1="24" y1="8" x2="24" y2="16" stroke="#ffffff" stroke-width="1" opacity="0.85">
+        <animateTransform attributeName="transform" type="rotate"
+          from="0 24 12" to="360 24 12" dur="1.2s" repeatCount="indefinite"/>
+      </line>
+
+      <!-- Brillo -->
+      <path d="M -26 -4 Q -12 -8 0 -8 Q 12 -8 22 -4 L 18 -6 Q 6 -9 -6 -9 Q -20 -9 -26 -6 Z"
+            fill="#ffffff" opacity="0.35"/>
+    </g>
+  </g>
+
+  <!-- 🔩 LLAVE INGLESA (6 en punto) -->
+  <g transform="translate(200 288) scale(0.62)">
+    <g transform="rotate(-30)">
+      <animateTransform attributeName="transform" type="rotate"
+        values="-30; -20; -30" dur="2.8s" repeatCount="indefinite" additive="replace"/>
+      <!-- Mango -->
+      <rect x="-6" y="-38" width="12" height="66" rx="6" fill="url(#gradMEC)"/>
+      <!-- Detalles del mango -->
+      <rect x="-6" y="-28" width="12" height="3" rx="1.5" fill="#ffffff" opacity="0.3"/>
+      <rect x="-6" y="-18" width="12" height="3" rx="1.5" fill="#ffffff" opacity="0.3"/>
+      <!-- Cabeza superior -->
+      <path d="M -18 -38 Q -20 -54 -8 -57 L 8 -57 Q 20 -54 18 -38 L 10 -38
+               Q 10 -46 0 -46 Q -10 -46 -10 -38 Z" fill="url(#gradMEC)"/>
+      <!-- Mandíbula inferior -->
+      <path d="M -18 28 Q -20 44 -8 47 L 8 47 Q 20 44 18 28 L 10 28
+               Q 10 36 0 36 Q -10 36 -10 28 Z" fill="url(#gradMEC)"/>
+      <!-- Tuerca de ajuste -->
+      <rect x="-8" y="-4" width="16" height="10" rx="2" fill="url(#gradMEC)"/>
+      <line x1="-8" y1="1" x2="8" y2="1" stroke="#ffffff" stroke-width="1" opacity="0.5"/>
+    </g>
+  </g>
+
+  <!-- ⚙️ ENGRANAJE (9 en punto) -->
+  <g transform="translate(118 200) scale(0.62)">
+    <g>
+      <animateTransform attributeName="transform" type="rotate"
+        from="0 0 0" to="360 0 0" dur="6s" repeatCount="indefinite"/>
+      <!-- Dientes del engranaje -->
+      <path d="M 0 -28 L 6 -28 L 6 -22 L -6 -22 L -6 -28 Z
+               M 0 28 L 6 28 L 6 22 L -6 22 L -6 28 Z
+               M -28 0 L -28 -6 L -22 -6 L -22 6 L -28 6 Z
+               M 28 0 L 28 -6 L 22 -6 L 22 6 L 28 6 Z
+               M -20 -20 L -16 -24 L -20 -28 L -24 -24 Z
+               M 20 -20 L 24 -24 L 20 -28 L 16 -24 Z
+               M -20 20 L -24 24 L -20 28 L -16 24 Z
+               M 20 20 L 16 24 L 20 28 L 24 24 Z"
+            fill="url(#gradMEC)"/>
+      <circle r="20" fill="url(#gradMEC)"/>
+      <circle r="8" fill="#ffffff" opacity="0.9"/>
+      <!-- Rayo en el centro -->
+      <path d="M 2 -8 L -3 1 L 0 1 L -1 8 L 3 0 L 0 0 Z" fill="#22C1E0"/>
+    </g>
+  </g>
+
+  <!-- 🛢️ ACEITE / LUBRICANTE (3 en punto) -->
+  <g transform="translate(282 200) scale(0.62)">
+    <g>
+      <animateTransform attributeName="transform" type="translate"
+        values="0 0; 0 -3; 0 0" dur="2.8s" repeatCount="indefinite"/>
+      <!-- Cuerpo de la lata de aceite -->
+      <rect x="-18" y="-18" width="36" height="44" rx="4" fill="url(#gradMEC)"/>
+      <!-- Pico vertedor -->
+      <path d="M 12 -18 L 20 -26 L 24 -22 L 16 -16 Z" fill="url(#gradMEC)"/>
+      <!-- Asa superior -->
+      <path d="M -8 -18 Q -8 -26 0 -26 Q 8 -26 8 -18"
+            fill="none" stroke="url(#gradMEC)" stroke-width="3" stroke-linecap="round"/>
+      <!-- Etiqueta -->
+      <rect x="-12" y="-8" width="24" height="20" rx="2" fill="#ffffff" opacity="0.9"/>
+      <!-- Gota de aceite (símbolo) -->
+      <path d="M 0 -4 Q -4 0 -4 3 Q -4 7 0 7 Q 4 7 4 3 Q 4 0 0 -4 Z"
+            fill="#0A2A66"/>
+      <!-- Línea de texto -->
+      <rect x="-8" y="10" width="16" height="2" rx="1" fill="#22C1E0"/>
+      <!-- Gotas saliendo del pico -->
+      <circle cx="24" cy="-14" r="2" fill="#22C1E0">
+        <animate attributeName="cy" values="-16;-6;-16" dur="1.6s" repeatCount="indefinite"/>
+        <animate attributeName="opacity" values="1;0.2;1" dur="1.6s" repeatCount="indefinite"/>
+      </circle>
+      <!-- Brillo -->
+      <rect x="-14" y="-14" width="3" height="36" rx="1.5" fill="#ffffff" opacity="0.3"/>
+    </g>
+  </g>
+
+  <!-- 👨‍🔧 MECÁNICO (10-11 en punto) -->
+  <g transform="translate(118 118) scale(0.58)">
+    <g>
+      <animateTransform attributeName="transform" type="translate"
+        values="0 0; 0 -3; 0 0" dur="2.8s" repeatCount="indefinite"/>
+      <!-- Cabeza -->
+      <circle cx="-8" cy="-12" r="10" fill="url(#gradMEC)"/>
+      <!-- Gorra de mecánico -->
+      <path d="M -18 -16 Q -18 -24 -8 -24 Q 2 -24 2 -16 Z" fill="url(#gradMEC)"/>
+      <rect x="-18" y="-16" width="20" height="3" rx="1.5" fill="url(#gradMEC)"/>
+      <!-- Cuerpo / overol -->
+      <path d="M -18 6 Q -20 -2 -8 -4 Q 4 -2 2 6 L 2 18 L -18 18 Z"
+            fill="url(#gradMEC)"/>
+      <!-- Brazo con llave -->
+      <path d="M 2 -2 L 14 -6 L 16 0 L 4 4 Z" fill="url(#gradMEC)"/>
+      <!-- Llave en mano -->
+      <rect x="14" y="-10" width="4" height="16" rx="2" fill="url(#gradMEC)"/>
+      <path d="M 12 -10 Q 12 -16 16 -16 Q 20 -16 20 -10 L 17 -10 Q 17 -13 16 -13 Q 15 -13 15 -10 Z"
+            fill="url(#gradMEC)"/>
+      <!-- Detalles del overol -->
+      <rect x="-14" y="2" width="14" height="2" rx="1" fill="#ffffff" opacity="0.4"/>
+      <rect x="-14" y="8" width="14" height="2" rx="1" fill="#ffffff" opacity="0.3"/>
+      <!-- Cara -->
+      <circle cx="-10" cy="-12" r="1.5" fill="#0A2A66"/>
+      <circle cx="-6" cy="-12" r="1.5" fill="#0A2A66"/>
+    </g>
+  </g>
+
+  <!-- 📊 ESCÁNER / DIAGNÓSTICO (1-2 en punto) -->
+  <g transform="translate(282 118) scale(0.58)">
+    <g>
+      <animateTransform attributeName="transform" type="translate"
+        values="0 0; 0 -3; 0 0" dur="2.6s" repeatCount="indefinite"/>
+      <!-- Cuerpo del escáner -->
+      <rect x="-20" y="-22" width="40" height="44" rx="5" fill="url(#gradMEC)"/>
+      <!-- Pantalla -->
+      <rect x="-16" y="-18" width="32" height="24" rx="2" fill="#0A2A66" opacity="0.9"/>
+      <!-- Líneas de diagnóstico -->
+      <rect x="-12" y="-14" width="20" height="2" rx="1" fill="#22C1E0">
+        <animate attributeName="width" values="20;28;20" dur="2s" repeatCount="indefinite"/>
+      </rect>
+      <rect x="-12" y="-9" width="14" height="2" rx="1" fill="#22C1E0" opacity="0.7"/>
+      <rect x="-12" y="-4" width="24" height="2" rx="1" fill="#22C1E0" opacity="0.5"/>
+      <!-- Onda de diagnóstico -->
+      <path d="M -12 2 L -6 2 L -4 -2 L -1 6 L 2 -2 L 4 2 L 12 2"
+            fill="none" stroke="#22C1E0" stroke-width="1.5" stroke-linecap="round">
+        <animate attributeName="opacity" values="1;0.4;1" dur="1.4s" repeatCount="indefinite"/>
+      </path>
+      <!-- Botones -->
+      <circle cx="-8" cy="14" r="3" fill="#22C1E0"/>
+      <circle cx="0" cy="14" r="3" fill="#0A2A66" opacity="0.6"/>
+      <circle cx="8" cy="14" r="3" fill="#0A2A66" opacity="0.6"/>
+      <!-- Cable de conexión -->
+      <path d="M 20 10 Q 28 10 28 2 Q 28 -6 24 -6"
+            fill="none" stroke="url(#gradMEC)" stroke-width="3"
+            stroke-linecap="round"/>
+      <circle cx="24" cy="-6" r="2.5" fill="url(#gradMEC)"/>
+    </g>
+  </g>
+
+  <!-- CHISPAS / partículas alrededor -->
+  <g fill="#22C1E0">
+    <circle cx="270" cy="105" r="3.5">
+      <animate attributeName="r" values="2.5;6;2.5" dur="1.2s" repeatCount="indefinite"/>
+      <animate attributeName="opacity" values="1;0.2;1" dur="1.2s" repeatCount="indefinite"/>
+    </circle>
+    <circle cx="130" cy="105" r="3">
+      <animate attributeName="r" values="2;5;2" dur="1.4s" begin="0.3s" repeatCount="indefinite"/>
+      <animate attributeName="opacity" values="1;0.2;1" dur="1.4s" begin="0.3s" repeatCount="indefinite"/>
+    </circle>
+    <circle cx="300" cy="272" r="3">
+      <animate attributeName="r" values="2;5;2" dur="1.3s" begin="0.6s" repeatCount="indefinite"/>
+      <animate attributeName="opacity" values="1;0.2;1" dur="1.3s" begin="0.6s" repeatCount="indefinite"/>
+    </circle>
+    <circle cx="100" cy="272" r="3.5">
+      <animate attributeName="r" values="2.5;6;2.5" dur="1.5s" begin="0.9s" repeatCount="indefinite"/>
+      <animate attributeName="opacity" values="1;0.2;1" dur="1.5s" begin="0.9s" repeatCount="indefinite"/>
+    </circle>
+  </g>
+</svg>

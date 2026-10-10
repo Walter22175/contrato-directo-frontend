@@ -1,0 +1,272 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg viewBox="0 0 400 400" width="100%" height="100%"
+     xmlns="http://www.w3.org/2000/svg" role="img"
+     aria-label="Icono de Atención al Cliente - Contrato Directo">
+
+  <defs>
+    <linearGradient id="gradAC2" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%"   stop-color="#0A2A66"/>
+      <stop offset="55%"  stop-color="#1E6FE8"/>
+      <stop offset="100%" stop-color="#22C1E0"/>
+    </linearGradient>
+
+    <linearGradient id="gradAroAC2" x1="0%" y1="100%" x2="100%" y2="0%">
+      <stop offset="0%"   stop-color="#22C1E0"/>
+      <stop offset="100%" stop-color="#0A2A66"/>
+    </linearGradient>
+
+    <linearGradient id="gradGloboAC2" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%"   stop-color="#22C1E0"/>
+      <stop offset="100%" stop-color="#1E6FE8"/>
+    </linearGradient>
+
+    <radialGradient id="glowAC2" cx="50%" cy="50%" r="50%">
+      <stop offset="0%"   stop-color="#22C1E0" stop-opacity="0.55"/>
+      <stop offset="100%" stop-color="#22C1E0" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+
+  <!-- Aro exterior institucional -->
+  <g fill="none" stroke="url(#gradAroAC2)" stroke-width="7"
+     stroke-linecap="round" opacity="0.85">
+    <path d="M 70 200 A 130 130 0 0 1 200 70" />
+    <path d="M 200 70 A 130 130 0 0 1 330 200" />
+    <path d="M 330 200 A 130 130 0 0 1 200 330" />
+    <path d="M 200 330 A 130 130 0 0 1 70 200" />
+    <animateTransform attributeName="transform" type="rotate"
+      from="0 200 200" to="360 200 200" dur="50s" repeatCount="indefinite"/>
+  </g>
+
+  <!-- Resplandor central -->
+  <circle cx="200" cy="200" r="95" fill="url(#glowAC2)">
+    <animate attributeName="r" values="90;110;90" dur="3s" repeatCount="indefinite"/>
+    <animate attributeName="opacity" values="0.7;0.3;0.7" dur="3s" repeatCount="indefinite"/>
+  </circle>
+
+  <!-- 💬 AGENTE + BURBUJA DE DIÁLOGO CENTRAL (núcleo) -->
+  <g transform="translate(200 200) scale(0.95)">
+    <g>
+      <!-- Animación: el agente se balancea suavemente -->
+      <animateTransform attributeName="transform" type="translate"
+        values="0 0; 0 -2; 0 0" dur="2.5s" repeatCount="indefinite"/>
+
+      <!-- Burbuja de diálogo grande (detrás del agente) -->
+      <path d="M -58 -38
+               Q -58 -54 -42 -54
+               L 42 -54
+               Q 58 -54 58 -38
+               L 58 12
+               Q 58 28 42 28
+               L 8 28
+               L -12 44
+               L -12 28
+               L -42 28
+               Q -58 28 -58 12
+               Z"
+            fill="url(#gradGloboAC2)"/>
+
+      <!-- Brillo del globo -->
+      <path d="M -50 -46 L 50 -46 L 48 -50 L -48 -50 Z"
+            fill="#ffffff" opacity="0.35"/>
+
+      <!-- AGENTE (persona sonriente) -->
+      <!-- Cabeza -->
+      <circle cx="0" cy="-14" r="14" fill="#ffffff" opacity="0.95"/>
+      <!-- Cabello -->
+      <path d="M -14 -14 Q -14 -26 0 -26 Q 14 -26 14 -14 L 12 -16 Q 12 -22 0 -22 Q -12 -22 -12 -16 Z"
+            fill="#0A2A66"/>
+      <!-- Ojos sonrientes (arcos) -->
+      <path d="M -7 -14 Q -5 -12 -3 -14" fill="none"
+            stroke="#0A2A66" stroke-width="1.8" stroke-linecap="round"/>
+      <path d="M 3 -14 Q 5 -12 7 -14" fill="none"
+            stroke="#0A2A66" stroke-width="1.8" stroke-linecap="round"/>
+      <!-- Sonrisa -->
+      <path d="M -5 -8 Q 0 -4 5 -8" fill="none"
+            stroke="#0A2A66" stroke-width="1.8" stroke-linecap="round"/>
+      <!-- Auricular de agente (pequeño, discreto) -->
+      <ellipse cx="-13" cy="-14" rx="3" ry="4" fill="#0A2A66"/>
+      <path d="M -13 -10 Q -10 -6 -6 -6" fill="none"
+            stroke="#0A2A66" stroke-width="1.5" stroke-linecap="round"/>
+
+      <!-- Cuerpo del agente -->
+      <path d="M -18 12 Q -18 -2 0 -2 Q 18 -2 18 12 Z"
+            fill="#ffffff" opacity="0.95"/>
+      <!-- Corbata -->
+      <path d="M 0 -2 L -4 4 L 0 12 L 4 4 Z" fill="#22C1E0"/>
+
+      <!-- Puntitos en el globo (arriba del agente) -->
+      <g fill="#ffffff">
+        <circle cx="-30" cy="-40" r="3">
+          <animate attributeName="opacity" values="1;0.3;1" dur="1s" repeatCount="indefinite"/>
+        </circle>
+        <circle cx="-18" cy="-40" r="3">
+          <animate attributeName="opacity" values="1;0.3;1" dur="1s" begin="0.2s" repeatCount="indefinite"/>
+        </circle>
+        <circle cx="-6" cy="-40" r="3">
+          <animate attributeName="opacity" values="1;0.3;1" dur="1s" begin="0.4s" repeatCount="indefinite"/>
+        </circle>
+      </g>
+
+      <!-- Corazón flotante (cariño) -->
+      <path d="M 34 -30 Q 28 -38 22 -34 Q 18 -30 22 -24 Q 28 -18 34 -12
+               Q 40 -18 46 -24 Q 50 -30 46 -34 Q 40 -38 34 -30 Z"
+            fill="#22C1E0" opacity="0.9">
+        <animate attributeName="opacity" values="0.9;0.4;0.9" dur="1.4s" repeatCount="indefinite"/>
+        <animateTransform attributeName="transform" type="translate"
+          values="0 0; 0 -4; 0 0" dur="1.8s" repeatCount="indefinite"/>
+      </path>
+
+      <!-- Brillo inferior -->
+      <path d="M -40 24 L -12 24 L -14 26 L -42 26 Z"
+            fill="#ffffff" opacity="0.3"/>
+    </g>
+  </g>
+
+  <!-- 🤝 MANO ESTRECHADA / ACUERDO (12 en punto) -->
+  <g transform="translate(200 118) scale(0.62)">
+    <g>
+      <animateTransform attributeName="transform" type="translate"
+        values="0 0; 0 -3; 0 0" dur="2.6s" repeatCount="indefinite"/>
+      <!-- Mano izquierda -->
+      <path d="M -22 -8 Q -22 -16 -14 -16 L -6 -14 L -6 4 L -14 6 Q -22 6 -22 -2 Z"
+            fill="url(#gradAC2)"/>
+      <!-- Mano derecha (estrechando) -->
+      <path d="M 22 -8 Q 22 -16 14 -16 L 6 -14 L 6 4 L 14 6 Q 22 6 22 -2 Z"
+            fill="url(#gradAC2)"/>
+      <!-- Unión / apretón -->
+      <ellipse cx="0" cy="-4" rx="8" ry="10" fill="url(#gradAC2)"/>
+      <ellipse cx="0" cy="-4" rx="5" ry="6" fill="#22C1E0" opacity="0.7"/>
+      <!-- Brillo -->
+      <ellipse cx="-2" cy="-8" rx="4" ry="2" fill="#ffffff" opacity="0.4"/>
+    </g>
+  </g>
+
+  <!-- ⭐ SATISFACCIÓN / ESTRELLA (6 en punto) -->
+  <g transform="translate(200 288) scale(0.62)">
+    <g>
+      <animateTransform attributeName="transform" type="scale"
+        values="1 1; 1.08 1.08; 1 1" dur="1.6s" repeatCount="indefinite"/>
+      <!-- Estrella -->
+      <path d="M 0 -24 L 7 -8 L 24 -7 L 11 5 L 15 22 L 0 13 L -15 22 L -11 5 L -24 -7 L -7 -8 Z"
+            fill="url(#gradAC2)"/>
+      <path d="M 0 -18 L 4 -6 L 14 -5 L 6 1 L 8 12 L 0 7 Z" fill="#ffffff" opacity="0.5"/>
+      <!-- Estrellitas alrededor -->
+      <g fill="#22C1E0">
+        <circle cx="-28" cy="-14" r="2">
+          <animate attributeName="opacity" values="1;0.2;1" dur="1.4s" repeatCount="indefinite"/>
+        </circle>
+        <circle cx="28" cy="-14" r="2">
+          <animate attributeName="opacity" values="1;0.2;1" dur="1.4s" begin="0.3s" repeatCount="indefinite"/>
+        </circle>
+      </g>
+    </g>
+  </g>
+
+  <!-- 📋 ENCUESTA / FEEDBACK (9 en punto) -->
+  <g transform="translate(118 200) scale(0.62)">
+    <g>
+      <animateTransform attributeName="transform" type="translate"
+        values="0 0; 0 -3; 0 0" dur="2.8s" repeatCount="indefinite"/>
+      <!-- Tabla de encuesta -->
+      <rect x="-20" y="-24" width="40" height="48" rx="4" fill="url(#gradAC2)"/>
+      <!-- Clip superior -->
+      <rect x="-8" y="-28" width="16" height="8" rx="3" fill="url(#gradAC2)"/>
+      <!-- Hoja interior -->
+      <rect x="-16" y="-20" width="32" height="40" rx="2" fill="#ffffff" opacity="0.95"/>
+      <!-- Pregunta -->
+      <rect x="-12" y="-14" width="24" height="2" rx="1" fill="#0A2A66"/>
+      <!-- Opciones de respuesta -->
+      <g fill="#0A2A66" opacity="0.7">
+        <rect x="-12" y="-6" width="20" height="2" rx="1"/>
+        <rect x="-12" y="0" width="24" height="2" rx="1"/>
+        <rect x="-12" y="6" width="16" height="2" rx="1"/>
+      </g>
+      <!-- Estrellas de rating -->
+      <g fill="#22C1E0">
+        <path d="M -10 14 L -8 10 L -4 10 L -7 8 L -6 4 L -10 6 L -14 4 L -13 8 L -16 10 L -12 10 Z"/>
+        <path d="M 0 14 L 2 10 L 6 10 L 3 8 L 4 4 L 0 6 L -4 4 L -3 8 L -6 10 L -2 10 Z"/>
+        <path d="M 10 14 L 12 10 L 16 10 L 13 8 L 14 4 L 10 6 L 6 4 L 7 8 L 4 10 L 8 10 Z"/>
+      </g>
+    </g>
+  </g>
+
+  <!-- 🎁 REGALO / BENEFICIO (3 en punto) -->
+  <g transform="translate(282 200) scale(0.62)">
+    <g>
+      <animateTransform attributeName="transform" type="translate"
+        values="0 0; 0 -3; 0 0" dur="2.8s" repeatCount="indefinite"/>
+      <!-- Caja del regalo -->
+      <rect x="-18" y="-6" width="36" height="26" rx="3" fill="url(#gradAC2)"/>
+      <!-- Tapa del regalo -->
+      <rect x="-22" y="-14" width="44" height="10" rx="2" fill="url(#gradAC2)"/>
+      <!-- Cinta vertical -->
+      <rect x="-3" y="-14" width="6" height="34" fill="#22C1E0"/>
+      <!-- Cinta horizontal -->
+      <rect x="-22" y="-4" width="44" height="4" fill="#22C1E0"/>
+      <!-- Moño superior -->
+      <path d="M 0 -14 Q -8 -24 -14 -18 Q -10 -14 0 -14 Z" fill="#22C1E0"/>
+      <path d="M 0 -14 Q 8 -24 14 -18 Q 10 -14 0 -14 Z" fill="#22C1E0"/>
+      <circle cx="0" cy="-16" r="2.5" fill="#ffffff"/>
+      <!-- Brillo -->
+      <rect x="-16" y="-4" width="32" height="2" rx="1" fill="#ffffff" opacity="0.3"/>
+    </g>
+  </g>
+
+  <!-- 👥 CLIENTE (10-11 en punto) -->
+  <g transform="translate(118 118) scale(0.58)">
+    <g>
+      <animateTransform attributeName="transform" type="translate"
+        values="0 0; 0 -3; 0 0" dur="2.8s" repeatCount="indefinite"/>
+      <!-- Cabeza -->
+      <circle cx="0" cy="-10" r="11" fill="url(#gradAC2)"/>
+      <!-- Sonrisa -->
+      <path d="M -4 -6 Q 0 -3 4 -6" fill="none"
+            stroke="#0A2A66" stroke-width="1.5" stroke-linecap="round"/>
+      <!-- Ojos -->
+      <circle cx="-3" cy="-11" r="1.2" fill="#0A2A66"/>
+      <circle cx="3" cy="-11" r="1.2" fill="#0A2A66"/>
+      <!-- Cuerpo / hombros -->
+      <path d="M -16 20 Q -16 0 0 0 Q 16 0 16 20 Z" fill="url(#gradAC2)"/>
+      <!-- Brillo -->
+      <ellipse cx="-4" cy="-13" rx="4" ry="2" fill="#ffffff" opacity="0.4"/>
+    </g>
+  </g>
+
+  <!-- 💖 CORAZÓN / FIDELIZACIÓN (1-2 en punto) -->
+  <g transform="translate(282 118) scale(0.58)">
+    <g>
+      <animateTransform attributeName="transform" type="scale"
+        values="1 1; 1.08 1.08; 1 1" dur="1.4s" repeatCount="indefinite"/>
+      <!-- Corazón grande -->
+      <path d="M 0 -16 Q -14 -30 -24 -18 Q -30 -8 -22 2 Q -12 14 0 24 Q 12 14 22 2 Q 30 -8 24 -18 Q 14 -30 0 -16 Z"
+            fill="url(#gradAC2)"/>
+      <!-- Brillo -->
+      <ellipse cx="-8" cy="-10" rx="5" ry="3" fill="#ffffff" opacity="0.5"/>
+      <!-- Corazoncitos flotantes -->
+      <path d="M -22 -22 Q -26 -28 -30 -24 Q -32 -20 -28 -18 Q -24 -16 -22 -20 Q -20 -16 -16 -18 Q -12 -20 -14 -24 Q -18 -28 -22 -22 Z"
+            fill="#22C1E0" opacity="0.7">
+        <animate attributeName="opacity" values="0.7;0.2;0.7" dur="1.8s" repeatCount="indefinite"/>
+      </path>
+    </g>
+  </g>
+
+  <!-- CHISPAS / partículas alrededor -->
+  <g fill="#22C1E0">
+    <circle cx="270" cy="105" r="3.5">
+      <animate attributeName="r" values="2.5;6;2.5" dur="1.2s" repeatCount="indefinite"/>
+      <animate attributeName="opacity" values="1;0.2;1" dur="1.2s" repeatCount="indefinite"/>
+    </circle>
+    <circle cx="130" cy="105" r="3">
+      <animate attributeName="r" values="2;5;2" dur="1.4s" begin="0.3s" repeatCount="indefinite"/>
+      <animate attributeName="opacity" values="1;0.2;1" dur="1.4s" begin="0.3s" repeatCount="indefinite"/>
+    </circle>
+    <circle cx="300" cy="272" r="3">
+      <animate attributeName="r" values="2;5;2" dur="1.3s" begin="0.6s" repeatCount="indefinite"/>
+      <animate attributeName="opacity" values="1;0.2;1" dur="1.3s" begin="0.6s" repeatCount="indefinite"/>
+    </circle>
+    <circle cx="100" cy="272" r="3.5">
+      <animate attributeName="r" values="2.5;6;2.5" dur="1.5s" begin="0.9s" repeatCount="indefinite"/>
+      <animate attributeName="opacity" values="1;0.2;1" dur="1.5s" begin="0.9s" repeatCount="indefinite"/>
+    </circle>
+  </g>
+</svg>

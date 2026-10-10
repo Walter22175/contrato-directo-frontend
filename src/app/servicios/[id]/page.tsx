@@ -3,9 +3,11 @@
 import { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
+import Image from 'next/image';
 import { Card, CardTitle } from '@/components/ui/Card';
 import Button from '@/components/ui/Button';
 import api, { extractData } from '@/lib/api';
+import { iconoServicio } from '@/lib/iconos';
 import { formatCurrency } from '@/lib/utils';
 import { useAuthStore } from '@/store/auth';
 import { Shield, ArrowLeft, MessageSquare, Loader2, Send, X } from 'lucide-react';
@@ -129,11 +131,23 @@ export default function ServicioDetallePage() {
         <div className="lg:col-span-2">
           <Card>
             <div className="flex items-start justify-between mb-4">
-              <div>
-                <h1 className="text-2xl font-bold text-white">{servicio.nombre}</h1>
-                <span className="text-sm text-slate-400 bg-slate-700/50 px-2 py-1 rounded mt-2 inline-block">
-                  {servicio.categoria?.nombre || 'Servicio'}
-                </span>
+              <div className="flex items-center gap-5">
+                {iconoServicio(servicio.nombre, servicio.categoria?.nombre) && (
+                  <Image
+                    src={iconoServicio(servicio.nombre, servicio.categoria?.nombre)!}
+                    alt=""
+                    width={96}
+                    height={96}
+                    unoptimized
+                    className="w-24 h-24 object-contain flex-shrink-0"
+                  />
+                )}
+                <div>
+                  <h1 className="text-2xl font-bold text-white">{servicio.nombre}</h1>
+                  <span className="text-sm text-slate-400 bg-slate-700/50 px-2 py-1 rounded mt-2 inline-block">
+                    {servicio.categoria?.nombre || 'Servicio'}
+                  </span>
+                </div>
               </div>
               <div className="flex items-center gap-1">
                 <LlaveIcon className="w-5 h-5 text-yellow-400" />
@@ -142,11 +156,7 @@ export default function ServicioDetallePage() {
               </div>
             </div>
 
-            <p className="text-slate-300 mb-6">
-              {servicio.descripcion || 'Servicio profesional disponible en la plataforma Contrato Directo.'}
-            </p>
-
-            <div className="flex flex-wrap gap-2">
+            <div className="flex flex-wrap gap-2 mt-6">
               {servicio.palabras_clave?.map((kw, i) => (
                 <span key={i} className="text-xs bg-slate-700/50 text-slate-300 px-3 py-1 rounded-full">
                   {kw}

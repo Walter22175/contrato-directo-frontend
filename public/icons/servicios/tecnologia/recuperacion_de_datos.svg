@@ -1,0 +1,244 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg viewBox="0 0 400 400" width="100%" height="100%"
+     xmlns="http://www.w3.org/2000/svg" role="img"
+     aria-label="Icono de Recuperación de Datos - Contrato Directo">
+
+  <defs>
+    <linearGradient id="gradRD" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%"   stop-color="#0A2A66"/>
+      <stop offset="55%"  stop-color="#1E6FE8"/>
+      <stop offset="100%" stop-color="#22C1E0"/>
+    </linearGradient>
+
+    <linearGradient id="gradAroRD" x1="0%" y1="100%" x2="100%" y2="0%">
+      <stop offset="0%"   stop-color="#22C1E0"/>
+      <stop offset="100%" stop-color="#0A2A66"/>
+    </linearGradient>
+
+    <linearGradient id="gradDisco" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%"   stop-color="#22C1E0"/>
+      <stop offset="100%" stop-color="#1E6FE8"/>
+    </linearGradient>
+
+    <radialGradient id="glowRD" cx="50%" cy="50%" r="50%">
+      <stop offset="0%"   stop-color="#22C1E0" stop-opacity="0.55"/>
+      <stop offset="100%" stop-color="#22C1E0" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+
+  <!-- Aro exterior institucional -->
+  <g fill="none" stroke="url(#gradAroRD)" stroke-width="7"
+     stroke-linecap="round" opacity="0.85">
+    <path d="M 70 200 A 130 130 0 0 1 200 70" />
+    <path d="M 200 70 A 130 130 0 0 1 330 200" />
+    <path d="M 330 200 A 130 130 0 0 1 200 330" />
+    <path d="M 200 330 A 130 130 0 0 1 70 200" />
+    <animateTransform attributeName="transform" type="rotate"
+      from="0 200 200" to="360 200 200" dur="50s" repeatCount="indefinite"/>
+  </g>
+
+  <!-- Resplandor central -->
+  <circle cx="200" cy="200" r="95" fill="url(#glowRD)">
+    <animate attributeName="r" values="90;110;90" dur="3s" repeatCount="indefinite"/>
+    <animate attributeName="opacity" values="0.7;0.3;0.7" dur="3s" repeatCount="indefinite"/>
+  </circle>
+
+  <!-- 💾 DISCO DURO CENTRAL (núcleo) -->
+  <g transform="translate(200 200) scale(0.95)">
+    <g>
+      <!-- Animación: el disco gira y parpadea -->
+      <animateTransform attributeName="transform" type="translate"
+        values="0 0; 0 -2; 0 0" dur="3s" repeatCount="indefinite"/>
+
+      <!-- Cuerpo del disco duro -->
+      <rect x="-56" y="-40" width="112" height="80" rx="6" fill="url(#gradRD)"/>
+
+      <!-- Interior del disco (tapa) -->
+      <rect x="-50" y="-34" width="100" height="68" rx="4" fill="#0A2A66" opacity="0.75"/>
+
+      <!-- Plato del disco girando -->
+      <g transform="translate(-14 0)">
+        <circle r="26" fill="url(#gradDisco)"/>
+        <circle r="20" fill="#0A2A66" opacity="0.6"/>
+        <circle r="14" fill="url(#gradDisco)"/>
+        <circle r="8" fill="#0A2A66" opacity="0.6"/>
+        <circle r="3" fill="#22C1E0"/>
+        <!-- Animación de rotación -->
+        <animateTransform attributeName="transform" type="rotate"
+          from="0 -14 0" to="360 -14 0" dur="3s" repeatCount="indefinite"/>
+      </g>
+
+      <!-- Brazo lector -->
+      <g>
+        <rect x="14" y="-16" width="6" height="32" rx="2" fill="url(#gradRD)"/>
+        <circle cx="17" cy="-16" r="5" fill="url(#gradRD)"/>
+        <rect x="20" y="-3" width="20" height="6" rx="2" fill="url(#gradRD)"/>
+        <!-- Animación: el brazo se mueve -->
+        <animateTransform attributeName="transform" type="rotate"
+          values="-3 17 -16; 3 17 -16; -3 17 -16" dur="2s" repeatCount="indefinite"/>
+      </g>
+
+      <!-- LEDs de actividad -->
+      <circle cx="-42" cy="26" r="2.5" fill="#22C1E0">
+        <animate attributeName="opacity" values="1;0.2;1" dur="1s" repeatCount="indefinite"/>
+      </circle>
+      <circle cx="-34" cy="26" r="2.5" fill="#22C1E0">
+        <animate attributeName="opacity" values="1;0.2;1" dur="1.2s" begin="0.3s" repeatCount="indefinite"/>
+      </circle>
+      <circle cx="-26" cy="26" r="2.5" fill="#22C1E0">
+        <animate attributeName="opacity" values="1;0.2;1" dur="1.4s" begin="0.6s" repeatCount="indefinite"/>
+      </circle>
+
+      <!-- Brillo superior -->
+      <rect x="-52" y="-38" width="104" height="2" rx="1" fill="#ffffff" opacity="0.4"/>
+    </g>
+  </g>
+
+  <!-- 🔄 FLECHA DE RECUPERACIÓN (12 en punto) -->
+  <g transform="translate(200 118) scale(0.62)">
+    <g>
+      <animateTransform attributeName="transform" type="rotate"
+        from="0 0 0" to="360 0 0" dur="4s" repeatCount="indefinite"/>
+      <!-- Flecha circular (recuperación) -->
+      <path d="M -22 -6 A 22 22 0 1 1 22 -6" fill="none"
+            stroke="url(#gradRD)" stroke-width="6" stroke-linecap="round"/>
+      <!-- Punta de la flecha -->
+      <path d="M 22 -6 L 14 -14 L 28 -14 Z" fill="url(#gradRD)"/>
+      <!-- Centro -->
+      <circle r="6" fill="url(#gradRD)"/>
+      <circle r="2.5" fill="#22C1E0"/>
+    </g>
+  </g>
+
+  <!-- 📁 CARPETA / ARCHIVO (6 en punto) -->
+  <g transform="translate(200 288) scale(0.62)">
+    <g>
+      <animateTransform attributeName="transform" type="translate"
+        values="0 0; 0 3; 0 0" dur="2.8s" repeatCount="indefinite"/>
+      <!-- Carpeta -->
+      <path d="M -22 -10 L -10 -10 L -6 -14 L 22 -14 L 22 16 L -22 16 Z"
+            fill="url(#gradRD)"/>
+      <!-- Pestaña -->
+      <path d="M -22 -10 L -10 -10 L -6 -14 L -22 -14 Z" fill="url(#gradRD)" opacity="0.8"/>
+      <!-- Hoja de archivo dentro -->
+      <rect x="-14" y="-6" width="28" height="18" rx="2" fill="#ffffff" opacity="0.9"/>
+      <!-- Líneas de datos -->
+      <rect x="-10" y="-2" width="20" height="2" rx="1" fill="#0A2A66"/>
+      <rect x="-10" y="3" width="14" height="2" rx="1" fill="#0A2A66" opacity="0.7"/>
+      <rect x="-10" y="8" width="18" height="2" rx="1" fill="#22C1E0"/>
+      <!-- Flecha recuperando archivo -->
+      <circle cx="0" cy="-22" r="3" fill="#22C1E0">
+        <animate attributeName="cy" values="-22;-30;-22" dur="1.8s" repeatCount="indefinite"/>
+        <animate attributeName="opacity" values="1;0.3;1" dur="1.8s" repeatCount="indefinite"/>
+      </circle>
+    </g>
+  </g>
+
+  <!-- 🛠️ DESTORNILLADOR / HERRAMIENTA (9 en punto) -->
+  <g transform="translate(118 200) scale(0.62)">
+    <g transform="rotate(-25)">
+      <animateTransform attributeName="transform" type="rotate"
+        values="-25; -18; -25" dur="3s" repeatCount="indefinite" additive="replace"/>
+      <!-- Mango -->
+      <rect x="-5" y="-38" width="10" height="46" rx="5" fill="url(#gradRD)"/>
+      <!-- Detalles del mango -->
+      <rect x="-5" y="-30" width="10" height="2" rx="1" fill="#ffffff" opacity="0.3"/>
+      <rect x="-5" y="-22" width="10" height="2" rx="1" fill="#ffffff" opacity="0.3"/>
+      <!-- Vástago -->
+      <rect x="-2" y="8" width="4" height="26" rx="2" fill="url(#gradRD)"/>
+      <!-- Punta -->
+      <rect x="-3.5" y="34" width="7" height="10" rx="1" fill="url(#gradRD)"/>
+      <!-- Brillo -->
+      <rect x="-3" y="-34" width="2" height="40" rx="1" fill="#ffffff" opacity="0.4"/>
+    </g>
+  </g>
+
+  <!-- 🔍 LUPA / ESCANEO (3 en punto) -->
+  <g transform="translate(282 200) scale(0.62)">
+    <g>
+      <animateTransform attributeName="transform" type="translate"
+        values="0 0; 3 3; 0 0" dur="2.4s" repeatCount="indefinite"/>
+      <!-- Cristal de la lupa -->
+      <circle r="18" fill="url(#gradRD)"/>
+      <circle r="13" fill="#0A2A66" opacity="0.7"/>
+      <!-- Reflejo del cristal -->
+      <ellipse cx="-5" cy="-5" rx="5" ry="3" fill="#ffffff" opacity="0.5"/>
+      <!-- Mango de la lupa -->
+      <rect x="14" y="10" width="10" height="20" rx="5"
+            transform="rotate(-45 19 20)" fill="url(#gradRD)"/>
+      <!-- Líneas de escaneo -->
+      <g stroke="#22C1E0" stroke-width="2" stroke-linecap="round" opacity="0.7">
+        <line x1="-10" y1="-8" x2="10" y2="-8">
+          <animate attributeName="opacity" values="0.7;0.1;0.7" dur="1.6s" repeatCount="indefinite"/>
+        </line>
+        <line x1="-10" y1="0" x2="10" y2="0">
+          <animate attributeName="opacity" values="0.7;0.1;0.7" dur="1.6s" begin="0.4s" repeatCount="indefinite"/>
+        </line>
+        <line x1="-10" y1="8" x2="10" y2="8">
+          <animate attributeName="opacity" values="0.7;0.1;0.7" dur="1.6s" begin="0.8s" repeatCount="indefinite"/>
+        </line>
+      </g>
+    </g>
+  </g>
+
+  <!-- 🛡️ ESCUDO / SEGURIDAD (10-11 en punto) -->
+  <g transform="translate(118 118) scale(0.58)">
+    <g>
+      <animateTransform attributeName="transform" type="translate"
+        values="0 0; 0 -3; 0 0" dur="2.8s" repeatCount="indefinite"/>
+      <!-- Escudo -->
+      <path d="M 0 -24 L 20 -16 L 20 4 Q 20 18 0 26 Q -20 18 -20 4 L -20 -16 Z"
+            fill="url(#gradRD)"/>
+      <!-- Candado dentro -->
+      <rect x="-7" y="-4" width="14" height="12" rx="2" fill="#ffffff" opacity="0.95"/>
+      <path d="M -4 -4 L -4 -7 Q -4 -10 0 -10 Q 4 -10 4 -7 L 4 -4"
+            fill="none" stroke="#ffffff" stroke-width="2.5" stroke-linecap="round"/>
+      <circle cx="0" cy="1" r="1.5" fill="#0A2A66"/>
+      <!-- Brillo -->
+      <path d="M -12 -12 L 12 -12 L 10 -14 L -10 -14 Z" fill="#ffffff" opacity="0.35"/>
+    </g>
+  </g>
+
+  <!-- ⚡ RAYO / ENERGÍA (1-2 en punto) -->
+  <g transform="translate(282 118) scale(0.58)">
+    <g>
+      <animateTransform attributeName="transform" type="scale"
+        values="1 1; 1.1 1.1; 1 1" dur="1.4s" repeatCount="indefinite"/>
+      <!-- Rayo -->
+      <path d="M 4 -26 L -14 2 L -2 2 L -8 26 L 14 -4 L 2 -4 Z"
+            fill="url(#gradRD)"/>
+      <!-- Brillo del rayo -->
+      <path d="M 4 -26 L -14 2 L -2 2 L -8 26 L 14 -4 L 2 -4 Z"
+            fill="#ffffff" opacity="0.25">
+        <animate attributeName="opacity" values="0.25;0.05;0.25" dur="1.4s" repeatCount="indefinite"/>
+      </path>
+      <!-- Chispas -->
+      <circle cx="-16" cy="-10" r="2" fill="#22C1E0">
+        <animate attributeName="opacity" values="1;0.2;1" dur="1.2s" repeatCount="indefinite"/>
+      </circle>
+      <circle cx="16" cy="10" r="2" fill="#22C1E0">
+        <animate attributeName="opacity" values="1;0.2;1" dur="1.2s" begin="0.4s" repeatCount="indefinite"/>
+      </circle>
+    </g>
+  </g>
+
+  <!-- CHISPAS / partículas alrededor (bits de datos) -->
+  <g fill="#22C1E0">
+    <circle cx="270" cy="105" r="3.5">
+      <animate attributeName="r" values="2.5;6;2.5" dur="1.2s" repeatCount="indefinite"/>
+      <animate attributeName="opacity" values="1;0.2;1" dur="1.2s" repeatCount="indefinite"/>
+    </circle>
+    <circle cx="130" cy="105" r="3">
+      <animate attributeName="r" values="2;5;2" dur="1.4s" begin="0.3s" repeatCount="indefinite"/>
+      <animate attributeName="opacity" values="1;0.2;1" dur="1.4s" begin="0.3s" repeatCount="indefinite"/>
+    </circle>
+    <circle cx="300" cy="272" r="3">
+      <animate attributeName="r" values="2;5;2" dur="1.3s" begin="0.6s" repeatCount="indefinite"/>
+      <animate attributeName="opacity" values="1;0.2;1" dur="1.3s" begin="0.6s" repeatCount="indefinite"/>
+    </circle>
+    <circle cx="100" cy="272" r="3.5">
+      <animate attributeName="r" values="2.5;6;2.5" dur="1.5s" begin="0.9s" repeatCount="indefinite"/>
+      <animate attributeName="opacity" values="1;0.2;1" dur="1.5s" begin="0.9s" repeatCount="indefinite"/>
+    </circle>
+  </g>
+</svg>

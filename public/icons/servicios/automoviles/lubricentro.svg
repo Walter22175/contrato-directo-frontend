@@ -1,0 +1,329 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<svg viewBox="0 0 400 400" width="100%" height="100%"
+     xmlns="http://www.w3.org/2000/svg" role="img"
+     aria-label="Icono de Lubricentro - Contrato Directo">
+
+  <defs>
+    <linearGradient id="gradLUB" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%"   stop-color="#0A2A66"/>
+      <stop offset="55%"  stop-color="#1E6FE8"/>
+      <stop offset="100%" stop-color="#22C1E0"/>
+    </linearGradient>
+
+    <linearGradient id="gradAroLUB" x1="0%" y1="100%" x2="100%" y2="0%">
+      <stop offset="0%"   stop-color="#22C1E0"/>
+      <stop offset="100%" stop-color="#0A2A66"/>
+    </linearGradient>
+
+    <linearGradient id="gradBidon" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%"   stop-color="#22C1E0"/>
+      <stop offset="100%" stop-color="#1E6FE8"/>
+    </linearGradient>
+
+    <linearGradient id="gradCarroceriaLUB" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%"   stop-color="#22C1E0"/>
+      <stop offset="50%"  stop-color="#1E6FE8"/>
+      <stop offset="100%" stop-color="#0A2A66"/>
+    </linearGradient>
+
+    <linearGradient id="gradCristalLUB" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%"   stop-color="#22C1E0" stop-opacity="0.9"/>
+      <stop offset="100%" stop-color="#1E6FE8" stop-opacity="0.6"/>
+    </linearGradient>
+
+    <radialGradient id="glowLUB" cx="50%" cy="50%" r="50%">
+      <stop offset="0%"   stop-color="#22C1E0" stop-opacity="0.55"/>
+      <stop offset="100%" stop-color="#22C1E0" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+
+  <!-- Aro exterior institucional -->
+  <g fill="none" stroke="url(#gradAroLUB)" stroke-width="7"
+     stroke-linecap="round" opacity="0.85">
+    <path d="M 70 200 A 130 130 0 0 1 200 70" />
+    <path d="M 200 70 A 130 130 0 0 1 330 200" />
+    <path d="M 330 200 A 130 130 0 0 1 200 330" />
+    <path d="M 200 330 A 130 130 0 0 1 70 200" />
+    <animateTransform attributeName="transform" type="rotate"
+      from="0 200 200" to="360 200 200" dur="50s" repeatCount="indefinite"/>
+  </g>
+
+  <!-- Resplandor central -->
+  <circle cx="200" cy="200" r="95" fill="url(#glowLUB)">
+    <animate attributeName="r" values="90;110;90" dur="3s" repeatCount="indefinite"/>
+    <animate attributeName="opacity" values="0.7;0.3;0.7" dur="3s" repeatCount="indefinite"/>
+  </circle>
+
+  <!-- 🛢️ BIDÓN DE ACEITE CENTRAL (núcleo) -->
+  <g transform="translate(200 200) scale(0.95)">
+    <g>
+      <!-- Animación: el bidón flota levemente -->
+      <animateTransform attributeName="transform" type="translate"
+        values="0 0; 0 -2; 0 0" dur="3s" repeatCount="indefinite"/>
+
+      <!-- Cuerpo del bidón -->
+      <rect x="-34" y="-32" width="68" height="64" rx="6" fill="url(#gradBidon)"/>
+
+      <!-- Asa superior -->
+      <path d="M -18 -32 Q -18 -46 0 -46 Q 18 -46 18 -32"
+            fill="none" stroke="url(#gradLUB)" stroke-width="6"
+            stroke-linecap="round"/>
+
+      <!-- Tapa / pico vertedor -->
+      <rect x="-10" y="-40" width="20" height="10" rx="3" fill="url(#gradLUB)"/>
+      <rect x="-6" y="-46" width="12" height="6" rx="2" fill="url(#gradLUB)"/>
+      <!-- Gota saliendo del pico -->
+      <circle cx="0" cy="-50" r="2" fill="#22C1E0">
+        <animate attributeName="cy" values="-50;-60;-50" dur="1.8s" repeatCount="indefinite"/>
+        <animate attributeName="opacity" values="1;0;1" dur="1.8s" repeatCount="indefinite"/>
+      </circle>
+
+      <!-- Etiqueta principal -->
+      <rect x="-26" y="-18" width="52" height="40" rx="4" fill="#ffffff" opacity="0.95"/>
+
+      <!-- Símbolo de gota de aceite -->
+      <path d="M 0 -12 Q -9 -2 -9 5 Q -9 14 0 14 Q 9 14 9 5 Q 9 -2 0 -12 Z"
+            fill="url(#gradLUB)"/>
+      <!-- Brillo de la gota -->
+      <ellipse cx="-3" cy="4" rx="2" ry="4" fill="#ffffff" opacity="0.6"/>
+
+      <!-- Líneas de texto simuladas -->
+      <rect x="-18" y="16" width="36" height="2" rx="1" fill="#0A2A66"/>
+      <rect x="-14" y="20" width="28" height="2" rx="1" fill="#0A2A66" opacity="0.7"/>
+
+      <!-- Brillo del bidón -->
+      <rect x="-30" y="-28" width="4" height="56" rx="2" fill="#ffffff" opacity="0.3"/>
+
+      <!-- Indicador de nivel -->
+      <rect x="22" y="-10" width="6" height="40" rx="3" fill="#0A2A66" opacity="0.4"/>
+      <rect x="22" y="10" width="6" height="20" rx="3" fill="#22C1E0">
+        <animate attributeName="height" values="20;14;20" dur="3s" repeatCount="indefinite"/>
+        <animate attributeName="y" values="10;16;10" dur="3s" repeatCount="indefinite"/>
+      </rect>
+    </g>
+  </g>
+
+  <!-- 🏎️ AUTO DEPORTIVO (12 en punto) -->
+  <g transform="translate(200 118) scale(0.65)">
+    <g>
+      <animateTransform attributeName="transform" type="translate"
+        values="0 0; 3 0; 0 0; -3 0; 0 0" dur="3.5s" repeatCount="indefinite"/>
+
+      <!-- Sombra -->
+      <ellipse cx="0" cy="14" rx="38" ry="3" fill="#0A2A66" opacity="0.35"/>
+
+      <!-- Carrocería deportiva -->
+      <path d="M -36 8 L -36 2 Q -36 -3 -32 -5 L -22 -6
+               Q -16 -15 -4 -17 Q 8 -17 14 -13 Q 20 -10 26 -5
+               L 34 -4 Q 38 -3 38 2 L 38 8 Q 38 12 34 12
+               L -34 12 Q -38 12 -38 8 Z"
+            fill="url(#gradCarroceriaLUB)"/>
+
+      <!-- Línea de carácter -->
+      <path d="M -32 3 L 34 3" stroke="#0A2A66" stroke-width="1.2" opacity="0.4" fill="none"/>
+
+      <!-- Cristales -->
+      <path d="M -16 -6 Q -10 -13 0 -14 Q 8 -14 14 -11 L 18 -6 Z"
+            fill="url(#gradCristalLUB)"/>
+      <line x1="-2" y1="-14" x2="-2" y2="-6" stroke="#0A2A66" stroke-width="1.5" opacity="0.6"/>
+
+      <!-- Hood scoop -->
+      <path d="M 8 -10 L 18 -10 L 19 -7 L 7 -7 Z" fill="#0A2A66" opacity="0.7"/>
+
+      <!-- Faro delantero -->
+      <path d="M 30 -2 L 37 -2 L 38 1 L 30 2 Z" fill="#22C1E0">
+        <animate attributeName="opacity" values="1;0.5;1" dur="1.8s" repeatCount="indefinite"/>
+      </path>
+
+      <!-- Faros traseros -->
+      <rect x="-38" y="-3" width="6" height="2.5" rx="1" fill="#22C1E0"/>
+      <rect x="-38" y="1" width="6" height="2.5" rx="1" fill="#22C1E0"/>
+
+      <!-- Splitter / difusor -->
+      <path d="M 30 12 L 42 12 L 40 15 L 28 15 Z" fill="#0A2A66" opacity="0.85"/>
+      <path d="M -42 12 L -30 12 L -28 15 L -40 15 Z" fill="#0A2A66" opacity="0.85"/>
+
+      <!-- Ruedas -->
+      <circle cx="-22" cy="12" r="8" fill="#0A2A66"/>
+      <circle cx="-22" cy="12" r="4" fill="url(#gradLUB)">
+        <animateTransform attributeName="transform" type="rotate"
+          from="0 -22 12" to="360 -22 12" dur="1.2s" repeatCount="indefinite"/>
+      </circle>
+      <line x1="-26" y1="12" x2="-18" y2="12" stroke="#ffffff" stroke-width="1" opacity="0.85">
+        <animateTransform attributeName="transform" type="rotate"
+          from="0 -22 12" to="360 -22 12" dur="1.2s" repeatCount="indefinite"/>
+      </line>
+      <line x1="-22" y1="8" x2="-22" y2="16" stroke="#ffffff" stroke-width="1" opacity="0.85">
+        <animateTransform attributeName="transform" type="rotate"
+          from="0 -22 12" to="360 -22 12" dur="1.2s" repeatCount="indefinite"/>
+      </line>
+
+      <circle cx="24" cy="12" r="8" fill="#0A2A66"/>
+      <circle cx="24" cy="12" r="4" fill="url(#gradLUB)">
+        <animateTransform attributeName="transform" type="rotate"
+          from="0 24 12" to="360 24 12" dur="1.2s" repeatCount="indefinite"/>
+      </circle>
+      <line x1="20" y1="12" x2="28" y2="12" stroke="#ffffff" stroke-width="1" opacity="0.85">
+        <animateTransform attributeName="transform" type="rotate"
+          from="0 24 12" to="360 24 12" dur="1.2s" repeatCount="indefinite"/>
+      </line>
+      <line x1="24" y1="8" x2="24" y2="16" stroke="#ffffff" stroke-width="1" opacity="0.85">
+        <animateTransform attributeName="transform" type="rotate"
+          from="0 24 12" to="360 24 12" dur="1.2s" repeatCount="indefinite"/>
+      </line>
+
+      <!-- Brillo -->
+      <path d="M -26 -4 Q -12 -8 0 -8 Q 12 -8 22 -4 L 18 -6 Q 6 -9 -6 -9 Q -20 -9 -26 -6 Z"
+            fill="#ffffff" opacity="0.35"/>
+    </g>
+  </g>
+
+  <!-- 🔧 LLAVE / FILTRO (6 en punto) -->
+  <g transform="translate(200 288) scale(0.62)">
+    <g transform="rotate(-25)">
+      <animateTransform attributeName="transform" type="rotate"
+        values="-25; -15; -25" dur="2.8s" repeatCount="indefinite" additive="replace"/>
+      <!-- Mango de la llave -->
+      <rect x="-5" y="-38" width="10" height="60" rx="5" fill="url(#gradLUB)"/>
+      <!-- Detalles del mango -->
+      <rect x="-5" y="-30" width="10" height="2" rx="1" fill="#ffffff" opacity="0.3"/>
+      <rect x="-5" y="-22" width="10" height="2" rx="1" fill="#ffffff" opacity="0.3"/>
+      <!-- Boca de la llave (abierta) -->
+      <path d="M -14 -38 Q -16 -52 -6 -55 L 6 -55 Q 16 -52 14 -38 L 8 -38
+               Q 8 -46 0 -46 Q -8 -46 -8 -38 Z" fill="url(#gradLUB)"/>
+      <!-- Filtro de aceite en el extremo -->
+      <circle cx="0" cy="20" r="12" fill="url(#gradLUB)"/>
+      <circle cx="0" cy="20" r="6" fill="#0A2A66" opacity="0.6"/>
+      <rect x="-8" y="18" width="16" height="2" rx="1" fill="#ffffff" opacity="0.4"/>
+      <rect x="-8" y="23" width="16" height="2" rx="1" fill="#ffffff" opacity="0.4"/>
+      <!-- Brillo -->
+      <rect x="-3" y="-34" width="2" height="44" rx="1" fill="#ffffff" opacity="0.35"/>
+    </g>
+  </g>
+
+  <!-- 💧 GOTA DE ACEITE (9 en punto) -->
+  <g transform="translate(118 200) scale(0.62)">
+    <g>
+      <animateTransform attributeName="transform" type="translate"
+        values="0 0; 0 4; 0 0" dur="2.4s" repeatCount="indefinite"/>
+      <!-- Gota grande -->
+      <path d="M 0 -28
+               Q -18 -6 -18 8
+               Q -18 26 0 26
+               Q 18 26 18 8
+               Q 18 -6 0 -28 Z"
+            fill="url(#gradLUB)"/>
+      <!-- Brillo -->
+      <ellipse cx="-6" cy="6" rx="4" ry="9" fill="#ffffff" opacity="0.5"/>
+      <!-- Gota secundaria -->
+      <path d="M 4 32 Q -2 38 -2 42 Q -2 46 4 46 Q 10 46 10 42 Q 10 38 4 32 Z"
+            fill="url(#gradLUB)" opacity="0.8">
+        <animate attributeName="opacity" values="0.8;0.3;0.8" dur="2s" repeatCount="indefinite"/>
+      </path>
+    </g>
+  </g>
+
+  <!-- ⚙️ ENGRANAJE / MOTOR (3 en punto) -->
+  <g transform="translate(282 200) scale(0.62)">
+    <g>
+      <animateTransform attributeName="transform" type="rotate"
+        from="0 0 0" to="360 0 0" dur="6s" repeatCount="indefinite"/>
+      <!-- Dientes del engranaje -->
+      <path d="M 0 -28 L 6 -28 L 6 -22 L -6 -22 L -6 -28 Z
+               M 0 28 L 6 28 L 6 22 L -6 22 L -6 28 Z
+               M -28 0 L -28 -6 L -22 -6 L -22 6 L -28 6 Z
+               M 28 0 L 28 -6 L 22 -6 L 22 6 L 28 6 Z
+               M -20 -20 L -16 -24 L -20 -28 L -24 -24 Z
+               M 20 -20 L 24 -24 L 20 -28 L 16 -24 Z
+               M -20 20 L -24 24 L -20 28 L -16 24 Z
+               M 20 20 L 16 24 L 20 28 L 24 24 Z"
+            fill="url(#gradLUB)"/>
+      <circle r="20" fill="url(#gradLUB)"/>
+      <circle r="8" fill="#ffffff" opacity="0.9"/>
+      <!-- Gota en el centro -->
+      <path d="M 0 -6 Q -4 0 -4 3 Q -4 7 0 7 Q 4 7 4 3 Q 4 0 0 -6 Z"
+            fill="#22C1E0"/>
+    </g>
+  </g>
+
+  <!-- 👨‍🔧 OPERARIO (10-11 en punto) -->
+  <g transform="translate(118 118) scale(0.58)">
+    <g>
+      <animateTransform attributeName="transform" type="translate"
+        values="0 0; 0 -3; 0 0" dur="2.8s" repeatCount="indefinite"/>
+      <!-- Cabeza -->
+      <circle cx="-8" cy="-12" r="10" fill="url(#gradLUB)"/>
+      <!-- Gorra -->
+      <path d="M -18 -16 Q -18 -24 -8 -24 Q 2 -24 2 -16 Z" fill="url(#gradLUB)"/>
+      <rect x="-18" y="-16" width="20" height="3" rx="1.5" fill="url(#gradLUB)"/>
+      <!-- Cuerpo -->
+      <path d="M -18 6 Q -20 -2 -8 -4 Q 4 -2 2 6 L 2 18 L -18 18 Z"
+            fill="url(#gradLUB)"/>
+      <!-- Brazo con bidón -->
+      <path d="M 2 -2 L 14 -6 L 16 0 L 4 4 Z" fill="url(#gradLUB)"/>
+      <!-- Bidón pequeño en mano -->
+      <rect x="14" y="-8" width="8" height="14" rx="2" fill="url(#gradLUB)"/>
+      <rect x="16" y="-12" width="4" height="4" rx="1" fill="url(#gradLUB)"/>
+      <!-- Detalles del overol -->
+      <rect x="-14" y="2" width="14" height="2" rx="1" fill="#ffffff" opacity="0.4"/>
+      <rect x="-14" y="8" width="14" height="2" rx="1" fill="#ffffff" opacity="0.3"/>
+      <!-- Cara -->
+      <circle cx="-10" cy="-12" r="1.5" fill="#0A2A66"/>
+      <circle cx="-6" cy="-12" r="1.5" fill="#0A2A66"/>
+    </g>
+  </g>
+
+  <!-- 📋 CHECKLIST / ORDEN DE SERVICIO (1-2 en punto) -->
+  <g transform="translate(282 118) scale(0.58)">
+    <g>
+      <animateTransform attributeName="transform" type="rotate"
+        values="-4; 4; -4" dur="3s" repeatCount="indefinite"/>
+      <!-- Tabla / portapapeles -->
+      <rect x="-20" y="-24" width="40" height="48" rx="4" fill="url(#gradLUB)"/>
+      <!-- Clip superior -->
+      <rect x="-8" y="-28" width="16" height="8" rx="3" fill="url(#gradLUB)"/>
+      <rect x="-6" y="-30" width="12" height="6" rx="2" fill="#0A2A66" opacity="0.7"/>
+      <!-- Hoja de papel -->
+      <rect x="-16" y="-18" width="32" height="38" rx="2" fill="#ffffff" opacity="0.95"/>
+      <!-- Líneas de la checklist -->
+      <g fill="#0A2A66" opacity="0.7">
+        <rect x="-12" y="-12" width="20" height="2" rx="1"/>
+        <rect x="-12" y="-4" width="24" height="2" rx="1"/>
+        <rect x="-12" y="4" width="18" height="2" rx="1"/>
+        <rect x="-12" y="12" width="22" height="2" rx="1"/>
+      </g>
+      <!-- Checks en cian -->
+      <g fill="#22C1E0">
+        <circle cx="8" cy="-11" r="2">
+          <animate attributeName="opacity" values="1;0.3;1" dur="1.6s" repeatCount="indefinite"/>
+        </circle>
+        <circle cx="8" cy="-3" r="2" fill="#0A2A66" opacity="0.3"/>
+        <circle cx="8" cy="5" r="2">
+          <animate attributeName="opacity" values="1;0.3;1" dur="1.6s" begin="0.3s" repeatCount="indefinite"/>
+        </circle>
+        <circle cx="8" cy="13" r="2" fill="#0A2A66" opacity="0.3"/>
+      </g>
+    </g>
+  </g>
+
+  <!-- CHISPAS / partículas alrededor (gotas de aceite) -->
+  <g fill="#22C1E0">
+    <circle cx="270" cy="105" r="3.5">
+      <animate attributeName="r" values="2.5;6;2.5" dur="1.2s" repeatCount="indefinite"/>
+      <animate attributeName="opacity" values="1;0.2;1" dur="1.2s" repeatCount="indefinite"/>
+    </circle>
+    <circle cx="130" cy="105" r="3">
+      <animate attributeName="r" values="2;5;2" dur="1.4s" begin="0.3s" repeatCount="indefinite"/>
+      <animate attributeName="opacity" values="1;0.2;1" dur="1.4s" begin="0.3s" repeatCount="indefinite"/>
+    </circle>
+    <circle cx="300" cy="272" r="3">
+      <animate attributeName="r" values="2;5;2" dur="1.3s" begin="0.6s" repeatCount="indefinite"/>
+      <animate attributeName="opacity" values="1;0.2;1" dur="1.3s" begin="0.6s" repeatCount="indefinite"/>
+    </circle>
+    <circle cx="100" cy="272" r="3.5">
+      <animate attributeName="r" values="2.5;6;2.5" dur="1.5s" begin="0.9s" repeatCount="indefinite"/>
+      <animate attributeName="opacity" values="1;0.2;1" dur="1.5s" begin="0.9s" repeatCount="indefinite"/>
+    </circle>
+  </g>
+</svg>

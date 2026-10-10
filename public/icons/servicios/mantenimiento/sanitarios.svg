@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400" width="400" height="400" fill="none">
+  <!-- Inodoro y Tubería (Estructura Principal en Azul) -->
+  <!-- Tanque y Taza -->
+  <rect x="75" y="80" width="60" height="180" rx="16" stroke="#0047D4" stroke-width="16" stroke-linecap="round" stroke-linejoin="round" />
+  <path d="M135 200 C175 200 245 200 245 200 C245 200 240 240 220 260 H135 V200 Z" stroke="#0047D4" stroke-width="16" stroke-linecap="round" stroke-linejoin="round" />
+  <path d="M115 200 C115 150 245 150 245 200" stroke="#0047D4" stroke-width="16" stroke-linecap="round" stroke-linejoin="round" />
+  
+  <!-- Desagüe / Tubería Sifón -->
+  <path d="M75 295 H125 V310 C125 350 165 350 165 310" stroke="#0047D4" stroke-width="16" stroke-linecap="round" stroke-linejoin="round" />
+  <path d="M165 310 C165 270 205 270 205 310 V330 C205 355 235 355 255 350" stroke="#0047D4" stroke-width="16" stroke-linecap="round" stroke-linejoin="round" />
+
+  <!-- Herramienta de Destapado - Sopapa / Desatascador (Acción en Cian) -->
+  <g stroke="#00C9B7" stroke-width="16" stroke-linecap="round" stroke-linejoin="round">
+    <!-- Mango en diagonal -->
+    <path d="M295 120 L260 215" />
+    
+    <!-- Campana / Ventosa de goma -->
+    <path d="M225 220 C225 210 280 190 290 225 L245 245 C235 240 225 230 225 220 Z" />
+    <ellipse cx="245" cy="235" rx="28" ry="12" transform="rotate(-25 245 235)" />
+
+    <!-- Dinamismo / Efecto de Flujo y Agua en Destape -->
+    <!-- Espiral de desobstrucción / movimiento en tubería -->
+    <path d="M205 275 C205 275 220 265 235 275 C245 285 240 295 240 295" />
+    
+    <!-- Gotas de agua y liberación -->
+    <circle cx="270" cy="275" r="4" fill="#00C9B7" />
+    <path d="M260 295 C260 300 255 305 250 305 C245 305 242 300 242 295 C242 290 250 280 250 280 C250 280 260 290 260 295 Z" />
+    
+    <!-- Líneas de fuerza de la acción -->
+    <path d="M280 180 C285 170 292 165 292 165" />
+    <path d="M290 195 C295 185 302 180 302 180" />
+  </g>
+</svg>
