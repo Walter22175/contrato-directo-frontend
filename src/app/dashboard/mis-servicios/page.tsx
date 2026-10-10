@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { useAuthStore } from '@/store/auth';
 import api, { extractData } from '@/lib/api';
 import { Card } from '@/components/ui/Card';
-import { Settings, Edit3, Save, X, ToggleLeft, ToggleRight, DollarSign, Tag } from 'lucide-react';
+import { Settings, Edit3, Save, X, ToggleLeft, ToggleRight, DollarSign } from 'lucide-react';
 
 interface MiServicio {
   id_servicio_proveedor: number;
@@ -114,8 +114,8 @@ export default function MisServiciosPage() {
                         {s.categoria}
                       </span>
                     </div>
-                    {s.descripcion && (
-                      <p className="text-sm text-slate-400 line-clamp-1">{s.descripcion}</p>
+                    {(s.descripcion_personalizada || s.descripcion) && (
+                      <p className="text-sm text-slate-400 line-clamp-1">{s.descripcion_personalizada || s.descripcion}</p>
                     )}
                   </div>
                   <div className="flex items-center gap-2">
@@ -204,12 +204,6 @@ export default function MisServiciosPage() {
                       </div>
                     ) : (
                       <span className="text-slate-500">Sin precio</span>
-                    )}
-                    {s.descripcion_personalizada && (
-                      <div className="flex items-center gap-1 text-slate-400">
-                        <Tag className="w-3 h-3" />
-                        <span className="truncate max-w-xs">{s.descripcion_personalizada}</span>
-                      </div>
                     )}
                   </div>
                 )}
