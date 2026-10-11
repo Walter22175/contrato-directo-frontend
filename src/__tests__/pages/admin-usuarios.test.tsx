@@ -26,6 +26,6 @@ describe('AdminUsuariosPage', () => {
     await act(async () => {
       render(<AdminUsuariosPage />);
     });
-    expect(screen.getByPlaceholderText('Buscar por nombre o email...')).toBeInTheDocument();
+    expect(screen.getByPlaceholderText('Buscar por nombre, apellido o email...')).toBeInTheDocument();
   });
 });
