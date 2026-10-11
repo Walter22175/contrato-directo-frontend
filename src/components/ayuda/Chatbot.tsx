@@ -238,12 +238,12 @@ const INTENCIONES: Intencion[] = [
     id: 'privacidad',
     keywords: ['privacidad', 'datos personales', 'mis datos', 'ley 25326', 'eliminar datos'],
     frases: ['como protegen mis datos', 'quiero eliminar mi cuenta'],
-    respuesta: 'Cumplimos con la **Ley 25.326** de Protección de Datos Personales. Podés ejercer tus derechos de acceso, rectificación, supresión y oposición escribiendo a nuestro DPO. Más info en la Política de Privacidad: [/legal/privacidad](/legal/privacidad).',
+    respuesta: 'Cumplimos con la **Ley 25.326** de Protección de Datos Personales. Podés ejercer tus derechos de acceso, rectificación, supresión y oposición escribiendo a nuestro DPO. Más info en la Política de Privacidad: [/privacidad](/privacidad).',
   },
   {
     id: 'terminos',
     keywords: ['terminos', 'condiciones', 'contrato legal', 'ley'],
-    respuesta: 'Podés leer los **Términos y Condiciones v3.0** en [/legal/terminos](/legal/terminos) y la **Política de Privacidad** en [/legal/privacidad](/legal/privacidad).',
+    respuesta: 'Podés leer los **Términos y Condiciones** en [/terminos](/terminos) y la **Política de Privacidad** en [/privacidad](/privacidad).',
   },
   {
     id: 'seguridad',
