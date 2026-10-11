@@ -1,11 +1,11 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Card } from '@/components/ui/Card';
 import Button from '@/components/ui/Button';
 import api, { extractData } from '@/lib/api';
 import { formatDate } from '@/lib/utils';
-import { FileText, Download, Pen } from 'lucide-react';
+import { FileText, Download, Pen, Loader2 } from 'lucide-react';
 import type { Contrato } from '@/types';
 
 const estadoColors: Record<string, string> = {
@@ -18,21 +18,49 @@ const estadoColors: Record<string, string> = {
 export default function ContratosPage() {
   const [contratos, setContratos] = useState<Contrato[]>([]);
   const [loading, setLoading] = useState(true);
+  const [firmandoId, setFirmandoId] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
+
+  const fetchContratos = useCallback(async () => {
+    try {
+      const res = await api.get('/contratos');
+      const raw = extractData<Contrato[] | { data?: Contrato[] } | null>(res);
+      setContratos(Array.isArray(raw) ? raw : raw?.data || []);
+    } catch {
+      setContratos([]);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
 
   useEffect(() => {
-    const fetchContratos = async () => {
-      try {
-        const res = await api.get('/contratos');
-        const raw = extractData<Contrato[] | { data?: Contrato[] } | null>(res);
-        setContratos(Array.isArray(raw) ? raw : raw?.data || []);
-      } catch {
-        setContratos([]);
-      } finally {
-        setLoading(false);
-      }
-    };
     fetchContratos();
-  }, []);
+  }, [fetchContratos]);
+
+  const firmar = async (idContrato: string) => {
+    setFirmandoId(idContrato);
+    setError(null);
+    try {
+      await api.post(`/contratos/${idContrato}/firmar`, {
+        proveedor_firma: 'docusign',
+      });
+      await fetchContratos();
+    } catch (e) {
+      const err = e as { response?: { data?: { message?: string | string[]; error?: string } } };
+      const msg = err?.response?.data?.message ?? err?.response?.data?.error;
+      if (Array.isArray(msg)) {
+        setError(msg[0] || 'No se pudo firmar el contrato.');
+      } else {
+        setError(msg || 'No se pudo firmar el contrato. Intentá nuevamente.');
+      }
+    } finally {
+      setFirmandoId(null);
+    }
+  };
+
+  const abrirPdf = (url: string) => {
+    window.open(url, '_blank', 'noopener,noreferrer');
+  };
 
   return (
     <div>
@@ -40,6 +68,12 @@ export default function ContratosPage() {
         <h1 className="text-2xl font-bold text-white">Mis Contratos</h1>
         <p className="text-slate-400 mt-1">Gestioná y firmá tus contratos digitales</p>
       </div>
+
+      {error && (
+        <div className="mb-4 px-4 py-3 bg-red-500/10 border border-red-500/30 rounded-lg text-sm text-red-400">
+          {error}
+        </div>
+      )}
 
       {loading ? (
         <div className="space-y-4">
@@ -80,18 +114,35 @@ export default function ContratosPage() {
                       Firmado por cliente el {formatDate(c.fecha_firma_cliente)}
                     </p>
                   )}
+                  {c.fecha_firma_proveedor && (
+                    <p className="text-xs text-green-400 mt-1">
+                      Firmado por proveedor el {formatDate(c.fecha_firma_proveedor)}
+                    </p>
+                  )}
                 </div>
                 <div className="flex gap-2">
-                  {c.url_pdf_firmado && (
-                    <Button variant="outline" size="sm">
+                  {(c.url_pdf_firmado || c.url_pdf_borrador) && (
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => abrirPdf(c.url_pdf_firmado || c.url_pdf_borrador!)}
+                    >
                       <Download className="w-4 h-4 mr-1" />
                       PDF
                     </Button>
                   )}
                   {c.estado === 'pendiente_firma' && (
-                    <Button size="sm">
-                      <Pen className="w-4 h-4 mr-1" />
-                      Firmar
+                    <Button
+                      size="sm"
+                      disabled={firmandoId === c.id_contrato}
+                      onClick={() => firmar(c.id_contrato)}
+                    >
+                      {firmandoId === c.id_contrato ? (
+                        <Loader2 className="w-4 h-4 mr-1 animate-spin" />
+                      ) : (
+                        <Pen className="w-4 h-4 mr-1" />
+                      )}
+                      {firmandoId === c.id_contrato ? 'Firmando...' : 'Firmar'}
                     </Button>
                   )}
                 </div>
