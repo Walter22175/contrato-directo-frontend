@@ -3,8 +3,8 @@
 import { useState, useEffect, useCallback } from 'react';
 import api, { extractData } from '@/lib/api';
 import { Card } from '@/components/ui/Card';
-import { Users, Search, XCircle } from 'lucide-react';
-import type { Usuario } from '@/types';
+import { Users, Search, XCircle, Shield, Plus, X } from 'lucide-react';
+import type { Usuario, Rol } from '@/types';
 
 type Tab = 'todos' | 'pendientes' | 'verificados';
 
@@ -23,6 +23,9 @@ export default function AdminUsuariosPage() {
   const [selectedUser, setSelectedUser] = useState<Usuario | null>(null);
   const [msg, setMsg] = useState<{ tipo: 'ok' | 'error'; texto: string } | null>(null);
   const [cambiando, setCambiando] = useState<string | null>(null);
+  const [rolesCatalogo, setRolesCatalogo] = useState<Rol[]>([]);
+  const [nuevoRol, setNuevoRol] = useState('');
+  const [guardandoRol, setGuardandoRol] = useState(false);
 
   const fetchUsuarios = useCallback(async () => {
     setLoading(true);
@@ -42,6 +45,61 @@ export default function AdminUsuariosPage() {
   }, [tab, busqueda]);
 
   useEffect(() => { fetchUsuarios(); }, [fetchUsuarios]);
+
+  useEffect(() => {
+    api
+      .get<RespuestaApi<Rol[]>>('/roles')
+      .then((res) => {
+        const data = extractData<RespuestaApi<Rol[]> | null>(res);
+        setRolesCatalogo(data?.data || data || []);
+      })
+      .catch(() => setRolesCatalogo([]));
+  }, []);
+
+  const asignarRol = async () => {
+    if (!selectedUser || !nuevoRol) return;
+    setGuardandoRol(true);
+    setMsg(null);
+    try {
+      await api.post(`/usuarios/${selectedUser.id_usuario}/roles`, { rol: nuevoRol });
+      const res = await api.get<RespuestaApi<Usuario>>(`/usuarios/${selectedUser.id_usuario}`);
+      const actualizado = extractData<Usuario>(res);
+      if (actualizado) {
+        setSelectedUser(actualizado);
+        setUsuarios((prev) =>
+          prev.map((x) => (x.id_usuario === actualizado.id_usuario ? actualizado : x))
+        );
+      }
+      setMsg({ tipo: 'ok', texto: `Rol "${nuevoRol}" asignado a ${selectedUser.nombre} ${selectedUser.apellido}` });
+      setNuevoRol('');
+    } catch (e) {
+      setMsg({ tipo: 'error', texto: mensajeDeError(e, 'Error al asignar el rol') });
+    } finally {
+      setGuardandoRol(false);
+    }
+  };
+
+  const quitarRol = async (idUsuarioRol: number, nombreRol: string) => {
+    if (!selectedUser) return;
+    setGuardandoRol(true);
+    setMsg(null);
+    try {
+      await api.delete(`/usuarios/${selectedUser.id_usuario}/roles/${idUsuarioRol}`);
+      const res = await api.get<RespuestaApi<Usuario>>(`/usuarios/${selectedUser.id_usuario}`);
+      const actualizado = extractData<Usuario>(res);
+      if (actualizado) {
+        setSelectedUser(actualizado);
+        setUsuarios((prev) =>
+          prev.map((x) => (x.id_usuario === actualizado.id_usuario ? actualizado : x))
+        );
+      }
+      setMsg({ tipo: 'ok', texto: `Rol "${nombreRol}" quitado a ${selectedUser.nombre} ${selectedUser.apellido}` });
+    } catch (e) {
+      setMsg({ tipo: 'error', texto: mensajeDeError(e, 'Error al quitar el rol') });
+    } finally {
+      setGuardandoRol(false);
+    }
+  };
 
   const cambiarEstado = async (u: Usuario) => {
     const nuevo = u.estado === 'activo' ? 'suspendido' : 'activo';
@@ -249,6 +307,67 @@ export default function AdminUsuariosPage() {
               <div>
                 <span className="text-slate-400">Registro:</span>
                 <p className="text-white">{formatearFecha(selectedUser.fecha_registro)}</p>
+              </div>
+            </div>
+
+            <div className="pt-4 border-t border-slate-700 space-y-3">
+              <div className="flex items-center gap-2">
+                <Shield className="w-4 h-4 text-cyan-400" />
+                <h3 className="text-sm font-semibold text-white">Roles asignados</h3>
+              </div>
+
+              <div className="flex flex-wrap gap-2">
+                {(selectedUser.usuario_roles || [])
+                  .filter((ur) => ur.activo)
+                  .map((ur) => (
+                    <span
+                      key={ur.id_usuario_rol}
+                      className="flex items-center gap-1.5 text-xs px-2.5 py-1 rounded bg-cyan-500/10 text-cyan-400 border border-cyan-500/20"
+                    >
+                      {ur.rol?.nombre?.replace('_', ' ')}
+                      <button
+                        onClick={() => quitarRol(ur.id_usuario_rol, ur.rol?.nombre || '')}
+                        disabled={guardandoRol}
+                        className="hover:text-red-400 transition-colors disabled:opacity-50"
+                        title="Quitar rol"
+                      >
+                        <X className="w-3 h-3" />
+                      </button>
+                    </span>
+                  ))}
+                {!(selectedUser.usuario_roles || []).some((ur) => ur.activo) && (
+                  <span className="text-xs text-slate-500">Sin roles asignados</span>
+                )}
+              </div>
+
+              <div className="flex items-center gap-2">
+                <select
+                  value={nuevoRol}
+                  onChange={(e) => setNuevoRol(e.target.value)}
+                  className="flex-1 px-3 py-2 bg-slate-800 border border-slate-600 rounded-lg text-white text-sm focus:outline-none focus:ring-2 focus:ring-cyan-500"
+                >
+                  <option value="">Seleccionar rol a asignar…</option>
+                  {rolesCatalogo
+                    .filter(
+                      (r) =>
+                        !(selectedUser.usuario_roles || []).some(
+                          (ur) => ur.activo && ur.rol?.nombre === r.nombre
+                        )
+                    )
+                    .map((r) => (
+                      <option key={r.id_rol} value={r.nombre}>
+                        {r.nombre.replace('_', ' ')}
+                      </option>
+                    ))}
+                </select>
+                <button
+                  onClick={asignarRol}
+                  disabled={guardandoRol || !nuevoRol}
+                  className="flex items-center gap-1.5 px-3 py-2 bg-cyan-600 hover:bg-cyan-500 text-white text-xs font-medium rounded-lg transition-colors disabled:opacity-50"
+                >
+                  {guardandoRol ? '...' : <Plus className="w-3.5 h-3.5" />}
+                  Asignar
+                </button>
               </div>
             </div>
           </div>

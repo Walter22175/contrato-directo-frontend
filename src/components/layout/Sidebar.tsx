@@ -65,6 +65,7 @@ const providerLinks = [
 const adminLinks = [
   { href: '/dashboard/admin', label: 'Dashboard', icon: LayoutDashboard },
   { href: '/dashboard/admin/usuarios', label: 'Usuarios', icon: Users },
+  { href: '/dashboard/admin/configuracion', label: 'Config. Sistema', icon: Settings },
   { href: '/dashboard/admin/promociones', label: 'Promociones', icon: ImageIcon },
   { href: '/dashboard/admin/servicios', label: 'Gestión de Servicios', icon: Briefcase },
   { href: '/dashboard/admin/reportes', label: 'Reportes', icon: BarChart3 },
