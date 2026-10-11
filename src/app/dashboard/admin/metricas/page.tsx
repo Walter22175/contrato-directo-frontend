@@ -59,12 +59,39 @@ interface MetricasObjetivo9 {
   };
 }
 
+interface MetricasContratos {
+  generado_en: string;
+  totales: {
+    total: number;
+    por_estado: Record<string, number>;
+    firmados: number;
+    tasa_firmado_pct: number;
+    tiempo_medio_firma_horas: number | null;
+    firmados_con_pdf_firmado: number;
+    monto_total_firmado: number;
+    firmas_exitosas: number;
+    firmas_por_proveedor: Record<string, number>;
+  };
+}
+
 export default function MetricasPage() {
   const [metricas, setMetricas] = useState<MetricaRow | null>(null);
   const [loading, setLoading] = useState(true);
   const [periodo, setPeriodo] = useState('actual');
   const [obj2, setObj2] = useState<MetricaObjetivo2 | null>(null);
   const [obj9, setObj9] = useState<MetricasObjetivo9 | null>(null);
+  const [ctr, setCtr] = useState<MetricasContratos | null>(null);
+
+  useEffect(() => {
+    api
+      .get('/metricas/contratos')
+      .then((res) => {
+        const d = extractData<MetricasContratos | null>(res);
+        if (d && d.totales && typeof d.totales.total === 'number') setCtr(d);
+        else setCtr(null);
+      })
+      .catch(() => setCtr(null));
+  }, []);
 
   useEffect(() => {
     api
@@ -259,6 +286,64 @@ export default function MetricasPage() {
                   {obj9.cumplimiento.metricas_evaluadas} métricas evaluadas (
                   {obj9.cumplimiento.pct_cumplimiento}%) · {obj9.metricas.length} métricas
                   definidas
+                </p>
+              )}
+            </div>
+          </Card>
+
+          {/* Métricas de contratos y firma digital (OE12) */}
+          <Card>
+            <div className="p-4">
+              <CardTitle>Objetivo 12 — Contratos y Firma Digital</CardTitle>
+              <p className="text-sm text-slate-400 mt-1">
+                Estado de los contratos, tasa de firma y desempeño del flujo de firma digital
+              </p>
+              {ctr ? (
+                <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                  <div className="p-4 bg-slate-800/50 rounded-xl border border-slate-700">
+                    <p className="text-xs text-slate-400">Contratos totales</p>
+                    <p className="text-2xl font-bold text-cyan-400 mt-1">{ctr.totales.total}</p>
+                    <p className="text-xs text-slate-500 mt-1">
+                      Firmados: {ctr.totales.firmados} · Pendientes:{' '}
+                      {ctr.totales.por_estado.pendiente_firma || 0} · Borradores:{' '}
+                      {ctr.totales.por_estado.borrador || 0}
+                    </p>
+                  </div>
+                  <div className="p-4 bg-slate-800/50 rounded-xl border border-slate-700">
+                    <p className="text-xs text-slate-400">Tasa de firma</p>
+                    <p className="text-2xl font-bold text-green-400 mt-1">
+                      {ctr.totales.tasa_firmado_pct}%
+                    </p>
+                    <p className="text-xs text-slate-500 mt-1">
+                      {ctr.totales.firmados_con_pdf_firmado} con PDF firmado
+                    </p>
+                  </div>
+                  <div className="p-4 bg-slate-800/50 rounded-xl border border-slate-700">
+                    <p className="text-xs text-slate-400">Tiempo medio de firma</p>
+                    <p className="text-2xl font-bold text-yellow-400 mt-1">
+                      {ctr.totales.tiempo_medio_firma_horas !== null
+                        ? `${ctr.totales.tiempo_medio_firma_horas}h`
+                        : '—'}
+                    </p>
+                    <p className="text-xs text-slate-500 mt-1">Generación → última firma</p>
+                  </div>
+                  <div className="p-4 bg-slate-800/50 rounded-xl border border-slate-700">
+                    <p className="text-xs text-slate-400">Monto total contratado</p>
+                    <p className="text-2xl font-bold text-purple-400 mt-1">
+                      ${ctr.totales.monto_total_firmado.toLocaleString('es-AR')}
+                    </p>
+                    <p className="text-xs text-slate-500 mt-1">
+                      {ctr.totales.firmas_exitosas} firmas exitosas
+                      {Object.entries(ctr.totales.firmas_por_proveedor).length > 0 &&
+                        ` · ${Object.entries(ctr.totales.firmas_por_proveedor)
+                          .map(([prov, n]) => `${prov}: ${n}`)
+                          .join(' · ')}`}
+                    </p>
+                  </div>
+                </div>
+              ) : (
+                <p className="text-sm text-slate-500 mt-3">
+                  No se pudieron cargar las métricas de contratos.
                 </p>
               )}
             </div>
