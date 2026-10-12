@@ -23,6 +23,9 @@ export const ICONOS_SERVICIOS: Record<string, string> = {
   'Sanitarios': `${DIR_SERVICIOS}/mantenimiento/sanitarios.svg`,
   'Vidriería': `${DIR_SERVICIOS}/mantenimiento/vidrieria.svg`,
   'Herrería': `${DIR_SERVICIOS}/mantenimiento/herreria.svg`,
+  'Albañilería': `${DIR_SERVICIOS}/mantenimiento/albañil.svg`,
+  'Techos': `${DIR_SERVICIOS}/mantenimiento/techos.svg`,
+  'Refrigeración': `${DIR_SERVICIOS}/mantenimiento/refrigeración.svg`,
   'Pozos Artesanales': `${DIR_SERVICIOS}/mantenimiento/pozos_artesanales.svg`,
   'Pozo Artesanal': `${DIR_SERVICIOS}/mantenimiento/pozos_artesanales.svg`,
   // Automóviles

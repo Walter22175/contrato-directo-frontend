@@ -15,6 +15,9 @@ import {
   Clock,
   RefreshCw,
   Gavel,
+  Plus,
+  Pencil,
+  Trash2,
 } from 'lucide-react';
 
 type RespuestaApi<T> = T & { data?: T };
@@ -44,6 +47,17 @@ interface Servicio {
   id_servicio: number;
   nombre: string;
   id_categoria: number;
+  activo: boolean;
+  descripcion?: string;
+  palabras_clave?: string[];
+}
+
+interface FormServicio {
+  id_servicio?: number;
+  nombre: string;
+  id_categoria: number;
+  descripcion: string;
+  palabras_clave: string;
   activo: boolean;
 }
 
@@ -199,6 +213,8 @@ export default function AdminServiciosPage() {
   const [accionando, setAccionando] = useState<number | null>(null);
   const [msg, setMsg] = useState<{ tipo: 'ok' | 'error'; texto: string } | null>(null);
   const [loadingDinamico, setLoadingDinamico] = useState(false);
+  const [formServicio, setFormServicio] = useState<FormServicio | null>(null);
+  const [guardandoServicio, setGuardandoServicio] = useState(false);
 
   const fetchData = useCallback(async () => {
     setLoading(true);
@@ -337,6 +353,96 @@ export default function AdminServiciosPage() {
     }
   };
 
+  const abrirNuevoServicio = () => {
+    setMsg(null);
+    setFormServicio({
+      nombre: '',
+      id_categoria: catsFiltradas[0]?.id_categoria ?? categorias[0]?.id_categoria ?? 0,
+      descripcion: '',
+      palabras_clave: '',
+      activo: true,
+    });
+  };
+
+  const abrirEditarServicio = (s: Servicio) => {
+    setMsg(null);
+    setFormServicio({
+      id_servicio: s.id_servicio,
+      nombre: s.nombre,
+      id_categoria: s.id_categoria,
+      descripcion: s.descripcion ?? '',
+      palabras_clave: (s.palabras_clave ?? []).join(', '),
+      activo: s.activo,
+    });
+  };
+
+  const guardarServicio = async () => {
+    if (!formServicio) return;
+    setMsg(null);
+    const nombre = formServicio.nombre.trim();
+    if (!nombre) {
+      setMsg({ tipo: 'error', texto: 'El nombre es obligatorio' });
+      return;
+    }
+    if (nombre.length > 150) {
+      setMsg({ tipo: 'error', texto: 'El nombre no puede superar los 150 caracteres' });
+      return;
+    }
+    if (!formServicio.id_categoria) {
+      setMsg({ tipo: 'error', texto: 'Seleccioná una categoría' });
+      return;
+    }
+    const palabrasClave = formServicio.palabras_clave
+      .split(',')
+      .map((p) => p.trim())
+      .filter(Boolean);
+    const payload = {
+      id_categoria: formServicio.id_categoria,
+      nombre,
+      descripcion: formServicio.descripcion.trim() || undefined,
+      palabras_clave: palabrasClave.length > 0 ? palabrasClave : undefined,
+      activo: formServicio.activo,
+    };
+    setGuardandoServicio(true);
+    try {
+      if (formServicio.id_servicio) {
+        await api.patch(`/servicios/${formServicio.id_servicio}`, payload);
+        setMsg({ tipo: 'ok', texto: `Servicio "${nombre}" actualizado correctamente` });
+      } else {
+        await api.post('/servicios', payload);
+        setMsg({ tipo: 'ok', texto: `Servicio "${nombre}" creado correctamente` });
+      }
+      setFormServicio(null);
+      await fetchData();
+    } catch (e) {
+      setMsg({ tipo: 'error', texto: mensajeDeError(e, 'Error al guardar el servicio') });
+    } finally {
+      setGuardandoServicio(false);
+    }
+  };
+
+  const eliminarServicio = async (s: Servicio) => {
+    if (!window.confirm(`¿Eliminar el servicio "${s.nombre}"? Esta acción no se puede deshacer.`)) return;
+    setAccionando(s.id_servicio);
+    setMsg(null);
+    try {
+      await api.delete(`/servicios/${s.id_servicio}`);
+      setMsg({ tipo: 'ok', texto: `Servicio "${s.nombre}" eliminado correctamente` });
+      if (formServicio?.id_servicio === s.id_servicio) setFormServicio(null);
+      await fetchData();
+    } catch (e) {
+      setMsg({
+        tipo: 'error',
+        texto: mensajeDeError(e, 'No se pudo eliminar el servicio. Si tiene proveedores o transacciones asociados, inactivalo en su lugar.'),
+      });
+    } finally {
+      setAccionando(null);
+    }
+  };
+
+  const nombreCategoria = (id: number) =>
+    categorias.find((c) => c.id_categoria === id)?.nombre || `Categoría #${id}`;
+
   const catsFiltradas = categorias.filter((c) =>
     !busqueda || c.nombre.toLowerCase().includes(busqueda.toLowerCase())
   );
@@ -410,6 +516,15 @@ export default function AdminServiciosPage() {
               ))}
             </div>
           )}
+          {tab === 'servicios' && !formServicio && (
+            <button
+              onClick={abrirNuevoServicio}
+              className="flex items-center gap-1.5 px-3 py-2 text-xs font-medium rounded-lg bg-cyan-600 hover:bg-cyan-500 text-white transition-colors"
+            >
+              <Plus className="w-4 h-4" />
+              Nuevo servicio
+            </button>
+          )}
         </div>
       )}
 
@@ -419,6 +534,91 @@ export default function AdminServiciosPage() {
         }`}>
           {msg.texto}
         </div>
+      )}
+
+      {tab === 'servicios' && formServicio && (
+        <Card>
+          <div className="p-5 space-y-4">
+            <h2 className="text-sm font-semibold text-white">
+              {formServicio.id_servicio ? 'Editar servicio' : 'Nuevo servicio'}
+            </h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-xs text-slate-400 mb-1">Nombre *</label>
+                <input
+                  type="text"
+                  value={formServicio.nombre}
+                  onChange={(e) => setFormServicio({ ...formServicio, nombre: e.target.value })}
+                  maxLength={150}
+                  placeholder="Ej: Albañilería"
+                  className="w-full px-3 py-2 bg-slate-800 border border-slate-600 rounded-lg text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-cyan-500"
+                />
+              </div>
+              <div>
+                <label className="block text-xs text-slate-400 mb-1">Categoría *</label>
+                <select
+                  value={formServicio.id_categoria}
+                  onChange={(e) => setFormServicio({ ...formServicio, id_categoria: Number(e.target.value) })}
+                  className="w-full px-3 py-2 bg-slate-800 border border-slate-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-cyan-500"
+                >
+                  <option value={0} disabled>
+                    Seleccionar categoría...
+                  </option>
+                  {categorias.map((c) => (
+                    <option key={c.id_categoria} value={c.id_categoria}>
+                      {c.nombre}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            </div>
+            <div>
+              <label className="block text-xs text-slate-400 mb-1">Descripción</label>
+              <textarea
+                value={formServicio.descripcion}
+                onChange={(e) => setFormServicio({ ...formServicio, descripcion: e.target.value })}
+                rows={3}
+                placeholder="Qué incluye el servicio..."
+                className="w-full px-3 py-2 bg-slate-800 border border-slate-600 rounded-lg text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-cyan-500"
+              />
+            </div>
+            <div>
+              <label className="block text-xs text-slate-400 mb-1">Palabras clave (separadas por coma)</label>
+              <input
+                type="text"
+                value={formServicio.palabras_clave}
+                onChange={(e) => setFormServicio({ ...formServicio, palabras_clave: e.target.value })}
+                placeholder="Ej: albañil, obra menor, revoque"
+                className="w-full px-3 py-2 bg-slate-800 border border-slate-600 rounded-lg text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-cyan-500"
+              />
+            </div>
+            <label className="flex items-center gap-2 text-sm text-slate-300">
+              <input
+                type="checkbox"
+                checked={formServicio.activo}
+                onChange={(e) => setFormServicio({ ...formServicio, activo: e.target.checked })}
+                className="w-4 h-4 accent-cyan-500"
+              />
+              Activo (visible en el catálogo)
+            </label>
+            <div className="flex gap-2">
+              <button
+                onClick={guardarServicio}
+                disabled={guardandoServicio}
+                className="px-4 py-2 text-sm font-medium rounded-lg bg-cyan-600 hover:bg-cyan-500 text-white transition-colors disabled:opacity-50"
+              >
+                {guardandoServicio ? 'Guardando...' : formServicio.id_servicio ? 'Guardar cambios' : 'Crear servicio'}
+              </button>
+              <button
+                onClick={() => setFormServicio(null)}
+                disabled={guardandoServicio}
+                className="px-4 py-2 text-sm font-medium rounded-lg bg-slate-700 hover:bg-slate-600 text-slate-300 transition-colors disabled:opacity-50"
+              >
+                Cancelar
+              </button>
+            </div>
+          </div>
+        </Card>
       )}
 
       {loading ? (
@@ -490,7 +690,7 @@ export default function AdminServiciosPage() {
                     </div>
                     <div>
                       <h3 className="text-sm font-medium text-white">{s.nombre}</h3>
-                      <p className="text-xs text-slate-500">Categoría #{s.id_categoria}</p>
+                      <p className="text-xs text-slate-500">{nombreCategoria(s.id_categoria)}</p>
                     </div>
                   </div>
                   <div className="flex items-center gap-2 flex-shrink-0">
@@ -511,6 +711,24 @@ export default function AdminServiciosPage() {
                     >
                       {s.activo ? <XCircle className="w-3.5 h-3.5" /> : <CheckCircle className="w-3.5 h-3.5" />}
                       {accionando === s.id_servicio ? '...' : s.activo ? 'Inactivar' : 'Activar'}
+                    </button>
+                    <button
+                      onClick={() => abrirEditarServicio(s)}
+                      disabled={accionando === s.id_servicio}
+                      className="flex items-center gap-1 px-2.5 py-1 text-xs font-medium rounded-lg bg-slate-700 hover:bg-slate-600 text-slate-300 transition-colors disabled:opacity-50"
+                      title="Editar servicio"
+                    >
+                      <Pencil className="w-3.5 h-3.5" />
+                      Editar
+                    </button>
+                    <button
+                      onClick={() => eliminarServicio(s)}
+                      disabled={accionando === s.id_servicio}
+                      className="flex items-center gap-1 px-2.5 py-1 text-xs font-medium rounded-lg bg-red-500/10 hover:bg-red-500/20 text-red-400 transition-colors disabled:opacity-50"
+                      title="Eliminar servicio"
+                    >
+                      <Trash2 className="w-3.5 h-3.5" />
+                      {accionando === s.id_servicio ? '...' : 'Eliminar'}
                     </button>
                   </div>
                 </div>

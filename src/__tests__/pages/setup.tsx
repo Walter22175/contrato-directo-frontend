@@ -70,6 +70,7 @@ jest.mock('@/lib/api', () => {
       get: jest.fn(() => Promise.resolve({ data: { statusCode: 200, timestamp: '', data: { data: [], meta: { total: 0 } } } })),
       post: jest.fn(() => Promise.resolve({ data: { statusCode: 200, timestamp: '', data: {} } })),
       patch: jest.fn(() => Promise.resolve({ data: { statusCode: 200, timestamp: '', data: {} } })),
+      delete: jest.fn(() => Promise.resolve({ data: { statusCode: 200, timestamp: '', data: {} } })),
     },
     extractData: jest.fn(mockExtract),
   };
