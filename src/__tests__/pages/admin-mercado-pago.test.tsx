@@ -20,6 +20,33 @@ const metricasMock = {
     cancelados: 1,
     capturas_solicitadas: 2,
     auto_capturas_disparadas: 1,
+    serie_diaria: {
+      desde: '2026-10-12T15:00:00Z',
+      hasta: '2026-10-14T15:00:00Z',
+      dias: [
+        {
+          fecha: '2026-10-12',
+          creados: 2,
+          capturados: 1,
+          cancelados: 0,
+          capturas_solicitadas: 0,
+        },
+        {
+          fecha: '2026-10-13',
+          creados: 3,
+          capturados: 2,
+          cancelados: 1,
+          capturas_solicitadas: 1,
+        },
+        {
+          fecha: '2026-10-14',
+          creados: 1,
+          capturados: 2,
+          cancelados: 0,
+          capturas_solicitadas: 1,
+        },
+      ],
+    },
   },
   fallas_token: {
     ultimas_24h: 0,
@@ -103,13 +130,13 @@ describe('MercadoPagoAdminPage', () => {
     });
 
     expect(screen.getByText('Por estado (mp_status)')).toBeInTheDocument();
-    expect(screen.getByText('Capturados')).toBeInTheDocument();
-    expect(screen.getByText('Cancelados')).toBeInTheDocument();
+    expect(screen.getAllByText('Capturados').length).toBeGreaterThan(0);
+    expect(screen.getAllByText('Cancelados').length).toBeGreaterThan(0);
     expect(screen.getByText('Capturas solicitadas')).toBeInTheDocument();
     expect(screen.getByText('Auto-capturas')).toBeInTheDocument();
     expect(screen.getByText('Autorizado')).toBeInTheDocument();
-    expect(screen.getByText('Capturado')).toBeInTheDocument();
-    expect(screen.getByText('Cancelado')).toBeInTheDocument();
+    expect(screen.getAllByText('Capturado').length).toBeGreaterThan(0);
+    expect(screen.getAllByText('Cancelado').length).toBeGreaterThan(0);
   });
 
   it('muestra las fallas de token y el detalle por tipo', async () => {
@@ -135,6 +162,23 @@ describe('MercadoPagoAdminPage', () => {
     expect(screen.getByText('Sin refresh token')).toBeInTheDocument();
     expect(
       screen.getByText('Habilitadas con token roto'),
+    ).toBeInTheDocument();
+  });
+
+  it('muestra la evolución diaria con las tres series del gráfico', async () => {
+    let container!: HTMLElement;
+    await act(async () => {
+      ({ container } = render(<MercadoPagoAdminPage />));
+    });
+
+    expect(screen.getByText('Evolución diaria')).toBeInTheDocument();
+    expect(screen.getAllByText('Capturados').length).toBeGreaterThan(1);
+    const lineas = container.querySelectorAll('polyline');
+    expect(lineas).toHaveLength(3);
+    expect(
+      screen.getByLabelText(
+        'Evolución diaria de creados, capturados y cancelados',
+      ),
     ).toBeInTheDocument();
   });
 

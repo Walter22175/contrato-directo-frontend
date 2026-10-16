@@ -664,6 +664,14 @@ export interface AlertaCuentaMercadoPago {
   marketplace_habilitado: boolean;
 }
 
+export interface SerieDiariaPagoMp {
+  fecha: string;
+  creados: number;
+  capturados: number;
+  cancelados: number;
+  capturas_solicitadas: number;
+}
+
 export interface MetricasMercadoPago {
   generado_en: string;
   cuentas: {
@@ -678,6 +686,11 @@ export interface MetricasMercadoPago {
     cancelados: number;
     capturas_solicitadas: number;
     auto_capturas_disparadas: number;
+    serie_diaria: {
+      desde: string;
+      hasta: string;
+      dias: SerieDiariaPagoMp[];
+    };
   };
   fallas_token: {
     ultimas_24h: number;

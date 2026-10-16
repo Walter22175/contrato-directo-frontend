@@ -4,7 +4,11 @@ import { useCallback, useEffect, useState } from 'react';
 import { Card } from '@/components/ui/Card';
 import Button from '@/components/ui/Button';
 import { obtenerMetricasMercadoPago } from '@/lib/mercadopago';
-import type { AlertaCuentaMercadoPago, MetricasMercadoPago } from '@/types';
+import type {
+  AlertaCuentaMercadoPago,
+  MetricasMercadoPago,
+  SerieDiariaPagoMp,
+} from '@/types';
 import {
   Activity,
   AlertTriangle,
@@ -148,6 +152,90 @@ function BarrasHorizontales({
           </div>
         </div>
       ))}
+    </div>
+  );
+}
+
+const SERIES_DIARIAS: {
+  campo: Exclude<keyof SerieDiariaPagoMp, 'fecha'>;
+  color: string;
+  etiqueta: string;
+}[] = [
+  { campo: 'creados', color: '#94a3b8', etiqueta: 'Creados' },
+  { campo: 'capturados', color: '#22d3ee', etiqueta: 'Capturados' },
+  { campo: 'cancelados', color: '#f87171', etiqueta: 'Cancelados' },
+];
+
+function GraficoLineas({ dias }: { dias: SerieDiariaPagoMp[] }) {
+  if (dias.length === 0) {
+    return <p className="text-sm text-slate-500">Sin datos en el período</p>;
+  }
+  const ancho = 600;
+  const alto = 180;
+  const padX = 10;
+  const padY = 14;
+  const max = Math.max(
+    1,
+    ...dias.flatMap((d) => SERIES_DIARIAS.map((s) => d[s.campo])),
+  );
+  const x = (i: number) =>
+    padX + (dias.length <= 1 ? 0 : (i / (dias.length - 1)) * (ancho - 2 * padX));
+  const y = (v: number) =>
+    alto - padY - (v / max) * (alto - 2 * padY);
+  const mostrarPuntos = dias.length <= 60;
+
+  return (
+    <div>
+      <ul className="flex flex-wrap items-center gap-4 mb-3 text-xs">
+        {SERIES_DIARIAS.map((s) => (
+          <li key={s.etiqueta} className="flex items-center gap-1.5">
+            <span
+              className="w-3 h-0.5 rounded"
+              style={{ backgroundColor: s.color }}
+            />
+            <span className="text-slate-300">{s.etiqueta}</span>
+          </li>
+        ))}
+      </ul>
+      <svg
+        viewBox={`0 0 ${ancho} ${alto}`}
+        className="w-full h-44"
+        role="img"
+        aria-label="Evolución diaria de creados, capturados y cancelados"
+      >
+        <line
+          x1={padX}
+          y1={alto - padY}
+          x2={ancho - padX}
+          y2={alto - padY}
+          stroke="#334155"
+          strokeWidth="1"
+        />
+        {SERIES_DIARIAS.map((s) => (
+          <g key={s.campo}>
+            <polyline
+              points={dias
+                .map((d, i) => `${x(i)},${y(d[s.campo])}`)
+                .join(' ')}
+              fill="none"
+              stroke={s.color}
+              strokeWidth="2"
+              strokeLinejoin="round"
+              strokeLinecap="round"
+            />
+            {mostrarPuntos &&
+              dias.map((d, i) => (
+                <circle key={`${s.campo}-${d.fecha}`} cx={x(i)} cy={y(d[s.campo])} r="2.5" fill={s.color}>
+                  <title>{`${d.fecha} · ${s.etiqueta}: ${d[s.campo]}`}</title>
+                </circle>
+              ))}
+          </g>
+        ))}
+      </svg>
+      <div className="flex justify-between text-[10px] text-slate-500 mt-1">
+        <span>{dias[0].fecha}</span>
+        <span>{dias[dias.length - 1].fecha}</span>
+      </div>
     </div>
   );
 }
@@ -581,6 +669,25 @@ export default function MercadoPagoAdminPage() {
                 </div>
               </Card>
             </div>
+            <Card className="mt-4">
+              <div className="p-5">
+                <div className="flex flex-wrap items-baseline justify-between gap-2 mb-4">
+                  <h3 className="text-sm font-medium text-slate-300">
+                    Evolución diaria
+                  </h3>
+                  <span className="text-xs text-slate-500">
+                    {new Date(
+                      metricas.pagos.serie_diaria.desde,
+                    ).toLocaleDateString('es-AR')}{' '}
+                    —{' '}
+                    {new Date(
+                      metricas.pagos.serie_diaria.hasta,
+                    ).toLocaleDateString('es-AR')}
+                  </span>
+                </div>
+                <GraficoLineas dias={metricas.pagos.serie_diaria.dias} />
+              </div>
+            </Card>
           </section>
 
           <section>
