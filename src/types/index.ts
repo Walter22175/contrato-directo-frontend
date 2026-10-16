@@ -655,3 +655,44 @@ export interface DashboardMercadoPagoProveedor {
   retenciones: RetencionDashboardMp[];
   alertas: AlertaDashboardMp[];
 }
+
+export interface AlertaCuentaMercadoPago {
+  id_usuario: string;
+  mp_user_id: string | null;
+  email: string | null;
+  nombre: string | null;
+  marketplace_habilitado: boolean;
+}
+
+export interface MetricasMercadoPago {
+  generado_en: string;
+  cuentas: {
+    total: number;
+    conectadas: number;
+    habilitadas_marketplace: number;
+    token_invalido: number;
+  };
+  pagos: {
+    por_mp_status: Record<string, number>;
+    capturados: number;
+    cancelados: number;
+    capturas_solicitadas: number;
+    auto_capturas_disparadas: number;
+  };
+  fallas_token: {
+    ultimas_24h: number;
+    ultimos_30d: number;
+    por_tipo: Record<string, number>;
+    rango?: {
+      desde: string;
+      hasta: string;
+      total: number;
+      por_tipo: Record<string, number>;
+    };
+  };
+  alertas: {
+    token_invalido: AlertaCuentaMercadoPago[];
+    sin_refresh_token: AlertaCuentaMercadoPago[];
+    habilitado_token_roto: AlertaCuentaMercadoPago[];
+  };
+}

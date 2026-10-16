@@ -3,6 +3,7 @@ import type {
   ConexionMercadoPago,
   DashboardMercadoPagoProveedor,
   EstadoMercadoPagoProveedor,
+  MetricasMercadoPago,
   ResultadoCallbackMercadoPago,
 } from '@/types';
 
@@ -45,4 +46,16 @@ export async function intercambiarCodigoMercadoPago(
     params: { code, state },
   });
   return extractData<ResultadoCallbackMercadoPago>(res);
+}
+
+/**
+ * Métricas del marketplace para el panel admin (solo super admin).
+ * `desde`/`hasta` (ISO 8601) acotan el conteo de fallas de token a un rango.
+ */
+export async function obtenerMetricasMercadoPago(params?: {
+  desde?: string;
+  hasta?: string;
+}): Promise<MetricasMercadoPago> {
+  const res = await api.get('/pagos/mercadopago/metricas', { params });
+  return extractData<MetricasMercadoPago>(res);
 }
