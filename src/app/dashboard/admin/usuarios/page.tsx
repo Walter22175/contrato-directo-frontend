@@ -85,12 +85,12 @@ export default function AdminUsuariosPage() {
     }
   };
 
-  const quitarRol = async (idUsuarioRol: number, nombreRol: string) => {
-    if (!selectedUser) return;
+  const quitarRol = async (idRol: number, nombreRol: string) => {
+    if (!selectedUser || !idRol) return;
     setGuardandoRol(true);
     setMsg(null);
     try {
-      await api.delete(`/usuarios/${selectedUser.id_usuario}/roles/${idUsuarioRol}`);
+      await api.delete(`/usuarios/${selectedUser.id_usuario}/roles/${idRol}`);
       const res = await api.get<RespuestaApi<Usuario>>(`/usuarios/${selectedUser.id_usuario}`);
       const actualizado = extractData<Usuario>(res);
       if (actualizado) {
@@ -265,7 +265,7 @@ export default function AdminUsuariosPage() {
                     >
                       {ur.rol?.nombre?.replace('_', ' ')}
                       <button
-                        onClick={() => quitarRol(ur.id_usuario_rol, ur.rol?.nombre || '')}
+                        onClick={() => quitarRol(ur.id_rol, ur.rol?.nombre || '')}
                         disabled={guardandoRol}
                         className="hover:text-red-400 transition-colors disabled:opacity-50"
                         title="Quitar rol"
