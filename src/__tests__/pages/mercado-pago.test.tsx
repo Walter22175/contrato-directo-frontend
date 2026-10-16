@@ -31,7 +31,7 @@ describe('MercadoPagoPage', () => {
 
     expect(screen.getByText('Mercado Pago')).toBeInTheDocument();
     expect(screen.getByText('Conectada')).toBeInTheDocument();
-    expect(screen.getByText(/987654/)).toBeInTheDocument();
+    expect(screen.getAllByText(/987654/).length).toBeGreaterThan(0);
     expect(screen.getByText('Cobro directo activo')).toBeInTheDocument();
   });
 
@@ -46,15 +46,30 @@ describe('MercadoPagoPage', () => {
     expect(screen.getByText('Token operativo')).toBeInTheDocument();
   });
 
-  it('muestra la política de retención y liberación', async () => {
+  it('muestra el texto principal de onboarding y las secciones informativas', async () => {
     await act(async () => {
       render(<MercadoPagoPage />);
     });
 
     expect(
-      screen.getByText(/Cómo funciona tu dinero: retención y liberación/),
+      screen.getByText(/podés revocar el acceso cuando quieras/),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText('¿Qué permisos estás otorgando?'),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText('¿Por qué es necesario conectarla?'),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText('¿Qué pasa si no conecto mi cuenta?'),
     ).toBeInTheDocument();
     expect(screen.getByText(/72 horas hábiles/)).toBeInTheDocument();
+    expect(
+      screen.getByText(/No accedemos a tu saldo/),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText(/modo de cobro directo \(marketplace\) queda deshabilitado/),
+    ).toBeInTheDocument();
   });
 
   it('muestra estado no conectada con botón de conectar', async () => {

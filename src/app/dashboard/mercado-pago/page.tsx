@@ -17,6 +17,7 @@ import {
   ShieldAlert,
   Clock,
   Info,
+  KeyRound,
   Loader2,
 } from 'lucide-react';
 import type { EstadoMercadoPagoProveedor } from '@/types';
@@ -91,10 +92,20 @@ export default function MercadoPagoPage() {
         <div>
           <h1 className="text-2xl font-bold text-white">Mercado Pago</h1>
           <p className="text-sm text-slate-400">
-            Conectá tu cuenta de cobro para recibir los pagos directamente
+            Conectá tu cuenta de cobro para recibir los pagos de tus trabajos
+            directamente en ella
           </p>
         </div>
       </div>
+
+      <p className="text-sm text-slate-300 leading-relaxed">
+        Al conectar tu cuenta, los pagos de tus trabajos se acreditán en{' '}
+        <strong className="text-white">tu Mercado Pago</strong>, sin pasar por la
+        cuenta de la plataforma. La conexión usa la autorización oficial de
+        Mercado Pago: nunca pedimos ni guardamos tu contraseña, no vemos tu
+        saldo ni tus movimientos, y podés revocar el acceso cuando quieras
+        desde tu panel.
+      </p>
 
       {error && (
         <div className="bg-red-500/10 border border-red-500/30 text-red-400 text-sm rounded-lg px-4 py-3">
@@ -105,6 +116,7 @@ export default function MercadoPagoPage() {
       {loading ? (
         <div className="h-40 bg-slate-800/50 rounded-xl animate-pulse" />
       ) : (
+        <>
         <div className="grid gap-4 md:grid-cols-2">
           <Card>
             <div className="flex items-start justify-between gap-4">
@@ -206,12 +218,44 @@ export default function MercadoPagoPage() {
               </div>
             )}
           </Card>
+        </div>
 
-          <Card className="md:col-span-2">
+        <div className="grid gap-4 md:grid-cols-3">
+          <Card>
             <div className="flex items-center gap-2">
-              <Info className="w-5 h-5 text-cyan-400" />
+              <KeyRound className="w-5 h-5 text-cyan-400" />
               <h2 className="font-semibold text-white">
-                Cómo funciona tu dinero: retención y liberación
+                ¿Qué permisos estás otorgando?
+              </h2>
+            </div>
+            <ul className="mt-3 space-y-2 text-sm text-slate-300 list-disc list-inside">
+              <li>
+                Identificación de tu cuenta de Mercado Pago
+                <span className="text-slate-500"> (usuario MP #</span>
+                {estado?.mp_user_id || 'n/d'}
+                <span className="text-slate-500">)</span> para saber a qué
+                cuenta acreditar.
+              </li>
+              <li>
+                Creación de preferencias de pago en tu nombre cuando un cliente
+                contrata tus servicios.
+              </li>
+              <li>
+                Captura y cancelación de esos pagos, según el flujo de
+                retención y liberación.
+              </li>
+              <li>
+                No accedemos a tu saldo, a tus movimientos ni a datos
+                personales fuera de la operación de pago.
+              </li>
+            </ul>
+          </Card>
+
+          <Card>
+            <div className="flex items-center gap-2">
+              <ShieldCheck className="w-5 h-5 text-cyan-400" />
+              <h2 className="font-semibold text-white">
+                ¿Por qué es necesario conectarla?
               </h2>
             </div>
             <ul className="mt-3 space-y-2 text-sm text-slate-300 list-disc list-inside">
@@ -222,28 +266,53 @@ export default function MercadoPagoPage() {
                 completó.
               </li>
               <li>
-                Con tu cuenta conectada, la liberación acredita el pago{' '}
-                <strong>directo en tu cuenta de Mercado Pago</strong> (menos la
-                comisión del 8%), dentro de las 24 horas hábiles posteriores a
-                la conformidad del cliente.
+                Si el cliente no da conformidad en{' '}
+                <strong>72 horas hábiles</strong> tras la finalización, la
+                conformidad es automática y el pago se libera igual.
               </li>
               <li>
-                Si el cliente no da conformidad en <strong>72 horas hábiles</strong>{' '}
-                tras la finalización, la conformidad es automática y el pago se
-                libera igual.
+                Si el cliente rechaza el trabajo, el pago se cancela o se
+                resuelve por mediación antes de liberarse: nadie pierde fondos
+                sin revisión.
               </li>
               <li>
-                Si hay una disputa, el monto disputado queda retenido hasta la
-                resolución de mediación; el resto se libera normalmente.
+                Con la cuenta conectada, la liberación acredita directo en tu
+                cuenta (menos la comisión del 8%), dentro de las 24 horas
+                hábiles posteriores a la conformidad, con transparencia para
+                ambas partes.
+              </li>
+            </ul>
+          </Card>
+
+          <Card>
+            <div className="flex items-center gap-2">
+              <Info className="w-5 h-5 text-cyan-400" />
+              <h2 className="font-semibold text-white">
+                ¿Qué pasa si no conecto mi cuenta?
+              </h2>
+            </div>
+            <ul className="mt-3 space-y-2 text-sm text-slate-300 list-disc list-inside">
+              <li>
+                No podés recibir los pagos de tus trabajos directamente en tu
+                cuenta de Mercado Pago.
               </li>
               <li>
-                Los pagos de trabajos contratados antes de conectar tu cuenta se
-                acreditan como hasta ahora, en la cuenta de la plataforma, con
-                los mismos plazos.
+                La plataforma sigue operando en modo tradicional: los fondos se
+                abonan desde la cuenta de Contrato Directo con los mismos
+                plazos de siempre.
+              </li>
+              <li>
+                El modo de cobro directo (marketplace) queda deshabilitado
+                hasta que conectes tu cuenta y el equipo la habilite.
+              </li>
+              <li>
+                Los pagos de trabajos contratados antes de conectar la cuenta se
+                acreditan como hasta ahora, en la cuenta de la plataforma.
               </li>
             </ul>
           </Card>
         </div>
+        </>
       )}
     </div>
   );
