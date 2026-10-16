@@ -2,7 +2,7 @@
 
 import { Card } from '@/components/ui/Card';
 import Link from 'next/link';
-import { Shield, CheckCircle, ArrowLeft, Clock, RotateCcw, Lock, DollarSign, RefreshCw } from 'lucide-react';
+import { Shield, CheckCircle, ArrowLeft, ArrowRight, Clock, RotateCcw, Lock, DollarSign, RefreshCw } from 'lucide-react';
 
 export default function PagosSegurosPage() {
   return (
@@ -154,7 +154,14 @@ export default function PagosSegurosPage() {
             </div>
           </Card>
 
-          <div className="text-center">
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+            <Link
+              href="/ayuda/retencion-liberacion"
+              className="inline-flex items-center gap-2 text-cyan-400 hover:text-cyan-300"
+            >
+              Ver condiciones de retención, liberación y cancelación
+              <ArrowRight className="w-4 h-4" />
+            </Link>
             <Link href="/ayuda" className="inline-flex items-center gap-2 text-cyan-400 hover:text-cyan-300">
               <ArrowLeft className="w-4 h-4" />
               Volver al Centro de Ayuda
