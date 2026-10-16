@@ -594,3 +594,23 @@ export interface UpdatePromocionDto {
   fecha_inicio?: string;
   fecha_fin?: string;
 }
+
+export interface EstadoMercadoPagoProveedor {
+  conectado: boolean;
+  mp_user_id: string | null;
+  mp_scopes: string | null;
+  mp_token_expires_at: string | null;
+  marketplace_habilitado: boolean;
+  token_valido: boolean | null;
+  ultimo_error_token: string | null;
+}
+
+export interface ConexionMercadoPago {
+  url: string;
+  state: string;
+}
+
+export interface ResultadoCallbackMercadoPago {
+  ok: boolean;
+  mp_user_id: string | null;
+}

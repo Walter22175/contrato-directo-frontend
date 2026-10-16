@@ -28,6 +28,7 @@ import {
   Image as ImageIcon,
   Briefcase,
   LogOut,
+  Wallet,
 } from 'lucide-react';
 import { LlaveIcon } from '@/components/ui/LlaveIcon';
 
@@ -54,6 +55,7 @@ const providerLinks = [
   { href: '/dashboard/contratos', label: 'Contratos', icon: FileText },
   { href: '/dashboard/documentos', label: 'Documentos', icon: FileText },
   { href: '/dashboard/valoraciones', label: 'Valoraciones', icon: LlaveIcon },
+  { href: '/dashboard/mercado-pago', label: 'Mercado Pago', icon: Wallet },
   { href: '/dashboard/reclamos', label: 'Reclamos', icon: AlertTriangle },
   { href: '/dashboard/notificaciones', label: 'Notificaciones', icon: Bell },
   { href: '/dashboard/tickets', label: 'Soporte', icon: MessageSquare },

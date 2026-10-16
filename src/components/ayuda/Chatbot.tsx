@@ -144,7 +144,19 @@ const INTENCIONES: Intencion[] = [
     id: 'liberacion_pago',
     keywords: ['liberacion', 'conformidad', 'cuando cobra', 'cuando me pagan', 'liberar'],
     frases: ['cuando se libera el pago', 'cuando recibo el dinero'],
-    respuesta: 'El pago se libera al proveedor **24 horas hábiles** después de tu conformidad. Si no das conformidad explícita en **72 horas hábiles**, se considera automática y se libera igual. Para proyectos extensos, se libera por **hitos**.',
+    respuesta: 'El pago se libera al proveedor **24 horas hábiles** después de tu conformidad. Si no das conformidad explícita en **72 horas hábiles**, se considera automática y se libera igual. Para proyectos extensos, se libera por **hitos**. Si el proveedor conectó su cuenta de Mercado Pago, la acreditación es **directa en su cuenta** (menos la comisión del 8%); sin conexión, se acredita en la cuenta de la plataforma con los mismos plazos.',
+  },
+  {
+    id: 'conexion_mercadopago',
+    keywords: ['conectar', 'conexion', 'cuenta de cobro', 'cuenta propia', 'vincular', 'onboarding', 'cobrar directo'],
+    frases: ['como conecto mi cuenta de mercadopago', 'quiero cobrar en mi cuenta', 'como vinculo mercadopago'],
+    respuesta: 'Los proveedores pueden conectar su propia cuenta de Mercado Pago desde [Mercado Pago](/dashboard/mercado-pago) en el panel. El proceso usa autorización oficial de Mercado Pago (no pedimos tu contraseña): te redirigimos, autorizás y volvés al panel. Al conectarla, los pagos liberados se acreditan **directo en tu cuenta** (menos la comisión del 8%). Los tokens se renuevan solos; si se vencen, la plataforma usa temporalmente su cuenta y te avisamos.',
+  },
+  {
+    id: 'falla_conexion_mp',
+    keywords: ['no conecta', 'error conexion', 'token', 'revocado', 'cuenta invalida', 'no recibo mercadopago'],
+    frases: ['me da error al conectar mercadopago', 'mi cuenta de mercadopago no funciona', 'token invalido'],
+    respuesta: 'Si la conexión falla: **(1)** el mensaje "Onboarding no configurado" es interno de la plataforma —contactá soporte—; **(2)** "Mercado Pago rechazó la autorización" suele ser porque la sesión de MP abierta es de otra cuenta: cerrá sesión en mercadopago.com y volvé a intentar; **(3)** si el panel muestra "Token con problemas", volvé a conectar tu cuenta desde [Mercado Pago](/dashboard/mercado-pago). Mientras tanto tus pagos no se frenan: se acreditan temporalmente en la cuenta de la plataforma.',
   },
   {
     id: 'pagos_parcelados',

@@ -421,8 +421,11 @@ export default function TransaccionesPage() {
               <div className="bg-slate-800/50 border border-slate-700 rounded-lg p-3 text-xs text-slate-400">
                 Monto en custodia: <span className="text-white font-semibold">{formatCurrency(txModal.monto_acordado)}</span>.
                 Al confirmar, el pago se libera al proveedor en 24 horas hábiles
-                (se deduce la comisión del 8%). Si el trabajo está incompleto, indicá un
-                porcentaje menor a 100: esa parte queda retenida y se abre una disputa.
+                (se deduce la comisión del 8%). Si el proveedor conectó su cuenta de
+                Mercado Pago, la acreditación es directa en esa cuenta; si no, queda
+                disponible en la plataforma con los mismos plazos. Si el trabajo está
+                incompleto, indicá un porcentaje menor a 100: esa parte queda
+                retenida y se abre una disputa.
               </div>
 
               <div>
