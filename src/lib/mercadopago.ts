@@ -1,6 +1,7 @@
 import api, { extractData } from './api';
 import type {
   ConexionMercadoPago,
+  DashboardMercadoPagoProveedor,
   EstadoMercadoPagoProveedor,
   ResultadoCallbackMercadoPago,
 } from '@/types';
@@ -14,6 +15,16 @@ export async function obtenerEstadoMercadoPago(
 ): Promise<EstadoMercadoPagoProveedor> {
   const res = await api.get(`/proveedores/${idProveedor}/mercadopago/estado`);
   return extractData<EstadoMercadoPagoProveedor>(res);
+}
+
+/** Pagos en curso, retenciones y alertas del proveedor (dashboard). */
+export async function obtenerDashboardMercadoPago(
+  idProveedor: string,
+): Promise<DashboardMercadoPagoProveedor> {
+  const res = await api.get(
+    `/proveedores/${idProveedor}/mercadopago/dashboard`,
+  );
+  return extractData<DashboardMercadoPagoProveedor>(res);
 }
 
 export async function iniciarConexionMercadoPago(

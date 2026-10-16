@@ -614,3 +614,44 @@ export interface ResultadoCallbackMercadoPago {
   ok: boolean;
   mp_user_id: string | null;
 }
+
+export type EstadoCronRetencionMp =
+  | 'a_la_espera_de_entrega'
+  | 'en_plazo'
+  | 'pendiente_de_captura'
+  | 'captura_encolada'
+  | 'capturado';
+
+export interface RetencionDashboardMp {
+  id_pago: string;
+  monto: number;
+  mp_status: string;
+  entrega_proveedor_at: string | null;
+  liberacion_estimada: string | null;
+  minutos_habiles_restantes: number | null;
+  estado_cron: EstadoCronRetencionMp;
+}
+
+export type TipoAlertaDashboardMp =
+  | 'token_invalido'
+  | 'marketplace_deshabilitado'
+  | 'captura_demorada'
+  | 'operacion_fallida';
+
+export interface AlertaDashboardMp {
+  tipo: TipoAlertaDashboardMp;
+  mensaje: string;
+}
+
+export interface DashboardMercadoPagoProveedor {
+  generado_en: string;
+  pagos_en_curso: {
+    autorizados: number;
+    retenidos: number;
+    capturados: number;
+    cancelados: number;
+    auto_capturas_programadas: number;
+  };
+  retenciones: RetencionDashboardMp[];
+  alertas: AlertaDashboardMp[];
+}

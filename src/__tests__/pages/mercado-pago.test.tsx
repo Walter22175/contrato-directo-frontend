@@ -16,44 +16,173 @@ const estadoConectado = {
   ultimo_error_token: null,
 };
 
+const dashboardOk = {
+  generado_en: '2026-10-14T15:00:00Z',
+  pagos_en_curso: {
+    autorizados: 2,
+    retenidos: 1,
+    capturados: 5,
+    cancelados: 0,
+    auto_capturas_programadas: 1,
+  },
+  retenciones: [
+    {
+      id_pago: 'p1',
+      monto: 15000,
+      mp_status: 'authorized',
+      entrega_proveedor_at: '2026-10-13T13:00:00Z',
+      liberacion_estimada: '2026-10-16T13:00:00Z',
+      minutos_habiles_restantes: 600,
+      estado_cron: 'en_plazo',
+    },
+  ],
+  alertas: [],
+};
+
+const mockear = (
+  estado: unknown,
+  dashboard: unknown = dashboardOk,
+) => {
+  (api.get as jest.Mock).mockImplementation((url: string) => {
+    if (url.includes('/mercadopago/dashboard')) {
+      return Promise.resolve({
+        data: { statusCode: 200, timestamp: '', data: dashboard },
+      });
+    }
+    return Promise.resolve({
+      data: { statusCode: 200, timestamp: '', data: estado },
+    });
+  });
+};
+
 describe('MercadoPagoPage', () => {
   beforeEach(() => {
     jest.clearAllMocks();
-    (api.get as jest.Mock).mockResolvedValue({
-      data: { statusCode: 200, timestamp: '', data: estadoConectado },
-    });
   });
 
-  it('muestra el título y el estado de conexión', async () => {
+  it('muestra el semáforo verde y el estado de conexión', async () => {
+    mockear(estadoConectado);
     await act(async () => {
       render(<MercadoPagoPage />);
     });
 
     expect(screen.getByText('Mercado Pago')).toBeInTheDocument();
+    expect(screen.getByText('Todo operativo')).toBeInTheDocument();
     expect(screen.getByText('Conectada')).toBeInTheDocument();
     expect(screen.getAllByText(/987654/).length).toBeGreaterThan(0);
-    expect(screen.getByText('Cobro directo activo')).toBeInTheDocument();
+    expect(screen.getByText('Habilitado')).toBeInTheDocument();
+    expect(screen.getByText('Operativo')).toBeInTheDocument();
   });
 
-  it('muestra el botón de reconectar y el estado del token', async () => {
+  it('muestra la conexión activa sin botón cuando todo está OK', async () => {
+    mockear(estadoConectado);
     await act(async () => {
       render(<MercadoPagoPage />);
     });
 
     expect(
-      screen.getByRole('button', { name: /volver a conectar/i }),
+      screen.getByText(/Conexión activa — el token se renueva solo/),
     ).toBeInTheDocument();
-    expect(screen.getByText('Token operativo')).toBeInTheDocument();
+    expect(
+      screen.queryByRole('button', { name: /conectar mercado pago/i }),
+    ).not.toBeInTheDocument();
   });
 
-  it('muestra el texto principal de onboarding y las secciones informativas', async () => {
+  it('muestra semáforo ámbar cuando no está habilitado el marketplace', async () => {
+    mockear(
+      { ...estadoConectado, marketplace_habilitado: false },
+      {
+        ...dashboardOk,
+        alertas: [
+          {
+            tipo: 'marketplace_deshabilitado',
+            mensaje:
+              'Tu cuenta está conectada pero el cobro directo aún no está habilitado: los pagos se abonan desde la cuenta de la plataforma.',
+          },
+        ],
+      },
+    );
     await act(async () => {
       render(<MercadoPagoPage />);
     });
 
     expect(
-      screen.getByText(/podés revocar el acceso cuando quieras/),
+      screen.getByText('Conectada — cobro directo pendiente'),
     ).toBeInTheDocument();
+    expect(screen.getByText('Pendiente de habilitar')).toBeInTheDocument();
+    expect(
+      screen.getByText(/cobro directo aún no está habilitado/),
+    ).toBeInTheDocument();
+  });
+
+  it('muestra semáforo rojo, alerta de token y botón de reconectar', async () => {
+    mockear(
+      {
+        ...estadoConectado,
+        token_valido: false,
+        ultimo_error_token: 'invalid_token',
+      },
+      {
+        ...dashboardOk,
+        alertas: [
+          {
+            tipo: 'token_invalido',
+            mensaje:
+              'Tu conexión con Mercado Pago tiene problemas (invalid_token). Volvé a conectar tu cuenta.',
+          },
+        ],
+      },
+    );
+    await act(async () => {
+      render(<MercadoPagoPage />);
+    });
+
+    expect(screen.getByText('Requiere atención')).toBeInTheDocument();
+    expect(screen.getByText('Con problemas')).toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: /reconectar con mercado pago/i }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText(/Volvé a conectar tu cuenta/),
+    ).toBeInTheDocument();
+  });
+
+  it('muestra los contadores de pagos en curso', async () => {
+    mockear(estadoConectado);
+    await act(async () => {
+      render(<MercadoPagoPage />);
+    });
+
+    expect(screen.getByText('Pagos en curso')).toBeInTheDocument();
+    expect(screen.getByText('Autorizados')).toBeInTheDocument();
+    expect(screen.getByText('Retenidos')).toBeInTheDocument();
+    expect(screen.getByText('Capturados')).toBeInTheDocument();
+    expect(screen.getByText('Cancelados')).toBeInTheDocument();
+    expect(screen.getByText('Auto-capturas')).toBeInTheDocument();
+    expect(screen.getByText('2')).toBeInTheDocument();
+    expect(screen.getByText('5')).toBeInTheDocument();
+  });
+
+  it('muestra las retenciones con tiempo hábil restante y estado del cron', async () => {
+    mockear(estadoConectado);
+    await act(async () => {
+      render(<MercadoPagoPage />);
+    });
+
+    expect(
+      screen.getByText('Retenciones y liberaciones'),
+    ).toBeInTheDocument();
+    expect(screen.getByText(/\$\s?15\.000/)).toBeInTheDocument();
+    expect(screen.getByText(/10 h 0 min/)).toBeInTheDocument();
+    expect(screen.getByText('En plazo')).toBeInTheDocument();
+  });
+
+  it('muestra las secciones informativas', async () => {
+    mockear(estadoConectado);
+    await act(async () => {
+      render(<MercadoPagoPage />);
+    });
+
     expect(
       screen.getByText('¿Qué permisos estás otorgando?'),
     ).toBeInTheDocument();
@@ -63,39 +192,29 @@ describe('MercadoPagoPage', () => {
     expect(
       screen.getByText('¿Qué pasa si no conecto mi cuenta?'),
     ).toBeInTheDocument();
-    expect(screen.getByText(/72 horas hábiles/)).toBeInTheDocument();
+    expect(screen.getAllByText(/72 horas hábiles/).length).toBeGreaterThan(0);
     expect(
       screen.getByText(/No accedemos a tu saldo/),
-    ).toBeInTheDocument();
-    expect(
-      screen.getByText(/modo de cobro directo \(marketplace\) queda deshabilitado/),
     ).toBeInTheDocument();
   });
 
   it('muestra estado no conectada con botón de conectar', async () => {
-    (api.get as jest.Mock).mockResolvedValue({
-      data: {
-        statusCode: 200,
-        timestamp: '',
-        data: {
-          conectado: false,
-          mp_user_id: null,
-          mp_scopes: null,
-          mp_token_expires_at: null,
-          marketplace_habilitado: false,
-          token_valido: null,
-          ultimo_error_token: null,
-        },
-      },
+    mockear({
+      conectado: false,
+      mp_user_id: null,
+      mp_scopes: null,
+      mp_token_expires_at: null,
+      marketplace_habilitado: false,
+      token_valido: null,
+      ultimo_error_token: null,
     });
-
     await act(async () => {
       render(<MercadoPagoPage />);
     });
 
-    expect(screen.getByText('No conectada')).toBeInTheDocument();
+    expect(screen.getAllByText('No conectada').length).toBeGreaterThan(0);
     expect(
-      screen.getByRole('button', { name: /conectar con mercado pago/i }),
+      screen.getByRole('button', { name: /conectar mercado pago/i }),
     ).toBeInTheDocument();
   });
 });
