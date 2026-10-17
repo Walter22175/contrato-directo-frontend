@@ -22,8 +22,8 @@ describe('ComienzoDelServicioPage', () => {
       render(<ComienzoDelServicioPage />);
     });
     expect(
-      screen.getByText(/el inicio efectivo es la/i),
-    ).toBeInTheDocument();
+      screen.getAllByText(/el inicio efectivo es la/i).length,
+    ).toBeGreaterThanOrEqual(1);
     expect(
       screen.getAllByText(/segunda notificación/i).length,
     ).toBeGreaterThanOrEqual(1);
@@ -59,6 +59,27 @@ describe('ComienzoDelServicioPage', () => {
     ).toBeInTheDocument();
     expect(
       screen.getByText(/el administrador puede forzar el inicio/i),
+    ).toBeInTheDocument();
+  });
+
+  it('incluye las condiciones legales del comienzo notificado y la liberación anticipada', async () => {
+    await act(async () => {
+      render(<ComienzoDelServicioPage />);
+    });
+    expect(
+      screen.getByRole('heading', { name: /comienzo notificado/i }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole('heading', { name: /liberación anticipada del 30%/i }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole('heading', { name: /^resto del pago$/i }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText(/nunca puede superar el 100% del monto total/i),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText(/complementando los términos y condiciones/i),
     ).toBeInTheDocument();
   });
 });
