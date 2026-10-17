@@ -229,6 +229,27 @@ export default function TransaccionesPage() {
             const esCliente = !!user && t.id_cliente === user.id_usuario;
             const esProveedor = !!user && t.id_proveedor === user.id_usuario;
             const busy = ocupado(t.id_transaccion);
+            const yaNotifiqueInicio =
+              (esCliente && !!t.fecha_inicio_servicio_cliente) ||
+              (esProveedor && !!t.fecha_inicio_servicio_proveedor);
+            const inicioConfirmado = !!t.fecha_inicio_servicio_at;
+            const inicioSinConfirmar =
+              t.estado === 'en_custodia' &&
+              !t.fecha_fin_servicio &&
+              !inicioConfirmado &&
+              (!!t.fecha_inicio_servicio_cliente ||
+                !!t.fecha_inicio_servicio_proveedor);
+            const liberacionAnticipadaEstimada = t.fecha_inicio_servicio_at
+              ? new Date(
+                  new Date(t.fecha_inicio_servicio_at).getTime() +
+                    72 * 60 * 60 * 1000,
+                )
+              : null;
+            const duracionSuperaTresDias =
+              t.fecha_fin_estimada && liberacionAnticipadaEstimada
+                ? new Date(t.fecha_fin_estimada) >
+                  liberacionAnticipadaEstimada
+                : false;
 
             return (
               <Card key={t.id_transaccion}>
@@ -264,6 +285,16 @@ export default function TransaccionesPage() {
                             Conformidad parcial: {t.conformidad_porcentaje}%
                           </span>
                         )}
+                      {t.fecha_inicio_servicio_at && (
+                        <span className="text-cyan-400/80">
+                          Inicio del servicio: {formatDate(t.fecha_inicio_servicio_at)}
+                        </span>
+                      )}
+                      {t.fecha_liberacion_anticipada_at && (
+                        <span className="text-green-400/80">
+                          30% anticipado: {formatDate(t.fecha_liberacion_anticipada_at)}
+                        </span>
+                      )}
                     </div>
                   </div>
                   <div className="text-right">
@@ -325,6 +356,58 @@ export default function TransaccionesPage() {
                       Esperando el pago del cliente…
                     </span>
                   )}
+
+                  {t.estado === 'en_custodia' &&
+                    !t.fecha_fin_servicio &&
+                    !yaNotifiqueInicio &&
+                    (esCliente || esProveedor) && (
+                      <Button
+                        size="sm"
+                        disabled={busy}
+                        onClick={() =>
+                          accion(
+                            t.id_transaccion,
+                            'post',
+                            `/transacciones/${t.id_transaccion}/inicio-servicio`,
+                            undefined,
+                            'Comienzo notificado. Cuando ambas partes confirmen, inicia el conteo para la liberación anticipada del 30% (servicios mayores a 3 días).',
+                          )
+                        }
+                      >
+                        {busy ? <Loader2 className="w-4 h-4 mr-1 animate-spin" /> : <Handshake className="w-4 h-4 mr-1" />}
+                        {inicioSinConfirmar
+                          ? 'Confirmar comienzo del servicio'
+                          : 'Notificar comienzo del servicio'}
+                      </Button>
+                    )}
+
+                  {t.estado === 'en_custodia' &&
+                    !t.fecha_fin_servicio &&
+                    inicioSinConfirmar &&
+                    yaNotifiqueInicio && (
+                      <span className="text-xs text-slate-400 self-center">
+                        Comienzo notificado — esperando la confirmación de la
+                        otra parte…
+                      </span>
+                    )}
+
+                  {t.estado === 'en_custodia' &&
+                    inicioConfirmado &&
+                    !t.fecha_liberacion_anticipada_at && (
+                      <span className="text-xs text-slate-400 self-center">
+                        Servicio iniciado el {formatDate(t.fecha_inicio_servicio_at!)}
+                        {duracionSuperaTresDias && liberacionAnticipadaEstimada && (
+                          <>
+                            {' '}
+                            — el 30% se liberará el{' '}
+                            {formatDate(
+                              liberacionAnticipadaEstimada.toISOString(),
+                            )}{' '}
+                            en horario bancario
+                          </>
+                        )}
+                      </span>
+                    )}
 
                   {t.estado === 'en_custodia' && !t.fecha_fin_servicio && esProveedor && (
                     <Button

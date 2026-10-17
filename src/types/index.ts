@@ -133,6 +133,18 @@ export interface Transaccion {
   fecha_liberacion?: string | null;
   monto_liberado?: number | null;
   fondos_retenidos?: boolean;
+  fecha_inicio_servicio_cliente?: string | null;
+  fecha_inicio_servicio_proveedor?: string | null;
+  fecha_inicio_servicio_at?: string | null;
+  fecha_liberacion_anticipada_at?: string | null;
+  fecha_fin_estimada?: string | null;
+}
+
+export interface EstadoInicioServicio {
+  fecha_inicio_servicio_cliente: string | null;
+  fecha_inicio_servicio_proveedor: string | null;
+  fecha_inicio_servicio_at: string | null;
+  fecha_liberacion_anticipada_estimada: string | null;
 }
 
 export interface Contrato {
