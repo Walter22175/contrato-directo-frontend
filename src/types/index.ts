@@ -676,6 +676,43 @@ export interface AlertaCuentaMercadoPago {
   marketplace_habilitado: boolean;
 }
 
+export interface AlertaInicioServicio {
+  id_transaccion: string;
+  detalle: string;
+}
+
+export interface MetricasInicioServicio {
+  generado_en: string;
+  inicio_servicio: {
+    solo_notificacion: number;
+    ambas_notificaciones: number;
+    inicio_forzado: number;
+    tiempo_promedio_entre_notificaciones_horas: number | null;
+  };
+  anticipo: {
+    liberados: number;
+    pendientes: number;
+    no_aplicables: number;
+    monto_bruto_total: number;
+    monto_neto_total: number;
+    monto_descontado_en_liberaciones: number;
+  };
+  cron: {
+    ultima_ejecucion: string;
+    proxima_ejecucion: string;
+    candidatas: number;
+    liberadas: number;
+    excluidas_hitos: number;
+    excluidas_retencion: number;
+  };
+  alertas: {
+    solo_notificacion_72h: AlertaInicioServicio[];
+    demorados_por_horario: AlertaInicioServicio[];
+    inconsistencias: AlertaInicioServicio[];
+  };
+  salud: 'saludable' | 'atencion' | 'critico';
+}
+
 export interface SerieDiariaPagoMp {
   fecha: string;
   creados: number;

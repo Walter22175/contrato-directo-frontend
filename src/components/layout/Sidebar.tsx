@@ -75,6 +75,7 @@ const adminLinks = [
   { href: '/dashboard/admin/reportes', label: 'Reportes', icon: BarChart3 },
   { href: '/dashboard/admin/reportes/trimestral', label: 'Reporte Trimestral', icon: FileBarChart },
   { href: '/dashboard/admin/metricas', label: 'Métricas de Atención', icon: Activity },
+  { href: '/dashboard/admin/inicio-servicio', label: 'Anticipo 30%', icon: Handshake },
   { href: '/dashboard/admin/agentes', label: 'Agentes de Soporte', icon: UserCheck },
   { href: '/dashboard/sla', label: 'Gestión SLA', icon: Clock },
   { href: '/dashboard/reclamos', label: 'Reclamos', icon: AlertTriangle },

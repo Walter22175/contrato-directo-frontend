@@ -3,6 +3,7 @@ import type {
   ConexionMercadoPago,
   DashboardMercadoPagoProveedor,
   EstadoMercadoPagoProveedor,
+  MetricasInicioServicio,
   MetricasMercadoPago,
   ResultadoCallbackMercadoPago,
 } from '@/types';
@@ -58,4 +59,16 @@ export async function obtenerMetricasMercadoPago(params?: {
 }): Promise<MetricasMercadoPago> {
   const res = await api.get('/pagos/mercadopago/metricas', { params });
   return extractData<MetricasMercadoPago>(res);
+}
+
+/**
+ * Métricas del flujo de comienzo notificado y liberación anticipada del 30%
+ * para el panel admin (solo super admin). `desde`/`hasta` en ISO 8601.
+ */
+export async function obtenerMetricasInicioServicio(params?: {
+  desde?: string;
+  hasta?: string;
+}): Promise<MetricasInicioServicio> {
+  const res = await api.get('/pagos/inicio-servicio/metricas', { params });
+  return extractData<MetricasInicioServicio>(res);
 }
