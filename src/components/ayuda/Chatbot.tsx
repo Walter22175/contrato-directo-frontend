@@ -147,6 +147,12 @@ const INTENCIONES: Intencion[] = [
     respuesta: 'El pago se libera al proveedor **24 horas hábiles** después de tu conformidad. Si no das conformidad explícita en **72 horas hábiles**, se considera automática y se libera igual. Para proyectos extensos, se libera por **hitos**. Si el proveedor conectó su cuenta de Mercado Pago, la acreditación es **directa en su cuenta** (menos la comisión del 8%); sin conexión, se acredita en la cuenta de la plataforma con los mismos plazos.',
   },
   {
+    id: 'inicio_servicio',
+    keywords: ['inicio', 'comienzo', 'empezo', 'empezó', 'notificar inicio', 'anticipo', '30%', 'liberacion anticipada'],
+    frases: ['como aviso que el servicio empezo', 'que es el anticipo del 30%', 'cuando se libera el 30'],
+    respuesta: 'Para servicios de más de **3 días**, cliente y proveedor notifican el comienzo desde [Mis Transacciones](/dashboard/transacciones). El inicio efectivo es la **segunda notificación** y a las **72 horas calendario** se libera el **30%** al proveedor, en horario bancario hábil. El resto sigue igual: se libera con la conformidad o **72 horas hábiles** después. Si nadie notifica, no hay anticipo y el flujo normal sigue funcionando. Detalle en [Comienzo del servicio](/ayuda/comienzo-del-servicio).',
+  },
+  {
     id: 'conexion_mercadopago',
     keywords: ['conectar', 'conexion', 'cuenta de cobro', 'cuenta propia', 'vincular', 'onboarding', 'cobrar directo'],
     frases: ['como conecto mi cuenta de mercadopago', 'quiero cobrar en mi cuenta', 'como vinculo mercadopago'],

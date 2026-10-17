@@ -162,6 +162,13 @@ export default function PagosSegurosPage() {
               Ver condiciones de retención, liberación y cancelación
               <ArrowRight className="w-4 h-4" />
             </Link>
+            <Link
+              href="/ayuda/comienzo-del-servicio"
+              className="inline-flex items-center gap-2 text-cyan-400 hover:text-cyan-300"
+            >
+              Comienzo del servicio y anticipo del 30%
+              <ArrowRight className="w-4 h-4" />
+            </Link>
             <Link href="/ayuda" className="inline-flex items-center gap-2 text-cyan-400 hover:text-cyan-300">
               <ArrowLeft className="w-4 h-4" />
               Volver al Centro de Ayuda

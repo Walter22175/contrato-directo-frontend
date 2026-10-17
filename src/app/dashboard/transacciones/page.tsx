@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import { Card, CardTitle } from '@/components/ui/Card';
 import Button from '@/components/ui/Button';
 import api, { extractData } from '@/lib/api';
@@ -178,6 +179,30 @@ export default function TransaccionesPage() {
           Ofertas, pagos en custodia y conformidad del servicio
         </p>
       </div>
+
+      {transacciones.some((t) => t.estado === 'en_custodia') && (
+        <Card className="mb-6">
+          <div className="p-4">
+            <p className="text-sm text-slate-300 leading-relaxed">
+              <strong className="text-white">
+                ¿Cómo funciona el comienzo del servicio?
+              </strong>{' '}
+              Cliente y proveedor notifican cuando el trabajo empieza; el
+              inicio efectivo es la <strong>segunda notificación</strong>. A
+              las <strong>72 horas calendario</strong> desde ese inicio se
+              libera automáticamente el <strong>30%</strong> al proveedor (en
+              horario bancario hábil). El resto del pago se libera con la
+              conformidad, como siempre.{' '}
+              <Link
+                href="/ayuda/comienzo-del-servicio"
+                className="text-cyan-400 hover:text-cyan-300"
+              >
+                Saber más
+              </Link>
+            </p>
+          </div>
+        </Card>
+      )}
 
       {msg && (
         <div

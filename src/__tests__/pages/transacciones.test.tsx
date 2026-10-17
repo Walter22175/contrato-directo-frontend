@@ -79,6 +79,23 @@ describe('TransaccionesPage', () => {
     expect(
       screen.getByRole('button', { name: /notificar comienzo del servicio/i }),
     ).toBeInTheDocument();
+    expect(
+      screen.getByText(/¿cómo funciona el comienzo del servicio\?/i),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole('link', { name: /saber más/i }),
+    ).toBeInTheDocument();
+  });
+
+  it('no muestra el banner informativo sin transacciones en custodia', async () => {
+    mockearLista([]);
+    await act(async () => {
+      render(<TransaccionesPage />);
+    });
+
+    expect(
+      screen.queryByText(/¿cómo funciona el comienzo del servicio\?/i),
+    ).not.toBeInTheDocument();
   });
 
   it('muestra espera de la otra parte cuando el cliente ya notificó el inicio', async () => {
