@@ -34,7 +34,7 @@ describe('AdminUsuariosPage', () => {
     expect(screen.getByPlaceholderText('Buscar por nombre, apellido o email...')).toBeInTheDocument();
   });
 
-  it('quita un rol enviando id_rol (no id_usuario_rol) al endpoint', async () => {
+  it('quita un rol enviando id_rol (no id_usuario_rol) al endpoint, tras confirmar', async () => {
     const usuario = {
       id_usuario: 'u-1',
       email: 'ana@test.com',
@@ -82,9 +82,142 @@ describe('AdminUsuariosPage', () => {
       fireEvent.click(botonQuitar);
     });
 
+    // La acción NO se ejecuta hasta confirmar en el diálogo
+    expect(api.delete).not.toHaveBeenCalled();
+
+    const confirmar = await screen.findByTestId('confirm-accept');
+    expect(
+      screen.getByText(/¿Estás seguro de que querés quitar el rol "sistemas" a Ana Lopez\?/),
+    ).toBeInTheDocument();
+    await act(async () => {
+      fireEvent.click(confirmar);
+    });
+
     await waitFor(() => {
       expect(api.delete).toHaveBeenCalledWith('/usuarios/u-1/roles/5');
     });
     expect(api.delete).not.toHaveBeenCalledWith('/usuarios/u-1/roles/999');
+  });
+
+  it('al cancelar en el diálogo no se quita el rol', async () => {
+    const usuario = {
+      id_usuario: 'u-1',
+      email: 'ana@test.com',
+      nombre: 'Ana',
+      apellido: 'Lopez',
+      tipo_persona: 'fisica',
+      estado: 'activo',
+      email_verificado: true,
+      fecha_registro: '2026-01-01T00:00:00Z',
+      usuario_roles: [
+        {
+          id_usuario_rol: 999,
+          id_usuario: 'u-1',
+          id_rol: 5,
+          activo: true,
+          rol: { id_rol: 5, nombre: 'sistemas' },
+        },
+      ],
+    };
+
+    (api.get as jest.Mock).mockImplementation((url: string) => {
+      if (url === '/roles') {
+        return Promise.resolve({
+          data: { statusCode: 200, timestamp: '', data: [{ id_rol: 5, nombre: 'sistemas' }] },
+        });
+      }
+      if (url === '/usuarios/u-1') {
+        return Promise.resolve({
+          data: { statusCode: 200, timestamp: '', data: usuario },
+        });
+      }
+      return Promise.resolve({
+        data: { statusCode: 200, timestamp: '', data: { data: [usuario], meta: { total: 1 } } },
+      });
+    });
+
+    await act(async () => {
+      render(<AdminUsuariosPage />);
+    });
+
+    fireEvent.click(await screen.findByText('Ana Lopez'));
+    await act(async () => {
+      fireEvent.click(await screen.findByTitle('Quitar rol'));
+    });
+
+    const cancelar = await screen.findByTestId('confirm-cancel');
+    await act(async () => {
+      fireEvent.click(cancelar);
+    });
+
+    expect(api.delete).not.toHaveBeenCalled();
+    await waitFor(() => {
+      expect(screen.queryByTestId('confirm-accept')).not.toBeInTheDocument();
+    });
+  });
+
+  it('pide confirmación antes de asignar un rol', async () => {
+    const usuario = {
+      id_usuario: 'u-1',
+      email: 'ana@test.com',
+      nombre: 'Ana',
+      apellido: 'Lopez',
+      tipo_persona: 'fisica',
+      estado: 'activo',
+      email_verificado: true,
+      fecha_registro: '2026-01-01T00:00:00Z',
+      usuario_roles: [],
+    };
+
+    (api.get as jest.Mock).mockImplementation((url: string) => {
+      if (url === '/roles') {
+        return Promise.resolve({
+          data: {
+            statusCode: 200,
+            timestamp: '',
+            data: [{ id_rol: 7, nombre: 'mediador' }],
+          },
+        });
+      }
+      if (url === '/usuarios/u-1') {
+        return Promise.resolve({
+          data: { statusCode: 200, timestamp: '', data: usuario },
+        });
+      }
+      return Promise.resolve({
+        data: { statusCode: 200, timestamp: '', data: { data: [usuario], meta: { total: 1 } } },
+      });
+    });
+
+    await act(async () => {
+      render(<AdminUsuariosPage />);
+    });
+
+    fireEvent.click(await screen.findByText('Ana Lopez'));
+
+    const select = await screen.findByRole('combobox');
+    await act(async () => {
+      fireEvent.change(select, { target: { value: 'mediador' } });
+    });
+
+    await act(async () => {
+      fireEvent.click(screen.getByText('Asignar'));
+    });
+
+    // Aún no se ejecuta: aparece el diálogo de confirmación
+    expect(api.post).not.toHaveBeenCalled();
+    expect(
+      screen.getByText(/¿Estás seguro de que querés asignar el rol "mediador" a Ana Lopez\?/),
+    ).toBeInTheDocument();
+
+    await act(async () => {
+      fireEvent.click(screen.getByTestId('confirm-accept'));
+    });
+
+    await waitFor(() => {
+      expect(api.post).toHaveBeenCalledWith('/usuarios/u-1/roles', {
+        rol: 'mediador',
+      });
+    });
   });
 });

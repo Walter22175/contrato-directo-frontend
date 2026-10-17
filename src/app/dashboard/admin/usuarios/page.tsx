@@ -3,10 +3,15 @@
 import { useState, useEffect, useCallback } from 'react';
 import api, { extractData } from '@/lib/api';
 import { Card } from '@/components/ui/Card';
+import ConfirmDialog from '@/components/ui/ConfirmDialog';
 import { Users, Search, XCircle, Shield, Plus, X } from 'lucide-react';
 import type { Usuario, Rol } from '@/types';
 
 type Tab = 'todos' | 'pendientes' | 'verificados';
+
+type Confirmacion =
+  | { tipo: 'asignar' }
+  | { tipo: 'quitar'; idRol: number; nombreRol: string };
 
 type RespuestaApi<T> = T & { data?: T };
 
@@ -27,6 +32,7 @@ export default function AdminUsuariosPage() {
   const [nuevoRol, setNuevoRol] = useState('');
   const [guardandoRol, setGuardandoRol] = useState(false);
   const [busquedaDebounced, setBusquedaDebounced] = useState('');
+  const [confirmacion, setConfirmacion] = useState<Confirmacion | null>(null);
 
   useEffect(() => {
     const t = setTimeout(() => setBusquedaDebounced(busqueda), 300);
@@ -105,6 +111,16 @@ export default function AdminUsuariosPage() {
     } finally {
       setGuardandoRol(false);
     }
+  };
+
+  const ejecutarConfirmacion = async () => {
+    if (!confirmacion) return;
+    if (confirmacion.tipo === 'asignar') {
+      await asignarRol();
+    } else {
+      await quitarRol(confirmacion.idRol, confirmacion.nombreRol);
+    }
+    setConfirmacion(null);
   };
 
   const cambiarEstado = async (u: Usuario) => {
@@ -265,7 +281,13 @@ export default function AdminUsuariosPage() {
                     >
                       {ur.rol?.nombre?.replace('_', ' ')}
                       <button
-                        onClick={() => quitarRol(ur.id_rol, ur.rol?.nombre || '')}
+                        onClick={() =>
+                          setConfirmacion({
+                            tipo: 'quitar',
+                            idRol: ur.id_rol,
+                            nombreRol: ur.rol?.nombre || '',
+                          })
+                        }
                         disabled={guardandoRol}
                         className="hover:text-red-400 transition-colors disabled:opacity-50"
                         title="Quitar rol"
@@ -300,7 +322,7 @@ export default function AdminUsuariosPage() {
                     ))}
                 </select>
                 <button
-                  onClick={asignarRol}
+                  onClick={() => setConfirmacion({ tipo: 'asignar' })}
                   disabled={guardandoRol || !nuevoRol}
                   className="flex items-center gap-1.5 px-3 py-2 bg-cyan-600 hover:bg-cyan-500 text-white text-xs font-medium rounded-lg transition-colors disabled:opacity-50"
                 >
@@ -379,6 +401,22 @@ export default function AdminUsuariosPage() {
           ))}
         </div>
       )}
+
+      <ConfirmDialog
+        open={confirmacion !== null}
+        titulo={confirmacion?.tipo === 'quitar' ? 'Quitar rol' : 'Asignar rol'}
+        mensaje={
+          confirmacion?.tipo === 'quitar'
+            ? `¿Estás seguro de que querés quitar el rol "${confirmacion.nombreRol.replace('_', ' ')}" a ${selectedUser?.nombre} ${selectedUser?.apellido}? Podés volver a asignarlo más adelante.`
+            : `¿Estás seguro de que querés asignar el rol "${nuevoRol.replace('_', ' ')}" a ${selectedUser?.nombre} ${selectedUser?.apellido}?`
+        }
+        confirmLabel={confirmacion?.tipo === 'quitar' ? 'Sí, quitar rol' : 'Sí, asignar rol'}
+        cancelLabel="Cancelar"
+        variant={confirmacion?.tipo === 'quitar' ? 'danger' : 'primary'}
+        loading={guardandoRol}
+        onConfirm={ejecutarConfirmacion}
+        onCancel={() => setConfirmacion(null)}
+      />
     </div>
   );
 }
