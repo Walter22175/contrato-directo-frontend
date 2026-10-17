@@ -5,6 +5,7 @@ import { Card } from '@/components/ui/Card';
 import Button from '@/components/ui/Button';
 import { obtenerMetricasInicioServicio } from '@/lib/mercadopago';
 import { formatCurrency, formatDateTime } from '@/lib/utils';
+import { useConfigPublica } from '@/hooks/useConfigPublica';
 import {
   Handshake,
   RefreshCw,
@@ -254,6 +255,7 @@ function aCsv(m: MetricasInicioServicio): string {
 }
 
 export default function InicioServicioAdminPage() {
+  const { comision_porcentaje } = useConfigPublica();
   const [metricas, setMetricas] = useState<MetricasInicioServicio | null>(null);
   const [cargando, setCargando] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -487,7 +489,7 @@ export default function InicioServicioAdminPage() {
                   titulo="Monto neto anticipado"
                   valor={formatCurrency(metricas.anticipo.monto_neto_total)}
                   acento="text-emerald-400"
-                  meta="menos comisión del 8%"
+                  meta={`menos comisión del ${comision_porcentaje}%`}
                 />
                 <Kpi
                   titulo="Descontado en liberaciones finales"

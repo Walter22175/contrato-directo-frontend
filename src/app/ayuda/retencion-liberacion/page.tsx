@@ -10,6 +10,7 @@ import {
   ArrowLeft,
   Shield,
 } from 'lucide-react';
+import { useConfigPublica } from '@/hooks/useConfigPublica';
 
 const secciones = [
   {
@@ -29,7 +30,7 @@ const secciones = [
       'Cuando el cliente confirma la entrega, se libera el pago al proveedor.',
       'La liberación es inmediata y definitiva: una vez confirmada la conformidad, el pago no puede volver a quedar retenido por esa contratación.',
       'Se registra la fecha y hora de la liberación en la transacción, con trazabilidad para ambas partes.',
-      'La acreditación en la cuenta del proveedor se realiza dentro de las 24 horas hábiles siguientes, menos la comisión acordada (8%).',
+      'La acreditación en la cuenta del proveedor se realiza dentro de las 24 horas hábiles siguientes, menos la comisión acordada ({COMISION}%).',
     ],
   },
   {
@@ -55,6 +56,7 @@ const secciones = [
 ];
 
 export default function RetencionLiberacionPage() {
+  const { comision_porcentaje } = useConfigPublica();
   return (
     <main className="flex-1">
       <div className="bg-slate-900/50 border-b border-slate-800 py-8">
@@ -100,7 +102,9 @@ export default function RetencionLiberacionPage() {
                 </div>
                 <ul className="space-y-3 text-sm text-slate-300 list-disc list-inside">
                   {puntos.map((p) => (
-                    <li key={p}>{p}</li>
+                    <li key={p}>
+                      {p.replace('{COMISION}', String(comision_porcentaje))}
+                    </li>
                   ))}
                 </ul>
               </div>

@@ -12,6 +12,7 @@ import { formatCurrency } from '@/lib/utils';
 import { useAuthStore } from '@/store/auth';
 import { Shield, ArrowLeft, MessageSquare, Loader2, Send, X } from 'lucide-react';
 import { LlaveIcon } from '@/components/ui/LlaveIcon';
+import { ComisionPorcentaje } from '@/components/ui/ValoresVigentes';
 import type { Servicio, ServicioProveedor } from '@/types';
 
 export default function ServicioDetallePage() {
@@ -231,7 +232,7 @@ export default function ServicioDetallePage() {
               </div>
               <div className="flex items-center justify-between text-sm">
                 <span className="text-slate-400">Comisión plataforma</span>
-                <span className="text-white font-medium">8%</span>
+                <ComisionPorcentaje className="text-white font-medium" />
               </div>
               <hr className="border-slate-700" />
               <Button className="w-full" size="lg" onClick={() => abrirOferta()}>
@@ -310,7 +311,8 @@ export default function ServicioDetallePage() {
 
               <div className="bg-slate-800/50 border border-slate-700 rounded-lg p-3 text-xs text-slate-400">
                 <Shield className="w-4 h-4 text-green-400 inline mr-1" />
-                El pago se retiene en custodia hasta que confirmes la conformidad. La comisión del 8% se deduce del pago al proveedor.
+                El pago se retiene en custodia hasta que confirmes la conformidad. La comisión del{' '}
+                <ComisionPorcentaje /> se deduce del pago al proveedor.
               </div>
 
               {errorOferta && (

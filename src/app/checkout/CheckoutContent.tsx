@@ -496,7 +496,9 @@ export function CheckoutContent() {
                   <span className="text-white">{formatCurrency(transaccion.monto_acordado)}</span>
                 </div>
                 <div className="flex justify-between text-sm">
-                  <span className="text-slate-400">Comisión plataforma (8%)</span>
+                  <span className="text-slate-400">
+                    Comisión plataforma ({transaccion.comision_porcentaje ?? 8}%)
+                  </span>
                   <span className="text-white">{formatCurrency(comision)}</span>
                 </div>
                 <hr className="border-slate-700" />

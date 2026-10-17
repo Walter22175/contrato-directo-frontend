@@ -8,6 +8,7 @@ import api, { extractData, mensajeError } from '@/lib/api';
 import { formatCurrency, formatDateTime } from '@/lib/utils';
 import { obtenerDashboardMercadoPago } from '@/lib/mercadopago';
 import { useAuthStore } from '@/store/auth';
+import { useConfigPublica } from '@/hooks/useConfigPublica';
 import {
   Handshake,
   Clock,
@@ -24,7 +25,10 @@ import type { Transaccion, DashboardMercadoPagoProveedor } from '@/types';
 
 const HORAS_ANTICIPO = 72;
 const PORCENTAJE_ANTICIPO = 0.3;
-const COMISION = 0.08;
+
+function pctATexto(pct: number): string {
+  return `${pct.toLocaleString('es-AR', { maximumFractionDigits: 1 })}%`;
+}
 
 type EstadoInicio = 'pendiente' | 'mio' | 'cliente' | 'confirmado';
 
@@ -97,6 +101,9 @@ function estadoAnticipo(t: Transaccion): 'pendiente' | 'liberado' | 'no_aplica' 
 export default function InicioServicioPage() {
   const user = useAuthStore((s) => s.user);
   const idProveedor = user?.id_usuario;
+  const { comision_porcentaje } = useConfigPublica();
+  const comisionFraccion = comision_porcentaje / 100;
+  const netoAnticipoPct = PORCENTAJE_ANTICIPO * (1 - comisionFraccion) * 100;
 
   const [transacciones, setTransacciones] = useState<Transaccion[]>([]);
   const [pagos, setPagos] = useState<DashboardMercadoPagoProveedor | null>(
@@ -218,7 +225,7 @@ export default function InicioServicioPage() {
             const estimada = liberacionEstimada(t);
             const anticipo = estadoAnticipo(t);
             const bruto = t.monto_acordado * PORCENTAJE_ANTICIPO;
-            const comision = bruto * COMISION;
+            const comision = bruto * comisionFraccion;
             const neto = bruto - comision;
             const yaNotifique = estadoInicio === 'mio' || estadoInicio === 'confirmado';
             const corto = duracionSuperaTresDias(t) === false;
@@ -321,13 +328,17 @@ export default function InicioServicioPage() {
                           </p>
                         </div>
                         <div className="rounded-lg bg-slate-800/50 border border-slate-700/60 p-3 text-center">
-                          <p className="text-xs text-slate-400">Comisión (8%)</p>
+                          <p className="text-xs text-slate-400">
+                            Comisión ({pctATexto(comision_porcentaje)})
+                          </p>
                           <p className="text-sm font-semibold text-red-400 mt-0.5">
                             −{formatCurrency(comision)}
                           </p>
                         </div>
                         <div className="rounded-lg bg-slate-800/50 border border-slate-700/60 p-3 text-center">
-                          <p className="text-xs text-slate-400">Neto (27,6%)</p>
+                          <p className="text-xs text-slate-400">
+                            Neto ({pctATexto(netoAnticipoPct)})
+                          </p>
                           <p className="text-sm font-semibold text-green-400 mt-0.5">
                             {formatCurrency(neto)}
                           </p>

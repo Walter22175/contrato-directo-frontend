@@ -8,6 +8,7 @@ import Button from '@/components/ui/Button';
 import api, { extractData } from '@/lib/api';
 import { formatCurrency, formatDate } from '@/lib/utils';
 import { useAuthStore } from '@/store/auth';
+import { useConfigPublica } from '@/hooks/useConfigPublica';
 import {
   CreditCard,
   Clock,
@@ -55,6 +56,7 @@ const FILTROS = [
 type Modal = 'conformidad' | 'reembolso' | null;
 
 export default function TransaccionesPage() {
+  const { comision_porcentaje } = useConfigPublica();
   const router = useRouter();
   const user = useAuthStore((s) => s.user);
   const [transacciones, setTransacciones] = useState<Transaccion[]>([]);
@@ -529,7 +531,7 @@ export default function TransaccionesPage() {
               <div className="bg-slate-800/50 border border-slate-700 rounded-lg p-3 text-xs text-slate-400">
                 Monto en custodia: <span className="text-white font-semibold">{formatCurrency(txModal.monto_acordado)}</span>.
                 Al confirmar, el pago se libera al proveedor en 24 horas hábiles
-                (se deduce la comisión del 8%). Si el proveedor conectó su cuenta de
+                (se deduce la comisión del {comision_porcentaje}%). Si el proveedor conectó su cuenta de
                 Mercado Pago, la acreditación es directa en esa cuenta; si no, queda
                 disponible en la plataforma con los mismos plazos. Si el trabajo está
                 incompleto, indicá un porcentaje menor a 100: esa parte queda

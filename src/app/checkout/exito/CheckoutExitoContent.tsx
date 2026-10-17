@@ -123,7 +123,7 @@ export function CheckoutExitoContent() {
                 <p className="font-semibold text-white">{formatCurrency(transaccion.monto_acordado)}</p>
               </div>
               <div>
-                <p className="text-xs text-slate-500">Comisión (8%, se deduce al proveedor)</p>
+                <p className="text-xs text-slate-500">Comisión ({transaccion.comision_porcentaje ?? 8}%, se deduce al proveedor)</p>
                 <p className="font-semibold text-white">{formatCurrency(comision)}</p>
               </div>
               <div>

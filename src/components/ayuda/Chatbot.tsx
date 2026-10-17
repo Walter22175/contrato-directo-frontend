@@ -6,6 +6,7 @@ import { Card } from '@/components/ui/Card';
 import { Bot, User, Send, X, MessageCircle, ExternalLink } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import api, { extractData } from '@/lib/api';
+import { useConfigPublica } from '@/hooks/useConfigPublica';
 
 // ============================================================
 // CONFIGURACIÓN
@@ -138,13 +139,13 @@ const INTENCIONES: Intencion[] = [
     id: 'comision',
     keywords: ['comision', 'porcentaje', 'cuanto cobran', 'cuanto se llevan', '8%', 'tarifa'],
     frases: ['cuanto es la comision', 'que porcentaje cobran'],
-    respuesta: 'Contrato Directo cobra una **comisión del 8%** sobre el valor total del servicio. Se descuenta automáticamente del pago al proveedor. Es visible antes de confirmar la contratación. Se revisa anualmente con 30 días de aviso.',
+    respuesta: 'Contrato Directo cobra una **comisión del {COMISION}%** sobre el valor total del servicio. Se descuenta automáticamente del pago al proveedor. Es visible antes de confirmar la contratación. Se revisa anualmente con 30 días de aviso.',
   },
   {
     id: 'liberacion_pago',
     keywords: ['liberacion', 'conformidad', 'cuando cobra', 'cuando me pagan', 'liberar'],
     frases: ['cuando se libera el pago', 'cuando recibo el dinero'],
-    respuesta: 'El pago se libera al proveedor **24 horas hábiles** después de tu conformidad. Si no das conformidad explícita en **72 horas hábiles**, se considera automática y se libera igual. Para proyectos extensos, se libera por **hitos**. Si el proveedor conectó su cuenta de Mercado Pago, la acreditación es **directa en su cuenta** (menos la comisión del 8%); sin conexión, se acredita en la cuenta de la plataforma con los mismos plazos.',
+    respuesta: 'El pago se libera al proveedor **24 horas hábiles** después de tu conformidad. Si no das conformidad explícita en **72 horas hábiles**, se considera automática y se libera igual. Para proyectos extensos, se libera por **hitos**. Si el proveedor conectó su cuenta de Mercado Pago, la acreditación es **directa en su cuenta** (menos la comisión del {COMISION}%); sin conexión, se acredita en la cuenta de la plataforma con los mismos plazos.',
   },
   {
     id: 'inicio_servicio',
@@ -156,7 +157,7 @@ const INTENCIONES: Intencion[] = [
     id: 'conexion_mercadopago',
     keywords: ['conectar', 'conexion', 'cuenta de cobro', 'cuenta propia', 'vincular', 'onboarding', 'cobrar directo'],
     frases: ['como conecto mi cuenta de mercadopago', 'quiero cobrar en mi cuenta', 'como vinculo mercadopago'],
-    respuesta: 'Los proveedores pueden conectar su propia cuenta de Mercado Pago desde [Mercado Pago](/dashboard/mercado-pago) en el panel. El proceso usa autorización oficial de Mercado Pago (no pedimos tu contraseña): te redirigimos, autorizás y volvés al panel. Al conectarla, los pagos liberados se acreditan **directo en tu cuenta** (menos la comisión del 8%). Los tokens se renuevan solos; si se vencen, la plataforma usa temporalmente su cuenta y te avisamos.',
+    respuesta: 'Los proveedores pueden conectar su propia cuenta de Mercado Pago desde [Mercado Pago](/dashboard/mercado-pago) en el panel. El proceso usa autorización oficial de Mercado Pago (no pedimos tu contraseña): te redirigimos, autorizás y volvés al panel. Al conectarla, los pagos liberados se acreditan **directo en tu cuenta** (menos la comisión del {COMISION}%). Los tokens se renuevan solos; si se vencen, la plataforma usa temporalmente su cuenta y te avisamos.',
   },
   {
     id: 'falla_conexion_mp',
@@ -174,7 +175,7 @@ const INTENCIONES: Intencion[] = [
     id: 'servicio_max',
     keywords: ['max', 'servicio max', 'contrato', 'firma', 'pdf', '150', '150000', 'rapido'],
     frases: ['que es un servicio max', 'que es un servicio rapido', 'diferencia entre max y rapido'],
-    respuesta: 'Los **Servicios Rápidos** son los que no superan **$150.000 ARS**: se aceptan con dos clics y no requieren firma. Los **Servicios Max** superan ese monto y requieren **contrato PDF con firma digital** de ambas partes (Ley 25.506).',
+    respuesta: 'Los **Servicios Rápidos** son los que no superan **{MONTO_EXPRESS} ARS**: se aceptan con dos clics y no requieren firma. Los **Servicios Max** superan ese monto y requieren **contrato PDF con firma digital** de ambas partes (Ley 25.506).',
   },
   {
     id: 'firma_digital',
@@ -373,6 +374,8 @@ const SUGERENCIAS = [
 // ============================================================
 export default function Chatbot() {
   const [abierto, setAbierto] = useState(false);
+  const { comision_porcentaje, monto_maximo_servicio_rapido } =
+    useConfigPublica();
   const [mensajes, setMensajes] = useState<Mensaje[]>([
     {
       id: 1,
@@ -439,6 +442,14 @@ export default function Chatbot() {
       });
   };
 
+  const interpolar = (texto: string) =>
+    texto
+      .replaceAll('{COMISION}', String(comision_porcentaje))
+      .replaceAll(
+        '{MONTO_EXPRESS}',
+        monto_maximo_servicio_rapido.toLocaleString('es-AR'),
+      );
+
   const responder = (textoUsuario: string) => {
     setEscribiendo(true);
 
@@ -446,7 +457,7 @@ export default function Chatbot() {
       const intencion = buscarIntencion(textoUsuario);
 
       if (intencion) {
-        agregarMensaje({ remitente: 'bot', contenido: intencion.respuesta });
+        agregarMensaje({ remitente: 'bot', contenido: interpolar(intencion.respuesta) });
       } else {
         // Fallback: sin recursos de respuesta, se libera la opción WhatsApp
         agregarMensaje({

@@ -15,6 +15,7 @@ import {
   Percent,
   Wallet,
 } from 'lucide-react';
+import { useConfigPublica } from '@/hooks/useConfigPublica';
 
 const condicionesLegales = [
   {
@@ -32,7 +33,7 @@ const condicionesLegales = [
     titulo: 'Liberación anticipada del 30%',
     puntos: [
       'Cumplidas las 72 horas calendario desde el inicio efectivo del servicio, la plataforma libera anticipadamente el 30% del monto total al proveedor, exclusivamente en horario bancario hábil.',
-      'Sobre el monto anticipado se aplica la comisión habitual del 8%, en las mismas condiciones que el resto del pago.',
+      'Sobre el monto anticipado se aplica la comisión habitual del {COMISION}%, en las mismas condiciones que el resto del pago.',
       'Toda liberación anticipada se registra con fecha y hora en la transacción, con trazabilidad para ambas partes.',
       'La liberación anticipada no afecta los derechos del cliente: el 70% restante permanece en custodia hasta la conformidad del cliente o su conformidad automática, y el cliente conserva íntegramente su derecho a rechazo, reclamo y reembolso sobre el monto no liberado.',
       'La liberación anticipada no modifica ni reemplaza el resto del flujo de pagos: conformidad, plazos, hitos y cancelaciones se rigen por las condiciones generales de la plataforma.',
@@ -93,6 +94,9 @@ const secciones = [
 ];
 
 export default function ComienzoDelServicioPage() {
+  const { comision_porcentaje } = useConfigPublica();
+  const textoPunto = (p: string) =>
+    p.replace('{COMISION}', String(comision_porcentaje));
   return (
     <main className="flex-1">
       <div className="bg-slate-900/50 border-b border-slate-800 py-8">
@@ -187,7 +191,7 @@ export default function ComienzoDelServicioPage() {
                 </div>
                 <ul className="space-y-3 text-sm text-slate-300 list-disc list-inside">
                   {puntos.map((p) => (
-                    <li key={p}>{p}</li>
+                    <li key={p}>{textoPunto(p)}</li>
                   ))}
                 </ul>
               </div>
@@ -211,7 +215,7 @@ export default function ComienzoDelServicioPage() {
                 </div>
                 <ul className="space-y-3 text-sm text-slate-300 list-disc list-inside">
                   {puntos.map((p) => (
-                    <li key={p}>{p}</li>
+                    <li key={p}>{textoPunto(p)}</li>
                   ))}
                 </ul>
               </div>

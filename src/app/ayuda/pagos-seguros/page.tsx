@@ -3,8 +3,10 @@
 import { Card } from '@/components/ui/Card';
 import Link from 'next/link';
 import { Shield, CheckCircle, ArrowLeft, ArrowRight, Clock, RotateCcw, Lock, DollarSign, RefreshCw } from 'lucide-react';
+import { useConfigPublica } from '@/hooks/useConfigPublica';
 
 export default function PagosSegurosPage() {
+  const { comision_porcentaje } = useConfigPublica();
   return (
     <main className="flex-1">
       <div className="bg-slate-900/50 border-b border-slate-800 py-8">
@@ -82,7 +84,7 @@ export default function PagosSegurosPage() {
                   <div className="w-8 h-8 bg-cyan-500/20 rounded-full flex items-center justify-center flex-shrink-0 text-cyan-400 font-bold">2</div>
                   <div>
                     <h3 className="font-semibold text-white">Pagás con Mercado Pago</h3>
-                    <p className="text-slate-400 text-sm">Tarjetas de crédito/débito, transferencias. El pago queda en custodia (8% comisión Contrato Directo).</p>
+                    <p className="text-slate-400 text-sm">Tarjetas de crédito/débito, transferencias. El pago queda en custodia ({comision_porcentaje}% comisión Contrato Directo).</p>
                   </div>
                 </div>
                 <div className="flex items-center gap-4 p-4 bg-slate-800/50 rounded-lg">
@@ -138,7 +140,7 @@ export default function PagosSegurosPage() {
                   </div>
                   <div>
                     <h3 className="font-semibold text-white mb-1">Comisión transparente</h3>
-                    <p className="text-slate-400 text-sm">Solo 8% sobre el valor del servicio. Visible antes de confirmar la contratación.</p>
+                    <p className="text-slate-400 text-sm">Solo {comision_porcentaje}% sobre el valor del servicio. Visible antes de confirmar la contratación.</p>
                   </div>
                 </div>
                 <div className="flex items-start gap-3 p-4 bg-slate-800/50 rounded-lg">

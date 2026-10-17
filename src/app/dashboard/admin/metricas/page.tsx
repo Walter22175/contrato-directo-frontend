@@ -5,6 +5,7 @@ import api, { extractData } from '@/lib/api';
 import { Card, CardTitle } from '@/components/ui/Card';
 import SlaDashboard from '@/components/sla/SlaDashboard';
 import { TrendingUp, Users, Clock, Star, Target, BarChart3 } from 'lucide-react';
+import { useConfigPublica } from '@/hooks/useConfigPublica';
 
 interface MetricaRow {
   periodo: string;
@@ -75,6 +76,7 @@ interface MetricasContratos {
 }
 
 export default function MetricasPage() {
+  const { comision_porcentaje } = useConfigPublica();
   const [metricas, setMetricas] = useState<MetricaRow | null>(null);
   const [loading, setLoading] = useState(true);
   const [periodo, setPeriodo] = useState('actual');
@@ -218,7 +220,7 @@ export default function MetricasPage() {
                     { titulo: 'Liberaciones en plazo', valor: `${obj2.pct_liberacion_en_plazo}%`, meta: '≤24h hábiles tras conformidad' },
                     { titulo: 'Tasa de disputas', valor: `${obj2.tasa_disputas}%`, meta: 'reclamos sobre pagos' },
                     { titulo: 'Reembolsos en plazo', valor: `${obj2.pct_reembolsos_en_plazo}%`, meta: 'dentro de 10 días hábiles' },
-                    { titulo: 'Comisiones recaudadas', valor: `$${obj2.comisiones_totales.toLocaleString('es-AR')}`, meta: '8% sobre lo liberado' },
+                    { titulo: 'Comisiones recaudadas', valor: `$${obj2.comisiones_totales.toLocaleString('es-AR')}`, meta: `${comision_porcentaje}% sobre lo liberado` },
                     { titulo: 'Conversión oferta→pago', valor: `${obj2.tasa_conversion_oferta_pago}%`, meta: 'sobre todas las ofertas' },
                   ].map((m) => (
                     <div key={m.titulo} className="p-4 bg-slate-800/50 rounded-xl border border-slate-700">

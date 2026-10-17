@@ -3,8 +3,10 @@
 import { Card } from '@/components/ui/Card';
 import Link from 'next/link';
 import { FileText, CheckCircle, Shield, Clock, ArrowLeft, FileCheck } from 'lucide-react';
+import { useConfigPublica } from '@/hooks/useConfigPublica';
 
 export default function ContratosDigitalesPage() {
+  const { comision_porcentaje } = useConfigPublica();
   return (
     <main className='flex-1'>
       <div className='bg-slate-900/50 border-b border-slate-800 py-8'>
@@ -118,7 +120,7 @@ export default function ContratosDigitalesPage() {
                 </div>
                 <div className='flex items-center gap-3 p-3 bg-slate-800/50 rounded-lg'>
                   <CheckCircle className='w-5 h-5 text-cyan-400 flex-shrink-0' />
-                  <span className='text-slate-300'>Precio acordado + comision (8%) + IVA discriminado</span>
+                  <span className='text-slate-300'>Precio acordado + comision ({comision_porcentaje}%) + IVA discriminado</span>
                 </div>
                 <div className='flex items-center gap-3 p-3 bg-slate-800/50 rounded-lg'>
                   <CheckCircle className='w-5 h-5 text-cyan-400 flex-shrink-0' />

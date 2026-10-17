@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useState } from 'react';
 import { useAuthStore } from '@/store/auth';
+import { useConfigPublica } from '@/hooks/useConfigPublica';
 import {
   obtenerEstadoMercadoPago,
   obtenerDashboardMercadoPago,
@@ -121,6 +122,7 @@ const contadores = [
 ] as const;
 
 export default function MercadoPagoPage() {
+  const { comision_porcentaje } = useConfigPublica();
   const user = useAuthStore((s) => s.user);
   const idProveedor = user?.id_usuario;
 
@@ -471,7 +473,7 @@ export default function MercadoPagoPage() {
                 </li>
                 <li>
                   Con la cuenta conectada, la liberación acredita directo en tu
-                  cuenta (menos la comisión del 8%).
+                  cuenta (menos la comisión del {comision_porcentaje}%).
                 </li>
               </ul>
             </Card>
