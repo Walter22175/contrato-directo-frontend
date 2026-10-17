@@ -29,6 +29,7 @@ import {
   Briefcase,
   LogOut,
   Wallet,
+  Handshake,
 } from 'lucide-react';
 import { LlaveIcon } from '@/components/ui/LlaveIcon';
 
@@ -52,6 +53,7 @@ const providerLinks = [
   { href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
   { href: '/dashboard/mis-servicios', label: 'Mis Servicios', icon: Settings },
   { href: '/dashboard/transacciones', label: 'Transacciones', icon: CreditCard },
+  { href: '/dashboard/inicio-servicio', label: 'Anticipo 30%', icon: Handshake },
   { href: '/dashboard/contratos', label: 'Contratos', icon: FileText },
   { href: '/dashboard/documentos', label: 'Documentos', icon: FileText },
   { href: '/dashboard/valoraciones', label: 'Valoraciones', icon: LlaveIcon },
