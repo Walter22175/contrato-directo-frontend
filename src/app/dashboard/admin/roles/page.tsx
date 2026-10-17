@@ -24,6 +24,11 @@ type ErrorApi = { response?: { data?: { message?: string } } };
 const mensajeDeError = (error: unknown, fallback: string): string =>
   (error as ErrorApi | undefined)?.response?.data?.message || fallback;
 
+/** Espejo del patrón del backend (CreateRolDto). */
+const PATRON_ROL = /^[a-z][a-z0-9_]{1,39}$/;
+const MENSAJE_PATRON =
+  'El nombre debe ir en minúsculas, sin espacios: letras, números y guiones bajos (2 a 40 caracteres)';
+
 type RespuestaApi<T> = T & { data?: T };
 
 type RolConConteo = Rol & {
@@ -75,6 +80,10 @@ export default function AdminRolesPage() {
 
   const crearRol = async () => {
     if (!nombre) return;
+    if (!PATRON_ROL.test(nombre)) {
+      setMsg({ tipo: 'error', texto: MENSAJE_PATRON });
+      return;
+    }
     let permisos: Record<string, unknown>;
     try {
       const parsed: unknown = JSON.parse(permisosText || '{}');
@@ -132,75 +141,71 @@ export default function AdminRolesPage() {
             <h2 className="text-lg font-semibold text-white">Agregar rol</h2>
           </div>
 
-          {disponibles.length === 0 ? (
-            <p className="text-sm text-slate-400">
-              Todos los roles disponibles ya fueron creados. Los roles nuevos se
-              habilitan desde el backend (enum de roles) y aparecen acá
-              automáticamente.
-            </p>
-          ) : (
-            <div className="grid md:grid-cols-3 gap-4">
-              <div>
-                <label className="block text-sm text-slate-400 mb-1" htmlFor="rol-nombre">
-                  Nombre del rol
-                </label>
-                <select
-                  id="rol-nombre"
-                  value={nombre}
-                  onChange={(e) => setNombre(e.target.value)}
-                  className="w-full px-3 py-2 bg-slate-800 border border-slate-600 rounded-lg text-white text-sm focus:outline-none focus:ring-2 focus:ring-cyan-500"
-                >
-                  <option value="">Seleccionar nombre…</option>
-                  {disponibles.map((n) => (
-                    <option key={n} value={n}>
-                      {n.replace('_', ' ')}
-                    </option>
-                  ))}
-                </select>
-              </div>
-              <div>
-                <label className="block text-sm text-slate-400 mb-1" htmlFor="rol-descripcion">
-                  Descripción
-                </label>
-                <input
-                  id="rol-descripcion"
-                  type="text"
-                  value={descripcion}
-                  onChange={(e) => setDescripcion(e.target.value)}
-                  maxLength={255}
-                  placeholder="Qué hace este rol…"
-                  className="w-full px-3 py-2 bg-slate-800 border border-slate-600 rounded-lg text-white text-sm placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-cyan-500"
-                />
-              </div>
-              <div>
-                <label className="block text-sm text-slate-400 mb-1" htmlFor="rol-permisos">
-                  Permisos (JSON)
-                </label>
-                <input
-                  id="rol-permisos"
-                  type="text"
-                  value={permisosText}
-                  onChange={(e) => setPermisosText(e.target.value)}
-                  placeholder='{"mediacion": true}'
-                  className="w-full px-3 py-2 bg-slate-800 border border-slate-600 rounded-lg text-white text-sm font-mono placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-cyan-500"
-                />
-              </div>
+          <div className="grid md:grid-cols-3 gap-4">
+            <div>
+              <label className="block text-sm text-slate-400 mb-1" htmlFor="rol-nombre">
+                Nombre del rol
+              </label>
+              <input
+                id="rol-nombre"
+                list="roles-sugeridos"
+                value={nombre}
+                onChange={(e) => setNombre(e.target.value.trim().toLowerCase())}
+                maxLength={40}
+                placeholder="coordinador_tecnicos"
+                autoComplete="off"
+                className="w-full px-3 py-2 bg-slate-800 border border-slate-600 rounded-lg text-white text-sm font-mono placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-cyan-500"
+              />
+              <datalist id="roles-sugeridos">
+                {disponibles.map((n) => (
+                  <option key={n} value={n} />
+                ))}
+              </datalist>
+              <p className="text-xs text-slate-500 mt-1">
+                Escribí un nombre nuevo o elegí una sugerencia ({disponibles.length} sin
+                crear).
+              </p>
             </div>
-          )}
+            <div>
+              <label className="block text-sm text-slate-400 mb-1" htmlFor="rol-descripcion">
+                Descripción
+              </label>
+              <input
+                id="rol-descripcion"
+                type="text"
+                value={descripcion}
+                onChange={(e) => setDescripcion(e.target.value)}
+                maxLength={255}
+                placeholder="Qué hace este rol…"
+                className="w-full px-3 py-2 bg-slate-800 border border-slate-600 rounded-lg text-white text-sm placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-cyan-500"
+              />
+            </div>
+            <div>
+              <label className="block text-sm text-slate-400 mb-1" htmlFor="rol-permisos">
+                Permisos (JSON)
+              </label>
+              <input
+                id="rol-permisos"
+                type="text"
+                value={permisosText}
+                onChange={(e) => setPermisosText(e.target.value)}
+                placeholder='{"mediacion": true}'
+                className="w-full px-3 py-2 bg-slate-800 border border-slate-600 rounded-lg text-white text-sm font-mono placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-cyan-500"
+              />
+            </div>
+          </div>
 
-          {disponibles.length > 0 && (
-            <div className="flex justify-end">
-              <Button
-                type="button"
-                onClick={crearRol}
-                disabled={!nombre || guardando}
-                isLoading={guardando}
-              >
-                <Plus className="w-4 h-4 mr-1.5" />
-                Crear rol
-              </Button>
-            </div>
-          )}
+          <div className="flex justify-end">
+            <Button
+              type="button"
+              onClick={crearRol}
+              disabled={!nombre || guardando}
+              isLoading={guardando}
+            >
+              <Plus className="w-4 h-4 mr-1.5" />
+              Crear rol
+            </Button>
+          </div>
         </div>
       </Card>
 
