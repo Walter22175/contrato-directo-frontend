@@ -15,6 +15,27 @@ interface CategoriaAyuda {
   nombre?: string;
 }
 
+interface Novedad {
+  href: string;
+  titulo: string;
+  descripcion: string;
+}
+
+const novedades: Novedad[] = [
+  {
+    href: '/ayuda/novedades/comienzo-servicio',
+    titulo: 'Nuevo sistema de confirmación del comienzo del servicio',
+    descripcion:
+      'Ahora el inicio del servicio se confirma por ambas partes desde la plataforma. Conocé cómo funciona y qué cambia para vos.',
+  },
+  {
+    href: '/ayuda/novedades/anticipo-30',
+    titulo: 'Anticipo del 30% para servicios largos',
+    descripcion:
+      'Si trabajás en servicios de más de 3 días, ahora podés cobrar el 30% del presupuesto apenas arrancado el trabajo.',
+  },
+];
+
 type CategoriaEntrada = string | CategoriaAyuda;
 type CategoriasRespuesta = CategoriaEntrada[] | { data?: CategoriaEntrada[] };
 type FaqsRespuesta = Faq[] | { data?: Faq[] };
@@ -174,32 +195,33 @@ export default function AyudaPage() {
   );
 
   const renderNovedades = () => (
-    <Link
-      href="/ayuda/novedades/anticipo-30"
-      className="block mb-8"
-      data-testid="novedad-anticipo-30"
-    >
-      <Card>
-        <div className="flex items-start gap-4">
-          <div className="w-10 h-10 shrink-0 bg-cyan-500/10 border border-cyan-500/20 rounded-xl flex items-center justify-center">
-            <Megaphone className="w-5 h-5 text-cyan-400" />
-          </div>
-          <div>
-            <span className="inline-block text-xs font-semibold uppercase tracking-wide bg-cyan-500/10 text-cyan-400 border border-cyan-500/20 rounded px-2 py-0.5 mb-1">
-              Novedad
-            </span>
-            <h2 className="font-semibold text-white">
-              Anticipo del 30% para servicios largos
-            </h2>
-            <p className="text-sm text-slate-400 mt-1">
-              Si trabajás en servicios de más de 3 días, ahora podés cobrar el
-              30% del presupuesto apenas arrancado el trabajo. Conocé cómo
-              funciona.
-            </p>
-          </div>
-        </div>
-      </Card>
-    </Link>
+    <div className="mb-8 space-y-3">
+      {novedades.map((novedad) => (
+        <Link
+          key={novedad.href}
+          href={novedad.href}
+          className="block"
+          data-testid={`novedad-${novedad.href.split('/').pop()}`}
+        >
+          <Card>
+            <div className="flex items-start gap-4">
+              <div className="w-10 h-10 shrink-0 bg-cyan-500/10 border border-cyan-500/20 rounded-xl flex items-center justify-center">
+                <Megaphone className="w-5 h-5 text-cyan-400" />
+              </div>
+              <div>
+                <span className="inline-block text-xs font-semibold uppercase tracking-wide bg-cyan-500/10 text-cyan-400 border border-cyan-500/20 rounded px-2 py-0.5 mb-1">
+                  Novedad
+                </span>
+                <h2 className="font-semibold text-white">{novedad.titulo}</h2>
+                <p className="text-sm text-slate-400 mt-1">
+                  {novedad.descripcion}
+                </p>
+              </div>
+            </div>
+          </Card>
+        </Link>
+      ))}
+    </div>
   );
 
   return (
