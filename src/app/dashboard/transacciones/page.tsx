@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { Card, CardTitle } from '@/components/ui/Card';
 import Button from '@/components/ui/Button';
+import Tooltip, { TOOLTIP_COMIENZO } from '@/components/ui/Tooltip';
 import api, { extractData } from '@/lib/api';
 import { formatCurrency, formatDate } from '@/lib/utils';
 import { useAuthStore } from '@/store/auth';
@@ -55,6 +56,8 @@ const FILTROS = [
 
 type Modal = 'conformidad' | 'reembolso' | null;
 
+const MODAL_COMIENZO_KEY = 'cd_modal_comienzo_visto';
+
 export default function TransaccionesPage() {
   const { comision_porcentaje } = useConfigPublica();
   const router = useRouter();
@@ -66,6 +69,7 @@ export default function TransaccionesPage() {
   const [modal, setModal] = useState<Modal>(null);
   const [txModal, setTxModal] = useState<Transaccion | null>(null);
   const [msg, setMsg] = useState<{ tipo: 'ok' | 'error'; texto: string } | null>(null);
+  const [modalComienzo, setModalComienzo] = useState(false);
 
   const [porcentaje, setPorcentaje] = useState('100');
   const [comentario, setComentario] = useState('');
@@ -78,6 +82,14 @@ export default function TransaccionesPage() {
       const raw = extractData<Transaccion[] | { data: Transaccion[] } | null>(res);
       const lista = Array.isArray(raw) ? raw : raw?.data || [];
       setTransacciones(lista);
+      try {
+        if (
+          lista.some((t) => t.estado === 'en_custodia') &&
+          !localStorage.getItem(MODAL_COMIENZO_KEY)
+        ) {
+          setModalComienzo(true);
+        }
+      } catch {}
     } catch {
       setTransacciones([]);
     } finally {
@@ -388,24 +400,26 @@ export default function TransaccionesPage() {
                     !t.fecha_fin_servicio &&
                     !yaNotifiqueInicio &&
                     (esCliente || esProveedor) && (
-                      <Button
-                        size="sm"
-                        disabled={busy}
-                        onClick={() =>
-                          accion(
-                            t.id_transaccion,
-                            'post',
-                            `/transacciones/${t.id_transaccion}/inicio-servicio`,
-                            undefined,
-                            'Comienzo notificado. Cuando ambas partes confirmen, inicia el conteo para la liberación anticipada del 30% (servicios mayores a 3 días).',
-                          )
-                        }
-                      >
-                        {busy ? <Loader2 className="w-4 h-4 mr-1 animate-spin" /> : <Handshake className="w-4 h-4 mr-1" />}
-                        {inicioSinConfirmar
-                          ? 'Confirmar comienzo del servicio'
-                          : 'Notificar comienzo del servicio'}
-                      </Button>
+                      <Tooltip texto={TOOLTIP_COMIENZO}>
+                        <Button
+                          size="sm"
+                          disabled={busy}
+                          onClick={() =>
+                            accion(
+                              t.id_transaccion,
+                              'post',
+                              `/transacciones/${t.id_transaccion}/inicio-servicio`,
+                              undefined,
+                              'Comienzo notificado. Cuando ambas partes confirmen, inicia el conteo para la liberación anticipada del 30% (servicios mayores a 3 días).',
+                            )
+                          }
+                        >
+                          {busy ? <Loader2 className="w-4 h-4 mr-1 animate-spin" /> : <Handshake className="w-4 h-4 mr-1" />}
+                          {inicioSinConfirmar
+                            ? 'Confirmar comienzo del servicio'
+                            : 'Notificar comienzo del servicio'}
+                        </Button>
+                      </Tooltip>
                     )}
 
                   {t.estado === 'en_custodia' &&
@@ -514,6 +528,47 @@ export default function TransaccionesPage() {
               </Card>
             );
           })}
+        </div>
+      )}
+
+      {/* Modal bienvenida comienzo del servicio (una sola vez) */}
+      {modalComienzo && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4">
+          <Card className="w-full max-w-lg">
+            <div className="flex items-center justify-between mb-4">
+              <CardTitle>El nuevo flujo del comienzo del servicio ya está activo</CardTitle>
+            </div>
+            <div className="space-y-4">
+              <p className="text-sm text-slate-300 leading-relaxed">
+                Cuando el trabajo empieza, ambas partes notifican desde su
+                dashboard. El inicio efectivo es la{' '}
+                <strong className="text-white">segunda notificación</strong>. A
+                las <strong className="text-white">72 horas calendario</strong>{' '}
+                desde ese inicio, el <strong className="text-white">30%</strong>{' '}
+                del pago se libera automáticamente al proveedor (en horario
+                bancario hábil). El resto del pago se libera con la
+                conformidad, como siempre.
+              </p>
+              <Link
+                href="/ayuda/comienzo-del-servicio"
+                className="text-cyan-400 hover:text-cyan-300 text-sm"
+              >
+                Ver la ayuda completa
+              </Link>
+              <div className="flex justify-end">
+                <Button
+                  onClick={() => {
+                    setModalComienzo(false);
+                    try {
+                      localStorage.setItem(MODAL_COMIENZO_KEY, '1');
+                    } catch {}
+                  }}
+                >
+                  Entendido
+                </Button>
+              </div>
+            </div>
+          </Card>
         </div>
       )}
 

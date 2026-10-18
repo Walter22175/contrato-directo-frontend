@@ -4,6 +4,7 @@ import { useCallback, useEffect, useState } from 'react';
 import Link from 'next/link';
 import { Card } from '@/components/ui/Card';
 import Button from '@/components/ui/Button';
+import Tooltip, { TOOLTIP_COMIENZO } from '@/components/ui/Tooltip';
 import api, { extractData, mensajeError } from '@/lib/api';
 import { formatCurrency, formatDateTime } from '@/lib/utils';
 import { obtenerDashboardMercadoPago } from '@/lib/mercadopago';
@@ -288,18 +289,20 @@ export default function InicioServicioPage() {
                   {/* B. Botón notificar */}
                   <div className="flex flex-wrap items-center gap-3">
                     {estadoInicio !== 'confirmado' && !yaNotifique && (
-                      <Button
-                        size="sm"
-                        disabled={notificando === t.id_transaccion}
-                        onClick={() => void notificar(t)}
-                      >
-                        {notificando === t.id_transaccion ? (
-                          <Loader2 className="w-4 h-4 mr-1 animate-spin" />
-                        ) : (
-                          <Handshake className="w-4 h-4 mr-1" />
-                        )}
-                        Notificar comienzo del servicio
-                      </Button>
+                      <Tooltip texto={TOOLTIP_COMIENZO}>
+                        <Button
+                          size="sm"
+                          disabled={notificando === t.id_transaccion}
+                          onClick={() => void notificar(t)}
+                        >
+                          {notificando === t.id_transaccion ? (
+                            <Loader2 className="w-4 h-4 mr-1 animate-spin" />
+                          ) : (
+                            <Handshake className="w-4 h-4 mr-1" />
+                          )}
+                          Notificar comienzo del servicio
+                        </Button>
+                      </Tooltip>
                     )}
                     {estadoInicio === 'mio' && (
                       <span className="text-xs text-slate-400">

@@ -29,4 +29,17 @@ describe('AdminPage', () => {
     expect(screen.getByText('Gestión de Servicios')).toBeInTheDocument();
     expect(screen.getByText('Reportes Agregados')).toBeInTheDocument();
   });
+
+  it('muestra el banner del nuevo flujo de inicio del servicio', async () => {
+    await act(async () => {
+      render(<AdminPage />);
+    });
+    expect(
+      screen.getByText(/el nuevo flujo de inicio del servicio ya está activo/i),
+    ).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: /revisá las métricas/i })).toHaveAttribute(
+      'href',
+      '/dashboard/admin/metricas',
+    );
+  });
 });

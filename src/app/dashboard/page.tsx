@@ -2,6 +2,7 @@
 
 import { useAuthStore } from '@/store/auth';
 import { Card, CardTitle } from '@/components/ui/Card';
+import { ChipLanzamiento } from '@/components/ui/Tooltip';
 import { CreditCard, FileText, TrendingUp, Clock, CheckCircle } from 'lucide-react';
 import { LlaveIcon } from '@/components/ui/LlaveIcon';
 
@@ -21,6 +22,9 @@ const recentActivity = [
 
 export default function DashboardPage() {
   const user = useAuthStore((s) => s.user);
+  const esProveedor = (user?.usuario_roles || []).some(
+    (ur) => ur.activo && ur.rol?.nombre === 'proveedor',
+  );
 
   return (
     <div>
@@ -29,6 +33,14 @@ export default function DashboardPage() {
           Hola, {user?.nombre} 👋
         </h1>
         <p className="text-slate-400 mt-1">Bienvenido a tu panel de control</p>
+        {esProveedor && (
+          <div className="mt-3">
+            <ChipLanzamiento
+              href="/novedades/anticipo-30"
+              texto="Nuevo: anticipo del 30% disponible para servicios >3 días."
+            />
+          </div>
+        )}
       </div>
 
       {/* Stats */}

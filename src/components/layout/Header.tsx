@@ -29,6 +29,10 @@ function formatRelativeTime(dateStr: string): string {
 
 const RECENT_SEARCHES_KEY = 'recent_searches';
 
+export function esVentanaLanzamiento(fecha: Date = new Date()): boolean {
+  return fecha.getDate() >= 1 && fecha.getDate() <= 5;
+}
+
 interface CategoriaApi {
   id_categoria: number;
   nombre: string;
@@ -61,6 +65,7 @@ export default function Header({ onToggleSidebar }: { onToggleSidebar?: () => vo
   const [selectedIndex, setSelectedIndex] = useState(-1);
   const [categories, setCategories] = useState<Array<{id_categoria: number; nombre: string; slug: string}>>([]);
   const [services, setServices] = useState<Array<{id_servicio: number; nombre: string; id_categoria: number}>>([]);
+  const [mostrarBannerLanzamiento, setMostrarBannerLanzamiento] = useState(false);
   const searchRef = useRef<HTMLDivElement>(null);
   const notifRef = useRef<HTMLDivElement>(null);
   const searchInputRef = useRef<HTMLInputElement>(null);
@@ -92,6 +97,10 @@ export default function Header({ onToggleSidebar }: { onToggleSidebar?: () => vo
       const stored = localStorage.getItem(RECENT_SEARCHES_KEY);
       if (stored) setRecentSearches(JSON.parse(stored));
     } catch {}
+  }, []);
+
+  useEffect(() => {
+    setMostrarBannerLanzamiento(esVentanaLanzamiento());
   }, []);
 
   useEffect(() => {
@@ -536,6 +545,18 @@ export default function Header({ onToggleSidebar }: { onToggleSidebar?: () => vo
             {menuAbierto ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
           </button>
         </div>
+
+        {isAuthenticated && mostrarBannerLanzamiento && (
+          <div className="pb-2">
+            <Link
+              href="/novedades/anticipo-30"
+              className="block text-center text-sm font-medium text-cyan-700 bg-cyan-500/10 border border-cyan-500/30 rounded-lg px-3 py-2 hover:bg-cyan-500/20 transition-colors"
+            >
+              Anticipo del 30% para servicios largos.{' '}
+              <span className="underline">Más información.</span>
+            </Link>
+          </div>
+        )}
 
         {mobileMenuOpen && (
           <div className="md:hidden py-4 border-t border-slate-100">

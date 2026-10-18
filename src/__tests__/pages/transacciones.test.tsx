@@ -44,6 +44,7 @@ const mockearLista = (lista: unknown[]) => {
 describe('TransaccionesPage', () => {
   beforeEach(() => {
     jest.clearAllMocks();
+    localStorage.clear();
     mockearLista([]);
   });
 
@@ -153,5 +154,58 @@ describe('TransaccionesPage', () => {
         undefined,
       );
     });
+  });
+
+  it('muestra el modal de bienvenida del comienzo al detectar custodia', async () => {
+    mockearLista([txBase()]);
+    await act(async () => {
+      render(<TransaccionesPage />);
+    });
+
+    expect(
+      screen.getByText(/el nuevo flujo del comienzo del servicio ya está activo/i),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: /entendido/i }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole('link', { name: /ver la ayuda completa/i }),
+    ).toHaveAttribute('href', '/ayuda/comienzo-del-servicio');
+  });
+
+  it('no repite el modal de bienvenida una vez cerrado', async () => {
+    mockearLista([txBase()]);
+    await act(async () => {
+      render(<TransaccionesPage />);
+    });
+
+    fireEvent.click(screen.getByRole('button', { name: /entendido/i }));
+
+    expect(
+      screen.queryByText(/el nuevo flujo del comienzo del servicio ya está activo/i),
+    ).not.toBeInTheDocument();
+    expect(localStorage.getItem('cd_modal_comienzo_visto')).toBe('1');
+  });
+
+  it('no muestra el modal sin transacciones en custodia', async () => {
+    mockearLista([]);
+    await act(async () => {
+      render(<TransaccionesPage />);
+    });
+
+    expect(
+      screen.queryByText(/el nuevo flujo del comienzo del servicio ya está activo/i),
+    ).not.toBeInTheDocument();
+  });
+
+  it('muestra el tooltip de liberación junto al botón de comienzo', async () => {
+    mockearLista([txBase()]);
+    await act(async () => {
+      render(<TransaccionesPage />);
+    });
+
+    expect(screen.getByRole('tooltip')).toHaveTextContent(
+      'Ambas partes deben notificar. El 30% se libera a las 72 h calendario.',
+    );
   });
 });

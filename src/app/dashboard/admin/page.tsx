@@ -67,6 +67,16 @@ export default function AdminPage() {
     <div className="space-y-6">
       <h1 className="text-2xl font-bold text-white">Panel de Administración</h1>
 
+      <div className="rounded-xl border border-cyan-500/30 bg-cyan-500/10 px-4 py-3 text-sm text-cyan-200">
+        El nuevo flujo de inicio del servicio ya está activo.{' '}
+        <Link
+          href="/dashboard/admin/metricas"
+          className="font-semibold text-cyan-100 underline hover:text-white"
+        >
+          Revisá las métricas.
+        </Link>
+      </div>
+
       {loading ? (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           {[1, 2, 3, 4].map((i) => (
