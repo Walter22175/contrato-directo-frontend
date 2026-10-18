@@ -86,7 +86,7 @@ export default function NovedadComienzoServicioPage() {
                 Novedad
               </span>
               <h1 className="text-3xl font-bold text-white">
-                Nuevo sistema de confirmación del comienzo del servicio
+                Sistema de confirmación del comienzo del servicio
               </h1>
               <p className="text-slate-400 mt-1">
                 Más control y transparencia sobre cuándo empieza realmente el

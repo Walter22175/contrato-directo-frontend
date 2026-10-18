@@ -24,7 +24,7 @@ interface Novedad {
 const novedades: Novedad[] = [
   {
     href: '/ayuda/novedades/comienzo-servicio',
-    titulo: 'Nuevo sistema de confirmación del comienzo del servicio',
+    titulo: 'Sistema de confirmación del comienzo del servicio',
     descripcion:
       'Ahora el inicio del servicio se confirma por ambas partes desde la plataforma. Conocé cómo funciona y qué cambia para vos.',
   },

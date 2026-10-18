@@ -12,7 +12,7 @@ describe('NovedadComienzoServicioPage', () => {
     });
     expect(
       screen.getByRole('heading', {
-        name: /nuevo sistema de confirmación del comienzo del servicio/i,
+        name: /sistema de confirmación del comienzo del servicio/i,
       }),
     ).toBeInTheDocument();
   });
