@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import api, { extractData } from '@/lib/api';
 import { Card } from '@/components/ui/Card';
-import { Users, Briefcase, FileText, AlertTriangle, TrendingUp, Activity, CreditCard } from 'lucide-react';
+import { Users, Briefcase, FileText, AlertTriangle, TrendingUp, Activity, CreditCard, BookOpen } from 'lucide-react';
 import Link from 'next/link';
 import type { Reclamo, Transaccion, Usuario } from '@/types';
 
@@ -61,6 +61,7 @@ export default function AdminPage() {
     { label: 'Reportes Agregados', description: 'Métricas y estadísticas de la plataforma', icon: Activity, href: '/dashboard/admin/reportes' },
     { label: 'Solicitudes de Cambio', description: 'Revisar solicitudes pendientes', icon: FileText, href: '/dashboard/admin/reportes' },
     { label: 'Mercado Pago', description: 'Estado del marketplace, tokens y capturas', icon: CreditCard, href: '/dashboard/admin/mercado-pago' },
+    { label: 'Manual de Soporte', description: 'Operativa interna: comienzo, anticipo del 30% y marketplace', icon: BookOpen, href: '/ayuda/interno/manual-soporte' },
   ];
 
   return (

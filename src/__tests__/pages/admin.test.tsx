@@ -42,4 +42,13 @@ describe('AdminPage', () => {
       '/dashboard/admin/metricas',
     );
   });
+
+  it('incluye el link al manual interno de soporte', async () => {
+    await act(async () => {
+      render(<AdminPage />);
+    });
+    expect(
+      screen.getByRole('link', { name: /manual de soporte/i }),
+    ).toHaveAttribute('href', '/ayuda/interno/manual-soporte');
+  });
 });
