@@ -7,7 +7,7 @@ import Button from '@/components/ui/Button';
 import BuscadorInteligente from '@/components/ayuda/BuscadorInteligente';
 import FeedbackArticulo from '@/components/ayuda/FeedbackArticulo';
 import api, { extractData } from '@/lib/api';
-import { ChevronDown, ChevronUp, HelpCircle, MessageSquare, Mail } from 'lucide-react';
+import { ChevronDown, ChevronUp, HelpCircle, MessageSquare, Mail, Megaphone } from 'lucide-react';
 import type { Faq } from '@/types';
 
 interface CategoriaAyuda {
@@ -173,10 +173,40 @@ export default function AyudaPage() {
     </div>
   );
 
+  const renderNovedades = () => (
+    <Link
+      href="/ayuda/novedades/anticipo-30"
+      className="block mb-8"
+      data-testid="novedad-anticipo-30"
+    >
+      <Card>
+        <div className="flex items-start gap-4">
+          <div className="w-10 h-10 shrink-0 bg-cyan-500/10 border border-cyan-500/20 rounded-xl flex items-center justify-center">
+            <Megaphone className="w-5 h-5 text-cyan-400" />
+          </div>
+          <div>
+            <span className="inline-block text-xs font-semibold uppercase tracking-wide bg-cyan-500/10 text-cyan-400 border border-cyan-500/20 rounded px-2 py-0.5 mb-1">
+              Novedad
+            </span>
+            <h2 className="font-semibold text-white">
+              Anticipo del 30% para servicios largos
+            </h2>
+            <p className="text-sm text-slate-400 mt-1">
+              Si trabajás en servicios de más de 3 días, ahora podés cobrar el
+              30% del presupuesto apenas arrancado el trabajo. Conocé cómo
+              funciona.
+            </p>
+          </div>
+        </div>
+      </Card>
+    </Link>
+  );
+
   return (
     <main className="flex-1">
       {renderHero()}
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        {renderNovedades()}
         {renderCategories()}
         {renderFaqs()}
         {renderContact()}
