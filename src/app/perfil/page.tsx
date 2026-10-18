@@ -30,6 +30,10 @@ export default function PerfilPage() {
   const esCliente = roles.includes('cliente');
   const esProveedor = roles.includes('proveedor');
   const esAmbos = esCliente && esProveedor;
+  const rolesExtras = roles.filter(
+    (r): r is string => !!r && r !== 'cliente' && r !== 'proveedor',
+  );
+  const tieneAlgunRol = esCliente || esProveedor || rolesExtras.length > 0;
   const contextoActivo = contexto || (esAmbos ? 'cliente' : esProveedor ? 'proveedor' : 'cliente');
 
   const handleSwitchRole = async (rol: 'cliente' | 'proveedor') => {
@@ -107,7 +111,16 @@ export default function PerfilPage() {
                     )}
                   </span>
                 )}
-                {!esCliente && !esProveedor && (
+                {rolesExtras.map((rol) => (
+                  <span
+                    key={rol}
+                    className="inline-flex items-center gap-1 text-xs px-2.5 py-1 bg-amber-500/10 text-amber-400 border border-amber-500/20 rounded-full capitalize"
+                  >
+                    <Shield className="w-3 h-3" />
+                    {rol.replace(/_/g, ' ')}
+                  </span>
+                ))}
+                {!tieneAlgunRol && (
                   <span className="inline-flex items-center gap-1 text-xs px-2.5 py-1 bg-slate-500/10 text-slate-400 border border-slate-500/20 rounded-full">
                     Sin rol
                   </span>
