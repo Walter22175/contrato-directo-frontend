@@ -4,6 +4,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { Card } from '@/components/ui/Card';
 import Button from '@/components/ui/Button';
 import { obtenerMetricasInicioServicio } from '@/lib/mercadopago';
+import { mensajeError } from '@/lib/api';
 import { formatCurrency, formatDateTime } from '@/lib/utils';
 import { useConfigPublica } from '@/hooks/useConfigPublica';
 import {
@@ -277,8 +278,10 @@ export default function InicioServicioAdminPage() {
             : undefined;
         const datos = await obtenerMetricasInicioServicio(params);
         setMetricas(datos);
-      } catch {
-        setError('No se pudieron cargar las métricas del anticipo.');
+      } catch (e) {
+        setError(
+          mensajeError(e, 'No se pudieron cargar las métricas del anticipo.'),
+        );
       } finally {
         setCargando(false);
       }

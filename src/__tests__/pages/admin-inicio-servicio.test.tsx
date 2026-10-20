@@ -155,6 +155,28 @@ describe('InicioServicioAdminPage', () => {
     await act(async () => {
       render(<InicioServicioAdminPage />);
     });
+    expect(await screen.findByRole('alert')).toHaveTextContent('boom');
+  });
+
+  it('muestra el mensaje del backend cuando la API devuelve un error', async () => {
+    (obtenerMetricasInicioServicio as jest.Mock).mockRejectedValueOnce({
+      isAxiosError: true,
+      response: { data: { message: 'syntax error at or near "$1"' } },
+      message: 'Request failed with status code 500',
+    });
+    await act(async () => {
+      render(<InicioServicioAdminPage />);
+    });
+    expect(await screen.findByRole('alert')).toHaveTextContent(
+      'syntax error at or near "$1"',
+    );
+  });
+
+  it('usa el texto de respaldo cuando el error no tiene mensaje', async () => {
+    (obtenerMetricasInicioServicio as jest.Mock).mockRejectedValueOnce(undefined);
+    await act(async () => {
+      render(<InicioServicioAdminPage />);
+    });
     expect(await screen.findByRole('alert')).toHaveTextContent(
       /no se pudieron cargar las métricas del anticipo/i,
     );

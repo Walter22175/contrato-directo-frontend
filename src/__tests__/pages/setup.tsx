@@ -73,5 +73,13 @@ jest.mock('@/lib/api', () => {
       delete: jest.fn(() => Promise.resolve({ data: { statusCode: 200, timestamp: '', data: {} } })),
     },
     extractData: jest.fn(mockExtract),
+    mensajeError: jest.fn((error: unknown, fallback = 'Error inesperado') => {
+      const e = error as { response?: { data?: { message?: string | string[] } }; message?: string };
+      const msg = e?.response?.data?.message;
+      if (Array.isArray(msg)) return msg.join(', ');
+      if (typeof msg === 'string' && msg) return msg;
+      if (error instanceof Error && error.message) return error.message;
+      return fallback;
+    }),
   };
 });
