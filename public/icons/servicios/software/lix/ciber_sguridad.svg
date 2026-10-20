@@ -1,0 +1,254 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<svg viewBox="0 0 400 400" width="100%" height="100%"
+     xmlns="http://www.w3.org/2000/svg" role="img"
+     aria-label="Icono de Ciber Seguridad - Contrato Directo">
+
+  <defs>
+    <linearGradient id="gradCS" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%"   stop-color="#0A2A66"/>
+      <stop offset="55%"  stop-color="#1E6FE8"/>
+      <stop offset="100%" stop-color="#22C1E0"/>
+    </linearGradient>
+
+    <linearGradient id="gradAroCS" x1="0%" y1="100%" x2="100%" y2="0%">
+      <stop offset="0%"   stop-color="#22C1E0"/>
+      <stop offset="100%" stop-color="#0A2A66"/>
+    </linearGradient>
+
+    <linearGradient id="gradEscudo" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%"   stop-color="#22C1E0"/>
+      <stop offset="100%" stop-color="#1E6FE8"/>
+    </linearGradient>
+
+    <radialGradient id="glowCS" cx="50%" cy="50%" r="50%">
+      <stop offset="0%"   stop-color="#22C1E0" stop-opacity="0.55"/>
+      <stop offset="100%" stop-color="#22C1E0" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+
+  <!-- Aro exterior institucional -->
+  <g fill="none" stroke="url(#gradAroCS)" stroke-width="7"
+     stroke-linecap="round" opacity="0.85">
+    <path d="M 70 200 A 130 130 0 0 1 200 70" />
+    <path d="M 200 70 A 130 130 0 0 1 330 200" />
+    <path d="M 330 200 A 130 130 0 0 1 200 330" />
+    <path d="M 200 330 A 130 130 0 0 1 70 200" />
+    <animateTransform attributeName="transform" type="rotate"
+      from="0 200 200" to="360 200 200" dur="50s" repeatCount="indefinite"/>
+  </g>
+
+  <!-- Resplandor central -->
+  <circle cx="200" cy="200" r="95" fill="url(#glowCS)">
+    <animate attributeName="r" values="90;110;90" dur="3s" repeatCount="indefinite"/>
+    <animate attributeName="opacity" values="0.7;0.3;0.7" dur="3s" repeatCount="indefinite"/>
+  </circle>
+
+  <!-- 🛡️ ESCUDO CENTRAL (núcleo) -->
+  <g transform="translate(200 200) scale(0.95)">
+    <g>
+      <!-- Animación: el escudo late -->
+      <animateTransform attributeName="transform" type="scale"
+        values="1 1; 1.04 1.04; 1 1" dur="2.5s" repeatCount="indefinite"/>
+
+      <!-- Escudo -->
+      <path d="M 0 -58
+               L 48 -38
+               L 48 4
+               Q 48 38 0 58
+               Q -48 38 -48 4
+               L -48 -38 Z"
+            fill="url(#gradEscudo)"/>
+
+      <!-- Borde interior del escudo -->
+      <path d="M 0 -50
+               L 40 -33
+               L 40 2
+               Q 40 32 0 50
+               Q -40 32 -40 2
+               L -40 -33 Z"
+            fill="none" stroke="#ffffff" stroke-width="2" opacity="0.4"/>
+
+      <!-- Candado dentro del escudo -->
+      <rect x="-16" y="-8" width="32" height="26" rx="4" fill="#ffffff" opacity="0.95"/>
+      <!-- Arco del candado -->
+      <path d="M -10 -8 L -10 -16 Q -10 -24 0 -24 Q 10 -24 10 -16 L 10 -8"
+            fill="none" stroke="#ffffff" stroke-width="6" stroke-linecap="round"/>
+      <!-- Ojo de la cerradura -->
+      <circle cx="0" cy="2" r="4" fill="#0A2A66"/>
+      <rect x="-1.5" y="2" width="3" height="8" fill="#0A2A66"/>
+
+      <!-- Check de validación -->
+      <circle cx="0" cy="2" r="4" fill="none" stroke="#22C1E0" stroke-width="1.5">
+        <animate attributeName="r" values="4;6;4" dur="2.5s" repeatCount="indefinite"/>
+        <animate attributeName="opacity" values="1;0;1" dur="2.5s" repeatCount="indefinite"/>
+      </circle>
+
+      <!-- Brillo superior del escudo -->
+      <path d="M -30 -32 L 30 -32 L 26 -36 L -26 -36 Z"
+            fill="#ffffff" opacity="0.35"/>
+
+      <!-- Puntos de datos en el escudo -->
+      <circle cx="-24" cy="-16" r="2" fill="#ffffff" opacity="0.6"/>
+      <circle cx="24" cy="-16" r="2" fill="#ffffff" opacity="0.6"/>
+      <circle cx="-24" cy="20" r="2" fill="#ffffff" opacity="0.6"/>
+      <circle cx="24" cy="20" r="2" fill="#ffffff" opacity="0.6"/>
+    </g>
+  </g>
+
+  <!-- 🔒 CANDADO (12 en punto) -->
+  <g transform="translate(200 118) scale(0.62)">
+    <g>
+      <animateTransform attributeName="transform" type="translate"
+        values="0 0; 0 -3; 0 0" dur="2.6s" repeatCount="indefinite"/>
+      <!-- Arco del candado -->
+      <path d="M -12 -6 L -12 -16 Q -12 -28 0 -28 Q 12 -28 12 -16 L 12 -6"
+            fill="none" stroke="url(#gradCS)" stroke-width="6"
+            stroke-linecap="round"/>
+      <!-- Cuerpo del candado -->
+      <rect x="-18" y="-6" width="36" height="30" rx="5" fill="url(#gradCS)"/>
+      <!-- Ojo de la cerradura -->
+      <circle cx="0" cy="6" r="4" fill="#0A2A66"/>
+      <path d="M 0 6 L 0 14" stroke="#0A2A66" stroke-width="3" stroke-linecap="round"/>
+      <!-- Brillo -->
+      <rect x="-14" y="-4" width="28" height="3" rx="1.5" fill="#ffffff" opacity="0.35"/>
+    </g>
+  </g>
+
+  <!-- 👁️ OJO / VIGILANCIA (6 en punto) -->
+  <g transform="translate(200 288) scale(0.62)">
+    <g>
+      <animateTransform attributeName="transform" type="translate"
+        values="0 0; 0 3; 0 0" dur="2.8s" repeatCount="indefinite"/>
+      <!-- Forma del ojo -->
+      <path d="M -24 0 Q 0 -16 24 0 Q 0 16 -24 0 Z" fill="url(#gradCS)"/>
+      <!-- Iris -->
+      <circle cx="0" cy="0" r="8" fill="#ffffff" opacity="0.95"/>
+      <!-- Pupila -->
+      <circle cx="0" cy="0" r="4" fill="#0A2A66">
+        <animate attributeName="r" values="4;3;4" dur="2s" repeatCount="indefinite"/>
+      </circle>
+      <!-- Brillo del iris -->
+      <circle cx="-2" cy="-2" r="1.5" fill="#ffffff" opacity="0.9"/>
+      <!-- Pestañas -->
+      <path d="M -24 0 L -28 -4 M 24 0 L 28 -4" stroke="url(#gradCS)"
+            stroke-width="2.5" stroke-linecap="round"/>
+    </g>
+  </g>
+
+  <!-- 🔐 LLAVE / CONTRASEÑA (9 en punto) -->
+  <g transform="translate(118 200) scale(0.62)">
+    <g transform="rotate(-30)">
+      <animateTransform attributeName="transform" type="rotate"
+        values="-30; -22; -30" dur="3s" repeatCount="indefinite" additive="replace"/>
+      <!-- Anillo de la llave -->
+      <circle cx="0" cy="-36" r="14" fill="none"
+              stroke="url(#gradCS)" stroke-width="6"/>
+      <circle cx="0" cy="-36" r="6" fill="#ffffff" opacity="0.25"/>
+      <!-- Vástago -->
+      <rect x="-3" y="-22" width="6" height="48" rx="2" fill="url(#gradCS)"/>
+      <!-- Dientes -->
+      <rect x="3" y="10" width="10" height="5" rx="1" fill="url(#gradCS)"/>
+      <rect x="3" y="18" width="8" height="5" rx="1" fill="url(#gradCS)"/>
+      <rect x="3" y="26" width="12" height="5" rx="1" fill="url(#gradCS)"/>
+      <!-- Brillo -->
+      <rect x="-2" y="-18" width="1.5" height="38" rx="0.75" fill="#ffffff" opacity="0.4"/>
+    </g>
+  </g>
+
+  <!-- 🌐 RED / NODOS (3 en punto) -->
+  <g transform="translate(282 200) scale(0.62)">
+    <g>
+      <animateTransform attributeName="transform" type="rotate"
+        values="-6; 6; -6" dur="3.2s" repeatCount="indefinite"/>
+      <!-- Líneas de conexión -->
+      <line x1="0" y1="0" x2="-22" y2="-22" stroke="url(#gradCS)" stroke-width="2.5" stroke-linecap="round"/>
+      <line x1="0" y1="0" x2="-22" y2="22" stroke="url(#gradCS)" stroke-width="2.5" stroke-linecap="round"/>
+      <line x1="0" y1="0" x2="22" y2="-22" stroke="url(#gradCS)" stroke-width="2.5" stroke-linecap="round"/>
+      <line x1="0" y1="0" x2="22" y2="22" stroke="url(#gradCS)" stroke-width="2.5" stroke-linecap="round"/>
+      <!-- Nodos -->
+      <circle cx="-22" cy="-22" r="6" fill="url(#gradCS)"/>
+      <circle cx="-22" cy="22" r="6" fill="url(#gradCS)"/>
+      <circle cx="22" cy="-22" r="6" fill="url(#gradCS)"/>
+      <circle cx="22" cy="22" r="6" fill="url(#gradCS)"/>
+      <!-- Nodo central -->
+      <circle r="10" fill="url(#gradCS)"/>
+      <circle r="4" fill="#ffffff" opacity="0.95">
+        <animate attributeName="r" values="4;6;4" dur="1.8s" repeatCount="indefinite"/>
+      </circle>
+    </g>
+  </g>
+
+  <!-- 🖥️ MONITOR / FIREWALL (10-11 en punto) -->
+  <g transform="translate(118 118) scale(0.58)">
+    <g>
+      <animateTransform attributeName="transform" type="translate"
+        values="0 0; 0 -3; 0 0" dur="2.8s" repeatCount="indefinite"/>
+      <!-- Monitor -->
+      <rect x="-22" y="-16" width="44" height="30" rx="4" fill="url(#gradCS)"/>
+      <rect x="-18" y="-12" width="36" height="22" rx="2" fill="#0A2A66" opacity="0.9"/>
+      <!-- Base del monitor -->
+      <rect x="-8" y="14" width="16" height="6" rx="2" fill="url(#gradCS)"/>
+      <rect x="-14" y="18" width="28" height="4" rx="2" fill="url(#gradCS)"/>
+      <!-- Líneas de firewall -->
+      <g fill="#22C1E0">
+        <rect x="-14" y="-8" width="12" height="2" rx="1"/>
+        <rect x="-14" y="-3" width="20" height="2" rx="1" opacity="0.8"/>
+        <rect x="-14" y="2" width="16" height="2" rx="1" opacity="0.6"/>
+      </g>
+      <!-- Candado en la pantalla -->
+      <rect x="8" y="-6" width="8" height="8" rx="1" fill="#22C1E0"/>
+      <path d="M 10 -6 L 10 -8 Q 10 -11 12 -11 Q 14 -11 14 -8 L 14 -6"
+            fill="none" stroke="#22C1E0" stroke-width="1.5"/>
+      <!-- LED -->
+      <circle cx="16" cy="12" r="1.5" fill="#22C1E0">
+        <animate attributeName="opacity" values="1;0.2;1" dur="1.2s" repeatCount="indefinite"/>
+      </circle>
+    </g>
+  </g>
+
+  <!-- ⚠️ ALERTA / DETECCIÓN (1-2 en punto) -->
+  <g transform="translate(282 118) scale(0.58)">
+    <g>
+      <animateTransform attributeName="transform" type="scale"
+        values="1 1; 1.08 1.08; 1 1" dur="1.4s" repeatCount="indefinite"/>
+      <!-- Triángulo de alerta -->
+      <path d="M 0 -22 L 22 16 L -22 16 Z" fill="url(#gradCS)"/>
+      <!-- Borde interior -->
+      <path d="M 0 -16 L 17 12 L -17 12 Z" fill="none"
+            stroke="#ffffff" stroke-width="1.5" opacity="0.5"/>
+      <!-- Signo de exclamación -->
+      <rect x="-2" y="-8" width="4" height="14" rx="1.5" fill="#ffffff"/>
+      <circle cx="0" cy="10" r="2" fill="#ffffff"/>
+      <!-- Ondas de detección -->
+      <path d="M -28 -12 Q -32 -6 -28 0" fill="none"
+            stroke="#22C1E0" stroke-width="2" stroke-linecap="round" opacity="0.6">
+        <animate attributeName="opacity" values="0.6;0.1;0.6" dur="1.4s" repeatCount="indefinite"/>
+      </path>
+      <path d="M 28 -12 Q 32 -6 28 0" fill="none"
+            stroke="#22C1E0" stroke-width="2" stroke-linecap="round" opacity="0.6">
+        <animate attributeName="opacity" values="0.6;0.1;0.6" dur="1.4s" begin="0.3s" repeatCount="indefinite"/>
+      </path>
+    </g>
+  </g>
+
+  <!-- CHISPAS / partículas alrededor (bits de datos) -->
+  <g fill="#22C1E0">
+    <circle cx="270" cy="105" r="3.5">
+      <animate attributeName="r" values="2.5;6;2.5" dur="1.2s" repeatCount="indefinite"/>
+      <animate attributeName="opacity" values="1;0.2;1" dur="1.2s" repeatCount="indefinite"/>
+    </circle>
+    <circle cx="130" cy="105" r="3">
+      <animate attributeName="r" values="2;5;2" dur="1.4s" begin="0.3s" repeatCount="indefinite"/>
+      <animate attributeName="opacity" values="1;0.2;1" dur="1.4s" begin="0.3s" repeatCount="indefinite"/>
+    </circle>
+    <circle cx="300" cy="272" r="3">
+      <animate attributeName="r" values="2;5;2" dur="1.3s" begin="0.6s" repeatCount="indefinite"/>
+      <animate attributeName="opacity" values="1;0.2;1" dur="1.3s" begin="0.6s" repeatCount="indefinite"/>
+    </circle>
+    <circle cx="100" cy="272" r="3.5">
+      <animate attributeName="r" values="2.5;6;2.5" dur="1.5s" begin="0.9s" repeatCount="indefinite"/>
+      <animate attributeName="opacity" values="1;0.2;1" dur="1.5s" begin="0.9s" repeatCount="indefinite"/>
+    </circle>
+  </g>
+</svg>
