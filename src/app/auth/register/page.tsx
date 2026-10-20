@@ -54,10 +54,18 @@ export default function RegisterPage() {
   });
 
   useEffect(() => {
+    reset({ tipo_persona: 'fisica' });
+  }, [reset]);
+
+  useEffect(() => {
     if (error && errorRef.current) {
       errorRef.current.scrollIntoView({ behavior: 'smooth', block: 'center' });
     }
   }, [error]);
+
+  const desbloquearAutofill = (e: React.FocusEvent<HTMLInputElement>) => {
+    e.target.removeAttribute('readOnly');
+  };
 
   const onSubmit = async (data: RegisterForm) => {
     try {
@@ -99,11 +107,12 @@ export default function RegisterPage() {
               </div>
             )}
 
-            <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+            <form onSubmit={handleSubmit(onSubmit)} className="space-y-4" autoComplete="off">
               <Input
                 label="Nombre"
                 placeholder="Tu nombre"
                 error={errors.nombre?.message}
+                autoComplete="off"
                 onFocus={clearError}
                 {...register('nombre')}
               />
@@ -112,6 +121,7 @@ export default function RegisterPage() {
                 label="Apellido (opcional)"
                 placeholder="Tu apellido"
                 error={errors.apellido?.message}
+                autoComplete="off"
                 onFocus={clearError}
                 {...register('apellido')}
               />
@@ -121,7 +131,12 @@ export default function RegisterPage() {
                 type="email"
                 placeholder="tu@email.com"
                 error={errors.email?.message}
-                onFocus={clearError}
+                autoComplete="off"
+                readOnly
+                onFocus={(e) => {
+                  desbloquearAutofill(e);
+                  clearError();
+                }}
                 {...register('email')}
               />
 
@@ -131,6 +146,7 @@ export default function RegisterPage() {
                   type={showPassword ? 'text' : 'password'}
                   placeholder="Mínimo 8 caracteres"
                   error={errors.password?.message}
+                  autoComplete="new-password"
                   onFocus={clearError}
                   {...register('password')}
                 />
@@ -157,6 +173,8 @@ export default function RegisterPage() {
                 label="CUIT/CUIL (opcional)"
                 placeholder="XX-XXXXXXXX-X"
                 error={errors.cuit_cuil?.message}
+                autoComplete="off"
+                onFocus={clearError}
                 {...register('cuit_cuil')}
               />
 
@@ -164,6 +182,8 @@ export default function RegisterPage() {
                 label="DNI (opcional)"
                 placeholder="12345678"
                 error={errors.dni?.message}
+                autoComplete="off"
+                onFocus={clearError}
                 {...register('dni')}
               />
 
@@ -171,6 +191,8 @@ export default function RegisterPage() {
                 label="Teléfono (opcional)"
                 placeholder="+54 11 1234-5678"
                 error={errors.telefono?.message}
+                autoComplete="off"
+                onFocus={clearError}
                 {...register('telefono')}
               />
 

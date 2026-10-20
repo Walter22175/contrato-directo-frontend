@@ -8,11 +8,12 @@ import { useNotificationStore } from '@/store/notifications';
 import { useUiStore } from '@/store/ui';
 import { useNotificationsSocket } from '@/hooks/useNotificationsSocket';
 import { useState, useEffect, useRef, useCallback } from 'react';
-import { Menu, Search, Bell, User, LogOut, ChevronDown, Check, X, Box } from 'lucide-react';
+import { Menu, Search, Bell, User, LogOut, ChevronDown, Check, X, Box, Lamp } from 'lucide-react';
 import Image from 'next/image';
 import Button from '@/components/ui/Button';
 import api, { extractData } from '@/lib/api';
 import { iconoCategoria } from '@/lib/iconos';
+import { cn } from '@/lib/utils';
 
 function formatRelativeTime(dateStr: string): string {
   const now = new Date();
@@ -66,9 +67,17 @@ export default function Header({ onToggleSidebar }: { onToggleSidebar?: () => vo
   const [categories, setCategories] = useState<Array<{id_categoria: number; nombre: string; slug: string}>>([]);
   const [services, setServices] = useState<Array<{id_servicio: number; nombre: string; id_categoria: number}>>([]);
   const [mostrarBannerLanzamiento, setMostrarBannerLanzamiento] = useState(false);
+  const blacklight = useUiStore((s) => s.blacklight);
+  const [gestoLampara, setGestoLampara] = useState(false);
   const searchRef = useRef<HTMLDivElement>(null);
   const notifRef = useRef<HTMLDivElement>(null);
   const searchInputRef = useRef<HTMLInputElement>(null);
+
+  const alternarBlacklight = () => {
+    useUiStore.getState().alternarBlacklight();
+    setGestoLampara(false);
+    requestAnimationFrame(() => setGestoLampara(true));
+  };
 
   useNotificationsSocket((event) => {
     useNotificationStore.getState().addNotificacion({
@@ -536,14 +545,38 @@ export default function Header({ onToggleSidebar }: { onToggleSidebar?: () => vo
             )}
           </nav>
 
-          <button
-            onClick={alternarMenuMovil}
-            className="md:hidden text-slate-600 hover:text-slate-900"
-            aria-label={menuAbierto ? 'Cerrar menú' : 'Abrir menú'}
-            aria-expanded={menuAbierto}
-          >
-            {menuAbierto ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
-          </button>
+          <div className="flex items-center gap-3">
+            <button
+              onClick={alternarBlacklight}
+              onMouseEnter={() => setGestoLampara(false)}
+              className={cn(
+                'p-2 rounded-full transition-colors',
+                blacklight
+                  ? 'text-amber-400 hover:text-amber-300 bg-amber-400/10'
+                  : 'text-slate-600 hover:text-slate-900 active:text-cyan-600',
+              )}
+              aria-label={blacklight ? 'Desactivar modo blacklight' : 'Activar modo blacklight'}
+              aria-pressed={blacklight}
+              title="Modo blacklight"
+            >
+              <Lamp
+                className={cn(
+                  'w-5 h-5 transition-all duration-300',
+                  gestoLampara && 'animate-lamp-gesture',
+                  blacklight && 'drop-shadow-[0_0_8px_rgba(250,204,21,0.9)]',
+                )}
+              />
+            </button>
+
+            <button
+              onClick={alternarMenuMovil}
+              className="md:hidden text-slate-600 hover:text-slate-900"
+              aria-label={menuAbierto ? 'Cerrar menú' : 'Abrir menú'}
+              aria-expanded={menuAbierto}
+            >
+              {menuAbierto ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+            </button>
+          </div>
         </div>
 
         {isAuthenticated && mostrarBannerLanzamiento && (

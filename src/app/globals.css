@@ -25,3 +25,27 @@ body {
 ::-webkit-scrollbar-thumb:hover {
   background: #64748b;
 }
+
+/* Gesto del botón blacklight (lámpara) */
+@keyframes lamp-gesture {
+  0% { transform: rotate(0deg) scale(1); }
+  20% { transform: rotate(-18deg) scale(1.15); }
+  45% { transform: rotate(14deg) scale(1.1); }
+  70% { transform: rotate(-8deg) scale(1.05); }
+  100% { transform: rotate(0deg) scale(1); }
+}
+.animate-lamp-gesture {
+  animation: lamp-gesture 600ms ease-in-out;
+}
+
+/* Carrusel infinito de la galería "Nuestros clientes" */
+@keyframes marquee-clientes {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+.animate-marquee-clientes {
+  animation: marquee-clientes 40s linear infinite;
+}
+.grupo-marquee:hover .animate-marquee-clientes {
+  animation-play-state: paused;
+}

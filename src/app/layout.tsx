@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import "./globals.css";
 import AuthProvider from "@/components/providers/AuthProvider";
 import GlobalChatbot from "@/components/providers/GlobalChatbot";
+import BlacklightOverlay from "@/components/providers/BlacklightOverlay";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 
@@ -33,6 +34,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body className="min-h-screen text-slate-200 antialiased" style={{ backgroundColor: '#051027' }}>
         <AuthProvider>
           <GlobalChatbot />
+          <BlacklightOverlay />
           <Header />
           <main className="flex-1">{children}</main>
           <Footer />

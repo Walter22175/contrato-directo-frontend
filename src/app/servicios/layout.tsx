@@ -24,7 +24,7 @@ export default function PublicLayout({ children }: { children: React.ReactNode }
     <div className="min-h-screen flex flex-col">
       <div className="flex flex-1">
         <Sidebar role={role} />
-        <main className="flex-1">
+        <main className="flex-1 md:ml-64">
           {children}
         </main>
       </div>

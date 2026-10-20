@@ -1,11 +1,12 @@
 'use client';
 
 import PromocionCarousel from '@/components/layout/PromocionCarousel';
+import GaleriaClientes from '@/components/layout/GaleriaClientes';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { useState, useEffect, useRef, useCallback } from 'react';
-import { Search, Shield, FileText, Star, ArrowRight, ChevronRight, Box } from 'lucide-react';
+import { Search, Shield, FileText, Star, ArrowRight, ChevronRight, Box, Users } from 'lucide-react';
 import Button from '@/components/ui/Button';
 import { Promocion } from '@/types';
 import type { Servicio } from '@/types';
@@ -312,6 +313,76 @@ export default function HomePage() {
                   <span className="relative text-sm font-medium text-slate-300 text-center">{cat.name}</span>
                 </Link>
               ))}
+            </div>
+          </div>
+        </section>
+
+        {/* Nosotros */}
+        <section id="nosotros" className="py-16">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="grid md:grid-cols-2 gap-10 items-center">
+              <div>
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="w-12 h-12 bg-cyan-500/10 border border-cyan-500/20 rounded-xl flex items-center justify-center">
+                    <Users className="w-6 h-6 text-cyan-400" />
+                  </div>
+                  <h2 className="text-2xl font-bold text-white">Nosotros</h2>
+                </div>
+                <h3 className="text-lg font-semibold text-cyan-400 mb-3">Nuestra misión</h3>
+                <p className="text-slate-300 mb-3">
+                  Hacer de cada contacto la mejor experiencia de servicio, brindando calidad,
+                  innovación y eficiencia.
+                </p>
+                <p className="text-slate-300 mb-3">
+                  Trabajar con responsabilidad y compromiso en beneficio de nuestros clientes con
+                  personal altamente capacitado y comprometidos con los valores de la empresa.
+                </p>
+                <p className="text-slate-400">
+                  Conecta. Acuerda. Realiza. La plataforma que conecta clientes con proveedores de
+                  servicios de confianza, con contratos seguros y pagos protegidos.
+                </p>
+              </div>
+              <div className="grid gap-4">
+                {features.map((feat) => {
+                  const Icon = feat.icon;
+                  return (
+                    <Link key={feat.title} href={feat.href} className="group flex items-start gap-4 p-4 bg-slate-800/30 border border-slate-700/50 rounded-xl hover:border-cyan-500/30 transition-colors">
+                      <div className="w-11 h-11 shrink-0 bg-cyan-500/10 border border-cyan-500/20 rounded-lg flex items-center justify-center group-hover:scale-105 transition-transform">
+                        <Icon className="w-5 h-5 text-cyan-400" />
+                      </div>
+                      <div>
+                        <h4 className="font-semibold text-white group-hover:text-cyan-400 transition-colors">{feat.title}</h4>
+                        <p className="text-sm text-slate-400">{feat.description}</p>
+                      </div>
+                    </Link>
+                  );
+                })}
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* Nuestros clientes */}
+        <section id="clientes" className="py-16 bg-slate-900/50 overflow-hidden">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-10">
+            <h2 className="text-2xl font-bold text-white text-center">Nuestros clientes</h2>
+          </div>
+          <GaleriaClientes />
+        </section>
+
+        {/* Banner Quiero ser Proveedor */}
+        <section className="py-12">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="flex flex-col md:flex-row items-center justify-between gap-6 rounded-2xl border border-cyan-500/20 bg-gradient-to-r from-blue-900/40 via-slate-900 to-cyan-900/40 p-8">
+              <div>
+                <h3 className="text-2xl font-bold text-white">¿Tenés un oficio o profesión?</h3>
+                <p className="text-slate-300 mt-1">
+                  Sumate a Contrato Directo y empezá a conseguir clientes cerca tuyo.
+                </p>
+              </div>
+              <Link href="/proveedores/convertir">
+                <Button size="lg">Quiero ser Proveedor</Button>
+              </Link>
             </div>
           </div>
         </section>

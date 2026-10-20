@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { useEffect, useRef } from 'react';
 import { cn } from '@/lib/utils';
 import { useAuthStore } from '@/store/auth';
 import { useUiStore } from '@/store/ui';
@@ -96,6 +97,24 @@ export default function Sidebar({ role = 'cliente' }: { role?: string }) {
   const abierta = useUiStore((s) => s.sidebarAbierta);
   const cerrar = useUiStore((s) => s.cerrarSidebar);
   const links = role === 'admin' ? adminLinks : role === 'proveedor' ? providerLinks : clientLinks;
+  const navRef = useRef<HTMLElement>(null);
+  const itemRefs = useRef<Record<string, HTMLAnchorElement | null>>({});
+
+  const centrarItem = (href: string) => {
+    const nav = navRef.current;
+    const el = itemRefs.current[href];
+    if (!nav || !el) return;
+    const top = Math.max(0, el.offsetTop - nav.clientHeight / 2 + el.clientHeight / 2);
+    if (typeof nav.scrollTo === 'function') {
+      nav.scrollTo({ top, behavior: 'smooth' });
+    } else {
+      nav.scrollTop = top;
+    }
+  };
+
+  useEffect(() => {
+    centrarItem(pathname);
+  }, [pathname]);
 
   return (
     <>
@@ -110,10 +129,13 @@ export default function Sidebar({ role = 'cliente' }: { role?: string }) {
         className={cn(
           'fixed top-0 bottom-0 left-0 z-40 w-64 bg-slate-900 border-r border-slate-800 flex flex-col pt-28 transition-transform duration-200',
           abierta ? 'translate-x-0' : '-translate-x-full',
-          'md:static md:z-auto md:pt-0 md:translate-x-0 md:min-h-[calc(100vh-4rem)]',
+          'md:top-28 md:pt-0 md:translate-x-0 md:z-30',
         )}
       >
-        <nav className="p-4 space-y-1 flex-1 overflow-y-auto">
+        <nav
+          ref={navRef}
+          className="relative p-4 space-y-1 flex-1 overflow-y-auto overflow-x-hidden"
+        >
           {links.map((link) => {
             const Icon = link.icon;
             const isActive = pathname === link.href;
@@ -121,7 +143,13 @@ export default function Sidebar({ role = 'cliente' }: { role?: string }) {
               <Link
                 key={link.href}
                 href={link.href}
-                onClick={cerrar}
+                ref={(el) => {
+                  itemRefs.current[link.href] = el;
+                }}
+                onClick={() => {
+                  cerrar();
+                  centrarItem(link.href);
+                }}
                 className={cn(
                   'flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors',
                   isActive
