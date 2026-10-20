@@ -8,7 +8,7 @@ import { useNotificationStore } from '@/store/notifications';
 import { useUiStore } from '@/store/ui';
 import { useNotificationsSocket } from '@/hooks/useNotificationsSocket';
 import { useState, useEffect, useRef, useCallback } from 'react';
-import { Menu, Search, Bell, User, LogOut, ChevronDown, Check, X, Box, Lamp } from 'lucide-react';
+import { Menu, Search, Bell, User, LogOut, ChevronDown, Check, X, Box, Lightbulb } from 'lucide-react';
 import Image from 'next/image';
 import Button from '@/components/ui/Button';
 import api, { extractData } from '@/lib/api';
@@ -559,7 +559,7 @@ export default function Header({ onToggleSidebar }: { onToggleSidebar?: () => vo
               aria-pressed={blacklight}
               title="Modo blacklight"
             >
-              <Lamp
+              <Lightbulb
                 className={cn(
                   'w-5 h-5 transition-all duration-300',
                   gestoLampara && 'animate-lamp-gesture',
