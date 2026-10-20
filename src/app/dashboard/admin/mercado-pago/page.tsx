@@ -4,6 +4,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { Card } from '@/components/ui/Card';
 import Button from '@/components/ui/Button';
 import { obtenerMetricasMercadoPago } from '@/lib/mercadopago';
+import { mensajeError } from '@/lib/api';
 import type {
   AlertaCuentaMercadoPago,
   MetricasMercadoPago,
@@ -426,8 +427,10 @@ export default function MercadoPagoAdminPage() {
             : undefined;
         const datos = await obtenerMetricasMercadoPago(params);
         setMetricas(datos);
-      } catch {
-        setError('No se pudieron cargar las métricas de Mercado Pago.');
+      } catch (e) {
+        setError(
+          mensajeError(e, 'No se pudieron cargar las métricas de Mercado Pago.'),
+        );
       } finally {
         setCargando(false);
       }
