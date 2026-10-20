@@ -31,6 +31,7 @@ import {
   Wallet,
   Handshake,
   KeyRound,
+  Gauge,
 } from 'lucide-react';
 import { LlaveIcon } from '@/components/ui/LlaveIcon';
 
@@ -69,6 +70,7 @@ const providerLinks = [
 
 const adminLinks = [
   { href: '/dashboard/admin', label: 'Dashboard', icon: LayoutDashboard },
+  { href: '/dashboard/admin/control-total', label: 'Control Total', icon: Gauge },
   { href: '/dashboard/admin/usuarios', label: 'Usuarios', icon: Users },
   { href: '/dashboard/admin/roles', label: 'Roles', icon: KeyRound },
   { href: '/dashboard/admin/configuracion', label: 'Config. Sistema', icon: Settings },
