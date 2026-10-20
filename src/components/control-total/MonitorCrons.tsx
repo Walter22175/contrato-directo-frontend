@@ -1,12 +1,21 @@
 'use client';
 
 import { Card } from '@/components/ui/Card';
+import Button from '@/components/ui/Button';
 import { Chip, Semaforo } from './Semaforo';
-import { fmtFecha, fmtNum } from '@/lib/control-total';
+import { BannerAccion, DialogoAccion, useAccionAdmin } from './AccionAdmin';
+import { ejecutarCronManual, fmtFecha, fmtNum } from '@/lib/control-total';
 import type { MonitorCrons } from '@/lib/control-total';
-import { Timer } from 'lucide-react';
+import { Play, Timer } from 'lucide-react';
 
-export function MonitorCronsSeccion({ datos }: { datos: MonitorCrons | null }) {
+export function MonitorCronsSeccion({
+  datos,
+  refrescar,
+}: {
+  datos: MonitorCrons | null;
+  refrescar?: () => Promise<void> | void;
+}) {
+  const acc = useAccionAdmin();
   if (!datos) return null;
 
   return (
@@ -18,6 +27,8 @@ export function MonitorCronsSeccion({ datos }: { datos: MonitorCrons | null }) {
         </span>
       </div>
 
+      <BannerAccion msg={acc.msg} onCerrar={acc.cerrarMsg} />
+
       <div className="space-y-3">
         {datos.crons.map((c) => (
           <div key={c.nombre} className="bg-slate-900/40 border border-slate-800 rounded-xl p-4">
@@ -27,7 +38,32 @@ export function MonitorCronsSeccion({ datos }: { datos: MonitorCrons | null }) {
               <code className="text-[11px] text-slate-500 bg-slate-800 px-1.5 py-0.5 rounded">
                 {c.expresion}
               </code>
-              <Semaforo valor={c.semaforo} className="ml-auto" />
+              <Semaforo valor={c.semaforo} />
+              <Button
+                size="sm"
+                variant="outline"
+                className="ml-auto"
+                disabled={acc.ejecutando}
+                title="Ejecutar este cron ahora mismo (SUPER_ADMIN)"
+                onClick={() =>
+                  acc.pedir({
+                    titulo: 'Ejecutar cron ahora',
+                    mensaje: `Se ejecutará manualmente «${c.nombre}» (${c.expresion}). El resultado quedará auditado en control_evento.`,
+                    ejecutar: async () => {
+                      const r = await ejecutarCronManual(c.nombre);
+                      if (r.exitoso) {
+                        acc.ok(`Cron «${r.nombre}» ejecutado en ${fmtNum(r.duracion_ms)} ms.`);
+                      } else {
+                        acc.err(`Cron «${r.nombre}» terminó con error: ${r.error ?? 'sin detalle'}`);
+                      }
+                      await refrescar?.();
+                    },
+                  })
+                }
+              >
+                <Play className="w-3 h-3 mr-1" />
+                Ejecutar ahora
+              </Button>
             </div>
 
             <p className="text-xs text-slate-400 mb-3">{c.descripcion}</p>
@@ -75,6 +111,8 @@ export function MonitorCronsSeccion({ datos }: { datos: MonitorCrons | null }) {
           </div>
         ))}
       </div>
+
+      <DialogoAccion state={acc} />
     </Card>
   );
 }

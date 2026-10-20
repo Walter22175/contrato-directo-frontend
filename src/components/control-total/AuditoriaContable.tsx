@@ -3,9 +3,10 @@
 import { useState } from 'react';
 import { Card } from '@/components/ui/Card';
 import Button from '@/components/ui/Button';
-import { descargarCsv, fmtArs, fmtFecha } from '@/lib/control-total';
+import { BannerAccion, DialogoAccion, useAccionAdmin } from './AccionAdmin';
+import { descargarCsv, fmtArs, fmtFecha, recalcularContabilidadTotal } from '@/lib/control-total';
 import type { AuditoriaContable } from '@/lib/control-total';
-import { Download } from 'lucide-react';
+import { Download, RotateCw } from 'lucide-react';
 
 type Frecuencia = 'dia' | 'semana' | 'mes';
 
@@ -26,14 +27,17 @@ export function AuditoriaContableSeccion({
   frecuencia,
   onFrecuencia,
   onRango,
+  refrescar,
 }: {
   datos: AuditoriaContable | null;
   frecuencia: Frecuencia;
   onFrecuencia: (f: Frecuencia) => void;
   onRango: (desde: string, hasta: string) => void;
+  refrescar?: () => Promise<void> | void;
 }) {
   const [desde, setDesde] = useState('');
   const [hasta, setHasta] = useState('');
+  const acc = useAccionAdmin();
 
   if (!datos) return null;
 
@@ -51,6 +55,26 @@ export function AuditoriaContableSeccion({
     ];
     descargarCsv('control-total-contabilidad', filas);
   };
+
+  const recalcular = () =>
+    acc.pedir({
+      titulo: 'Recalcular contabilidad',
+      mensaje: `Se recomputarán totales, series y comisiones${
+        desde && hasta ? ` del rango ${desde} → ${hasta}` : ' de todos los pagos'
+      } (frecuencia: ${frecuencia}) y la acción quedará auditada.`,
+      ejecutar: async () => {
+        const r = await recalcularContabilidadTotal({
+          frecuencia,
+          ...(desde && hasta
+            ? { desde: `${desde}T00:00:00.000Z`, hasta: `${hasta}T23:59:59.999Z` }
+            : {}),
+        });
+        acc.ok(
+          `Contabilidad recalculada · cobrado ${fmtArs(r.contabilidad.totales.total_cobrado ?? 0)} · comisiones ${fmtArs(r.contabilidad.totales.total_comisiones ?? 0)}.`,
+        );
+        await refrescar?.();
+      },
+    });
 
   return (
     <div className="space-y-4">
@@ -76,8 +100,14 @@ export function AuditoriaContableSeccion({
               <Download className="w-3.5 h-3.5 mr-1" />
               CSV
             </Button>
+            <Button variant="outline" size="sm" onClick={recalcular} disabled={acc.ejecutando}>
+              <RotateCw className="w-3.5 h-3.5 mr-1" />
+              Recalcular
+            </Button>
           </div>
         </div>
+
+        <BannerAccion msg={acc.msg} onCerrar={acc.cerrarMsg} />
 
         <div className="grid grid-cols-2 md:grid-cols-3 gap-3 mb-5">
           {Object.entries(datos.totales).map(([clave, valor]) => (
@@ -166,6 +196,8 @@ export function AuditoriaContableSeccion({
           </p>
         </div>
       </Card>
+
+      <DialogoAccion state={acc} />
     </div>
   );
 }

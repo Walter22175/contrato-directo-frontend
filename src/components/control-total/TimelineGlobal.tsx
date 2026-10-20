@@ -4,9 +4,15 @@ import { useState } from 'react';
 import { Card } from '@/components/ui/Card';
 import Button from '@/components/ui/Button';
 import { Chip } from './Semaforo';
-import { descargarCsv, fmtFecha } from '@/lib/control-total';
+import { BannerAccion, DialogoAccion, useAccionAdmin } from './AccionAdmin';
+import {
+  descargarCsv,
+  descargarTrazaJson,
+  fmtFecha,
+  regenerarTimelineTransaccion,
+} from '@/lib/control-total';
 import type { EventoControl, TimelineGlobal } from '@/lib/control-total';
-import { AlertTriangle, Download, ShieldCheck, Zap } from 'lucide-react';
+import { AlertTriangle, Download, FileJson, RefreshCw, ShieldCheck, Zap } from 'lucide-react';
 
 const COLOR_SEVERIDAD: Record<string, string> = {
   error: 'bg-red-500/10 text-red-300 border-red-500/30',
@@ -58,9 +64,16 @@ function FilaEvento({ ev }: { ev: EventoControl }) {
   );
 }
 
-export function TimelineGlobalSeccion({ datos }: { datos: TimelineGlobal | null }) {
+export function TimelineGlobalSeccion({
+  datos,
+  refrescar,
+}: {
+  datos: TimelineGlobal | null;
+  refrescar?: () => Promise<void> | void;
+}) {
   const [expandidos, setExpandidos] = useState<Set<string>>(new Set());
   const [filtroTipo, setFiltroTipo] = useState('');
+  const acc = useAccionAdmin();
 
   if (!datos) return null;
 
@@ -123,6 +136,8 @@ export function TimelineGlobalSeccion({ datos }: { datos: TimelineGlobal | null 
         </Button>
       </div>
 
+      <BannerAccion msg={acc.msg} onCerrar={acc.cerrarMsg} />
+
       {grupos.length === 0 ? (
         <p className="text-sm text-slate-500">Sin eventos para los filtros actuales.</p>
       ) : (
@@ -149,6 +164,46 @@ export function TimelineGlobalSeccion({ datos }: { datos: TimelineGlobal | null 
                   <span className="text-xs text-slate-500 ml-auto">
                     {g.eventos.length} eventos
                   </span>
+                  {g.id_transaccion && (
+                    <span className="flex items-center gap-1">
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        title="Regenerar timeline desde control_evento"
+                        onClick={() =>
+                          acc.pedir({
+                            titulo: 'Regenerar timeline',
+                            mensaje: `Se reconstruirá el timeline de ${g.id_transaccion} desde control_evento y se recalcularán las correlaciones MP↔BD.`,
+                            ejecutar: async () => {
+                              const r = await regenerarTimelineTransaccion(
+                                g.id_transaccion as string,
+                              );
+                              acc.ok(
+                                `Timeline regenerado: ${r.timeline.length} eventos · semáforo ${r.semaforo ?? 'sin cambio'}.`,
+                              );
+                              await refrescar?.();
+                            },
+                          })
+                        }
+                      >
+                        <RefreshCw className="w-3 h-3" />
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        title="Exportar traza completa (JSON sanitizado)"
+                        onClick={() => {
+                          descargarTrazaJson(g.id_transaccion as string)
+                            .then(() => acc.ok(`Traza de ${g.id_transaccion} descargada.`))
+                            .catch((e: unknown) =>
+                              acc.err(`No se pudo exportar la traza: ${String(e)}`),
+                            );
+                        }}
+                      >
+                        <FileJson className="w-3 h-3" />
+                      </Button>
+                    </span>
+                  )}
                   <button
                     type="button"
                     onClick={() => toggle(g.clave)}
@@ -187,6 +242,8 @@ export function TimelineGlobalSeccion({ datos }: { datos: TimelineGlobal | null 
           </>
         )}
       </p>
+
+      <DialogoAccion state={acc} />
     </Card>
   );
 }

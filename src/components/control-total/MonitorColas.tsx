@@ -1,10 +1,15 @@
 'use client';
 
+import { useState } from 'react';
 import { Card } from '@/components/ui/Card';
+import Button from '@/components/ui/Button';
 import { Chip } from './Semaforo';
-import { fmtNum } from '@/lib/control-total';
+import { BannerAccion, DialogoAccion, useAccionAdmin } from './AccionAdmin';
+import { fmtNum, reencolarJobCola } from '@/lib/control-total';
 import type { MonitorColas } from '@/lib/control-total';
-import { AlertTriangle, Database, Layers } from 'lucide-react';
+import { AlertTriangle, Database, Layers, RotateCw } from 'lucide-react';
+
+const COLAS_CONOCIDAS = ['payments-capture', 'payments-cancel', 'webhooks-mp'];
 
 function EstadoColaFila({
   nombre,
@@ -55,7 +60,17 @@ function EstadoColaFila({
   );
 }
 
-export function MonitorColasSeccion({ datos }: { datos: MonitorColas | null }) {
+export function MonitorColasSeccion({
+  datos,
+  refrescar,
+}: {
+  datos: MonitorColas | null;
+  refrescar?: () => Promise<void> | void;
+}) {
+  const acc = useAccionAdmin();
+  const [cola, setCola] = useState(COLAS_CONOCIDAS[0]);
+  const [jobId, setJobId] = useState('');
+
   if (!datos) return null;
 
   const riesgos = datos.riesgos;
@@ -78,6 +93,7 @@ export function MonitorColasSeccion({ datos }: { datos: MonitorColas | null }) {
           </Chip>
           {datos.error_conexion && <Chip tono="red">error: {datos.error_conexion}</Chip>}
         </div>
+        <BannerAccion msg={acc.msg} onCerrar={acc.cerrarMsg} />
         {datos.colas.length === 0 ? (
           <p className="text-sm text-slate-500">Sin colas registradas.</p>
         ) : (
@@ -92,6 +108,62 @@ export function MonitorColasSeccion({ datos }: { datos: MonitorColas | null }) {
             ? 'Sin Redis: los jobs se procesan en línea y los contadores provienen de control_evento (últimas 24 h).'
             : 'Contadores en vivo desde Redis/BullMQ.'}
         </p>
+
+        <div className="mt-4 border border-slate-700 rounded-xl p-4">
+          <p className="text-xs font-semibold text-slate-300 mb-3">
+            Reencolar job (SUPER_ADMIN) — jobId determinístico: <code className="text-cyan-300">cola:id_pago</code>
+          </p>
+          <div className="flex flex-wrap items-end gap-2">
+            <div>
+              <label className="block text-[10px] text-slate-500 mb-1" htmlFor="reencolar-cola">
+                Cola
+              </label>
+              <select
+                id="reencolar-cola"
+                value={cola}
+                onChange={(e) => setCola(e.target.value)}
+                className="bg-slate-800 border border-slate-700 rounded-lg text-xs text-white px-2 py-1.5 font-mono"
+              >
+                {COLAS_CONOCIDAS.map((c) => (
+                  <option key={c} value={c}>
+                    {c}
+                  </option>
+                ))}
+              </select>
+            </div>
+            <div className="flex-1 min-w-48">
+              <label className="block text-[10px] text-slate-500 mb-1" htmlFor="reencolar-job">
+                jobId
+              </label>
+              <input
+                id="reencolar-job"
+                value={jobId}
+                onChange={(e) => setJobId(e.target.value)}
+                placeholder={`${cola}:uuid-del-pago`}
+                className="w-full bg-slate-800 border border-slate-700 rounded-lg text-xs text-white px-2 py-1.5 font-mono"
+              />
+            </div>
+            <Button
+              size="sm"
+              disabled={!jobId.trim() || acc.ejecutando}
+              onClick={() =>
+                acc.pedir({
+                  titulo: 'Reencolar job',
+                  mensaje: `Se reencolará (o reintentará) el job «${jobId.trim()}» de la cola «${cola}». Si el job está activo o esperando no se hará nada.`,
+                  ejecutar: async () => {
+                    const r = await reencolarJobCola(cola, jobId.trim());
+                    acc.ok(`Job ${r.jobId}: ${r.accion_job} (modo ${r.modo}).`);
+                    setJobId('');
+                    await refrescar?.();
+                  },
+                })
+              }
+            >
+              <RotateCw className="w-3 h-3 mr-1" />
+              Reencolar
+            </Button>
+          </div>
+        </div>
       </Card>
 
       <Card>
@@ -139,6 +211,8 @@ export function MonitorColasSeccion({ datos }: { datos: MonitorColas | null }) {
           </ul>
         )}
       </Card>
+
+      <DialogoAccion state={acc} />
     </div>
   );
 }

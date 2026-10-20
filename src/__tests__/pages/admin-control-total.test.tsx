@@ -217,7 +217,7 @@ describe('ControlTotalPage', () => {
     });
 
     expect(obtenerMonitorColas).toHaveBeenCalled();
-    expect(await screen.findByText('payments-capture')).toBeInTheDocument();
+    expect((await screen.findAllByText('payments-capture')).length).toBeGreaterThan(0);
   });
 
   it('muestra la tarjeta de error cuando falla el resumen', async () => {

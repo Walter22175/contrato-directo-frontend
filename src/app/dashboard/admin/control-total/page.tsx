@@ -107,36 +107,36 @@ function ErrorCard({ msg }: { msg: string }) {
 // ===========================================================================
 
 function TabTimeline({ activo }: { activo: boolean }) {
-  const { datos, cargando, error } = useControlTotalPolling<TimelineGlobal>(
+  const { datos, cargando, error, refrescar } = useControlTotalPolling<TimelineGlobal>(
     () => obtenerTimeline({ limit: 300 }),
     { activo },
   );
   if (!activo) return null;
   if (cargando && !datos) return <Skeleton alto="h-64" />;
   if (error && !datos) return <ErrorCard msg={`Timeline: ${error}`} />;
-  return <TimelineGlobalSeccion datos={datos} />;
+  return <TimelineGlobalSeccion datos={datos} refrescar={refrescar} />;
 }
 
 function TabColas({ activo }: { activo: boolean }) {
-  const { datos, cargando, error } = useControlTotalPolling<MonitorColas>(
+  const { datos, cargando, error, refrescar } = useControlTotalPolling<MonitorColas>(
     obtenerMonitorColas,
     { activo },
   );
   if (!activo) return null;
   if (cargando && !datos) return <Skeleton alto="h-64" />;
   if (error && !datos) return <ErrorCard msg={`Colas: ${error}`} />;
-  return <MonitorColasSeccion datos={datos} />;
+  return <MonitorColasSeccion datos={datos} refrescar={refrescar} />;
 }
 
 function TabCrons({ activo }: { activo: boolean }) {
-  const { datos, cargando, error } = useControlTotalPolling<MonitorCrons>(
+  const { datos, cargando, error, refrescar } = useControlTotalPolling<MonitorCrons>(
     obtenerMonitorCrons,
     { activo },
   );
   if (!activo) return null;
   if (cargando && !datos) return <Skeleton alto="h-64" />;
   if (error && !datos) return <ErrorCard msg={`Crons: ${error}`} />;
-  return <MonitorCronsSeccion datos={datos} />;
+  return <MonitorCronsSeccion datos={datos} refrescar={refrescar} />;
 }
 
 function TabTokens({ activo }: { activo: boolean }) {
@@ -179,7 +179,7 @@ function TabRetencion({
 }) {
   const [estado, setEstado] = useState('');
   const [page, setPage] = useState(1);
-  const { datos, cargando, error } = useControlTotalPolling<PanelRetencion>(
+  const { datos, cargando, error, refrescar } = useControlTotalPolling<PanelRetencion>(
     () => obtenerPanelRetencion({ estado: estado || undefined, page, limit: 20 }),
     { activo },
   );
@@ -196,6 +196,7 @@ function TabRetencion({
       }}
       onPagina={setPage}
       onInspeccionar={onInspeccionar}
+      refrescar={refrescar}
     />
   );
 }
@@ -220,7 +221,7 @@ function TabInconsistencias({
 function TabContabilidad({ activo }: { activo: boolean }) {
   const [frecuencia, setFrecuencia] = useState<'dia' | 'semana' | 'mes'>('mes');
   const [rango, setRango] = useState<{ desde?: string; hasta?: string }>({});
-  const { datos, cargando, error } = useControlTotalPolling<AuditoriaContable>(
+  const { datos, cargando, error, refrescar } = useControlTotalPolling<AuditoriaContable>(
     () => obtenerAuditoriaContable({ ...rango, frecuencia }),
     { activo },
   );
@@ -233,6 +234,7 @@ function TabContabilidad({ activo }: { activo: boolean }) {
       frecuencia={frecuencia}
       onFrecuencia={setFrecuencia}
       onRango={(desde, hasta) => setRango({ desde, hasta })}
+      refrescar={refrescar}
     />
   );
 }
@@ -420,6 +422,9 @@ export default function ControlTotalPage() {
             datos={inspector}
             onBuscar={inspeccionar}
             buscando={cargandoEspejo}
+            refrescar={
+              inspector ? () => inspeccionar(inspector.id_transaccion) : undefined
+            }
           />
         </div>
       )}

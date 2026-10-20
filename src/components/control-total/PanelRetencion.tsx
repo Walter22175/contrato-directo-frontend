@@ -3,9 +3,17 @@
 import { Card } from '@/components/ui/Card';
 import Button from '@/components/ui/Button';
 import { Chip, Semaforo } from './Semaforo';
-import { descargarCsv, fmtArs, fmtFecha } from '@/lib/control-total';
+import { BannerAccion, DialogoAccion, useAccionAdmin } from './AccionAdmin';
+import {
+  descargarCsv,
+  descargarTrazaJson,
+  fmtArs,
+  fmtFecha,
+  forzarCancelacionPago,
+  forzarCapturaPago,
+} from '@/lib/control-total';
 import type { FilaRetencion, PanelRetencion } from '@/lib/control-total';
-import { Download } from 'lucide-react';
+import { Ban, Download, Play } from 'lucide-react';
 
 const ESTADOS = [
   'EN_CUSTODIA',
@@ -28,10 +36,25 @@ const COLOR_ESTADO: Record<string, string> = {
 function FilaPago({
   p,
   onInspeccionar,
+  acc,
+  refrescar,
 }: {
   p: FilaRetencion;
   onInspeccionar: (id: string) => void;
+  acc: ReturnType<typeof useAccionAdmin>;
+  refrescar?: () => Promise<void> | void;
 }) {
+  const capturable =
+    !p.captured_at &&
+    !p.cancelled_at &&
+    !!p.mp_status &&
+    ['authorized', 'in_process', 'pending'].includes(p.mp_status);
+  const cancelable =
+    !p.captured_at &&
+    !p.cancelled_at &&
+    !!p.mp_status &&
+    !['cancelled', 'refunded', 'captured'].includes(p.mp_status);
+
   return (
     <tr className="border-b border-slate-800/60 hover:bg-slate-800/30">
       <td className="py-2 pr-3 font-mono text-cyan-300">
@@ -67,6 +90,70 @@ function FilaPago({
           label=""
         />
       </td>
+      <td className="py-2 pl-1">
+        <div className="flex items-center gap-1">
+          {capturable && (
+            <Button
+              size="sm"
+              variant="ghost"
+              title="Forzar captura en Mercado Pago"
+              onClick={() =>
+                acc.pedir({
+                  titulo: 'Forzar captura en MP',
+                  mensaje: `Se marcará la solicitud de captura del pago ${p.id_pago} y se encolará el job de captura. Mercado Pago debe tener el pago en estado capturable (authorized).`,
+                  ejecutar: async () => {
+                    const r = await forzarCapturaPago(p.id_pago);
+                    acc.ok(
+                      `Captura encolada (modo ${r.job.modo}, ${r.job.accion}, job ${r.job.jobId}).`,
+                    );
+                    await refrescar?.();
+                  },
+                })
+              }
+            >
+              <Play className="w-3 h-3" />
+            </Button>
+          )}
+          {cancelable && (
+            <Button
+              size="sm"
+              variant="ghost"
+              title="Forzar cancelación en Mercado Pago"
+              onClick={() =>
+                acc.pedir({
+                  titulo: 'Forzar cancelación en MP',
+                  mensaje: `Se marcará la cancelación del pago ${p.id_pago} y se encolará el job de cancelación. Si MP lo permite, el pago quedará cancelled.`,
+                  variant: 'danger',
+                  confirmLabel: 'Sí, cancelar',
+                  ejecutar: async () => {
+                    const r = await forzarCancelacionPago(p.id_pago);
+                    acc.ok(
+                      `Cancelación encolada (modo ${r.job.modo}, ${r.job.accion}, job ${r.job.jobId}).`,
+                    );
+                    await refrescar?.();
+                  },
+                })
+              }
+            >
+              <Ban className="w-3 h-3" />
+            </Button>
+          )}
+          {p.id_transaccion && (
+            <Button
+              size="sm"
+              variant="ghost"
+              title="Exportar traza completa (JSON sanitizado)"
+              onClick={() => {
+                descargarTrazaJson(p.id_transaccion as string)
+                  .then(() => acc.ok(`Traza de ${p.id_transaccion} descargada.`))
+                  .catch((e: unknown) => acc.err(`No se pudo exportar la traza: ${String(e)}`));
+              }}
+            >
+              <Download className="w-3 h-3" />
+            </Button>
+          )}
+        </div>
+      </td>
     </tr>
   );
 }
@@ -77,13 +164,16 @@ export function PanelRetencionSeccion({
   onEstado,
   onPagina,
   onInspeccionar,
+  refrescar,
 }: {
   datos: PanelRetencion | null;
   estadoFiltro: string;
   onEstado: (estado: string) => void;
   onPagina: (page: number) => void;
   onInspeccionar: (id: string) => void;
+  refrescar?: () => Promise<void> | void;
 }) {
+  const acc = useAccionAdmin();
   if (!datos) return null;
 
   const exportar = () => {
@@ -128,6 +218,8 @@ export function PanelRetencionSeccion({
         </Button>
       </div>
 
+      <BannerAccion msg={acc.msg} onCerrar={acc.cerrarMsg} />
+
       <div className="flex flex-wrap gap-2 mb-4">
         {Object.entries(datos.contadores).map(([clave, valor]) => (
           <Chip key={clave} tono={valor > 0 ? 'cyan' : 'slate'}>
@@ -152,11 +244,18 @@ export function PanelRetencionSeccion({
                 <th className="text-left py-2 pr-3">Pago</th>
                 <th className="text-left py-2 pr-3">Liberación</th>
                 <th className="text-left py-2">Sem.</th>
+                <th className="text-left py-2">Acciones</th>
               </tr>
             </thead>
             <tbody>
               {datos.data.map((p) => (
-                <FilaPago key={p.id_pago} p={p} onInspeccionar={onInspeccionar} />
+                <FilaPago
+                  key={p.id_pago}
+                  p={p}
+                  onInspeccionar={onInspeccionar}
+                  acc={acc}
+                  refrescar={refrescar}
+                />
               ))}
             </tbody>
           </table>
@@ -188,6 +287,8 @@ export function PanelRetencionSeccion({
           </div>
         </div>
       )}
+
+      <DialogoAccion state={acc} />
     </Card>
   );
 }

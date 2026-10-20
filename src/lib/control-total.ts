@@ -328,6 +328,206 @@ export async function obtenerInspector(idTransaccion: string): Promise<Inspector
 }
 
 // ===========================================================================
+// Acciones administrativas (control tower SUPER_ADMIN)
+// Todas requieren rol super_admin: el backend responde 403 para otros roles.
+// ===========================================================================
+
+export type CampoCorreccion =
+  | 'captured_at'
+  | 'cancelled_at'
+  | 'refunded_at'
+  | 'entrega_proveedor_at'
+  | 'fecha_inicio_servicio_at'
+  | 'fecha_liberacion_anticipada_at';
+
+export const CAMPOS_CORREGIBLES: Array<{
+  valor: CampoCorreccion;
+  etiqueta: string;
+  requiereMp: string | null;
+}> = [
+  {
+    valor: 'captured_at',
+    etiqueta: 'captured_at (MP ya capturó)',
+    requiereMp: 'captured / approved',
+  },
+  {
+    valor: 'cancelled_at',
+    etiqueta: 'cancelled_at (MP ya canceló)',
+    requiereMp: 'cancelled',
+  },
+  {
+    valor: 'refunded_at',
+    etiqueta: 'refunded_at (MP ya reembolsó)',
+    requiereMp: 'refunded',
+  },
+  { valor: 'entrega_proveedor_at', etiqueta: 'entrega_proveedor_at', requiereMp: null },
+  { valor: 'fecha_inicio_servicio_at', etiqueta: 'fecha_inicio_servicio_at', requiereMp: null },
+  {
+    valor: 'fecha_liberacion_anticipada_at',
+    etiqueta: 'fecha_liberacion_anticipada_at',
+    requiereMp: null,
+  },
+];
+
+export interface ResultadoJobReencole {
+  modo: 'redis' | 'inline';
+  jobId: string;
+  accion: 'reintentado' | 'recreado' | 'encolado' | 'ya_en_cola';
+}
+
+export interface ResultadoAccionPago {
+  accion: string;
+  ejecutado_en: string;
+  job: ResultadoJobReencole;
+  pago: Record<string, unknown>;
+}
+
+export interface ResultadoWebhookReintentado {
+  accion: string;
+  ejecutado_en: string;
+  job: ResultadoJobReencole;
+  id_pago_mercadopago: string;
+  id_pago: string | null;
+  id_transaccion: string | null;
+  firma_valida_original: boolean | null;
+}
+
+export interface ResultadoTimelineRegenerado {
+  accion: string;
+  generado_en: string;
+  id_transaccion: string;
+  id_pago: string | null;
+  timeline: Array<Record<string, unknown>>;
+  correlaciones: Record<string, unknown>;
+  semaforo: Semaforo | null;
+  motivos: string[];
+}
+
+export interface ResultadoContabilidadRecalculada {
+  accion: string;
+  recalculado_en: string;
+  contabilidad: AuditoriaContable;
+  comisiones: Record<string, number>;
+}
+
+export interface ResultadoCronManual {
+  accion: string;
+  nombre: string;
+  exitoso: boolean;
+  duracion_ms: number;
+  inicio: string;
+  fin: string;
+  error?: string;
+}
+
+export interface ResultadoJobReencolado {
+  accion: string;
+  ejecutado_en: string;
+  cola: string;
+  jobId: string;
+  modo: 'redis' | 'inline';
+  accion_job: 'reintentado' | 'recreado' | 'encolado' | 'ya_en_cola';
+}
+
+export interface ResultadoCorreccionEstado {
+  accion: string;
+  ejecutado_en: string;
+  campo: CampoCorreccion;
+  valor: string;
+  entidad: 'pago' | 'transaccion';
+  pago: Record<string, unknown>;
+  transaccion: Record<string, unknown> | null;
+}
+
+/** Forzar captura MP del pago (SUPER_ADMIN). */
+export async function forzarCapturaPago(idPago: string): Promise<ResultadoAccionPago> {
+  const res = await api.post(`/control-total/pagos/${idPago}/forzar-captura`);
+  return extractData<ResultadoAccionPago>(res);
+}
+
+/** Forzar cancelación MP del pago (SUPER_ADMIN). */
+export async function forzarCancelacionPago(idPago: string): Promise<ResultadoAccionPago> {
+  const res = await api.post(`/control-total/pagos/${idPago}/forzar-cancelacion`);
+  return extractData<ResultadoAccionPago>(res);
+}
+
+/** Reencolar el payload original de un webhook (evento de control o id de MP). */
+export async function reintentarWebhookMp(id: string): Promise<ResultadoWebhookReintentado> {
+  const res = await api.post(`/control-total/webhooks/${id}/reintentar`);
+  return extractData<ResultadoWebhookReintentado>(res);
+}
+
+/** Reconstruye el timeline desde control_evento y recalcula correlaciones. */
+export async function regenerarTimelineTransaccion(
+  idTransaccion: string,
+): Promise<ResultadoTimelineRegenerado> {
+  const res = await api.post(
+    `/control-total/transacciones/${idTransaccion}/regenerar-timeline`,
+  );
+  return extractData<ResultadoTimelineRegenerado>(res);
+}
+
+/** Recalcula totales, series, comisiones, anticipos y devoluciones. */
+export async function recalcularContabilidadTotal(params?: {
+  desde?: string;
+  hasta?: string;
+  frecuencia?: 'dia' | 'semana' | 'mes';
+  id_proveedor?: string;
+  id_cliente?: string;
+}): Promise<ResultadoContabilidadRecalculada> {
+  const res = await api.post('/control-total/contabilidad/recalcular', params ?? {});
+  return extractData<ResultadoContabilidadRecalculada>(res);
+}
+
+/** Ejecuta manualmente un cron (custodia | captura | refresh | monitor). */
+export async function ejecutarCronManual(nombre: string): Promise<ResultadoCronManual> {
+  const res = await api.post(`/control-total/crons/${encodeURIComponent(nombre)}/ejecutar`);
+  return extractData<ResultadoCronManual>(res);
+}
+
+/** Reencola (o reintenta) un job de una cola BullMQ. */
+export async function reencolarJobCola(
+  cola: string,
+  jobId: string,
+): Promise<ResultadoJobReencolado> {
+  const res = await api.post(
+    `/control-total/colas/${encodeURIComponent(cola)}/jobs/${encodeURIComponent(jobId)}/reencolar`,
+  );
+  return extractData<ResultadoJobReencolado>(res);
+}
+
+/** Corrección aditiva de estado: solo setea campos vacíos respaldados por MP. */
+export async function corregirEstadoPago(
+  idPago: string,
+  cuerpo: { campo: CampoCorreccion; valor?: string },
+): Promise<ResultadoCorreccionEstado> {
+  const res = await api.post(`/control-total/pagos/${idPago}/corregir-estado`, cuerpo);
+  return extractData<ResultadoCorreccionEstado>(res);
+}
+
+/** Traza completa de la transacción (JSON sanitizado, sin tokens). */
+export async function exportarTrazaTransaccion(
+  idTransaccion: string,
+): Promise<Record<string, unknown>> {
+  const res = await api.get(`/control-total/transacciones/${idTransaccion}/exportar`);
+  return extractData<Record<string, unknown>>(res);
+}
+
+/** Descarga la traza completa como archivo JSON en el navegador. */
+export async function descargarTrazaJson(idTransaccion: string): Promise<void> {
+  const traza = await exportarTrazaTransaccion(idTransaccion);
+  const blob = new Blob([JSON.stringify(traza, null, 2)], {
+    type: 'application/json;charset=utf-8',
+  });
+  const url = URL.createObjectURL(blob);
+  const enlace = document.createElement('a');
+  enlace.href = url;
+  enlace.download = `traza-${idTransaccion}-${new Date().toISOString().slice(0, 19).replace(/[:T]/g, '')}.json`;
+  enlace.click();
+  URL.revokeObjectURL(url);
+}
+
+// ===========================================================================
 // Helpers de formato (ARS, fechas es-AR)
 // ===========================================================================
 
