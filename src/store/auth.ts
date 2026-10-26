@@ -27,7 +27,7 @@ interface AuthState {
   cambiarContexto: (rol: 'cliente' | 'proveedor') => Promise<string>;
 }
 
-export const useAuthStore = create<AuthState>((set) => ({
+export const useAuthStore = create<AuthState>((set, get) => ({
   user: null,
   isAuthenticated: false,
   isLoading: true,
@@ -107,11 +107,14 @@ export const useAuthStore = create<AuthState>((set) => ({
       // /auth/me retorna { usuario }; el interceptor ya desenvuelve el envelope data/timestamp
       const usuario = data?.usuario ?? data;
       set({ user: usuario, isAuthenticated: true, isLoading: false });
-    } catch {
-      // Interceptor already handled refresh attempt. If tokens are gone, we're logged out.
+    } catch (err) {
+      // Interceptor already handled refresh attempt. Si la sesión no es
+      // recuperable, hacer logout completo (también limpia las cookies) para
+      // que el proxy no rebotie /auth/login hacia /dashboard en bucle.
+      const status = (err as { response?: { status?: number } })?.response?.status;
       const currentToken = localStorage.getItem('access_token');
-      if (!currentToken) {
-        set({ user: null, isAuthenticated: false, isLoading: false });
+      if (!currentToken || status === 401 || status === 403) {
+        get().logout();
       } else {
         set({ isLoading: false });
       }

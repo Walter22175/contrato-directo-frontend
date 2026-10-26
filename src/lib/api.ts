@@ -31,16 +31,34 @@ api.interceptors.request.use((config) => {
 });
 
 api.interceptors.response.use(
-  (response) => response,
+  (response) => {
+    // Una autenticación exitosa (login/register/refresh) reactiva el auto-refresh.
+    const url = response.config?.url || '';
+    if (
+      url.includes('/auth/login') ||
+      url.includes('/auth/register') ||
+      url.includes('/auth/refresh')
+    ) {
+      refreshFailed = false;
+    }
+    return response;
+  },
   async (error) => {
     const originalRequest = error.config;
-    if (
-      error.response?.status === 401 &&
-      !originalRequest._retry &&
-      !originalRequest.url?.includes('/auth/refresh') &&
-      !originalRequest.url?.includes('/auth/login') &&
-      !refreshFailed
-    ) {
+    const url = originalRequest?.url || '';
+    const esAuthBasica = url.includes('/auth/refresh') || url.includes('/auth/login');
+    const es401 = error.response?.status === 401;
+
+    // Sesión irrecuperable (el auto-refresh ya falló): limpiar tokens y cookies
+    // para que el proxy y el guard del dashboard no queden en bucle.
+    if (es401 && !esAuthBasica && refreshFailed) {
+      localStorage.removeItem('access_token');
+      localStorage.removeItem('refresh_token');
+      clearTokenCookies();
+      return Promise.reject(error);
+    }
+
+    if (es401 && !originalRequest._retry && !esAuthBasica && !refreshFailed) {
       if (isRefreshing) {
         return new Promise<string>((resolve, reject) => {
           failedQueue.push({ resolve, reject });
@@ -53,8 +71,9 @@ api.interceptors.response.use(
       originalRequest._retry = true;
       isRefreshing = true;
 
+      const refreshToken = localStorage.getItem('refresh_token');
+
       try {
-        const refreshToken = localStorage.getItem('refresh_token');
         if (!refreshToken) throw new Error('No refresh token');
 
         const { data } = await axios.post(
@@ -76,10 +95,15 @@ api.interceptors.response.use(
         }
         throw new Error('Invalid refresh response');
       } catch (refreshError) {
-        refreshFailed = true;
-        localStorage.removeItem('access_token');
-        localStorage.removeItem('refresh_token');
-        clearTokenCookies();
+        // Si la sesión cambió mientras esperábamos (logout o un login nuevo),
+        // no tocar el estado actual: el refresh que falló quedó obsoleto.
+        const actual = localStorage.getItem('refresh_token');
+        if (refreshToken && actual === refreshToken) {
+          refreshFailed = true;
+          localStorage.removeItem('access_token');
+          localStorage.removeItem('refresh_token');
+          clearTokenCookies();
+        }
         processQueue(refreshError, null);
         return Promise.reject(error);
       } finally {

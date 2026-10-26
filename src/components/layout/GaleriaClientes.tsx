@@ -31,7 +31,6 @@ export default function GaleriaClientes() {
               alt={logo.alt}
               width={160}
               height={80}
-              unoptimized
               className="max-h-20 w-auto max-w-full object-contain opacity-80 grayscale transition duration-300 hover:opacity-100 hover:grayscale-0"
             />
           </div>

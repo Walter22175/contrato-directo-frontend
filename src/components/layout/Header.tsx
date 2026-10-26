@@ -297,7 +297,7 @@ export default function Header({ onToggleSidebar }: { onToggleSidebar?: () => vo
           {/* Cyan accent line at bottom of header */}
           <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-gradient-to-r from-transparent via-cyan-500 to-transparent opacity-60" />
           
-            <Link href="/" className="flex items-center gap-2 transition-transform active:scale-90" prefetch={false}>
+            <Link href="/" className="flex items-center gap-2 transition-transform active:scale-90">
               <Image src="/logo-institucional.png" alt="Contrato Directo" width={96} height={96} className="w-24 h-24 transition-transform duration-200" />
             </Link>
 

@@ -6,10 +6,12 @@ const authRoutes = ['/auth/login', '/auth/register', '/auth/forgot-password'];
 export function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
   const token = request.cookies.get('access_token')?.value;
-  const refreshToken = request.cookies.get('refresh_token')?.value;
 
   if (authRoutes.some((route) => pathname.startsWith(route))) {
-    if (token || refreshToken) {
+    // Solo forzar /dashboard con sesión visible (cookie de access_token).
+    // La refresh_token sola no alcanza: si no, a los 15 min (cuando expira
+    // el access) o tras un logout incompleto, el login queda inalcanzable.
+    if (token) {
       return NextResponse.redirect(new URL('/dashboard', request.url));
     }
   }
