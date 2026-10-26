@@ -1,16 +1,7 @@
 import { create } from 'zustand';
 import api, { extractData } from '@/lib/api';
+import { setTokenCookies, clearTokenCookies } from '@/lib/cookies';
 import type { Usuario, LoginDto, RegisterDto, AuthResponse } from '@/types';
-
-function setCookies(access: string, refresh: string) {
-  document.cookie = `access_token=${access}; path=/; max-age=900`;
-  document.cookie = `refresh_token=${refresh}; path=/; max-age=604800`;
-}
-
-function clearCookies() {
-  document.cookie = 'access_token=; path=/; max-age=0';
-  document.cookie = 'refresh_token=; path=/; max-age=0';
-}
 
 function mensajeDeError(err: unknown, fallback: string, separador = ', '): string {
   if (typeof err === 'object' && err !== null && 'response' in err) {
@@ -49,7 +40,7 @@ export const useAuthStore = create<AuthState>((set) => ({
       const data = extractData<AuthResponse>(res);
       localStorage.setItem('access_token', data.access_token);
       localStorage.setItem('refresh_token', data.refresh_token);
-      setCookies(data.access_token, data.refresh_token);
+      setTokenCookies(data.access_token, data.refresh_token);
       set({ user: data.usuario, isAuthenticated: true, isLoading: false });
     } catch (err) {
       const message = mensajeDeError(err, 'Error al iniciar sesión');
@@ -65,7 +56,7 @@ export const useAuthStore = create<AuthState>((set) => ({
       const data = extractData<AuthResponse>(res);
       localStorage.setItem('access_token', data.access_token);
       localStorage.setItem('refresh_token', data.refresh_token);
-      setCookies(data.access_token, data.refresh_token);
+      setTokenCookies(data.access_token, data.refresh_token);
       set({ user: data.usuario, isAuthenticated: true, isLoading: false });
     } catch (err) {
       const message = mensajeDeError(err, 'Error al registrarse');
@@ -77,7 +68,7 @@ export const useAuthStore = create<AuthState>((set) => ({
   logout: () => {
     localStorage.removeItem('access_token');
     localStorage.removeItem('refresh_token');
-    clearCookies();
+    clearTokenCookies();
     set({ user: null, isAuthenticated: false, isLoading: false });
   },
 
@@ -97,14 +88,14 @@ export const useAuthStore = create<AuthState>((set) => ({
         if (raw.access_token && raw.refresh_token && raw.usuario) {
           localStorage.setItem('access_token', raw.access_token);
           localStorage.setItem('refresh_token', raw.refresh_token);
-          setCookies(raw.access_token, raw.refresh_token);
+          setTokenCookies(raw.access_token, raw.refresh_token);
           set({ user: raw.usuario, isAuthenticated: true, isLoading: false });
           return;
         }
       } catch {
         localStorage.removeItem('access_token');
         localStorage.removeItem('refresh_token');
-        clearCookies();
+        clearTokenCookies();
         set({ isLoading: false });
         return;
       }
@@ -136,7 +127,7 @@ export const useAuthStore = create<AuthState>((set) => ({
       if (data.access_token && data.refresh_token) {
         localStorage.setItem('access_token', data.access_token);
         localStorage.setItem('refresh_token', data.refresh_token);
-        setCookies(data.access_token, data.refresh_token);
+        setTokenCookies(data.access_token, data.refresh_token);
       }
       localStorage.setItem('contexto_activo', data.contexto || rol);
       if (data.usuario) set({ user: data.usuario });

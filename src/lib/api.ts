@@ -1,8 +1,10 @@
 import axios from 'axios';
+import { setTokenCookies, clearTokenCookies } from './cookies';
 
 const api = axios.create({
   baseURL: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/api/v1',
   headers: { 'Content-Type': 'application/json' },
+  withCredentials: true,
 });
 
 let isRefreshing = false;
@@ -58,6 +60,7 @@ api.interceptors.response.use(
         const { data } = await axios.post(
           `${api.defaults.baseURL}/auth/refresh`,
           { refresh_token: refreshToken },
+          { withCredentials: true },
         );
         const raw = data?.data || data;
         const newAccess = raw.access_token;
@@ -66,8 +69,7 @@ api.interceptors.response.use(
         if (newAccess && newRefresh) {
           localStorage.setItem('access_token', newAccess);
           localStorage.setItem('refresh_token', newRefresh);
-          document.cookie = `access_token=${newAccess}; path=/; max-age=900`;
-          document.cookie = `refresh_token=${newRefresh}; path=/; max-age=604800`;
+          setTokenCookies(newAccess, newRefresh);
           originalRequest.headers.Authorization = `Bearer ${newAccess}`;
           processQueue(null, newAccess);
           return api(originalRequest);
@@ -77,8 +79,7 @@ api.interceptors.response.use(
         refreshFailed = true;
         localStorage.removeItem('access_token');
         localStorage.removeItem('refresh_token');
-        document.cookie = 'access_token=; path=/; max-age=0';
-        document.cookie = 'refresh_token=; path=/; max-age=0';
+        clearTokenCookies();
         processQueue(refreshError, null);
         return Promise.reject(error);
       } finally {
