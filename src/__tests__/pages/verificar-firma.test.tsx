@@ -5,7 +5,7 @@ import './setup';
 import { render, screen, act, fireEvent, waitFor } from '@testing-library/react';
 import api from '@/lib/api';
 import { useAuthStore } from '@/store/auth';
-import VerificarFirmaPage from '@/app/verificar-firma/page';
+import VerificarFirmaContent from '@/app/verificar-firma/VerificarFirmaContent';
 
 const HASH = 'a3f9c8d1e4b2c5d6e7f8091a2b3c4d5e6f708192a3b4c5d6e7f8091a2b3c4d5e';
 
@@ -42,7 +42,7 @@ function submitHash(valor: string, container: HTMLElement) {
   fireEvent.submit(container.querySelector('form')!);
 }
 
-describe('VerificarFirmaPage', () => {
+describe('VerificarFirmaContent', () => {
   beforeEach(() => {
     jest.clearAllMocks();
   });
@@ -53,7 +53,7 @@ describe('VerificarFirmaPage', () => {
 
   it('renderiza el título, el input y el botón', async () => {
     await act(async () => {
-      render(<VerificarFirmaPage />);
+      render(<VerificarFirmaContent />);
     });
 
     expect(screen.getByText('Verificador de Evidencia')).toBeInTheDocument();
@@ -62,7 +62,7 @@ describe('VerificarFirmaPage', () => {
   });
 
   it('rechaza un hash inválido sin llamar a la API', async () => {
-    const { container } = await act(async () => render(<VerificarFirmaPage />));
+    const { container } = await act(async () => render(<VerificarFirmaContent />));
 
     await act(async () => {
       submitHash('no-es-un-hash', container);
@@ -79,7 +79,7 @@ describe('VerificarFirmaPage', () => {
       data: { statusCode: 200, timestamp: '', data: resultadoEncontrado },
     });
 
-    const { container } = await act(async () => render(<VerificarFirmaPage />));
+    const { container } = await act(async () => render(<VerificarFirmaContent />));
 
     await act(async () => {
       submitHash(HASH.toUpperCase(), container);
@@ -111,7 +111,7 @@ describe('VerificarFirmaPage', () => {
       },
     });
 
-    const { container } = await act(async () => render(<VerificarFirmaPage />));
+    const { container } = await act(async () => render(<VerificarFirmaContent />));
 
     await act(async () => {
       submitHash(HASH, container);
@@ -134,7 +134,7 @@ describe('VerificarFirmaPage', () => {
       data: { statusCode: 200, timestamp: '', data: resultadoEncontrado },
     });
 
-    const { container } = await act(async () => render(<VerificarFirmaPage />));
+    const { container } = await act(async () => render(<VerificarFirmaContent />));
 
     await act(async () => {
       submitHash(HASH, container);
@@ -154,7 +154,7 @@ describe('VerificarFirmaPage', () => {
     });
 
     await act(async () => {
-      render(<VerificarFirmaPage />);
+      render(<VerificarFirmaContent />);
     });
 
     await waitFor(() => {
@@ -170,7 +170,7 @@ describe('VerificarFirmaPage', () => {
     (globalThis as { __MOCK_SEARCH_PARAMS__?: string }).__MOCK_SEARCH_PARAMS__ = '?hash=malísimo';
 
     await act(async () => {
-      render(<VerificarFirmaPage />);
+      render(<VerificarFirmaContent />);
     });
 
     expect(
