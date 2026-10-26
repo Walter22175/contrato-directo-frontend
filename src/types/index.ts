@@ -154,11 +154,25 @@ export interface Contrato {
   incluye_iva: boolean;
   url_pdf_borrador?: string;
   url_pdf_firmado?: string;
+  hash_documento?: string;
   estado: 'borrador' | 'pendiente_firma' | 'firmado' | 'cancelado';
   fecha_generacion: string;
   fecha_firma_cliente?: string;
   fecha_firma_proveedor?: string;
   transaccion?: Transaccion;
+  firmas?: FirmaDigital[];
+}
+
+export interface FirmaDigital {
+  id_firma: string;
+  id_contrato: string;
+  id_usuario: string;
+  proveedor_firma: string;
+  fecha_firma: string;
+  ip_firma?: string;
+  hash_documento?: string;
+  certificado_url?: string;
+  estado: 'exitosa' | 'fallida' | 'pendiente';
 }
 
 export interface Valoracion {

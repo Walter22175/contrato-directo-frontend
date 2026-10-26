@@ -137,7 +137,13 @@ export default function VerificarContratoPage() {
           </div>
         )}
 
-        <div className="text-center mt-6">
+        <div className="text-center mt-6 space-y-2">
+          <p className="text-slate-500 text-sm">
+            ¿Tenés el hash SHA-256 del contrato?{' '}
+            <Link href="/verificar-firma" className="text-cyan-400">
+              Verificá por evidencia de firma
+            </Link>
+          </p>
           <Link href="/" className="text-cyan-400 text-sm">
             Volver al inicio
           </Link>

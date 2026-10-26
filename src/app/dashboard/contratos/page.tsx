@@ -1,11 +1,13 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
+import { useRouter } from 'next/navigation';
 import { Card } from '@/components/ui/Card';
 import Button from '@/components/ui/Button';
+import ConfirmDialog from '@/components/ui/ConfirmDialog';
 import api, { extractData } from '@/lib/api';
 import { formatDate } from '@/lib/utils';
-import { FileText, Download, Pen, Loader2 } from 'lucide-react';
+import { FileText, Download, Pen, Loader2, Eye } from 'lucide-react';
 import type { Contrato } from '@/types';
 
 const estadoColors: Record<string, string> = {
@@ -15,11 +17,17 @@ const estadoColors: Record<string, string> = {
   cancelado: 'text-red-400 bg-red-400/10',
 };
 
+const MENSAJE_EVIDENCIA =
+  'Al confirmar, se registrará tu firma electrónica con evidencia: hash SHA-256 del documento, fecha, IP y usuario autenticado. Recibirás un email con el comprobante de la firma.';
+
 export default function ContratosPage() {
+  const router = useRouter();
   const [contratos, setContratos] = useState<Contrato[]>([]);
   const [loading, setLoading] = useState(true);
   const [firmandoId, setFirmandoId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [dialogoAbierto, setDialogoAbierto] = useState(false);
+  const [contratoAFirmar, setContratoAFirmar] = useState<string | null>(null);
 
   const fetchContratos = useCallback(async () => {
     try {
@@ -55,6 +63,8 @@ export default function ContratosPage() {
       }
     } finally {
       setFirmandoId(null);
+      setDialogoAbierto(false);
+      setContratoAFirmar(null);
     }
   };
 
@@ -121,6 +131,14 @@ export default function ContratosPage() {
                   )}
                 </div>
                 <div className="flex gap-2">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => router.push(`/dashboard/contratos/${c.id_contrato}`)}
+                  >
+                    <Eye className="w-4 h-4 mr-1" />
+                    Ver detalle
+                  </Button>
                   {(c.url_pdf_firmado || c.url_pdf_borrador) && (
                     <Button
                       variant="outline"
@@ -135,7 +153,10 @@ export default function ContratosPage() {
                     <Button
                       size="sm"
                       disabled={firmandoId === c.id_contrato}
-                      onClick={() => firmar(c.id_contrato)}
+                      onClick={() => {
+                        setContratoAFirmar(c.id_contrato);
+                        setDialogoAbierto(true);
+                      }}
                     >
                       {firmandoId === c.id_contrato ? (
                         <Loader2 className="w-4 h-4 mr-1 animate-spin" />
@@ -151,6 +172,19 @@ export default function ContratosPage() {
           ))}
         </div>
       )}
+
+      <ConfirmDialog
+        open={dialogoAbierto}
+        titulo="Confirmar firma"
+        mensaje={MENSAJE_EVIDENCIA}
+        confirmLabel="Confirmar firma"
+        loading={firmandoId !== null}
+        onConfirm={() => contratoAFirmar && firmar(contratoAFirmar)}
+        onCancel={() => {
+          setDialogoAbierto(false);
+          setContratoAFirmar(null);
+        }}
+      />
     </div>
   );
 }

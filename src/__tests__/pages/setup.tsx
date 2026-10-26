@@ -2,9 +2,18 @@ import React from 'react';
 
 jest.mock('next/navigation', () => {
   const router = { push: jest.fn(), back: jest.fn(), refresh: jest.fn(), replace: jest.fn() };
+  let cachedParams: URLSearchParams | null = null;
+  let cachedSource: string | null = null;
   return {
     useRouter: () => router,
-    useSearchParams: () => new URLSearchParams(),
+    useSearchParams: () => {
+      const src = (globalThis as { __MOCK_SEARCH_PARAMS__?: string }).__MOCK_SEARCH_PARAMS__ || '';
+      if (!cachedParams || cachedSource !== src) {
+        cachedParams = new URLSearchParams(src);
+        cachedSource = src;
+      }
+      return cachedParams;
+    },
     usePathname: () => '',
     useParams: () => ({ id: 'test-id' }),
   };
