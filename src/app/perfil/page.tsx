@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { Card } from '@/components/ui/Card';
 import Button from '@/components/ui/Button';
+import api, { extractData, mensajeError } from '@/lib/api';
 import { User, Mail, Phone, MapPin, Calendar, Edit3, Shield, FileText, Briefcase, RotateCcw, CheckCircle2, Loader2 } from 'lucide-react';
 
 export default function PerfilPage() {
@@ -14,6 +15,9 @@ export default function PerfilPage() {
   const [contexto, setContexto] = useState<string | null>(null);
   const [switching, setSwitching] = useState(false);
   const [switchError, setSwitchError] = useState<string | null>(null);
+  const [resendingEmail, setResendingEmail] = useState(false);
+  const [emailMessage, setEmailMessage] = useState<string | null>(null);
+  const [emailError, setEmailError] = useState<string | null>(null);
 
   useEffect(() => {
     setContexto(localStorage.getItem('contexto_activo'));
@@ -54,6 +58,27 @@ export default function PerfilPage() {
 
   const handleConvertirProveedor = () => {
     router.push('/proveedores/convertir');
+  };
+
+  const handleResendVerification = async () => {
+    setResendingEmail(true);
+    setEmailMessage(null);
+    setEmailError(null);
+
+    try {
+      const res = await api.post('/auth/resend-verification');
+      const data = extractData<{ message?: string }>(res);
+      setEmailMessage(
+        data?.message || 'Te enviamos un nuevo enlace de verificación.',
+      );
+      await loadUser();
+    } catch (err) {
+      setEmailError(
+        mensajeError(err, 'No se pudo reenviar el email de verificación.'),
+      );
+    } finally {
+      setResendingEmail(false);
+    }
   };
 
   return (
@@ -290,6 +315,22 @@ export default function PerfilPage() {
                   <span className="text-slate-500">
                     {user?.email_verificado ? '✓ Email verificado' : '○ Email no verificado'}
                   </span>
+                  {!user?.email_verificado && (
+                    <button
+                      type="button"
+                      onClick={handleResendVerification}
+                      disabled={resendingEmail}
+                      className="text-cyan-400 hover:text-cyan-300 disabled:opacity-50"
+                    >
+                      {resendingEmail ? 'Enviando...' : 'Reenviar verificación'}
+                    </button>
+                  )}
+                  {emailError && (
+                    <span className="text-red-400">{emailError}</span>
+                  )}
+                  {emailMessage && (
+                    <span className="text-green-400">{emailMessage}</span>
+                  )}
                   <span className="text-slate-500 capitalize">
                     {user?.tipo_persona === 'fisica' ? 'Persona Física' : 'Persona Jurídica'}
                   </span>

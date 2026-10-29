@@ -40,6 +40,12 @@ describe('proxy (guard de rutas de auth)', () => {
     expect(mockNext).not.toHaveBeenCalled();
   });
 
+  it('permite /auth/forgot-password aunque exista access_token (recuperación siempre accesible)', () => {
+    proxy(makeRequest('/auth/forgot-password', 'access_token=abc'));
+    expect(mockRedirect).not.toHaveBeenCalled();
+    expect(mockNext).toHaveBeenCalledTimes(1);
+  });
+
   it('permite /auth/login cuando solo queda la refresh_token (access expirado a los 15 min)', () => {
     proxy(makeRequest('/auth/login', 'refresh_token=xyz'));
     expect(mockRedirect).not.toHaveBeenCalled();

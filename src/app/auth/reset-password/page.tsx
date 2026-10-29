@@ -8,6 +8,7 @@ import type { FieldErrors, UseFormHandleSubmit, UseFormRegister } from 'react-ho
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import api from '@/lib/api';
+import { useAuthStore } from '@/store/auth';
 import Button from '@/components/ui/Button';
 import Input from '@/components/ui/Input';
 import { AlertTriangle, CheckCircle, KeyRound } from 'lucide-react';
@@ -131,6 +132,7 @@ const FormView = ({
 const ResetPasswordContent = (): JSX.Element => {
   const searchParams = useSearchParams();
   const token = searchParams.get('token') ?? '';
+  const logout = useAuthStore((s) => s.logout);
 
   const [done, setDone] = useState(false);
   const [error, setError] = useState('');
@@ -151,6 +153,9 @@ const ResetPasswordContent = (): JSX.Element => {
         token,
         nueva_password: data.password,
       });
+      // La contraseña cambió: cerramos cualquier sesión local para que el
+      // proxy no redirija el login al dashboard con tokens viejos.
+      logout();
       setDone(true);
     } catch (err) {
       const status = (err as { response?: { status?: number } })?.response?.status;

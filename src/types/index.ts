@@ -35,6 +35,7 @@ export interface AuthResponse {
   usuario: Partial<Usuario>;
   access_token: string;
   refresh_token: string;
+  email_verificacion_enviada?: boolean;
 }
 
 export interface LoginDto {
