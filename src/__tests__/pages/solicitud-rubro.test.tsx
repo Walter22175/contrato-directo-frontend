@@ -5,8 +5,17 @@ import './setup';
 import { render, screen, act, fireEvent } from '@testing-library/react';
 import SolicitudRubroPage from '@/app/proveedores/solicitud/page';
 import api from '@/lib/api';
+import { useAuthStore } from '@/store/auth';
 
 const apiGetMock = api.get as unknown as jest.Mock;
+const apiPostMock = api.post as unknown as jest.Mock;
+const useAuthStoreMock = useAuthStore as unknown as jest.Mock;
+
+const mockStoreCon = (estado: Record<string, unknown>) => {
+  useAuthStoreMock.mockImplementation((selector?: (s: unknown) => unknown) =>
+    selector ? selector(estado) : estado,
+  );
+};
 
 const solicitudesMock = [
   {
@@ -109,5 +118,58 @@ describe('SolicitudRubroPage', () => {
     });
 
     expect(screen.getByText('Automática')).toBeInTheDocument();
+  });
+
+  it('exige sesión: sin sesión ofrece login en vez del formulario', async () => {
+    mockStoreCon({ user: null, isAuthenticated: false, isLoading: false, logout: jest.fn() });
+
+    await act(async () => {
+      render(<SolicitudRubroPage />);
+    });
+
+    expect(screen.getByText('Iniciá sesión para solicitar')).toBeInTheDocument();
+    expect(screen.queryByText('Nueva Solicitud')).not.toBeInTheDocument();
+    expect(
+      screen.getByText('Iniciá sesión para ver y enviar solicitudes de rubro'),
+    ).toBeInTheDocument();
+  });
+
+  it('ante un 401 al enviar cierra la sesión y muestra un mensaje claro', async () => {
+    const logout = jest.fn();
+    mockStoreCon({
+      user: { id_usuario: 'u-1' },
+      isAuthenticated: true,
+      isLoading: false,
+      logout,
+    });
+    apiPostMock.mockRejectedValue({
+      response: { status: 401, data: { message: 'Unauthorized' } },
+    });
+
+    await act(async () => {
+      render(<SolicitudRubroPage />);
+    });
+    await act(async () => {
+      fireEvent.click(screen.getByText('Nueva Solicitud'));
+    });
+
+    fireEvent.change(screen.getByPlaceholderText('Ej: Instalación de Paneles Solares'), {
+      target: { value: 'Instalación de Paneles Solares' },
+    });
+    fireEvent.change(
+      screen.getByPlaceholderText('Describí el tipo de servicios que incluiría este rubro...'),
+      { target: { value: 'Instalación y mantenimiento' } },
+    );
+
+    const form = screen.getByText('Enviar Solicitud').closest('form');
+    await act(async () => {
+      fireEvent.submit(form as HTMLFormElement);
+    });
+
+    expect(logout).toHaveBeenCalled();
+    expect(
+      screen.getByText(/Tu sesión expiró o no está activa/),
+    ).toBeInTheDocument();
+    expect(screen.queryByText('Enviar Solicitud')).not.toBeInTheDocument();
   });
 });

@@ -220,4 +220,93 @@ describe('AdminUsuariosPage', () => {
       });
     });
   });
+
+  it('al asignar el rol proveedor muestra el checklist de categorías y las envía en el payload', async () => {
+    const usuario = {
+      id_usuario: 'u-1',
+      email: 'ana@test.com',
+      nombre: 'Ana',
+      apellido: 'Lopez',
+      tipo_persona: 'fisica',
+      estado: 'activo',
+      email_verificado: true,
+      fecha_registro: '2026-01-01T00:00:00Z',
+      usuario_roles: [],
+    };
+
+    (api.get as jest.Mock).mockImplementation((url: string) => {
+      if (url === '/roles') {
+        return Promise.resolve({
+          data: {
+            statusCode: 200,
+            timestamp: '',
+            data: [{ id_rol: 2, nombre: 'proveedor' }],
+          },
+        });
+      }
+      if (url === '/catalogo/categorias') {
+        return Promise.resolve({
+          data: {
+            statusCode: 200,
+            timestamp: '',
+            data: [
+              { id_categoria: 1, nombre: 'Albañilería', activa: true, orden: 1 },
+              { id_categoria: 3, nombre: 'Electricidad', activa: true, orden: 2 },
+            ],
+          },
+        });
+      }
+      if (url === '/usuarios/u-1') {
+        return Promise.resolve({
+          data: { statusCode: 200, timestamp: '', data: usuario },
+        });
+      }
+      return Promise.resolve({
+        data: { statusCode: 200, timestamp: '', data: { data: [usuario], meta: { total: 1 } } },
+      });
+    });
+
+    await act(async () => {
+      render(<AdminUsuariosPage />);
+    });
+
+    fireEvent.click(await screen.findByText('Ana Lopez'));
+
+    const select = await screen.findByRole('combobox');
+    await act(async () => {
+      fireEvent.change(select, { target: { value: 'proveedor' } });
+    });
+
+    // Aparece el checklist de categorías de la plataforma
+    const checklist = await screen.findByTestId('checklist-categorias-proveedor');
+    expect(checklist).toBeInTheDocument();
+    expect(screen.getByText('Albañilería')).toBeInTheDocument();
+    expect(screen.getByText('Electricidad')).toBeInTheDocument();
+    expect(
+      screen.getByText(/Sin categorías marcadas: el proveedor podrá agregar servicios de cualquier categoría/),
+    ).toBeInTheDocument();
+
+    // Marcar una categoría con check
+    await act(async () => {
+      fireEvent.click(screen.getByLabelText('Electricidad'));
+    });
+    expect(
+      screen.getByText(/1 categoría seleccionada/),
+    ).toBeInTheDocument();
+
+    await act(async () => {
+      fireEvent.click(screen.getByText('Asignar'));
+    });
+
+    await act(async () => {
+      fireEvent.click(screen.getByTestId('confirm-accept'));
+    });
+
+    await waitFor(() => {
+      expect(api.post).toHaveBeenCalledWith('/usuarios/u-1/roles', {
+        rol: 'proveedor',
+        categorias: [3],
+      });
+    });
+  });
 });

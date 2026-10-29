@@ -38,10 +38,13 @@ export default function NotificacionesConfigPage() {
     const fetchPreferencias = async () => {
       try {
         const res = await api.get('/notificaciones/preferencias');
-        const data = extractData<PreferenciaNotificacion[]>(res);
-        setPreferencias(Array.isArray(data) ? data : []);
-        if (data?.length > 0) {
-          const freq = data.find((p) => p.frecuencia_resumen);
+        const data = extractData<
+          PreferenciaNotificacion[] | { data?: PreferenciaNotificacion[] } | null
+        >(res);
+        const lista = Array.isArray(data) ? data : data?.data || [];
+        setPreferencias(lista);
+        if (lista.length > 0) {
+          const freq = lista.find((p) => p.frecuencia_resumen);
           if (freq) setFrecuencia(freq.frecuencia_resumen);
         }
       } catch {

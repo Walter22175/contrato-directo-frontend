@@ -5,7 +5,7 @@ import api, { extractData } from '@/lib/api';
 import { Card } from '@/components/ui/Card';
 import ConfirmDialog from '@/components/ui/ConfirmDialog';
 import { Users, Search, XCircle, Shield, Plus, X } from 'lucide-react';
-import type { Usuario, Rol } from '@/types';
+import type { Usuario, Rol, Categoria } from '@/types';
 
 type Tab = 'todos' | 'pendientes' | 'verificados';
 
@@ -30,31 +30,53 @@ export default function AdminUsuariosPage() {
   const [cambiando, setCambiando] = useState<string | null>(null);
   const [rolesCatalogo, setRolesCatalogo] = useState<Rol[]>([]);
   const [nuevoRol, setNuevoRol] = useState('');
+  const [categoriasDisponibles, setCategoriasDisponibles] = useState<Categoria[]>([]);
+  const [categoriasSeleccionadas, setCategoriasSeleccionadas] = useState<number[]>([]);
   const [guardandoRol, setGuardandoRol] = useState(false);
   const [busquedaDebounced, setBusquedaDebounced] = useState('');
   const [confirmacion, setConfirmacion] = useState<Confirmacion | null>(null);
+  const [pagina, setPagina] = useState(1);
+  const [metaPaginacion, setMetaPaginacion] = useState({ total: 0, totalPages: 1 });
+
+  const LIMIT_PAGINA = 10;
 
   useEffect(() => {
     const t = setTimeout(() => setBusquedaDebounced(busqueda), 300);
     return () => clearTimeout(t);
   }, [busqueda]);
 
+  // Cambiar de tab o de búsqueda vuelve a la primera página
+  useEffect(() => {
+    setPagina(1);
+  }, [tab, busquedaDebounced]);
+
   const fetchUsuarios = useCallback(async () => {
     setLoading(true);
     try {
-      const params: Record<string, string> = {};
+      const params: Record<string, string> = {
+        page: String(pagina),
+        limit: String(LIMIT_PAGINA),
+      };
       if (tab === 'pendientes') params.estado = 'pendiente';
       if (tab === 'verificados') params.estado = 'verificado';
       if (busquedaDebounced) params.search = busquedaDebounced;
       const res = await api.get<RespuestaApi<Usuario[]>>('/usuarios', { params });
-      const data = extractData<RespuestaApi<Usuario[]> | null>(res);
-      setUsuarios(data?.data || data || []);
+      const data = extractData<RespuestaApi<Usuario[]> & { meta?: { total: number; totalPages: number; page: number } } | null>(res);
+      setUsuarios(data?.data || []);
+      const total = data?.meta?.total ?? 0;
+      const totalPages = data?.meta?.totalPages ?? 1;
+      setMetaPaginacion({ total, totalPages });
+      // Si la página actual quedó fuera de rango (ej. la búsqueda redujo el total), recorrer
+      if (data?.meta && data.meta.page > totalPages && totalPages >= 1) {
+        setPagina(totalPages);
+      }
     } catch {
       setUsuarios([]);
+      setMetaPaginacion({ total: 0, totalPages: 1 });
     } finally {
       setLoading(false);
     }
-  }, [tab, busquedaDebounced]);
+  }, [tab, busquedaDebounced, pagina]);
 
   useEffect(() => { fetchUsuarios(); }, [fetchUsuarios]);
 
@@ -68,12 +90,38 @@ export default function AdminUsuariosPage() {
       .catch(() => setRolesCatalogo([]));
   }, []);
 
+  useEffect(() => {
+    api
+      .get<RespuestaApi<Categoria[]>>('/catalogo/categorias', { params: { activa: true } })
+      .then((res) => {
+        const data = extractData<RespuestaApi<Categoria[]> | null>(res);
+        setCategoriasDisponibles(data?.data || data || []);
+      })
+      .catch(() => setCategoriasDisponibles([]));
+  }, []);
+
+  useEffect(() => {
+    setCategoriasSeleccionadas([]);
+  }, [nuevoRol]);
+
+  const toggleCategoria = (id: number) => {
+    setCategoriasSeleccionadas((prev) =>
+      prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]
+    );
+  };
+
+  const nombreCategoria = (id: number) =>
+    categoriasDisponibles.find((c) => c.id_categoria === id)?.nombre || `#${id}`;
+
   const asignarRol = async () => {
     if (!selectedUser || !nuevoRol) return;
     setGuardandoRol(true);
     setMsg(null);
     try {
-      await api.post(`/usuarios/${selectedUser.id_usuario}/roles`, { rol: nuevoRol });
+      await api.post(`/usuarios/${selectedUser.id_usuario}/roles`, {
+        rol: nuevoRol,
+        ...(nuevoRol === 'proveedor' ? { categorias: categoriasSeleccionadas } : {}),
+      });
       const res = await api.get<RespuestaApi<Usuario>>(`/usuarios/${selectedUser.id_usuario}`);
       const actualizado = extractData<Usuario>(res);
       if (actualizado) {
@@ -280,6 +328,11 @@ export default function AdminUsuariosPage() {
                       className="flex items-center gap-1.5 text-xs px-2.5 py-1 rounded bg-cyan-500/10 text-cyan-400 border border-cyan-500/20"
                     >
                       {ur.rol?.nombre?.replace('_', ' ')}
+                      {ur.categorias && ur.categorias.length > 0 && (
+                        <span className="text-[10px] text-cyan-300/80" title={ur.categorias.map(nombreCategoria).join(', ')}>
+                          ({ur.categorias.length} cat.)
+                        </span>
+                      )}
                       <button
                         onClick={() =>
                           setConfirmacion({
@@ -330,6 +383,43 @@ export default function AdminUsuariosPage() {
                   Asignar
                 </button>
               </div>
+
+              {nuevoRol === 'proveedor' && (
+                <div className="space-y-2 pt-2" data-testid="checklist-categorias-proveedor">
+                  <p className="text-xs font-medium text-slate-300">
+                    Categorías que podrá ofrecer el proveedor:
+                  </p>
+                  {categoriasDisponibles.length === 0 ? (
+                    <p className="text-xs text-slate-500">Cargando categorías…</p>
+                  ) : (
+                    <div className="grid grid-cols-2 gap-2">
+                      {categoriasDisponibles.map((c) => (
+                        <label
+                          key={c.id_categoria}
+                          className={`flex items-center gap-2 px-3 py-2 rounded-lg border text-xs cursor-pointer transition-colors ${
+                            categoriasSeleccionadas.includes(c.id_categoria)
+                              ? 'border-cyan-500 bg-cyan-500/10 text-cyan-400'
+                              : 'border-slate-700 bg-slate-800/50 text-slate-300 hover:border-slate-600'
+                          }`}
+                        >
+                          <input
+                            type="checkbox"
+                            checked={categoriasSeleccionadas.includes(c.id_categoria)}
+                            onChange={() => toggleCategoria(c.id_categoria)}
+                            className="accent-cyan-500"
+                          />
+                          {c.nombre}
+                        </label>
+                      ))}
+                    </div>
+                  )}
+                  <p className="text-xs text-slate-500">
+                    {categoriasSeleccionadas.length > 0
+                      ? `${categoriasSeleccionadas.length} categoría${categoriasSeleccionadas.length > 1 ? 's' : ''} seleccionada${categoriasSeleccionadas.length > 1 ? 's' : ''}: el proveedor solo podrá agregar servicios de ${categoriasSeleccionadas.map(nombreCategoria).join(', ')}`
+                      : 'Sin categorías marcadas: el proveedor podrá agregar servicios de cualquier categoría.'}
+                  </p>
+                </div>
+              )}
             </div>
           </div>
         </Card>
@@ -399,6 +489,33 @@ export default function AdminUsuariosPage() {
               </div>
             </div>
           ))}
+        </div>
+      )}
+
+      {!loading && metaPaginacion.total > 0 && (
+        <div className="flex items-center justify-between pt-2" data-testid="paginacion-usuarios">
+          <span className="text-xs text-slate-500">
+            {metaPaginacion.total} usuario{metaPaginacion.total !== 1 ? 's' : ''} en total
+          </span>
+          <div className="flex items-center gap-3">
+            <button
+              onClick={() => setPagina((p) => Math.max(1, p - 1))}
+              disabled={pagina <= 1}
+              className="px-3 py-1.5 text-xs font-medium rounded-lg border border-slate-600 text-slate-300 hover:text-white hover:border-slate-500 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+            >
+              Anterior
+            </button>
+            <span className="text-xs text-slate-400">
+              Página {pagina} de {Math.max(1, metaPaginacion.totalPages)}
+            </span>
+            <button
+              onClick={() => setPagina((p) => p + 1)}
+              disabled={pagina >= metaPaginacion.totalPages}
+              className="px-3 py-1.5 text-xs font-medium rounded-lg border border-slate-600 text-slate-300 hover:text-white hover:border-slate-500 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+            >
+              Siguiente
+            </button>
+          </div>
         </div>
       )}
 

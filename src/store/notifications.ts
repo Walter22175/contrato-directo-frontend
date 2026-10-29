@@ -22,8 +22,11 @@ export const useNotificationStore = create<NotificationState>((set) => ({
     set({ isLoading: true });
     try {
       const res = await api.get('/notificaciones');
-      const data = extractData<Notificacion[]>(res);
-      set({ notificaciones: Array.isArray(data) ? data : [], isLoading: false });
+      const data = extractData<Notificacion[] | { data?: Notificacion[] } | null>(res);
+      set({
+        notificaciones: Array.isArray(data) ? data : data?.data || [],
+        isLoading: false,
+      });
     } catch {
       set({ isLoading: false });
     }
@@ -32,8 +35,8 @@ export const useNotificationStore = create<NotificationState>((set) => ({
   fetchNoLeidas: async () => {
     try {
       const res = await api.get('/notificaciones/no-leidas');
-      const data = extractData<{ count: number }>(res);
-      set({ noLeidas: data?.count || 0 });
+      const data = extractData<{ count?: number; data?: { count?: number } }>(res);
+      set({ noLeidas: data?.count ?? data?.data?.count ?? 0 });
     } catch {
       // silent
     }

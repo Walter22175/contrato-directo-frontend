@@ -21,6 +21,8 @@ export interface UsuarioRol {
   id_rol: number;
   activo: boolean;
   rol: Rol;
+  /** Ids de categorías asignadas al asignar el rol (ej. proveedor). null/ausente = sin restricción. */
+  categorias?: number[] | null;
 }
 
 export interface Rol {

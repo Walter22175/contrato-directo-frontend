@@ -35,8 +35,12 @@ const mensajeDeApi = (err: unknown): string | string[] | undefined =>
   (err as { response?: { data?: { message?: string | string[] } } } | undefined)?.response?.data
     ?.message;
 
+const statusDeApi = (err: unknown): number | undefined =>
+  (err as { response?: { status?: number } } | undefined)?.response?.status;
+
 export default function SolicitudRubroPage() {
-  const { user } = useAuthStore();
+  const { user, logout } = useAuthStore();
+  const sesionActiva = Boolean(user?.id_usuario);
   const [solicitudes, setSolicitudes] = useState<Solicitud[]>([]);
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
@@ -68,7 +72,7 @@ export default function SolicitudRubroPage() {
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
-    if (!form.nombre_propuesto.trim() || !form.descripcion.trim()) return;
+    if (!sesionActiva || !form.nombre_propuesto.trim() || !form.descripcion.trim()) return;
     setSending(true);
     setFormError(null);
     try {
@@ -83,11 +87,30 @@ export default function SolicitudRubroPage() {
       setMsg({ tipo: 'ok', texto: 'Solicitud enviada. SLA de revisión legal: 5 días hábiles.' });
       await fetchSolicitudes();
     } catch (err) {
-      const m = mensajeDeApi(err) || 'No se pudo enviar la solicitud.';
-      setFormError(Array.isArray(m) ? m.join(' — ') : String(m));
+      if (statusDeApi(err) === 401) {
+        setShowForm(false);
+        logout();
+        setMsg({
+          tipo: 'error',
+          texto: 'Tu sesión expiró o no está activa. Iniciá sesión nuevamente para enviar tu solicitud.',
+        });
+      } else {
+        const m = mensajeDeApi(err) || 'No se pudo enviar la solicitud.';
+        setFormError(Array.isArray(m) ? m.join(' — ') : String(m));
+      }
     } finally {
       setSending(false);
     }
+  };
+
+  const cerrarSesionInvalida = (err: unknown, texto: string): string | null => {
+    if (statusDeApi(err) === 401) {
+      logout();
+      setMsg({ tipo: 'error', texto: 'Tu sesión expiró o no está activa. Iniciá sesión nuevamente.' });
+      return null;
+    }
+    const m = mensajeDeApi(err) || texto;
+    return Array.isArray(m) ? m.join(' — ') : String(m);
   };
 
   const apoyar = async (s: Solicitud) => {
@@ -98,8 +121,8 @@ export default function SolicitudRubroPage() {
       setMsg({ tipo: 'ok', texto: 'Apoyo registrado. Gracias por impulsar este rubro.' });
       await fetchSolicitudes();
     } catch (e) {
-      const m = mensajeDeApi(e) || 'No se pudo registrar el apoyo';
-      setMsg({ tipo: 'error', texto: Array.isArray(m) ? m.join(' — ') : String(m) });
+      const texto = cerrarSesionInvalida(e, 'No se pudo registrar el apoyo');
+      if (texto) setMsg({ tipo: 'error', texto });
     } finally {
       setAccionando(null);
     }
@@ -113,8 +136,8 @@ export default function SolicitudRubroPage() {
       setMsg({ tipo: 'ok', texto: '¡Gracias! Tu evaluación alimenta la métrica de satisfacción del proceso.' });
       await fetchSolicitudes();
     } catch (e) {
-      const m = mensajeDeApi(e) || 'No se pudo evaluar el proceso';
-      setMsg({ tipo: 'error', texto: Array.isArray(m) ? m.join(' — ') : String(m) });
+      const texto = cerrarSesionInvalida(e, 'No se pudo evaluar el proceso');
+      if (texto) setMsg({ tipo: 'error', texto });
     } finally {
       setEvaluando(null);
     }
@@ -141,13 +164,23 @@ export default function SolicitudRubroPage() {
             <h1 className="text-2xl font-bold text-white">Solicitar Nuevo Rubro</h1>
             <p className="text-slate-400 mt-1">Proponé un nuevo rubro o servicio para el catálogo</p>
           </div>
-          <button
-            onClick={() => setShowForm(!showForm)}
-            className="flex items-center gap-2 px-4 py-2 bg-cyan-600 hover:bg-cyan-700 text-white rounded-lg text-sm font-medium transition-colors"
-          >
-            <FilePlus className="w-4 h-4" />
-            Nueva Solicitud
-          </button>
+          {sesionActiva ? (
+            <button
+              onClick={() => setShowForm(!showForm)}
+              className="flex items-center gap-2 px-4 py-2 bg-cyan-600 hover:bg-cyan-700 text-white rounded-lg text-sm font-medium transition-colors"
+            >
+              <FilePlus className="w-4 h-4" />
+              Nueva Solicitud
+            </button>
+          ) : (
+            <Link
+              href="/auth/login"
+              className="flex items-center gap-2 px-4 py-2 bg-cyan-600 hover:bg-cyan-700 text-white rounded-lg text-sm font-medium transition-colors"
+            >
+              <FilePlus className="w-4 h-4" />
+              Iniciá sesión para solicitar
+            </Link>
+          )}
         </div>
 
         {/* Info de proceso (SLAs) */}
@@ -168,7 +201,7 @@ export default function SolicitudRubroPage() {
           </div>
         )}
 
-        {showForm && (
+        {showForm && sesionActiva && (
           <Card>
             <form onSubmit={handleSubmit} className="p-6 space-y-4">
               {formError && (
@@ -253,7 +286,7 @@ export default function SolicitudRubroPage() {
               <div className="text-center py-12">
                 <p className="text-slate-400 mb-4">Iniciá sesión para ver y enviar solicitudes de rubro</p>
                 <Link
-                  href="/login"
+                  href="/auth/login"
                   className="inline-flex px-4 py-2 bg-cyan-600 hover:bg-cyan-700 text-white rounded-lg text-sm font-medium transition-colors"
                 >
                   Iniciar sesión
