@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" version="1.2" baseProfile="tiny"
+     width="256" height="256" viewBox="0 0 256 256">
+
+  <!-- Fondo obligatorio para BIMI -->
+  <rect width="256" height="256" fill="#FFFFFF"/>
+
+  <!-- Arco izquierdo -->
+  <path fill="#0033BD"
+        d="M118 40 A88 88 0 0 0 118 216 L104 200 A68 68 0 0 1 104 56 Z"/>
+
+  <!-- Arco derecho -->
+  <path fill="#0033BD"
+        d="M138 40 A88 88 0 0 1 138 216 L152 200 A68 68 0 0 0 152 56 Z"/>
+
+  <!-- Flecha central -->
+  <path fill="#0033BD"
+        d="M80 120 L168 120 L168 96 L208 128 L168 160 L168 136 L80 136
+           A16 16 0 0 1 80 120 Z"/>
+</svg>
+

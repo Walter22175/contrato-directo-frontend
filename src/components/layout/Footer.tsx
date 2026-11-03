@@ -70,8 +70,8 @@ export default function Footer() {
               </li>
               <li className="flex items-center gap-2">
                 <Mail className="w-4 h-4 shrink-0" />
-                <a href="mailto:comercial@contactodirecto.com.ar" className="hover:text-white transition-colors break-all">
-                  comercial@contactodirecto.com.ar
+                <a href="mailto:info@contratodirecto.com.ar" className="hover:text-white transition-colors break-all">
+                  info@contratodirecto.com.ar
                 </a>
               </li>
               <li className="flex items-center gap-2">
