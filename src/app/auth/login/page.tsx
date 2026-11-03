@@ -11,6 +11,7 @@ import Button from '@/components/ui/Button';
 import Input from '@/components/ui/Input';
 import { Eye, EyeOff } from 'lucide-react';
 import { useState } from 'react';
+import api, { extractData, mensajeError } from '@/lib/api';
 
 const loginSchema = z.object({
   email: z.string().email('Email inválido'),
@@ -23,11 +24,16 @@ export default function LoginPage() {
   const router = useRouter();
   const { login, error, clearError } = useAuthStore();
   const [showPassword, setShowPassword] = useState(false);
+  const [resendingEmail, setResendingEmail] = useState(false);
+  const [resendMessage, setResendMessage] = useState('');
+  const [resendError, setResendError] = useState('');
   const errorRef = useRef<HTMLDivElement>(null);
 
   const { register, handleSubmit, reset, resetField, formState: { errors, isSubmitting } } = useForm<LoginForm>({
     resolver: zodResolver(loginSchema),
   });
+  const [emailIngresado, setEmailIngresado] = useState('');
+  const emailInput = register('email');
 
   useEffect(() => {
     reset();
@@ -49,6 +55,29 @@ export default function LoginPage() {
     }
   };
 
+  const reenviarVerificacion = async () => {
+    setResendingEmail(true);
+    setResendMessage('');
+    setResendError('');
+
+    try {
+      const res = await api.post('/auth/resend-verification-public', {
+        email: emailIngresado,
+      });
+      const data = extractData<{ message?: string }>(res);
+      setResendMessage(
+        data.message ||
+          'Si la cuenta necesita verificación, te enviaremos un nuevo enlace.',
+      );
+    } catch (err) {
+      setResendError(
+        mensajeError(err, 'No se pudo solicitar otro email de verificación.'),
+      );
+    } finally {
+      setResendingEmail(false);
+    }
+  };
+
   return (
     <main className="flex-1 flex items-center justify-center px-4 py-12">
       <div className="w-full max-w-md">
@@ -64,6 +93,27 @@ export default function LoginPage() {
             </div>
           )}
 
+          {error?.includes('Verificá tu email') && (
+            <div className="mb-4">
+              <Button
+                type="button"
+                variant="secondary"
+                className="w-full"
+                isLoading={resendingEmail}
+                disabled={!emailIngresado}
+                onClick={reenviarVerificacion}
+              >
+                Reenviar email de confirmación
+              </Button>
+              {resendMessage && (
+                <p className="mt-2 text-sm text-green-300">{resendMessage}</p>
+              )}
+              {resendError && (
+                <p className="mt-2 text-sm text-red-300">{resendError}</p>
+              )}
+            </div>
+          )}
+
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
             <Input
               label="Email"
@@ -71,7 +121,11 @@ export default function LoginPage() {
               placeholder="tu@email.com"
               error={errors.email?.message}
               onFocus={clearError}
-              {...register('email')}
+              {...emailInput}
+              onChange={(event) => {
+                emailInput.onChange(event);
+                setEmailIngresado(event.target.value);
+              }}
             />
 
             <div className="relative">

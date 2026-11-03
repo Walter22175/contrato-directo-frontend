@@ -3,9 +3,9 @@
 import { Suspense, useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
-import api from '@/lib/api';
-import { useAuthStore } from '@/store/auth';
+import api, { extractData, mensajeError } from '@/lib/api';
 import Button from '@/components/ui/Button';
+import Input from '@/components/ui/Input';
 import { AlertTriangle, CheckCircle, Loader2, MailCheck } from 'lucide-react';
 import type { JSX } from 'react';
 
@@ -14,10 +14,34 @@ type Estado = 'verificando' | 'ok' | 'error';
 const VerifyEmailContent = (): JSX.Element => {
   const searchParams = useSearchParams();
   const token = searchParams.get('token') ?? '';
-  const loadUser = useAuthStore((s) => s.loadUser);
 
   const [estado, setEstado] = useState<Estado>('verificando');
   const [mensaje, setMensaje] = useState('');
+  const [email, setEmail] = useState('');
+  const [reenviando, setReenviando] = useState(false);
+  const [mensajeReenvio, setMensajeReenvio] = useState('');
+  const [errorReenvio, setErrorReenvio] = useState('');
+
+  const reenviarVerificacion = async () => {
+    setReenviando(true);
+    setMensajeReenvio('');
+    setErrorReenvio('');
+
+    try {
+      const res = await api.post('/auth/resend-verification-public', { email });
+      const data = extractData<{ message?: string }>(res);
+      setMensajeReenvio(
+        data.message ||
+          'Si la cuenta necesita verificación, te enviaremos un nuevo enlace.',
+      );
+    } catch (err) {
+      setErrorReenvio(
+        mensajeError(err, 'No se pudo solicitar otro email de verificación.'),
+      );
+    } finally {
+      setReenviando(false);
+    }
+  };
 
   useEffect(() => {
     let cancelado = false;
@@ -35,15 +59,13 @@ const VerifyEmailContent = (): JSX.Element => {
         if (!cancelado) {
           setEstado('ok');
           setMensaje(data?.message || 'Email verificado exitosamente.');
-          void loadUser();
         }
       } catch (err) {
         if (!cancelado) {
-          const mensajeError =
-            (err as { response?: { data?: { message?: string } } })?.response?.data
-              ?.message;
           setEstado('error');
-          setMensaje(mensajeError || 'El enlace es inválido o expiró.');
+          setMensaje(
+            mensajeError(err, 'El enlace es inválido o expiró.'),
+          );
         }
       }
     };
@@ -53,7 +75,7 @@ const VerifyEmailContent = (): JSX.Element => {
     return () => {
       cancelado = true;
     };
-  }, [token, loadUser]);
+  }, [token]);
 
   return (
     <main className="flex-1 flex items-center justify-center px-4 py-12">
@@ -73,8 +95,8 @@ const VerifyEmailContent = (): JSX.Element => {
                 <CheckCircle className="w-16 h-16 text-green-400 mx-auto mb-4" />
                 <h1 className="text-2xl font-bold text-white mb-2">Email verificado</h1>
                 <p className="text-slate-400 mb-6">{mensaje}</p>
-                <Link href="/dashboard">
-                  <Button className="w-full">Ir a mi panel</Button>
+                <Link href="/auth/login">
+                  <Button className="w-full">Iniciar sesión</Button>
                 </Link>
               </>
             )}
@@ -84,12 +106,35 @@ const VerifyEmailContent = (): JSX.Element => {
                 <AlertTriangle className="w-16 h-16 text-amber-400 mx-auto mb-4" />
                 <h1 className="text-2xl font-bold text-white mb-2">No pudimos verificar tu email</h1>
                 <p className="text-slate-400 mb-6">{mensaje}</p>
-                <Link href="/auth/login">
-                  <Button className="w-full">Volver al login</Button>
+                <div className="space-y-3 text-left">
+                  <Input
+                    label="Email"
+                    type="email"
+                    placeholder="tu@email.com"
+                    value={email}
+                    onChange={(event) => setEmail(event.target.value)}
+                  />
+                  <Button
+                    type="button"
+                    className="w-full"
+                    isLoading={reenviando}
+                    onClick={reenviarVerificacion}
+                    disabled={!email}
+                  >
+                    Solicitar otro enlace
+                  </Button>
+                  {mensajeReenvio && (
+                    <p className="text-sm text-green-300">{mensajeReenvio}</p>
+                  )}
+                  {errorReenvio && (
+                    <p className="text-sm text-red-300">{errorReenvio}</p>
+                  )}
+                </div>
+                <Link href="/auth/login" className="block mt-4">
+                  <Button className="w-full" variant="secondary">
+                    Volver al login
+                  </Button>
                 </Link>
-                <p className="text-center text-slate-400 text-sm mt-4">
-                  Iniciá sesión y reenviá la verificación desde tu perfil.
-                </p>
               </>
             )}
           </div>

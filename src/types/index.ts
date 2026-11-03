@@ -38,6 +38,11 @@ export interface AuthResponse {
   email_verificacion_enviada?: boolean;
 }
 
+export interface RegisterResponse {
+  usuario: Partial<Usuario>;
+  email_verificacion_enviada: boolean;
+}
+
 export interface LoginDto {
   email: string;
   password: string;

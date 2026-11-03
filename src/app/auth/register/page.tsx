@@ -1,7 +1,6 @@
 'use client';
 
 import { useState, useRef, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -10,9 +9,9 @@ import { useAuthStore } from '@/store/auth';
 import Button from '@/components/ui/Button';
 import Input from '@/components/ui/Input';
 import Select from '@/components/ui/Select';
-import { Eye, EyeOff } from 'lucide-react';
+import { AlertTriangle, Eye, EyeOff, MailCheck } from 'lucide-react';
 import SUSModal from '@/components/ui/SUSModal';
-import api from '@/lib/api';
+import api, { extractData, mensajeError } from '@/lib/api';
 
 const registerSchema = z.object({
   email: z.string().email('Email inválido'),
@@ -42,10 +41,15 @@ interface RespuestasSUS {
 }
 
 export default function RegisterPage() {
-  const router = useRouter();
-  const { register: registerUser, error, clearError, user } = useAuthStore();
+  const { register: registerUser, error, clearError } = useAuthStore();
   const [showPassword, setShowPassword] = useState(false);
   const [showSUS, setShowSUS] = useState(false);
+  const [verificationEmail, setVerificationEmail] = useState('');
+  const [verificationSent, setVerificationSent] = useState(false);
+  const [registeredUserId, setRegisteredUserId] = useState<string>();
+  const [resendingEmail, setResendingEmail] = useState(false);
+  const [resendMessage, setResendMessage] = useState('');
+  const [resendError, setResendError] = useState('');
   const errorRef = useRef<HTMLDivElement>(null);
 
   const { register, handleSubmit, reset, formState: { errors, isSubmitting } } = useForm<RegisterForm>({
@@ -70,25 +74,51 @@ export default function RegisterPage() {
   const onSubmit = async (data: RegisterForm) => {
     try {
       clearError();
-      await registerUser(data);
+      const result = await registerUser(data);
+      setVerificationEmail(data.email);
+      setVerificationSent(result.email_verificacion_enviada);
+      setRegisteredUserId(result.usuario.id_usuario);
       setShowSUS(true);
     } catch {
       reset({ ...data, password: '', tipo_persona: data.tipo_persona });
     }
   };
 
+  const handleResendVerification = async () => {
+    setResendingEmail(true);
+    setResendMessage('');
+    setResendError('');
+
+    try {
+      const res = await api.post('/auth/resend-verification-public', {
+        email: verificationEmail,
+      });
+      const result = extractData<{ message?: string }>(res);
+      setResendMessage(
+        result.message ||
+          'Si la cuenta necesita verificación, te enviaremos un nuevo enlace.',
+      );
+    } catch (err) {
+      setResendError(
+        mensajeError(err, 'No se pudo solicitar otro email de verificación.'),
+      );
+    } finally {
+      setResendingEmail(false);
+    }
+  };
+
   const handleSUSSubmit = async (score: number, responses: RespuestasSUS) => {
     try {
-      await api.post('/metricas/sus', {
+      await api.post('/metricas/sus/registro', {
         ...responses,
         sus_score: score,
         flujo: 'registro_cliente',
-        id_usuario: user?.id_usuario,
+        id_usuario: registeredUserId,
       });
     } catch (e) {
       console.error('Error enviando SUS:', e);
     }
-    router.push('/');
+    setShowSUS(false);
   };
 
   return (
@@ -107,7 +137,58 @@ export default function RegisterPage() {
               </div>
             )}
 
-            <form onSubmit={handleSubmit(onSubmit)} className="space-y-4" autoComplete="off">
+            {verificationEmail ? (
+              <div className="text-center">
+                {verificationSent ? (
+                  <MailCheck className="w-16 h-16 text-cyan-400 mx-auto mb-4" />
+                ) : (
+                  <AlertTriangle className="w-16 h-16 text-amber-400 mx-auto mb-4" />
+                )}
+                <h2 className="text-xl font-bold text-white mb-2">
+                  {verificationSent
+                    ? 'Revisá tu correo'
+                    : 'Cuenta creada; falta enviar el email'}
+                </h2>
+                <p className="text-slate-300 mb-2">
+                  {verificationSent
+                    ? 'Enviamos la confirmación a'
+                    : 'La dirección de tu cuenta es'}{' '}
+                  <strong>{verificationEmail}</strong>.
+                </p>
+                {!verificationSent && (
+                  <p className="text-amber-300 text-sm mb-4">
+                    No pudimos enviar el mensaje. Podés volver a intentarlo en unos minutos.
+                  </p>
+                )}
+                {verificationSent && (
+                  <p className="text-slate-400 text-sm mb-4">
+                    Confirmá tu dirección antes de iniciar sesión. Revisá también la carpeta de spam.
+                  </p>
+                )}
+                <Button
+                  type="button"
+                  className="w-full"
+                  size="lg"
+                  isLoading={resendingEmail}
+                  onClick={handleResendVerification}
+                >
+                  Reenviar email de confirmación
+                </Button>
+                {resendMessage && (
+                  <p className="mt-3 text-sm text-green-300">{resendMessage}</p>
+                )}
+                {resendError && (
+                  <p className="mt-3 text-sm text-red-300">{resendError}</p>
+                )}
+                <p className="text-center text-slate-400 text-sm mt-6">
+                  ¿Ya confirmaste tu email?{' '}
+                  <Link href="/auth/login" className="text-cyan-400 hover:text-cyan-300 font-medium">
+                    Iniciá sesión
+                  </Link>
+                </p>
+              </div>
+            ) : (
+              <form onSubmit={handleSubmit(onSubmit)} className="space-y-4" autoComplete="off">
               <Input
                 label="Nombre"
                 placeholder="Tu nombre"
@@ -199,14 +280,17 @@ export default function RegisterPage() {
               <Button type="submit" className="w-full" size="lg" isLoading={isSubmitting}>
                 Crear Cuenta
               </Button>
-            </form>
+              </form>
+            )}
 
-            <p className="text-center text-slate-400 text-sm mt-6">
-              ¿Ya tenés cuenta?{' '}
-              <Link href="/auth/login" className="text-cyan-400 hover:text-cyan-300 font-medium">
-                Iniciá Sesión
-              </Link>
-            </p>
+            {!verificationEmail && (
+              <p className="text-center text-slate-400 text-sm mt-6">
+                ¿Ya tenés cuenta?{' '}
+                <Link href="/auth/login" className="text-cyan-400 hover:text-cyan-300 font-medium">
+                  Iniciá Sesión
+                </Link>
+              </p>
+            )}
           </div>
         </div>
       </main>
@@ -215,7 +299,6 @@ export default function RegisterPage() {
         open={showSUS}
         onClose={() => {
           setShowSUS(false);
-          router.push('/');
         }}
         onSubmit={handleSUSSubmit}
         context="cliente"

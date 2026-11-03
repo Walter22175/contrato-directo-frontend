@@ -1,7 +1,13 @@
 import { create } from 'zustand';
 import api, { extractData } from '@/lib/api';
 import { setTokenCookies, clearTokenCookies } from '@/lib/cookies';
-import type { Usuario, LoginDto, RegisterDto, AuthResponse } from '@/types';
+import type {
+  Usuario,
+  LoginDto,
+  RegisterDto,
+  AuthResponse,
+  RegisterResponse,
+} from '@/types';
 
 function mensajeDeError(err: unknown, fallback: string, separador = ', '): string {
   if (typeof err === 'object' && err !== null && 'response' in err) {
@@ -20,7 +26,7 @@ interface AuthState {
   isLoading: boolean;
   error: string | null;
   login: (dto: LoginDto) => Promise<void>;
-  register: (dto: RegisterDto) => Promise<void>;
+  register: (dto: RegisterDto) => Promise<RegisterResponse>;
   logout: () => void;
   loadUser: () => Promise<void>;
   clearError: () => void;
@@ -53,11 +59,9 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     try {
       set({ isLoading: true, error: null });
       const res = await api.post('/auth/register', dto);
-      const data = extractData<AuthResponse>(res);
-      localStorage.setItem('access_token', data.access_token);
-      localStorage.setItem('refresh_token', data.refresh_token);
-      setTokenCookies(data.access_token, data.refresh_token);
-      set({ user: data.usuario, isAuthenticated: true, isLoading: false });
+      const data = extractData<RegisterResponse>(res);
+      set({ user: null, isAuthenticated: false, isLoading: false });
+      return data;
     } catch (err) {
       const message = mensajeDeError(err, 'Error al registrarse');
       set({ error: message, isLoading: false });

@@ -66,7 +66,9 @@ export default function PerfilPage() {
     setEmailError(null);
 
     try {
-      const res = await api.post('/auth/resend-verification');
+      const res = await api.post('/auth/resend-verification-public', {
+        email: user?.email,
+      });
       const data = extractData<{ message?: string }>(res);
       setEmailMessage(
         data?.message || 'Te enviamos un nuevo enlace de verificación.',

@@ -2,7 +2,7 @@
  * @jest-environment jsdom
  */
 import './setup';
-import { render, screen, act, waitFor } from '@testing-library/react';
+import { fireEvent, render, screen, act, waitFor } from '@testing-library/react';
 import VerifyEmailPage from '@/app/auth/verify-email/page';
 import api from '@/lib/api';
 
@@ -61,6 +61,37 @@ describe('VerifyEmailPage', () => {
 
     await waitFor(() => {
       expect(screen.getByText('Token inválido o expirado')).toBeInTheDocument();
+    });
+  });
+
+  it('permite solicitar un nuevo enlace sin iniciar sesión', async () => {
+    (globalThis as { __MOCK_SEARCH_PARAMS__?: string }).__MOCK_SEARCH_PARAMS__ =
+      'token=expirado';
+    (api.post as jest.Mock).mockRejectedValueOnce({
+      response: { data: { message: 'Token inválido o expirado' } },
+    });
+
+    await act(async () => {
+      render(<VerifyEmailPage />);
+    });
+
+    await waitFor(() => {
+      expect(
+        screen.getByText('Token inválido o expirado'),
+      ).toBeInTheDocument();
+    });
+    fireEvent.change(screen.getByPlaceholderText('tu@email.com'), {
+      target: { value: 'ana@example.com' },
+    });
+    fireEvent.click(
+      screen.getByRole('button', { name: 'Solicitar otro enlace' }),
+    );
+
+    await waitFor(() => {
+      expect(api.post).toHaveBeenLastCalledWith(
+        '/auth/resend-verification-public',
+        { email: 'ana@example.com' },
+      );
     });
   });
 });
