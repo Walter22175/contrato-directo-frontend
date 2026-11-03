@@ -7,7 +7,7 @@ import { useForm } from 'react-hook-form';
 import type { FieldErrors, UseFormHandleSubmit, UseFormRegister } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import api from '@/lib/api';
+import api, { mensajeError } from '@/lib/api';
 import { useAuthStore } from '@/store/auth';
 import Button from '@/components/ui/Button';
 import Input from '@/components/ui/Input';
@@ -159,7 +159,7 @@ const ResetPasswordContent = (): JSX.Element => {
       setDone(true);
     } catch (err) {
       const status = (err as { response?: { status?: number } })?.response?.status;
-      const mensaje = (err as { response?: { data?: { message?: string } } })?.response?.data?.message;
+      const mensaje = mensajeError(err, '');
       if (status === 400) {
         setTokenError(mensaje || 'El enlace expiró o ya fue usado. Solicitá uno nuevo.');
       } else {

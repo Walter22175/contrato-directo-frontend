@@ -6,7 +6,7 @@ import { useForm } from 'react-hook-form';
 import type { FieldErrors, UseFormHandleSubmit, UseFormRegister } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import api from '@/lib/api';
+import api, { mensajeError } from '@/lib/api';
 import Button from '@/components/ui/Button';
 import Input from '@/components/ui/Input';
 import { CheckCircle, Mail } from 'lucide-react';
@@ -25,9 +25,9 @@ const SentView = (): JSX.Element => {
         <div className="bg-slate-800/50 border border-slate-700 rounded-2xl p-8">
           <div className="text-center">
             <CheckCircle className="w-16 h-16 text-green-400 mx-auto mb-4" />
-            <h1 className="text-2xl font-bold text-white mb-2">Email Enviado</h1>
+            <h1 className="text-2xl font-bold text-white mb-2">Revisá tu correo</h1>
             <p className="text-slate-400 mb-6">
-              Si el email está registrado, recibiste un enlace para restablecer tu contraseña.
+              Si el email está registrado, recibirás un enlace para restablecer tu contraseña.
             </p>
             <Link href="/auth/login">
               <Button className="w-full">Volver al Login</Button>
@@ -102,8 +102,7 @@ export default function ForgotPasswordPage() {
       await api.post('/auth/forgot-password', data);
       setSent(true);
     } catch (err) {
-      const mensaje = (err as { response?: { data?: { message?: string } } })?.response?.data?.message;
-      setError(mensaje || 'Error al enviar el email');
+      setError(mensajeError(err, 'No se pudo procesar la solicitud.'));
     }
   };
 
