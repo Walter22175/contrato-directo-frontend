@@ -1,14 +1,148 @@
 @import "tailwindcss";
 
-:root {
-  --color-primary: #0891b2;
-  --color-primary-dark: #0e7490;
-  --color-bg: #211fb3;
+@theme {
+  /* Galileo — Contrato Directo design tokens */
+  --color-void-navy: #03081a;
+  --color-deep-indigo: #020626;
+  --color-inkline-violet: #292f66;
+  --color-quartz-lavender: #aab1f2;
+  --color-mist-lilac: #7a83cc;
+  --color-dusk-iris: #4d5499;
+  --color-glacier-white: #f5f6ff;
+  --color-pure-white: #ffffff;
+  --color-pulse-cobalt: #3d50fc;
+  --color-signal-teal: #05e0e0;
+  --color-cyan-teal: #05cee0;
+
+  --font-plain: var(--font-inter), "Segoe UI", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-plain-light: var(--font-inter), "Segoe UI", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-plain-ultralight: var(--font-inter), "Segoe UI", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-plain-ultrathin: var(--font-inter), "Segoe UI", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+
+  /* Remapeo de la paleta existente a la paleta Galileo */
+  --color-slate-50: #ffffff;
+  --color-slate-100: #f5f6ff;
+  --color-slate-200: #e2e5ff;
+  --color-slate-300: #c7ccf9;
+  --color-slate-400: #aab1f2;
+  --color-slate-500: #7a83cc;
+  --color-slate-600: #5f69ad;
+  --color-slate-700: #292f66;
+  --color-slate-800: #020626;
+  --color-slate-900: #020626;
+  --color-slate-950: #03081a;
+
+  --color-cyan-50: #eef0ff;
+  --color-cyan-100: #dfe3ff;
+  --color-cyan-200: #c3c9ff;
+  --color-cyan-300: #9aa5fe;
+  --color-cyan-400: #7d8bfd;
+  --color-cyan-500: #3d50fc;
+  --color-cyan-600: #3d50fc;
+  --color-cyan-700: #2c3bd0;
+  --color-cyan-900: #0a1030;
+  --color-cyan-950: #05081c;
+
+  --color-blue-300: #7ff0f0;
+  --color-blue-400: #05e0e0;
+  --color-blue-500: #3d50fc;
+  --color-blue-600: #2c3bd0;
+  --color-blue-900: #0a1030;
+
+  --color-purple-100: #d6fbfb;
+  --color-purple-300: #7ff0f0;
+  --color-purple-400: #05e0e0;
+  --color-purple-500: #05cee0;
+  --color-purple-600: #05a1c9;
+
+  --color-green-300: #86f2cf;
+  --color-green-400: #46e6b0;
+  --color-green-500: #22d3a0;
+  --color-green-600: #16b585;
+  --color-green-700: #0f9169;
+
+  --color-emerald-200: #bffbe8;
+  --color-emerald-300: #86f2cf;
+  --color-emerald-400: #46e6b0;
+  --color-emerald-500: #22d3a0;
+  --color-emerald-600: #16b585;
+
+  --color-red-200: #ffd0d9;
+  --color-red-300: #ffa3b5;
+  --color-red-400: #ff7a94;
+  --color-red-500: #ff5c7a;
+  --color-red-600: #e84465;
+  --color-red-700: #c93052;
+  --color-red-900: #4a1220;
+
+  --color-rose-400: #ff7a94;
+  --color-rose-500: #ff5c7a;
+  --color-rose-600: #e84465;
+
+  --color-yellow-300: #ffdda1;
+  --color-yellow-400: #ffc861;
+  --color-yellow-500: #f5a623;
+  --color-yellow-600: #d98a12;
+
+  --color-amber-100: #fff2d4;
+  --color-amber-200: #ffe1a8;
+  --color-amber-300: #ffdda1;
+  --color-amber-400: #ffc861;
+  --color-amber-500: #f5a623;
+  --color-amber-600: #d98a12;
+  --color-amber-700: #b06f0a;
+
+  --color-orange-300: #ffdda1;
+  --color-orange-400: #ffc861;
+  --color-orange-500: #f5a623;
+  --color-orange-600: #d98a12;
+  --color-orange-700: #b06f0a;
+
+  /* Radios Galileo */
+  --radius-lg: 14px;
+  --radius-xl: 24px;
+  --radius-2xl: 35px;
+  --radius-3xl: 48px;
 }
 
-body {
-  background-color: #10161f;
-  color: #e2e8f0;
+@layer base {
+  :root {
+    color-scheme: dark;
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    background-color: var(--color-void-navy);
+    color: var(--color-quartz-lavender);
+    font-family: var(--font-plain);
+    font-weight: 300;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+
+  ::selection {
+    background-color: var(--color-pulse-cobalt);
+    color: var(--color-pure-white);
+  }
+}
+
+/* La firma tipográfica de Galileo: titulares ultra finos.
+   Sin capa para que prevalezca sobre utilidades como font-bold. */
+h1,
+h2 {
+  font-weight: 200;
+  letter-spacing: -0.02em;
+}
+
+h3,
+h4,
+h5,
+h6 {
+  font-weight: 300;
+  letter-spacing: -0.01em;
 }
 
 /* Scrollbar */
@@ -16,14 +150,53 @@ body {
   width: 8px;
 }
 ::-webkit-scrollbar-track {
-  background: #051027;
+  background: #020626;
 }
 ::-webkit-scrollbar-thumb {
-  background: #475569;
-  border-radius: 4px;
+  background: #292f66;
+  border-radius: 9999px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #64748b;
+  background: #4d5499;
+}
+
+/* Utilidades de marca */
+.galileo-gradient {
+  background-image: linear-gradient(90deg, #05a1c9 0%, #3d50fc 100%);
+}
+
+.galileo-gradient-soft {
+  background-image: linear-gradient(90deg, rgba(5, 161, 201, 0.18) 0%, rgba(61, 80, 252, 0.22) 100%);
+}
+
+.galileo-text-gradient {
+  background-image: linear-gradient(90deg, #05e0e0 0%, #3d50fc 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.galileo-eyebrow {
+  font-size: 10px;
+  font-weight: 400;
+  line-height: 1.2;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  color: var(--color-quartz-lavender);
+}
+
+.galileo-card {
+  background-color: rgba(2, 6, 38, 0.78);
+  border: 1px solid rgba(41, 47, 102, 0.72);
+  border-radius: 35px;
+}
+
+.galileo-grid {
+  background-image:
+    linear-gradient(rgba(41, 47, 102, 0.24) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(41, 47, 102, 0.24) 1px, transparent 1px);
+  background-size: 64px 64px;
+  mask-image: radial-gradient(ellipse 80% 60% at 50% 30%, black 30%, transparent 75%);
 }
 
 /* Gesto del botón blacklight (lámpara) */
@@ -48,4 +221,29 @@ body {
 }
 .grupo-marquee:hover .animate-marquee-clientes {
   animation-play-state: paused;
+}
+
+/* Escultura de vidrio del hero */
+@keyframes float-orb {
+  0%, 100% { transform: translate3d(0, 0, 0) rotate(0deg); }
+  50% { transform: translate3d(0, -14px, 0) rotate(4deg); }
+}
+.animate-float-orb {
+  animation: float-orb 9s ease-in-out infinite;
+}
+
+@keyframes pulse-glow {
+  0%, 100% { opacity: 0.55; }
+  50% { opacity: 0.9; }
+}
+.animate-pulse-glow {
+  animation: pulse-glow 6s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-float-orb,
+  .animate-pulse-glow,
+  .animate-marquee-clientes {
+    animation: none;
+  }
 }

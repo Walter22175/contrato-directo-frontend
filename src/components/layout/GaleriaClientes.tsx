@@ -24,14 +24,14 @@ export default function GaleriaClientes() {
         {doble.map((logo, i) => (
           <div
             key={`${logo.src}-${i}`}
-            className="mx-6 sm:mx-10 flex h-20 w-40 items-center justify-center"
+            className="mx-4 flex h-20 w-44 items-center justify-center rounded-[24px] border border-inkline-violet/60 bg-glacier-white px-5 sm:mx-6"
           >
             <Image
               src={logo.src}
               alt={logo.alt}
               width={160}
               height={80}
-              className="max-h-20 w-auto max-w-full object-contain opacity-80 grayscale transition duration-300 hover:opacity-100 hover:grayscale-0"
+              className="max-h-14 w-auto max-w-full object-contain opacity-90 transition duration-300 hover:opacity-100"
             />
           </div>
         ))}

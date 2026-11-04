@@ -181,15 +181,16 @@ export default function ServiciosContent() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className="min-h-screen bg-void-navy">
       <main className="flex-1">
-        <div className="bg-slate-900/50 border-b border-slate-800 py-8">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <h1 className="text-3xl font-bold text-white mb-6">Buscar Servicios</h1>
+        <div className="border-b border-inkline-violet/60 bg-deep-indigo/50 py-10">
+          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+            <p className="galileo-eyebrow text-signal-teal">Catálogo</p>
+            <h1 className="mb-6 mt-3 text-3xl font-extralight text-pure-white sm:text-4xl">Buscar Servicios</h1>
             <form onSubmit={handleSearchSubmit} className="relative">
-              <div className="flex flex-col md:flex-row gap-4">
-                <div className="flex-1 relative">
-                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
+              <div className="flex flex-col gap-4 md:flex-row">
+                <div className="relative flex-1">
+                  <Search className="absolute left-5 top-1/2 h-5 w-5 -translate-y-1/2 text-mist-lilac" />
                   <input
                     ref={searchInputRef}
                     type="text"
@@ -198,44 +199,44 @@ export default function ServiciosContent() {
                     onChange={handleSearchChange}
                     onFocus={() => busqueda && setShowSuggestions(true)}
                     onKeyDown={handleKeyDown}
-                    className="w-full pl-11 pr-4 py-3 bg-slate-800 border border-slate-700 rounded-xl text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-cyan-500"
+                    className="w-full rounded-full border border-inkline-violet bg-deep-indigo/80 py-3.5 pl-14 pr-5 text-base font-light text-pure-white placeholder:text-mist-lilac transition-colors focus:border-pulse-cobalt focus:outline-none focus:ring-2 focus:ring-pulse-cobalt/40"
                   />
                   
                   {showSuggestions && suggestions.length > 0 && (
-                    <div ref={suggestionsRef} className="absolute top-full left-0 right-0 mt-2 bg-slate-800 border border-slate-700 rounded-xl shadow-xl overflow-hidden z-50 max-h-96 overflow-y-auto">
+                    <div ref={suggestionsRef} className="absolute left-0 right-0 top-full z-50 mt-3 max-h-96 overflow-y-auto rounded-[28px] border border-inkline-violet bg-deep-indigo shadow-2xl shadow-black/50">
                       {suggestions.map((sug, i) => (
                         <button
                           key={i}
                           onClick={() => handleSuggestionClick(sug)}
-                          className="w-full px-4 py-3 text-left hover:bg-slate-700 transition-colors flex items-center gap-3 border-b border-slate-700/50 last:border-0"
+                          className="flex w-full items-center gap-3 border-b border-inkline-violet/40 px-4 py-3 text-left transition-colors last:border-0 hover:bg-white/5"
                         >
-                          <div className={`w-16 h-16 rounded-lg flex items-center justify-center flex-shrink-0 ${
-                            sug.type === 'categoria' ? 'bg-purple-500/20 text-purple-400' : 'bg-cyan-500/20 text-cyan-400'
+                          <div className={`flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full border ${
+                            sug.type === 'categoria' ? 'border-inkline-violet/40 bg-glacier-white' : 'border-pulse-cobalt/30 bg-pulse-cobalt/10 text-pulse-cobalt'
                           }`}>
                             {sug.type === 'categoria' ? (
                               iconoCategoria(sug.label) ? (
-                                <Image src={iconoCategoria(sug.label)!} alt="" width={32} height={32} unoptimized className="w-8 h-8 object-contain" />
+                                <Image src={iconoCategoria(sug.label)!} alt="" width={32} height={32} unoptimized className="h-7 w-7 object-contain" />
                               ) : (
-                                <Box className="w-8 h-8" />
+                                <Box className="h-6 w-6 text-deep-indigo" />
                               )
                             ) : (
-                              <Search className="w-8 h-8" />
+                              <Search className="h-6 w-6" />
                             )}
                           </div>
-                          <div className="flex-1 min-w-0">
-                            <span className="text-white font-medium truncate block">{sug.label}</span>
+                          <div className="min-w-0 flex-1">
+                            <span className="block truncate font-normal text-pure-white">{sug.label}</span>
                             {sug.type === 'categoria' && sug.count && (
-                              <span className="text-xs text-slate-500">{sug.count} servicios</span>
+                              <span className="text-xs font-light text-mist-lilac">{sug.count} servicios</span>
                             )}
                             {sug.type === 'servicio' && (
-                              <span className="text-xs text-slate-500">Servicio individual</span>
+                              <span className="text-xs font-light text-mist-lilac">Servicio individual</span>
                             )}
                           </div>
-                          <ChevronRight className="w-4 h-4 text-slate-500" />
+                          <ChevronRight className="h-4 w-4 text-mist-lilac" />
                         </button>
                       ))}
                       {suggestions.length === 0 && busqueda && (
-                        <div className="px-4 py-3 text-center text-slate-500">
+                        <div className="px-4 py-3 text-center text-sm font-light text-mist-lilac">
                           No se encontraron sugerencias para {'"'}{busqueda}{'"'}
                         </div>
                       )}
@@ -256,12 +257,13 @@ export default function ServiciosContent() {
                         router.push('/servicios');
                       }
                     }}
+                    className="py-3.5"
                   />
                 </div>
               </div>
               
               {showSuggestions && suggestions.length > 0 && (
-                <p className="mt-2 text-xs text-slate-500">
+                <p className="mt-3 pl-2 text-xs font-light text-mist-lilac">
                   Click en una sugerencia o seguí escribiendo para refinar
                 </p>
               )}
@@ -269,42 +271,44 @@ export default function ServiciosContent() {
           </div>
         </div>
 
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
           {loading ? (
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
               {[1, 2, 3].map((i) => (
-                <div key={i} className="h-48 bg-slate-800/50 rounded-xl animate-pulse" />
+                <div key={i} className="h-56 animate-pulse rounded-[35px] border border-inkline-violet/40 bg-deep-indigo/60" />
               ))}
             </div>
           ) : (
             <>
               {busqueda || categoria ? (
-                <p className="text-slate-400 mb-6">
+                <p className="mb-6 text-sm font-light text-quartz-lavender">
                   {filtered.length} servicio{filtered.length !== 1 ? 's' : ''} encontrado{filtered.length !== 1 ? 's' : ''} 
                   {filteredCategorias.length > 0 && (
                     <> + {filteredCategorias.length} categorí{filteredCategorias.length === 1 ? 'a' : 'as'} relacionada{filteredCategorias.length === 1 ? '' : 's'} </>
                   )}
                 </p>
               ) : (
-                <p className="text-slate-400 mb-6">{servicios.length} servicios disponibles en {categorias.length} categorías</p>
+                <p className="mb-6 text-sm font-light text-quartz-lavender">{servicios.length} servicios disponibles en {categorias.length} categorías</p>
               )}
 
               {sinResultados ? (
-                <div className="text-center py-16">
-                  <Search className="w-16 h-16 text-slate-600 mx-auto mb-4" />
-                  <h2 className="text-xl font-semibold text-white mb-2">No se encontraron resultados</h2>
-                  <p className="text-slate-400 mb-6">Intentá con otros términos de búsqueda</p>
-                  <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
+                <div className="py-16 text-center">
+                  <div className="mx-auto mb-5 flex h-20 w-20 items-center justify-center rounded-full border border-inkline-violet/60 bg-deep-indigo/70">
+                    <Search className="h-8 w-8 text-mist-lilac" />
+                  </div>
+                  <h2 className="mb-2 text-2xl font-extralight text-pure-white">No se encontraron resultados</h2>
+                  <p className="mb-8 text-sm font-light text-mist-lilac">Intentá con otros términos de búsqueda</p>
+                  <div className="flex flex-col items-center justify-center gap-3 sm:flex-row">
                     <Link
                       href="/proveedores/solicitud"
-                      className="inline-flex items-center gap-2 px-5 py-2.5 bg-cyan-600 hover:bg-cyan-500 text-white rounded-xl font-medium transition-colors"
+                      className="inline-flex items-center gap-2 rounded-full bg-pulse-cobalt px-5 py-2.5 text-sm font-light text-pure-white transition-colors hover:bg-[#2c3bd0]"
                     >
-                      <FilePlus className="w-4 h-4" />
+                      <FilePlus className="h-4 w-4" />
                       Solicitar {'"'}{busqueda.trim()}{'"'} como nuevo servicio
                     </Link>
                     <Link
                       href="/proveedores"
-                      className="inline-flex items-center gap-2 px-5 py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 rounded-xl font-medium transition-colors"
+                      className="inline-flex items-center gap-2 rounded-full border border-inkline-violet bg-white/5 px-5 py-2.5 text-sm font-light text-quartz-lavender transition-colors hover:border-dusk-iris hover:text-white"
                     >
                       Buscar proveedores
                     </Link>
@@ -314,27 +318,25 @@ export default function ServiciosContent() {
                 <>
                   {/* Categorías como bloques si hay coincidencia en búsqueda */}
                   {busqueda && filteredCategorias.length > 0 && (
-                    <div className="mb-8">
-                      <h3 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
-                        <Box className="w-5 h-5 text-purple-400" />
+                    <div className="mb-10">
+                      <h3 className="mb-4 flex items-center gap-2 text-lg font-light text-pure-white">
+                        <Box className="h-5 w-5 text-pulse-cobalt" />
                         Categorías relacionadas
                       </h3>
-                      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                      <div className="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-4">
                         {filteredCategorias.map((cat) => {
                           const count = servicios.filter(s => s.id_categoria?.toString() === cat.id_categoria.toString()).length;
                           const catHref = '/servicios?categoria=' + cat.id_categoria;
                           return (
                             <Link key={cat.id_categoria} href={catHref} className="group">
-                              <Card className="p-4 text-center relative overflow-hidden min-h-[12rem] flex flex-col justify-end hover:border-purple-500/50 hover:shadow-lg hover:shadow-purple-500/10 transition-all duration-300 bg-slate-800/50 border-slate-700">
+                              <Card className="flex min-h-[12rem] flex-col items-center justify-center p-6 text-center transition-colors group-hover:border-pulse-cobalt/60">
                                 {iconoCategoria(cat.nombre) && (
-                                  <div className="absolute inset-0 flex items-center justify-center pointer-events-none transition-transform duration-300 group-hover:scale-110">
-                                    <Image src={iconoCategoria(cat.nombre)!} alt="" width={96} height={96} unoptimized className="w-24 h-24 object-contain" />
+                                  <div className="mb-4 flex h-20 w-20 items-center justify-center rounded-full border border-inkline-violet/40 bg-glacier-white transition-transform duration-300 group-hover:scale-110">
+                                    <Image src={iconoCategoria(cat.nombre)!} alt="" width={96} height={96} unoptimized className="h-12 w-12 object-contain" />
                                   </div>
                                 )}
-                                <div className="relative">
-                                  <h4 className="font-medium text-white mb-1">{cat.nombre}</h4>
-                                  <p className="text-xs text-slate-400">{count} servicio{count === 1 ? '' : 's'}</p>
-                                </div>
+                                <h4 className="mb-1 text-base font-light text-pure-white">{cat.nombre}</h4>
+                                <p className="text-xs font-light text-mist-lilac">{count} servicio{count === 1 ? '' : 's'}</p>
                               </Card>
                             </Link>
                           );
@@ -347,33 +349,36 @@ export default function ServiciosContent() {
                   {filtered.length > 0 && (
                     <div>
                       {busqueda && filteredCategorias.length > 0 && (
-                        <h3 className="text-lg font-semibold text-white mb-4">Servicios encontrados</h3>
+                        <h3 className="mb-4 text-lg font-light text-pure-white">Servicios encontrados</h3>
                       )}
-                      <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
                         {filtered.map((s) => {
                           const servHref = '/servicios/' + s.id_servicio;
                           const icono = iconoServicio(s.nombre, s.categoria?.nombre);
                           return (
                             <Link key={s.id_servicio} href={servHref} className="group">
-                              <Card hover className="h-full relative overflow-hidden">
-                                  <div className="absolute inset-0 flex items-center justify-center pointer-events-none transition-transform duration-300 group-hover:scale-105">
+                              <Card hover className="flex h-full flex-col p-6">
+                                <div className="flex items-start justify-between gap-4">
+                                  <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-[22px] border border-inkline-violet/50 bg-glacier-white transition-transform duration-300 group-hover:scale-105">
                                     {icono ? (
-                                      <Image src={icono} alt="" width={96} height={96} unoptimized className="w-24 h-24 object-contain" />
+                                      <Image src={icono} alt="" width={96} height={96} unoptimized className="h-12 w-12 object-contain" />
                                     ) : (
-                                      <span className="text-[6rem] leading-none">🔧</span>
+                                      <span className="text-3xl">🔧</span>
                                     )}
                                   </div>
-                                <div className="relative">
-                                  <h3 className="text-sm font-semibold text-white mb-2">{s.nombre}</h3>
-                                  <div className="flex items-center justify-between text-sm mt-6">
-                                    <div className="flex items-center gap-1 text-slate-400">
-                                      <LlaveIcon className="w-4 h-4 text-yellow-400" />
-                                      <span>4.8</span>
-                                    </div>
-                                    <span className="text-cyan-400 font-medium">
-                                      {s.servicios_proveedor?.length || 0} proveedores
-                                    </span>
+                                  <span className="max-w-[58%] truncate rounded-full border border-inkline-violet/60 bg-white/[0.03] px-3 py-1 text-[10px] uppercase tracking-[0.18em] text-mist-lilac" title={s.categoria?.nombre || 'Servicio'}>
+                                    {s.categoria?.nombre || 'Servicio'}
+                                  </span>
+                                </div>
+                                <h3 className="mt-5 text-lg font-light text-pure-white transition-colors group-hover:text-cyan-200">{s.nombre}</h3>
+                                <div className="mt-6 flex items-center justify-between border-t border-inkline-violet/40 pt-4 text-sm">
+                                  <div className="flex items-center gap-1.5 text-quartz-lavender">
+                                    <LlaveIcon className="h-4 w-4 text-yellow-400" />
+                                    <span className="font-light">4.8</span>
                                   </div>
+                                  <span className="font-light text-signal-teal">
+                                    {s.servicios_proveedor?.length || 0} proveedores
+                                  </span>
                                 </div>
                               </Card>
                             </Link>

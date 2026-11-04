@@ -6,7 +6,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { useState, useEffect, useRef, useCallback } from 'react';
-import { Search, Shield, FileText, Star, ArrowRight, ChevronRight, Box, Users } from 'lucide-react';
+import { Search, Shield, FileText, Star, ArrowRight, ChevronRight, Box, Users, ShieldCheck, Sparkles } from 'lucide-react';
 import Button from '@/components/ui/Button';
 import { Promocion } from '@/types';
 import type { Servicio } from '@/types';
@@ -151,7 +151,7 @@ export default function HomePage() {
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (!showSuggestions || suggestions.length === 0) return;
-    
+
     if (e.key === 'ArrowDown') {
       e.preventDefault();
       setSelectedIndex(prev => Math.min(prev + 1, suggestions.length - 1));
@@ -190,7 +190,7 @@ export default function HomePage() {
   }, []);
 
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className="flex min-h-screen flex-col bg-void-navy">
 
       {!promocionesLoading && (
         <PromocionCarousel promociones={promociones} />
@@ -199,21 +199,25 @@ export default function HomePage() {
       <main className="flex-1">
         {/* Hero */}
         <section className="relative overflow-hidden">
-          <div className="absolute inset-0 bg-gradient-to-br from-blue-900/20 via-slate-900 to-cyan-900/20" />
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24 relative">
-            <div className="text-center max-w-3xl mx-auto">
-              <h1 className="text-4xl md:text-6xl font-bold text-white mb-6">
-                Conecta. <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-cyan-400">Acuerda.</span> Realiza.
+          <div className="galileo-grid absolute inset-0 opacity-70" aria-hidden="true" />
+          <div className="absolute -top-40 left-1/4 h-[520px] w-[520px] rounded-full bg-pulse-cobalt/20 blur-[150px]" aria-hidden="true" />
+          <div className="absolute bottom-0 right-0 h-[420px] w-[420px] rounded-full bg-signal-teal/10 blur-[130px]" aria-hidden="true" />
+
+          <div className="relative mx-auto grid max-w-[1200px] items-center gap-14 px-4 py-20 sm:px-6 lg:grid-cols-[1.05fr_0.95fr] lg:px-8 lg:py-28">
+            <div>
+              <p className="galileo-eyebrow text-signal-teal">Plataforma de servicios verificados</p>
+              <h1 className="mt-6 max-w-2xl text-4xl font-extralight leading-[0.95] text-pure-white sm:text-5xl lg:text-6xl xl:text-7xl">
+                Conecta. <span className="galileo-text-gradient">Acuerda.</span> Realiza.
               </h1>
-              <p className="text-xl text-slate-300 mb-8">
+              <p className="mt-6 max-w-xl text-base font-light leading-relaxed text-quartz-lavender sm:text-lg">
                 La plataforma que conecta clientes con proveedores de servicios de confianza. Contratos seguros, pagos protegidos.
               </p>
 
               {/* Search Bar */}
-              <form onSubmit={handleHeroSearch} className="relative">
-                <div className="flex flex-col sm:flex-row gap-3 max-w-xl mx-auto">
+              <form onSubmit={handleHeroSearch} className="relative mt-10 max-w-2xl">
+                <div className="flex flex-col gap-3 sm:flex-row">
                   <div className="relative flex-1" ref={searchInputRef}>
-                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
+                    <Search className="absolute left-5 top-1/2 z-10 h-5 w-5 -translate-y-1/2 text-mist-lilac" />
                     <input
                       ref={searchInputRef}
                       type="text"
@@ -222,23 +226,25 @@ export default function HomePage() {
                       onChange={handleSearchChange}
                       onFocus={() => heroSearch && setShowSuggestions(true)}
                       onKeyDown={handleKeyDown}
-                      className="w-full pl-11 pr-4 py-3 bg-slate-800 border border-slate-700 rounded-xl text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-cyan-500"
+                      className="w-full rounded-full border border-inkline-violet bg-deep-indigo/80 py-4 pl-14 pr-5 text-base font-light text-pure-white placeholder:text-mist-lilac transition-colors focus:border-pulse-cobalt focus:outline-none focus:ring-2 focus:ring-pulse-cobalt/40"
                     />
-                    
+
                     {showSuggestions && suggestions.length > 0 && (
-                      <div ref={suggestionsRef} className="absolute top-full left-0 right-0 mt-2 bg-slate-800 border border-slate-700 rounded-xl shadow-xl overflow-hidden z-50 max-h-96 overflow-y-auto">
+                      <div ref={suggestionsRef} className="absolute left-0 right-0 top-full z-50 mt-3 max-h-96 overflow-y-auto rounded-[28px] border border-inkline-violet bg-deep-indigo shadow-2xl shadow-black/50">
                         {suggestions.map((sug, i) => (
                           <button
                             key={i}
                             onClick={() => handleSuggestionClick(sug)}
                             onMouseEnter={() => setSelectedIndex(i)}
-                            className={`w-full px-4 py-3 text-left hover:bg-slate-700 transition-colors flex items-center gap-3 border-b border-slate-700/50 last:border-0 ${
-                              i === selectedIndex ? 'bg-slate-700' : ''
+                            className={`flex w-full items-center gap-3 border-b border-inkline-violet/40 px-4 py-3 text-left transition-colors last:border-0 hover:bg-white/5 ${
+                              i === selectedIndex ? 'bg-white/5' : ''
                             }`}
                           >
-                            <div className="w-16 h-16 rounded-lg flex items-center justify-center flex-shrink-0 
-                              {sug.type === 'categoria' ? 'bg-purple-500/20 text-purple-400' : 'bg-cyan-500/20 text-cyan-400'}
-                            ">
+                            <div className={`flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full border ${
+                              sug.type === 'categoria'
+                                ? 'border-purple-400/30 bg-purple-400/10 text-purple-400'
+                                : 'border-pulse-cobalt/30 bg-pulse-cobalt/10 text-pulse-cobalt'
+                            }`}>
                               {sug.type === 'categoria' ? (
                                 categories.find((c) => c.name === sug.label)?.icon ? (
                                   <Image
@@ -247,70 +253,122 @@ export default function HomePage() {
                                     width={32}
                                     height={32}
                                     unoptimized
-                                    className="w-8 h-8 object-contain"
+                                    className="h-8 w-8 object-contain"
                                   />
                                 ) : (
-                                  <Box className="w-8 h-8" />
+                                  <Box className="h-6 w-6" />
                                 )
                               ) : (
-                                <Search className="w-8 h-8" />
+                                <Search className="h-6 w-6" />
                               )}
                             </div>
-                            <div className="flex-1 min-w-0">
-                              <span className="text-white font-medium truncate block">{sug.label}</span>
+                            <div className="min-w-0 flex-1">
+                              <span className="block truncate font-normal text-pure-white">{sug.label}</span>
                               {sug.type === 'categoria' && (
-                                <span className="text-xs text-slate-500">Categoría</span>
+                                <span className="text-xs text-mist-lilac">Categoría</span>
                               )}
                               {sug.type === 'servicio' && (
-                                <span className="text-xs text-slate-500">Buscar servicio</span>
+                                <span className="text-xs text-mist-lilac">Buscar servicio</span>
                               )}
                             </div>
-                            <ChevronRight className="w-4 h-4 text-slate-500" />
+                            <ChevronRight className="h-4 w-4 text-mist-lilac" />
                           </button>
                         ))}
-                        {suggestions.length === 0 && heroSearch && (
-                          <div className="px-4 py-3 text-center text-slate-500">
-                            No se encontraron sugerencias para {'"'}{heroSearch}{'"'}
-                          </div>
-                        )}
                       </div>
                     )}
                   </div>
                   <Button type="submit" size="lg" className="whitespace-nowrap">
                     Buscar
-                    <ArrowRight className="w-5 h-5 ml-2" />
+                    <ArrowRight className="h-5 w-5" />
                   </Button>
                 </div>
-                
+
                 {showSuggestions && suggestions.length > 0 && (
-                  <p className="mt-2 text-xs text-slate-500 text-center">
+                  <p className="mt-3 text-center text-xs text-mist-lilac">
                     Usá ↑↓ para navegar, Enter para seleccionar
                   </p>
                 )}
               </form>
+
+              <div className="mt-10 flex flex-wrap gap-2">
+                {['Pagos en custodia', 'Contratos con validez legal', 'Proveedores verificados'].map((item) => (
+                  <span key={item} className="inline-flex items-center gap-2 rounded-full border border-inkline-violet/60 bg-white/[0.03] px-4 py-2 text-xs font-light text-quartz-lavender">
+                    <span className="h-1.5 w-1.5 rounded-full bg-signal-teal" />
+                    {item}
+                  </span>
+                ))}
+              </div>
+            </div>
+
+            {/* Escultura de vidrio / panel de producto */}
+            <div className="relative mx-auto w-full max-w-md lg:max-w-none" aria-hidden="true">
+              <div className="relative aspect-square overflow-hidden rounded-[48px] border border-inkline-violet/60 bg-deep-indigo/60 p-6">
+                <div className="absolute -right-16 top-0 h-72 w-72 rounded-full bg-pulse-cobalt/30 blur-3xl animate-pulse-glow" />
+                <div className="absolute -left-12 bottom-0 h-64 w-64 rounded-full bg-signal-teal/15 blur-3xl" />
+                <div className="absolute inset-10 rounded-full border border-white/10" />
+                <div className="absolute inset-20 rounded-full border border-white/10" />
+
+                <div className="relative flex h-full flex-col items-center justify-center">
+                  <div className="animate-float-orb relative flex h-48 w-48 items-center justify-center rounded-full border border-white/20 bg-gradient-to-br from-cyan-teal/70 via-pulse-cobalt/60 to-deep-indigo/90 shadow-[0_0_120px_rgba(61,80,252,0.45)] sm:h-56 sm:w-56">
+                    <div className="absolute inset-5 rounded-full border border-white/20" />
+                    <div className="absolute inset-14 rounded-full bg-white/15 blur-md" />
+                    <ShieldCheck className="relative h-16 w-16 text-white/80" strokeWidth={1} />
+                  </div>
+                </div>
+
+                <div className="absolute inset-x-5 bottom-5 rounded-[28px] border border-inkline-violet/70 bg-void-navy/85 p-5 backdrop-blur">
+                  <div className="flex items-center justify-between">
+                    <span className="text-[10px] uppercase tracking-[0.22em] text-mist-lilac">Contrato digital</span>
+                    <span className="rounded-full border border-green-400/30 bg-green-400/10 px-3 py-1 text-[10px] uppercase tracking-[0.16em] text-green-300">
+                      Protegido
+                    </span>
+                  </div>
+                  <div className="mt-4 flex items-end justify-between">
+                    <div>
+                      <p className="text-xs text-mist-lilac">Pago en custodia</p>
+                      <p className="text-2xl font-extralight text-pure-white">$ 125.000</p>
+                    </div>
+                    <div className="text-right">
+                      <p className="text-xs text-mist-lilac">Se libera</p>
+                      <p className="text-sm font-light text-quartz-lavender">Al conformar</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </section>
 
         {/* Categories */}
-        <section className="py-16 bg-slate-900/50">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <h2 className="text-2xl font-bold text-white text-center mb-8">Categorías Populares</h2>
-            <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-4">
+        <section className="border-y border-inkline-violet/40 bg-deep-indigo/40 py-20">
+          <div className="mx-auto max-w-[1200px] px-4 sm:px-6 lg:px-8">
+            <div className="mb-10 flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
+              <div>
+                <p className="galileo-eyebrow text-signal-teal">Catálogo</p>
+                <h2 className="mt-3 text-3xl font-extralight text-pure-white">Categorías populares</h2>
+              </div>
+              <Link href="/servicios" className="inline-flex items-center gap-2 text-sm font-light text-quartz-lavender transition-colors hover:text-white">
+                Ver todos los servicios
+                <ArrowRight className="h-4 w-4" />
+              </Link>
+            </div>
+
+            <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-7">
               {categories.map((cat) => (
                 <Link
                   key={cat.slug}
                   href={`/servicios?categoria=${cat.slug}`}
-                  className="group relative flex flex-col items-center justify-center gap-2 min-h-[9rem] p-4 overflow-hidden bg-slate-800/50 border border-slate-700 rounded-xl hover:border-cyan-500/50 transition-colors"
+                  className="group relative flex min-h-[10rem] flex-col items-center justify-center gap-3 overflow-hidden rounded-[28px] border border-inkline-violet/60 bg-deep-indigo/70 p-4 transition-colors hover:border-pulse-cobalt/60"
                 >
+                  <div className="absolute inset-0 bg-gradient-to-br from-pulse-cobalt/10 via-transparent to-signal-teal/10 opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
                   {cat.icon ? (
-                    <div className="absolute inset-0 flex items-center justify-center pointer-events-none transition-transform duration-300 group-hover:scale-110">
-                      <Image src={cat.icon} alt="" width={96} height={96} unoptimized className="w-24 h-24 object-contain" />
+                    <div className="relative flex h-20 w-20 items-center justify-center rounded-full border border-inkline-violet/60 bg-glacier-white transition-transform duration-300 group-hover:scale-110">
+                      <Image src={cat.icon} alt="" width={96} height={96} unoptimized className="h-14 w-14 object-contain" />
                     </div>
                   ) : (
-                    <span className="absolute inset-0 flex items-center justify-center text-[6rem] pointer-events-none">{cat.fallback}</span>
+                    <span className="relative flex h-20 w-20 items-center justify-center rounded-full border border-inkline-violet/60 bg-glacier-white text-4xl">{cat.fallback}</span>
                   )}
-                  <span className="relative text-sm font-medium text-slate-300 text-center">{cat.name}</span>
+                  <span className="relative text-center text-sm font-light text-quartz-lavender transition-colors group-hover:text-white">{cat.name}</span>
                 </Link>
               ))}
             </div>
@@ -318,41 +376,50 @@ export default function HomePage() {
         </section>
 
         {/* Nosotros */}
-        <section id="nosotros" className="py-16">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="grid md:grid-cols-2 gap-10 items-center">
+        <section id="nosotros" className="py-24">
+          <div className="mx-auto max-w-[1200px] px-4 sm:px-6 lg:px-8">
+            <div className="grid items-center gap-12 lg:grid-cols-2">
               <div>
-                <div className="flex items-center gap-3 mb-4">
-                  <div className="w-12 h-12 bg-cyan-500/10 border border-cyan-500/20 rounded-xl flex items-center justify-center">
-                    <Users className="w-6 h-6 text-cyan-400" />
+                <div className="mb-6 flex items-center gap-3">
+                  <div className="flex h-12 w-12 items-center justify-center rounded-full border border-inkline-violet bg-white/5">
+                    <Users className="h-5 w-5 text-signal-teal" strokeWidth={1.5} />
                   </div>
-                  <h2 className="text-2xl font-bold text-white">Nosotros</h2>
+                  <p className="galileo-eyebrow text-signal-teal">Nosotros</p>
                 </div>
-                <h3 className="text-lg font-semibold text-cyan-400 mb-3">Nuestra misión</h3>
-                <p className="text-slate-300 mb-3">
+                <h2 className="text-3xl font-extralight text-pure-white sm:text-4xl">Nuestra misión</h2>
+                <p className="mt-6 text-base font-light leading-relaxed text-quartz-lavender">
                   Hacer de cada contacto la mejor experiencia de servicio, brindando calidad,
                   innovación y eficiencia.
                 </p>
-                <p className="text-slate-300 mb-3">
+                <p className="mt-4 text-base font-light leading-relaxed text-quartz-lavender">
                   Trabajar con responsabilidad y compromiso en beneficio de nuestros clientes con
                   personal altamente capacitado y comprometidos con los valores de la empresa.
                 </p>
-                <p className="text-slate-400">
+                <p className="mt-4 text-base font-light leading-relaxed text-mist-lilac">
                   Conecta. Acuerda. Realiza. La plataforma que conecta clientes con proveedores de
                   servicios de confianza, con contratos seguros y pagos protegidos.
                 </p>
+                <Link href="/contacto" className="mt-8 inline-flex items-center gap-2 border-b border-quartz-lavender pb-1 text-sm font-light text-quartz-lavender transition-colors hover:border-white hover:text-white">
+                  Conocé más sobre nosotros
+                  <ArrowRight className="h-4 w-4" />
+                </Link>
               </div>
+
               <div className="grid gap-4">
                 {features.map((feat) => {
                   const Icon = feat.icon;
                   return (
-                    <Link key={feat.title} href={feat.href} className="group flex items-start gap-4 p-4 bg-slate-800/30 border border-slate-700/50 rounded-xl hover:border-cyan-500/30 transition-colors">
-                      <div className="w-11 h-11 shrink-0 bg-cyan-500/10 border border-cyan-500/20 rounded-lg flex items-center justify-center group-hover:scale-105 transition-transform">
-                        <Icon className="w-5 h-5 text-cyan-400" />
+                    <Link
+                      key={feat.title}
+                      href={feat.href}
+                      className="group flex items-start gap-5 rounded-[28px] border border-inkline-violet/60 bg-deep-indigo/60 p-6 transition-colors hover:border-pulse-cobalt/60"
+                    >
+                      <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full border border-inkline-violet bg-void-navy/60 transition-transform group-hover:scale-105">
+                        <Icon className="h-5 w-5 text-pulse-cobalt" strokeWidth={1.5} />
                       </div>
                       <div>
-                        <h4 className="font-semibold text-white group-hover:text-cyan-400 transition-colors">{feat.title}</h4>
-                        <p className="text-sm text-slate-400">{feat.description}</p>
+                        <h3 className="text-lg font-light text-pure-white transition-colors group-hover:text-cyan-200">{feat.title}</h3>
+                        <p className="mt-1 text-sm font-light leading-relaxed text-mist-lilac">{feat.description}</p>
                       </div>
                     </Link>
                   );
@@ -363,50 +430,68 @@ export default function HomePage() {
         </section>
 
         {/* Nuestros clientes */}
-        <section id="clientes" className="py-16 bg-slate-900/50 overflow-hidden">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-10">
-            <h2 className="text-2xl font-bold text-white text-center">Nuestros clientes</h2>
+        <section id="clientes" className="overflow-hidden border-y border-inkline-violet/40 bg-deep-indigo/30 py-16">
+          <div className="mx-auto mb-10 max-w-[1200px] px-4 sm:px-6 lg:px-8">
+            <div className="text-center">
+              <p className="galileo-eyebrow text-signal-teal">Confianza</p>
+              <h2 className="mt-3 text-3xl font-extralight text-pure-white">Nuestros clientes</h2>
+            </div>
           </div>
           <GaleriaClientes />
         </section>
 
         {/* Banner Quiero ser Proveedor */}
-        <section className="py-12">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="flex flex-col md:flex-row items-center justify-between gap-6 rounded-2xl border border-cyan-500/20 bg-gradient-to-r from-blue-900/40 via-slate-900 to-cyan-900/40 p-8">
-              <div>
-                <h3 className="text-2xl font-bold text-white">¿Tenés un oficio o profesión?</h3>
-                <p className="text-slate-300 mt-1">
-                  Sumate a Contrato Directo y empezá a conseguir clientes cerca tuyo.
-                </p>
+        <section className="py-20">
+          <div className="mx-auto max-w-[1200px] px-4 sm:px-6 lg:px-8">
+            <div className="galileo-gradient relative overflow-hidden rounded-[35px] px-8 py-12 sm:px-12">
+              <div className="absolute -right-16 -top-20 h-64 w-64 rounded-full bg-white/15 blur-3xl" aria-hidden="true" />
+              <div className="absolute -bottom-24 left-1/4 h-64 w-64 rounded-full bg-white/10 blur-3xl" aria-hidden="true" />
+              <div className="relative flex flex-col items-start justify-between gap-6 md:flex-row md:items-center">
+                <div>
+                  <p className="galileo-eyebrow text-white/80">Sumate a la red</p>
+                  <h3 className="mt-3 text-3xl font-extralight text-white">¿Tenés un oficio o profesión?</h3>
+                  <p className="mt-2 max-w-xl text-sm font-light text-white/80">
+                    Sumate a Contrato Directo y empezá a conseguir clientes cerca tuyo.
+                  </p>
+                </div>
+                <Link href="/proveedores/convertir">
+                  <Button variant="outline" size="lg">
+                    Quiero ser Proveedor
+                    <ArrowRight className="h-4 w-4" />
+                  </Button>
+                </Link>
               </div>
-              <Link href="/proveedores/convertir">
-                <Button size="lg">Quiero ser Proveedor</Button>
-              </Link>
             </div>
           </div>
         </section>
 
         {/* Features */}
-        <section className="py-16">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <h2 className="text-2xl font-bold text-white text-center mb-12">¿Por qué Contrato Directo?</h2>
-            <div className="grid md:grid-cols-3 gap-8">
+        <section className="pb-24">
+          <div className="mx-auto max-w-[1200px] px-4 sm:px-6 lg:px-8">
+            <div className="mx-auto max-w-2xl text-center">
+              <p className="galileo-eyebrow text-signal-teal">Diferenciales</p>
+              <h2 className="mt-3 text-3xl font-extralight text-pure-white sm:text-4xl">¿Por qué Contrato Directo?</h2>
+              <p className="mt-4 text-base font-light leading-relaxed text-quartz-lavender">
+                Tecnología, contratos y pagos pensados para que acordar un servicio sea simple y seguro.
+              </p>
+            </div>
+
+            <div className="mt-12 grid gap-6 md:grid-cols-3">
               {features.map((feat) => {
                 const Icon = feat.icon;
                 return (
                   <Link key={feat.title} href={feat.href} className="group">
-                    <div className="text-center p-6 hover:shadow-lg hover:shadow-cyan-500/10 rounded-xl transition-all duration-300 bg-slate-800/30 border border-slate-700/50 hover:border-cyan-500/30">
-                      <div className="w-14 h-14 bg-cyan-500/10 border border-cyan-500/20 rounded-xl flex items-center justify-center mx-auto mb-4 group-hover:scale-105 transition-transform">
-                        <Icon className="w-7 h-7 text-cyan-400" />
+                    <article className="flex h-full flex-col rounded-[35px] border border-inkline-violet/60 bg-deep-indigo/70 p-8 transition-colors duration-300 group-hover:border-pulse-cobalt/60">
+                      <div className="flex h-14 w-14 items-center justify-center rounded-full border border-inkline-violet bg-void-navy/60 transition-transform group-hover:scale-105">
+                        <Icon className="h-6 w-6 text-pulse-cobalt" strokeWidth={1.5} />
                       </div>
-                      <h3 className="text-lg font-semibold text-white mb-2 group-hover:text-cyan-400 transition-colors">{feat.title}</h3>
-                      <p className="text-slate-400">{feat.description}</p>
-                      <div className="mt-4 flex items-center justify-center gap-1 text-cyan-400 text-sm font-medium group-hover:translate-x-1 transition-transform">
-                        <span>Ver más</span>
-                        <ArrowRight className="w-4 h-4" />
-                      </div>
-                    </div>
+                      <h3 className="mt-6 text-xl font-light text-pure-white">{feat.title}</h3>
+                      <p className="mt-3 flex-1 text-sm font-light leading-relaxed text-mist-lilac">{feat.description}</p>
+                      <span className="mt-6 inline-flex items-center gap-2 text-sm font-light text-cyan-300 transition-transform group-hover:translate-x-1">
+                        Ver más
+                        <ArrowRight className="h-4 w-4" />
+                      </span>
+                    </article>
                   </Link>
                 );
               })}
@@ -415,19 +500,26 @@ export default function HomePage() {
         </section>
 
         {/* CTA */}
-        <section className="py-16 bg-gradient-to-r from-blue-900/30 to-cyan-900/30">
-          <div className="max-w-4xl mx-auto px-4 text-center">
-            <h2 className="text-3xl font-bold text-white mb-4">¿Sos proveedor de servicios?</h2>
-            <p className="text-slate-300 mb-8">
-              Unite a miles de profesionales que ya confían en Contrato Directo para conseguir nuevos clientes.
-            </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Link href="/proveedores/convertir">
-                <Button size="lg">Quiero Ser Proveedor</Button>
-              </Link>
-              <Link href="/auth/register">
-                <Button variant="outline" size="lg">Registrarse como Cliente</Button>
-              </Link>
+        <section className="pb-24">
+          <div className="mx-auto max-w-[1200px] px-4 sm:px-6 lg:px-8">
+            <div className="relative overflow-hidden rounded-[35px] border border-inkline-violet/60 bg-deep-indigo/70 px-6 py-16 text-center sm:px-12">
+              <div className="absolute left-1/2 top-0 h-64 w-64 -translate-x-1/2 -translate-y-1/2 rounded-full bg-pulse-cobalt/25 blur-3xl" aria-hidden="true" />
+              <div className="absolute bottom-0 right-0 h-48 w-48 rounded-full bg-signal-teal/10 blur-3xl" aria-hidden="true" />
+              <div className="relative">
+                <Sparkles className="mx-auto h-8 w-8 text-signal-teal" strokeWidth={1} />
+                <h2 className="mt-6 text-3xl font-extralight text-pure-white sm:text-4xl">¿Sos proveedor de servicios?</h2>
+                <p className="mx-auto mt-4 max-w-2xl text-base font-light leading-relaxed text-quartz-lavender">
+                  Unite a miles de profesionales que ya confían en Contrato Directo para conseguir nuevos clientes.
+                </p>
+                <div className="mt-8 flex flex-col justify-center gap-4 sm:flex-row">
+                  <Link href="/proveedores/convertir">
+                    <Button size="lg">Quiero Ser Proveedor</Button>
+                  </Link>
+                  <Link href="/auth/register">
+                    <Button variant="outline" size="lg">Registrarse como Cliente</Button>
+                  </Link>
+                </div>
+              </div>
             </div>
           </div>
         </section>

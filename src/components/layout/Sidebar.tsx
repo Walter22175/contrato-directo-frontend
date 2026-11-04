@@ -127,9 +127,9 @@ export default function Sidebar({ role = 'cliente' }: { role?: string }) {
       )}
       <aside
         className={cn(
-          'fixed top-0 bottom-0 left-0 z-40 w-64 bg-slate-900 border-r border-slate-800 flex flex-col pt-28 transition-transform duration-200',
+          'fixed left-0 top-0 bottom-0 z-40 flex w-64 flex-col border-r border-inkline-violet/60 bg-deep-indigo pt-28 transition-transform duration-200',
           abierta ? 'translate-x-0' : '-translate-x-full',
-          'md:top-28 md:pt-0 md:translate-x-0 md:z-30',
+          'md:top-28 md:z-30 md:translate-x-0 md:pt-0',
         )}
       >
         <nav
@@ -151,10 +151,10 @@ export default function Sidebar({ role = 'cliente' }: { role?: string }) {
                   centrarItem(link.href);
                 }}
                 className={cn(
-                  'flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors',
+                  'flex items-center gap-3 rounded-full border px-4 py-2.5 text-sm font-light transition-colors',
                   isActive
-                    ? 'bg-cyan-500/10 text-cyan-400 border border-cyan-500/20'
-                    : 'text-slate-400 hover:text-white hover:bg-slate-800',
+                    ? 'border-pulse-cobalt/50 bg-pulse-cobalt/15 text-white'
+                    : 'border-transparent text-quartz-lavender hover:border-inkline-violet hover:bg-white/5 hover:text-white',
                 )}
               >
                 <Icon className="w-5 h-5" />
@@ -163,14 +163,14 @@ export default function Sidebar({ role = 'cliente' }: { role?: string }) {
             );
           })}
         </nav>
-        <div className="p-4 border-t border-slate-800 space-y-3">
-          <p className="text-xs text-slate-500 text-center">Contrato Directo</p>
+        <div className="space-y-3 border-t border-inkline-violet/60 p-4">
+          <p className="text-center text-[10px] uppercase tracking-[0.25em] text-quartz-lavender">Contrato Directo</p>
           <button
             onClick={() => {
               logout();
               cerrar();
             }}
-            className="md:hidden w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-slate-400 hover:text-white hover:bg-slate-800 transition-colors"
+            className="flex w-full items-center gap-3 rounded-full border border-transparent px-4 py-2.5 text-sm font-light text-quartz-lavender transition-colors hover:border-inkline-violet hover:bg-white/5 hover:text-white md:hidden"
           >
             <LogOut className="w-5 h-5" />
             Cerrar Sesión

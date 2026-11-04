@@ -490,10 +490,13 @@ export default function Chatbot() {
     return (
       <button
         onClick={() => setAbierto(true)}
-        className="fixed bottom-6 right-6 z-50 w-14 h-14 bg-cyan-600 hover:bg-cyan-700 text-white rounded-full shadow-lg flex items-center justify-center transition-colors"
+        className="fixed bottom-6 right-6 z-50 flex items-center gap-2 rounded-full border border-inkline-violet bg-glacier-white px-4 py-3 text-sm font-normal text-deep-indigo shadow-2xl shadow-black/30 transition-transform hover:scale-[1.03]"
         aria-label="Abrir asistente virtual"
       >
-        <MessageCircle className="w-6 h-6" />
+        <span className="flex h-7 w-7 items-center justify-center rounded-full bg-pulse-cobalt text-white">
+          <MessageCircle className="w-4 h-4" />
+        </span>
+        Hablá con CoDi
       </button>
     );
   }
@@ -505,7 +508,7 @@ export default function Chatbot() {
     <div className="fixed bottom-6 right-6 z-50 w-80 sm:w-96">
       <Card className="overflow-hidden shadow-2xl">
         {/* Header */}
-        <div className="p-3 bg-cyan-600 flex items-center justify-between">
+        <div className="galileo-gradient flex items-center justify-between p-3">
           <div className="flex items-center gap-2">
             <Bot className="w-5 h-5 text-white" />
             <span className="text-white font-medium text-sm">Asistente Virtual</span>
@@ -536,8 +539,8 @@ export default function Chatbot() {
                 className={cn(
                   'max-w-[75%] px-3 py-2 rounded-xl text-sm leading-relaxed',
                   m.remitente === 'usuario'
-                    ? 'bg-cyan-600 text-white rounded-tr-none'
-                    : 'bg-slate-700 text-slate-200 rounded-tl-none'
+                    ? 'bg-pulse-cobalt text-white rounded-tr-none'
+                    : 'bg-white/5 text-quartz-lavender rounded-tl-none border border-inkline-violet/60'
                 )}
               >
                 {renderContenido(m.contenido)}
@@ -551,7 +554,7 @@ export default function Chatbot() {
           {escribiendo && (
             <div className="flex gap-2 justify-start">
               <Bot className="w-5 h-5 text-cyan-400 flex-shrink-0 mt-1" />
-              <div className="bg-slate-700 text-slate-400 px-3 py-2 rounded-xl rounded-tl-none text-sm">
+              <div className="rounded-xl rounded-tl-none border border-inkline-violet/60 bg-white/5 px-3 py-2 text-sm text-mist-lilac">
                 CoDi está escribiendo…
               </div>
             </div>
@@ -565,7 +568,7 @@ export default function Chatbot() {
               <button
                 key={s}
                 onClick={() => enviarMensaje(s)}
-                className="text-xs px-2 py-1 rounded-full bg-slate-800 border border-slate-600 text-slate-300 hover:bg-slate-700 hover:text-white transition-colors"
+                className="rounded-full border border-inkline-violet bg-white/5 px-3 py-1 text-xs font-light text-quartz-lavender transition-colors hover:border-pulse-cobalt/60 hover:text-white"
               >
                 {s}
               </button>
@@ -589,7 +592,7 @@ export default function Chatbot() {
         )}
 
         {/* Input */}
-        <div className="p-3 border-t border-slate-700">
+        <div className="border-t border-inkline-violet/60 p-3">
           <form
             onSubmit={(e) => {
               e.preventDefault();
@@ -601,12 +604,12 @@ export default function Chatbot() {
               value={input}
               onChange={(e) => setInput(e.target.value)}
               placeholder="Escribí tu pregunta..."
-              className="flex-1 px-3 py-2 bg-slate-800 border border-slate-600 rounded-lg text-white text-sm placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-cyan-500"
+              className="flex-1 rounded-full border border-inkline-violet bg-deep-indigo px-4 py-2 text-sm font-light text-white placeholder:text-mist-lilac focus:border-pulse-cobalt focus:outline-none focus:ring-2 focus:ring-pulse-cobalt/40"
             />
             <button
               type="submit"
               disabled={!input.trim()}
-              className="p-2 bg-cyan-600 hover:bg-cyan-700 disabled:opacity-50 text-white rounded-lg transition-colors"
+              className="rounded-full bg-pulse-cobalt p-2 text-white transition-colors hover:bg-[#2c3bd0] disabled:opacity-50"
               aria-label="Enviar"
             >
               <Send className="w-4 h-4" />

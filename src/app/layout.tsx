@@ -1,10 +1,17 @@
 import type { Metadata, Viewport } from "next";
+import { Inter } from "next/font/google";
 import "./globals.css";
 import AuthProvider from "@/components/providers/AuthProvider";
 import GlobalChatbot from "@/components/providers/GlobalChatbot";
 import BlacklightOverlay from "@/components/providers/BlacklightOverlay";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
+
+const inter = Inter({
+  subsets: ["latin"],
+  variable: "--font-inter",
+  display: "swap",
+});
 
 export const metadata: Metadata = {
   title: "Contrato Directo - Conecta. Acuerda. Realiza.",
@@ -25,13 +32,13 @@ export const metadata: Metadata = {
 export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
-  themeColor: "#051027",
+  themeColor: "#03081a",
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="es">
-      <body className="min-h-screen text-slate-200 antialiased" style={{ backgroundColor: '#051027' }}>
+    <html lang="es" className={inter.variable}>
+      <body className="min-h-screen text-slate-300 antialiased" style={{ backgroundColor: '#03081a' }}>
         <AuthProvider>
           <GlobalChatbot />
           <BlacklightOverlay />

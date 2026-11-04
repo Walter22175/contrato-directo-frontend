@@ -263,7 +263,7 @@ export default function PromocionCarousel({
 
   return (
     <section 
-      className="w-full overflow-hidden bg-slate-900 border-b border-slate-800 relative"
+      className="relative w-full overflow-hidden border-b border-inkline-violet/60 bg-void-navy"
       onMouseEnter={() => setIsPaused(true)}
       onMouseLeave={() => setIsPaused(false)}
     >
@@ -328,7 +328,7 @@ export default function PromocionCarousel({
                 ...effectStyle
               }}
             >
-              <article className="relative h-[260px] md:h-[300px] lg:h-[340px] rounded-xl overflow-hidden bg-slate-800/50 transition-all duration-300">
+              <article className="relative h-[260px] overflow-hidden rounded-[35px] border border-inkline-violet/70 bg-deep-indigo/70 transition-all duration-300 md:h-[300px] lg:h-[340px]">
                 <div className="absolute inset-0">
                   <Image
                     src={isPromocion(slide) ? slide.imagen_url : slide.src}
@@ -338,7 +338,7 @@ export default function PromocionCarousel({
                     className="object-cover transition-all duration-500"
                     sizes="(max-width: 768px) 380px, (max-width: 1024px) 420px, 460px"
                   />
-                  <div className="absolute inset-0 bg-gradient-to-t from-slate-900/95 via-slate-900/40 to-slate-900/10" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-void-navy via-void-navy/55 to-transparent" />
                 </div>
 
                 <div className="absolute inset-0 flex items-end p-4 md:p-6">
@@ -346,19 +346,19 @@ export default function PromocionCarousel({
                     {isPromocion(slide) ? (
                       <>
                         <div className="mb-3 flex items-center gap-2 flex-wrap">
-                          <span className="px-2.5 py-1 bg-cyan-500/20 text-cyan-400 text-xs font-medium rounded-full">
+                          <span className="rounded-full border border-pulse-cobalt/40 bg-pulse-cobalt/20 px-3 py-1 text-[10px] font-normal uppercase tracking-[0.18em] text-cyan-200">
                             Promoción
                           </span>
                           {slide.enlace && (
-                            <span className="px-2.5 py-1 bg-slate-800/50 text-slate-300 text-xs font-medium rounded-full backdrop-blur">
+                            <span className="rounded-full border border-white/20 bg-white/10 px-3 py-1 text-[10px] font-normal uppercase tracking-[0.18em] text-white backdrop-blur">
                               Ver detalles
                             </span>
                           )}
                         </div>
-                        <h2 className="text-lg md:text-xl lg:text-2xl font-bold text-white mb-2 leading-tight">
+                        <h2 className="mb-2 text-lg font-light leading-tight text-white md:text-xl lg:text-2xl">
                           {slide.titulo}
                         </h2>
-                        <p className="text-slate-300 text-sm md:text-base mb-4 leading-relaxed line-clamp-2">
+                        <p className="mb-4 line-clamp-2 text-sm font-light leading-relaxed text-quartz-lavender md:text-base">
                           {slide.descripcion}
                         </p>
                         <div className="flex items-center gap-3 flex-wrap">
@@ -372,7 +372,7 @@ export default function PromocionCarousel({
                           {slide.enlace && (
                             <Link
                               href={slide.enlace}
-                              className="px-4 py-2 bg-cyan-500 hover:bg-cyan-600 text-white font-semibold rounded-lg transition-colors text-sm"
+                              className="rounded-full bg-pulse-cobalt px-5 py-2 text-sm font-light text-white transition-colors hover:bg-[#2c3bd0]"
                             >
                               Ver promoción
                             </Link>
@@ -381,14 +381,14 @@ export default function PromocionCarousel({
                       </>
                     ) : (
                       <>
-                        <h2 className="text-lg md:text-xl lg:text-2xl font-bold text-white mb-2 leading-tight" dangerouslySetInnerHTML={{ __html: slide.title }} />
-                        <p className="text-slate-300 text-sm md:text-base mb-4 leading-relaxed line-clamp-2">
+                        <h2 className="mb-2 text-lg font-light leading-tight text-white md:text-xl lg:text-2xl" dangerouslySetInnerHTML={{ __html: slide.title }} />
+                        <p className="mb-4 line-clamp-2 text-sm font-light leading-relaxed text-quartz-lavender md:text-base">
                           {slide.description}
                         </p>
                         {slide.ctaLink && slide.ctaText && (
                           <Link
                             href={slide.ctaLink}
-                            className="px-4 py-2 bg-cyan-500 hover:bg-cyan-600 text-white font-semibold rounded-lg transition-colors text-sm inline-block"
+                            className="inline-block rounded-full bg-pulse-cobalt px-5 py-2 text-sm font-light text-white transition-colors hover:bg-[#2c3bd0]"
                           >
                             {slide.ctaText}
                           </Link>
@@ -422,7 +422,7 @@ export default function PromocionCarousel({
         onMouseDown={() => setIsPaused(true)}
         onMouseUp={() => setIsPaused(false)}
         onMouseLeave={() => setIsPaused(false)}
-        className="absolute left-4 top-1/2 -translate-y-1/2 z-10 w-10 h-10 bg-white/10 hover:bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center text-white/60 hover:text-white transition-all duration-200 border border-white/10"
+        className="absolute left-4 top-1/2 z-10 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full border border-white/15 bg-white/10 text-white/70 backdrop-blur-sm transition-all duration-200 hover:bg-white/20 hover:text-white"
         aria-label="Promoción anterior"
       >
         <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -434,7 +434,7 @@ export default function PromocionCarousel({
         onMouseDown={() => setIsPaused(true)}
         onMouseUp={() => setIsPaused(false)}
         onMouseLeave={() => setIsPaused(false)}
-        className="absolute right-4 top-1/2 -translate-y-1/2 z-10 w-10 h-10 bg-white/10 hover:bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center text-white/60 hover:text-white transition-all duration-200 border border-white/10"
+        className="absolute right-4 top-1/2 z-10 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full border border-white/15 bg-white/10 text-white/70 backdrop-blur-sm transition-all duration-200 hover:bg-white/20 hover:text-white"
         aria-label="Próxima promoción"
       >
         <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -443,8 +443,8 @@ export default function PromocionCarousel({
       </button>
 
       {/* Gradient fade edges */}
-      <div className="absolute left-0 top-0 bottom-0 w-24 bg-gradient-to-r from-slate-900 to-transparent pointer-events-none" aria-hidden="true" />
-      <div className="absolute right-0 top-0 bottom-0 w-24 bg-gradient-to-l from-slate-900 to-transparent pointer-events-none" aria-hidden="true" />
+      <div className="pointer-events-none absolute bottom-0 left-0 top-0 w-24 bg-gradient-to-r from-void-navy to-transparent" aria-hidden="true" />
+      <div className="pointer-events-none absolute bottom-0 right-0 top-0 w-24 bg-gradient-to-l from-void-navy to-transparent" aria-hidden="true" />
     </section>
   );
 }
