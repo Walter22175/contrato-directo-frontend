@@ -74,7 +74,7 @@ const fmtFecha = (f?: string | null) =>
 
 export default function VerificacionProveedorPage() {
   const router = useRouter();
-  const { isAuthenticated } = useAuthStore();
+  const { isAuthenticated, isLoading: authLoading } = useAuthStore();
   const [data, setData] = useState<VerificacionResponse | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -106,12 +106,13 @@ export default function VerificacionProveedorPage() {
   }, []);
 
   useEffect(() => {
+    if (authLoading) return;
     if (!isAuthenticated) {
-      router.push('/auth/login');
+      router.replace('/auth/login?next=%2Fproveedores%2Fverificacion');
       return;
     }
     fetchDatos();
-  }, [isAuthenticated, router, fetchDatos]);
+  }, [isAuthenticated, authLoading, router, fetchDatos]);
 
   const ultimasPorTipo = (verificaciones: Verificacion[]): Verificacion[] => {
     const mapa = new Map<string, Verificacion>();
@@ -180,7 +181,7 @@ export default function VerificacionProveedorPage() {
                 Completá el formulario de conversión para empezar la verificación de tu documentación.
               </p>
               <button
-                onClick={() => router.push('/proveedores/convertir')}
+                onClick={() => router.push('/proveedores/convertir?paso=2')}
                 className="mt-6 px-5 py-2.5 bg-cyan-600 hover:bg-cyan-700 text-white rounded-lg text-sm font-medium transition-colors"
               >
                 Convertirme en Proveedor

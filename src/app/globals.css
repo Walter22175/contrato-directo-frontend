@@ -108,6 +108,7 @@
 @layer base {
   :root {
     color-scheme: dark;
+    --header-height: 7rem;
   }
 
   html {

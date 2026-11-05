@@ -326,7 +326,7 @@ export default function HomePage() {
                   <div className="mt-4 flex items-end justify-between">
                     <div>
                       <p className="text-xs text-mist-lilac">Pago en custodia</p>
-                      <p className="text-2xl font-extralight text-pure-white">$ 125.000</p>
+                      <p className="text-sm font-light text-quartz-lavender">Monto acordado</p>
                     </div>
                     <div className="text-right">
                       <p className="text-xs text-mist-lilac">Se libera</p>
@@ -454,7 +454,7 @@ export default function HomePage() {
                     Sumate a Contrato Directo y empezá a conseguir clientes cerca tuyo.
                   </p>
                 </div>
-                <Link href="/proveedores/convertir">
+                <Link href="/proveedores/convertir?paso=2">
                   <Button variant="outline" size="lg">
                     Quiero ser Proveedor
                     <ArrowRight className="h-4 w-4" />
@@ -512,11 +512,8 @@ export default function HomePage() {
                   Unite a miles de profesionales que ya confían en Contrato Directo para conseguir nuevos clientes.
                 </p>
                 <div className="mt-8 flex flex-col justify-center gap-4 sm:flex-row">
-                  <Link href="/proveedores/convertir">
+                  <Link href="/proveedores/convertir?paso=2">
                     <Button size="lg">Quiero Ser Proveedor</Button>
-                  </Link>
-                  <Link href="/auth/register">
-                    <Button variant="outline" size="lg">Registrarse como Cliente</Button>
                   </Link>
                 </div>
               </div>

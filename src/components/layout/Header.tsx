@@ -8,7 +8,7 @@ import { useNotificationStore } from '@/store/notifications';
 import { useUiStore } from '@/store/ui';
 import { useNotificationsSocket } from '@/hooks/useNotificationsSocket';
 import { useState, useEffect, useRef, useCallback } from 'react';
-import { Menu, Search, Bell, User, LogOut, ChevronDown, Check, X, Box, Lightbulb } from 'lucide-react';
+import { Menu, Search, Bell, User, LogOut, ChevronDown, Check, X, Box, Lightbulb, Briefcase, Loader2 } from 'lucide-react';
 import Image from 'next/image';
 import Button from '@/components/ui/Button';
 import api, { extractData } from '@/lib/api';
@@ -53,6 +53,9 @@ export default function Header({ onToggleSidebar }: { onToggleSidebar?: () => vo
   const pathname = usePathname();
   const user = useAuthStore((s) => s.user);
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
+  const proveedorEstado = useAuthStore((s) => s.proveedorEstado);
+  const cambiarContexto = useAuthStore((s) => s.cambiarContexto);
+  const loadUser = useAuthStore((s) => s.loadUser);
   const logout = useAuthStore((s) => s.logout);
   const { noLeidas, notificaciones, fetchNoLeidas, fetchNotificaciones, marcarLeida, marcarTodasLeidas } = useNotificationStore();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -72,6 +75,9 @@ export default function Header({ onToggleSidebar }: { onToggleSidebar?: () => vo
   const searchRef = useRef<HTMLDivElement>(null);
   const notifRef = useRef<HTMLDivElement>(null);
   const searchInputRef = useRef<HTMLInputElement>(null);
+  const headerRef = useRef<HTMLElement>(null);
+  const [contextoActivo, setContextoActivo] = useState<string | null>(null);
+  const [cambiandoContexto, setCambiandoContexto] = useState(false);
 
   const alternarBlacklight = () => {
     useUiStore.getState().alternarBlacklight();
@@ -111,6 +117,38 @@ export default function Header({ onToggleSidebar }: { onToggleSidebar?: () => vo
   useEffect(() => {
     setMostrarBannerLanzamiento(esVentanaLanzamiento());
   }, []);
+
+  useEffect(() => {
+    const el = headerRef.current;
+    if (!el) return;
+
+    const update = () => {
+      document.documentElement.style.setProperty(
+        '--header-height',
+        `${el.offsetHeight}px`,
+      );
+    };
+
+    update();
+
+    if (typeof ResizeObserver === 'undefined') {
+      window.addEventListener('resize', update);
+      return () => window.removeEventListener('resize', update);
+    }
+
+    const observer = new ResizeObserver(update);
+    observer.observe(el);
+    window.addEventListener('resize', update);
+
+    return () => {
+      observer.disconnect();
+      window.removeEventListener('resize', update);
+    };
+  }, []);
+
+  useEffect(() => {
+    setContextoActivo(localStorage.getItem('contexto_activo'));
+  }, [user, pathname]);
 
   useEffect(() => {
     useUiStore.getState().cerrarSidebar();
@@ -290,8 +328,26 @@ export default function Header({ onToggleSidebar }: { onToggleSidebar?: () => vo
     }
   };
 
+  const handleCambiarContexto = async () => {
+    const destino = contextoActivo === 'proveedor' ? 'cliente' : 'proveedor';
+    setCambiandoContexto(true);
+    try {
+      await cambiarContexto(destino);
+      await loadUser();
+      setContextoActivo(destino);
+      setUserMenuOpen(false);
+      setMobileMenuOpen(false);
+      router.push('/dashboard');
+      router.refresh();
+    } catch {
+      // El store expone el error para la UI que lo consuma.
+    } finally {
+      setCambiandoContexto(false);
+    }
+  };
+
   return (
-    <header className="sticky top-0 z-50 border-b border-inkline-violet/60 bg-void-navy/85 backdrop-blur-xl">
+    <header ref={headerRef} className="sticky top-0 z-50 border-b border-inkline-violet/60 bg-void-navy/85 backdrop-blur-xl">
       <div className="mx-auto max-w-[1200px] px-4 sm:px-6 lg:px-8">
         <div className="relative flex h-28 items-center justify-between">
           {/* Línea de señal de marca */}
@@ -492,6 +548,26 @@ export default function Header({ onToggleSidebar }: { onToggleSidebar?: () => vo
                   )}
                 </div>
 
+                {proveedorEstado === 'aprobado' && (
+                  <button
+                    onClick={handleCambiarContexto}
+                    disabled={cambiandoContexto}
+                    className="flex items-center gap-2 rounded-full border border-inkline-violet px-3 py-2 text-sm font-light text-quartz-lavender transition-colors hover:border-pulse-cobalt hover:text-white disabled:opacity-60"
+                    title={
+                      contextoActivo === 'proveedor'
+                        ? 'Cambiar al modo cliente'
+                        : 'Ir al dashboard como proveedor'
+                    }
+                  >
+                    {cambiandoContexto ? (
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                    ) : (
+                      <Briefcase className="h-4 w-4" />
+                    )}
+                    {contextoActivo === 'proveedor' ? 'Cliente' : 'Proveedor'}
+                  </button>
+                )}
+
                 {/* User Menu */}
                 <div className="relative">
                   <button
@@ -599,6 +675,22 @@ export default function Header({ onToggleSidebar }: { onToggleSidebar?: () => vo
                 <Link href="/dashboard" className="block rounded-full px-4 py-2 text-quartz-lavender hover:bg-white/5 hover:text-white" onClick={() => setMobileMenuOpen(false)}>
                   Dashboard
                 </Link>
+                {proveedorEstado === 'aprobado' && (
+                  <button
+                    onClick={handleCambiarContexto}
+                    disabled={cambiandoContexto}
+                    className="flex w-full items-center gap-2 rounded-full px-4 py-2 text-left text-quartz-lavender hover:bg-white/5 hover:text-white disabled:opacity-60"
+                  >
+                    {cambiandoContexto ? (
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                    ) : (
+                      <Briefcase className="h-4 w-4" />
+                    )}
+                    {contextoActivo === 'proveedor'
+                      ? 'Cambiar a Cliente'
+                      : 'Ir al dashboard como Proveedor'}
+                  </button>
+                )}
                 <hr className="border-inkline-violet/60" />
                 <button
                   onClick={() => { logout(); setMobileMenuOpen(false); }}

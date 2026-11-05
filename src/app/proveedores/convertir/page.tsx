@@ -5,13 +5,17 @@ import { useRouter } from 'next/navigation';
 import Button from '@/components/ui/Button';
 import { useAuthStore } from '@/store/auth';
 import api from '@/lib/api';
+import {
+  guardarDestinoPostLogin,
+  limpiarDestinoPostLogin,
+} from '@/lib/postLoginRedirect';
 import Paso1DatosPersonales from '@/components/proveedor/registro/Paso1DatosPersonales';
 import Paso2DatosFiscales from '@/components/proveedor/registro/Paso2DatosFiscales';
 import Paso3Contacto from '@/components/proveedor/registro/Paso3Contacto';
 import Paso4RubroDescripcion from '@/components/proveedor/registro/Paso4RubroDescripcion';
 import Paso5DocumentacionFiscal from '@/components/proveedor/registro/Paso5DocumentacionFiscal';
 import Paso6Avales from '@/components/proveedor/registro/Paso6Avales';
-import { Check, ArrowLeft } from 'lucide-react';
+import { Check, ArrowLeft, Clock, LayoutDashboard } from 'lucide-react';
 import SUSModal from '@/components/ui/SUSModal';
 import type { Usuario } from '@/types';
 
@@ -115,7 +119,7 @@ interface RespuestasSUS {
 
 export default function ConvertirProveedorPage() {
   const router = useRouter();
-  const { user, isAuthenticated, loadUser } = useAuthStore();
+  const { user, isAuthenticated, isLoading, loadUser, proveedorEstado, cambiarContexto } = useAuthStore();
 
   const [pasoActual, setPasoActual] = useState<PasoActual>(1);
   const [wizardData, setWizardData] = useState<WizardState>({});
@@ -125,10 +129,20 @@ export default function ConvertirProveedorPage() {
   const wizardRef = useRef<WizardState>({});
 
   useEffect(() => {
+    if (new URLSearchParams(window.location.search).get('paso') === '2') {
+      setPasoActual(2);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (isLoading) return;
     if (!isAuthenticated) {
-      router.push('/auth/login');
+      const nextPath = `/proveedores/convertir${window.location.search || ''}`;
+      guardarDestinoPostLogin(nextPath);
+      router.replace(`/auth/login?next=${encodeURIComponent(nextPath)}`);
       return;
     }
+    limpiarDestinoPostLogin();
     const idUsuario = user?.id_usuario;
     if (!idUsuario) return;
 
@@ -181,7 +195,7 @@ export default function ConvertirProveedorPage() {
     };
 
     fetchClientData();
-  }, [isAuthenticated, router, user?.id_usuario]);
+  }, [isAuthenticated, isLoading, router, user?.id_usuario]);
 
   useEffect(() => {
     wizardRef.current = wizardData;
@@ -246,11 +260,54 @@ export default function ConvertirProveedorPage() {
     router.push('/proveedores/verificacion');
   };
 
+  const handleIrDashboardProveedor = async () => {
+    try {
+      await cambiarContexto('proveedor');
+      await loadUser();
+      router.push('/dashboard');
+    } catch {
+      // El store muestra el error correspondiente.
+    }
+  };
+
   const progress = (pasoActual / 6) * 100;
 
-  const isProveedor = user?.usuario_roles?.some((ur) => ur.rol?.nombre === 'proveedor' && ur.activo);
+  if (isLoading || !isAuthenticated) {
+    return (
+      <main className="flex-1">
+        <div className="flex min-h-[50vh] items-center justify-center">
+          <div className="h-8 w-8 animate-spin rounded-full border-2 border-cyan-500 border-t-transparent" />
+        </div>
+      </main>
+    );
+  }
 
-  if (isProveedor) {
+  if (proveedorEstado === 'pendiente') {
+    return (
+      <main className="flex-1">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          <div className="text-center py-12">
+            <Clock className="w-16 h-16 text-cyan-400 mx-auto mb-4" />
+            <h1 className="text-3xl font-bold text-white">Solicitud en revisión</h1>
+            <p className="text-slate-400 mt-2 max-w-xl mx-auto">
+              Tu solicitud para ser proveedor está siendo revisada. Mientras tanto,
+              tu cuenta sigue funcionando normalmente como cliente.
+            </p>
+            <div className="mt-6 flex flex-col items-center justify-center gap-3 sm:flex-row">
+              <Button onClick={() => router.push('/proveedores/verificacion')} size="lg">
+                Ver estado de la solicitud
+              </Button>
+              <Button variant="outline" onClick={() => router.push('/dashboard')} size="lg">
+                Ir a mi dashboard de cliente
+              </Button>
+            </div>
+          </div>
+        </div>
+      </main>
+    );
+  }
+
+  if (proveedorEstado === 'aprobado') {
     return (
       <main className="flex-1">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -258,9 +315,15 @@ export default function ConvertirProveedorPage() {
             <Check className="w-16 h-16 text-green-500 mx-auto mb-4" />
             <h1 className="text-3xl font-bold text-white">Ya eres Proveedor</h1>
             <p className="text-slate-400 mt-2">Tu cuenta ya tiene el rol de proveedor activo.</p>
-            <Button onClick={() => router.push('/proveedores/verificacion')} className="mt-6" size="lg">
-              Ver estado de verificación
-            </Button>
+            <div className="mt-6 flex flex-col items-center justify-center gap-3 sm:flex-row">
+              <Button onClick={handleIrDashboardProveedor} size="lg">
+                <LayoutDashboard className="w-4 h-4 mr-2" />
+                Ir al dashboard de proveedor
+              </Button>
+              <Button variant="outline" onClick={() => router.push('/proveedores/verificacion')} size="lg">
+                Ver estado de verificación
+              </Button>
+            </div>
           </div>
         </div>
       </main>

@@ -130,9 +130,9 @@ export default function Sidebar({ role = 'cliente' }: { role?: string }) {
       )}
       <aside
         className={cn(
-          'fixed left-0 top-0 bottom-0 z-40 flex w-64 flex-col border-r border-inkline-violet/60 bg-deep-indigo pt-28 transition-transform duration-200',
+          'fixed left-0 top-[var(--header-height)] bottom-0 z-40 flex w-64 flex-col border-r border-inkline-violet/60 bg-deep-indigo transition-transform duration-200',
           abierta ? 'translate-x-0' : '-translate-x-full',
-          'md:top-28 md:z-30 md:translate-x-0 md:pt-0',
+          'md:z-30 md:translate-x-0',
         )}
       >
         <nav

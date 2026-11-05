@@ -7,10 +7,10 @@ import { useRouter } from 'next/navigation';
 import { Card } from '@/components/ui/Card';
 import Button from '@/components/ui/Button';
 import api, { extractData, mensajeError } from '@/lib/api';
-import { User, Mail, Phone, MapPin, Calendar, Edit3, Shield, FileText, Briefcase, RotateCcw, CheckCircle2, Loader2 } from 'lucide-react';
+import { User, Mail, Phone, MapPin, Calendar, Edit3, Shield, FileText, Briefcase, RotateCcw, CheckCircle2, Loader2, Clock } from 'lucide-react';
 
 export default function PerfilPage() {
-  const { user, loadUser, cambiarContexto } = useAuthStore();
+  const { user, loadUser, cambiarContexto, proveedorEstado } = useAuthStore();
   const router = useRouter();
   const [contexto, setContexto] = useState<string | null>(null);
   const [switching, setSwitching] = useState(false);
@@ -32,7 +32,9 @@ export default function PerfilPage() {
     || [];
 
   const esCliente = roles.includes('cliente');
-  const esProveedor = roles.includes('proveedor');
+  const esProveedor = roles.includes('proveedor') && proveedorEstado === 'aprobado';
+  const proveedorPendiente =
+    roles.includes('proveedor') && proveedorEstado === 'pendiente';
   const esAmbos = esCliente && esProveedor;
   const rolesExtras = roles.filter(
     (r): r is string => !!r && r !== 'cliente' && r !== 'proveedor',
@@ -57,7 +59,7 @@ export default function PerfilPage() {
   };
 
   const handleConvertirProveedor = () => {
-    router.push('/proveedores/convertir');
+    router.push('/proveedores/convertir?paso=2');
   };
 
   const handleResendVerification = async () => {
@@ -130,12 +132,18 @@ export default function PerfilPage() {
                   >
                     <Briefcase className="w-3 h-3" />
                     Proveedor
-                    {user?.perfil_proveedor?.sello_verificado && (
+                    {proveedorEstado === 'aprobado' && (
                       <CheckCircle2 className="w-3 h-3 text-green-400" />
                     )}
                     {contextoActivo === 'proveedor' && esAmbos && (
                       <span className="text-[10px] text-purple-300/70">· activo</span>
                     )}
+                  </span>
+                )}
+                {proveedorPendiente && (
+                  <span className="inline-flex items-center gap-1 text-xs px-2.5 py-1 bg-amber-500/10 text-amber-400 border border-amber-500/20 rounded-full">
+                    <Clock className="w-3 h-3" />
+                    Proveedor en revisión
                   </span>
                 )}
                 {rolesExtras.map((rol) => (
@@ -154,7 +162,7 @@ export default function PerfilPage() {
                 )}
               </div>
 
-              {!esProveedor && esCliente && (
+              {!roles.includes('proveedor') && esCliente && (
                 <Button 
                   onClick={handleConvertirProveedor} 
                   className="mt-4 w-full"
@@ -162,6 +170,18 @@ export default function PerfilPage() {
                 >
                   <RotateCcw className="w-4 h-4 mr-2" />
                   Convertirme en Proveedor
+                </Button>
+              )}
+
+              {proveedorPendiente && (
+                <Button
+                  variant="outline"
+                  onClick={() => router.push('/proveedores/verificacion')}
+                  className="mt-4 w-full"
+                  size="sm"
+                >
+                  <Clock className="w-4 h-4 mr-2" />
+                  Ver estado de la solicitud
                 </Button>
               )}
 

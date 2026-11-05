@@ -12,6 +12,10 @@ import Input from '@/components/ui/Input';
 import { Eye, EyeOff } from 'lucide-react';
 import { useState } from 'react';
 import api, { extractData, mensajeError } from '@/lib/api';
+import {
+  limpiarDestinoPostLogin,
+  obtenerDestinoPostLogin,
+} from '@/lib/postLoginRedirect';
 
 const loginSchema = z.object({
   email: z.string().email('Email inválido'),
@@ -27,6 +31,7 @@ export default function LoginPage() {
   const [resendingEmail, setResendingEmail] = useState(false);
   const [resendMessage, setResendMessage] = useState('');
   const [resendError, setResendError] = useState('');
+  const [next, setNext] = useState<string | null>(null);
   const errorRef = useRef<HTMLDivElement>(null);
 
   const { register, handleSubmit, reset, resetField, formState: { errors, isSubmitting } } = useForm<LoginForm>({
@@ -40,6 +45,15 @@ export default function LoginPage() {
   }, [reset]);
 
   useEffect(() => {
+    const destino = obtenerDestinoPostLogin(
+      new URLSearchParams(window.location.search).get('next'),
+    );
+    if (destino) {
+      setNext(destino);
+    }
+  }, []);
+
+  useEffect(() => {
     if (error && errorRef.current) {
       errorRef.current.scrollIntoView({ behavior: 'smooth', block: 'center' });
     }
@@ -49,7 +63,9 @@ export default function LoginPage() {
     try {
       clearError();
       await login(data);
-      router.push('/');
+      const destino = next || '/';
+      limpiarDestinoPostLogin();
+      router.push(destino);
     } catch {
       resetField('password');
     }
@@ -160,7 +176,10 @@ export default function LoginPage() {
 
           <p className="text-center text-slate-400 text-sm mt-6">
             ¿No tenés cuenta?{' '}
-            <Link href="/auth/register" className="text-cyan-400 hover:text-cyan-300 font-medium">
+            <Link
+              href={next ? `/auth/register?next=${encodeURIComponent(next)}` : '/auth/register'}
+              className="text-cyan-400 hover:text-cyan-300 font-medium"
+            >
               Registrate
             </Link>
           </p>

@@ -10,6 +10,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
   const isLoading = useAuthStore((s) => s.isLoading);
   const user = useAuthStore((s) => s.user);
+  const proveedorEstado = useAuthStore((s) => s.proveedorEstado);
   const router = useRouter();
   const [mounted, setMounted] = useState(false);
   const [resendingEmail, setResendingEmail] = useState(false);
@@ -44,7 +45,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
   useEffect(() => {
     if (mounted && !isLoading && !isAuthenticated) {
-      router.push('/auth/login');
+      router.replace('/');
     }
   }, [mounted, isAuthenticated, isLoading, router]);
 
@@ -56,20 +57,30 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     );
   }
 
+  if (!isAuthenticated) {
+    return <div className="min-h-screen" />;
+  }
+
   const rolesActivos = (user?.usuario_roles || [])
     .filter((ur) => ur.activo)
     .map((ur) => ur.rol?.nombre as string)
     .filter(Boolean);
+  const esProveedorAprobado =
+    rolesActivos.includes('proveedor') && proveedorEstado === 'aprobado';
+  const tieneCliente = rolesActivos.includes('cliente');
   const contexto = localStorage.getItem('contexto_activo');
-  const role =
-    contexto && rolesActivos.includes(contexto)
-      ? contexto
-      : rolesActivos[0] || 'cliente';
   const isAdmin = rolesActivos.includes('super_admin') || rolesActivos.includes('sistemas');
+  const role = isAdmin
+    ? 'admin'
+    : contexto === 'proveedor' && esProveedorAprobado
+      ? 'proveedor'
+      : !tieneCliente && esProveedorAprobado
+        ? 'proveedor'
+        : 'cliente';
 
   return (
     <div className="flex flex-1">
-      <Sidebar role={isAdmin ? 'admin' : role} />
+      <Sidebar role={role} />
       <main className="flex-1 md:ml-64 p-4 sm:p-6 lg:p-8">
         {user && !user.email_verificado && (
           <div className="mb-4 rounded-lg border border-amber-500/30 bg-amber-500/10 px-4 py-3 text-sm text-amber-200">

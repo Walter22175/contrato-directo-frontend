@@ -505,10 +505,10 @@ export default function Chatbot() {
   // VENTANA ABIERTA
   // ============================================================
   return (
-    <div className="fixed bottom-6 right-6 z-50 w-80 sm:w-96">
-      <Card className="overflow-hidden shadow-2xl">
+    <div className="fixed bottom-4 left-4 right-4 z-[60] sm:bottom-6 sm:left-auto sm:right-6 sm:w-80">
+      <Card className="flex h-[min(clamp(27rem,38vw,32rem),calc(100dvh-var(--header-height)-1.5rem))] flex-col overflow-hidden p-0 shadow-2xl">
         {/* Header */}
-        <div className="galileo-gradient flex items-center justify-between p-3">
+        <div className="galileo-gradient flex shrink-0 items-center justify-between p-3">
           <div className="flex items-center gap-2">
             <Bot className="w-5 h-5 text-white" />
             <span className="text-white font-medium text-sm">Asistente Virtual</span>
@@ -523,7 +523,7 @@ export default function Chatbot() {
         </div>
 
         {/* Mensajes */}
-        <div ref={scrollRef} className="h-72 overflow-y-auto p-3 space-y-3">
+        <div ref={scrollRef} className="min-h-[10rem] flex-1 space-y-3 overflow-y-auto overscroll-contain p-3">
           {mensajes.map((m) => (
             <div
               key={m.id}
@@ -563,7 +563,7 @@ export default function Chatbot() {
 
         {/* Sugerencias rápidas */}
         {mensajes.length <= 1 && (
-          <div className="px-3 pb-2 flex flex-wrap gap-1.5">
+          <div className="flex shrink-0 flex-wrap gap-1.5 px-3 pb-2">
             {SUGERENCIAS.map((s) => (
               <button
                 key={s}
@@ -578,7 +578,7 @@ export default function Chatbot() {
 
         {/* Botón WhatsApp: se libera solo cuando CoDi no tiene respuesta */}
         {mostrarWhatsapp && (
-          <div className="px-3 pb-2">
+          <div className="shrink-0 px-3 pb-2">
             <a
               href={WHATSAPP_URL}
               target="_blank"
@@ -592,7 +592,7 @@ export default function Chatbot() {
         )}
 
         {/* Input */}
-        <div className="border-t border-inkline-violet/60 p-3">
+        <div className="shrink-0 border-t border-inkline-violet/60 p-3">
           <form
             onSubmit={(e) => {
               e.preventDefault();

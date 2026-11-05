@@ -9,9 +9,14 @@ import { useAuthStore } from '@/store/auth';
 import Button from '@/components/ui/Button';
 import Input from '@/components/ui/Input';
 import Select from '@/components/ui/Select';
-import { AlertTriangle, Eye, EyeOff, MailCheck } from 'lucide-react';
+import { AlertTriangle, Eye, EyeOff, MailCheck, User, Briefcase } from 'lucide-react';
 import SUSModal from '@/components/ui/SUSModal';
 import api, { extractData, mensajeError } from '@/lib/api';
+import {
+  guardarDestinoPostLogin,
+  limpiarDestinoPostLogin,
+  obtenerDestinoPostLogin,
+} from '@/lib/postLoginRedirect';
 
 const registerSchema = z.object({
   email: z.string().email('Email inválido'),
@@ -25,6 +30,9 @@ const registerSchema = z.object({
 });
 
 type RegisterForm = z.infer<typeof registerSchema>;
+
+const esDestinoProveedor = (destino: string | null) =>
+  !!destino && destino.includes('/proveedores/convertir');
 
 interface RespuestasSUS {
   q1: number;
@@ -50,6 +58,8 @@ export default function RegisterPage() {
   const [resendingEmail, setResendingEmail] = useState(false);
   const [resendMessage, setResendMessage] = useState('');
   const [resendError, setResendError] = useState('');
+  const [next, setNext] = useState<string | null>(null);
+  const [tipoRegistro, setTipoRegistro] = useState<'cliente' | 'proveedor'>('cliente');
   const errorRef = useRef<HTMLDivElement>(null);
 
   const { register, handleSubmit, reset, formState: { errors, isSubmitting } } = useForm<RegisterForm>({
@@ -60,6 +70,33 @@ export default function RegisterPage() {
   useEffect(() => {
     reset({ tipo_persona: 'fisica' });
   }, [reset]);
+
+  useEffect(() => {
+    const destino = obtenerDestinoPostLogin(
+      new URLSearchParams(window.location.search).get('next'),
+    );
+    if (destino) {
+      setNext(destino);
+      if (esDestinoProveedor(destino)) {
+        setTipoRegistro('proveedor');
+      }
+    }
+  }, []);
+
+  const cambiarTipoRegistro = (tipo: 'cliente' | 'proveedor') => {
+    setTipoRegistro(tipo);
+    clearError();
+    if (tipo === 'proveedor') {
+      const destino = '/proveedores/convertir?paso=2';
+      guardarDestinoPostLogin(destino);
+      setNext(destino);
+    } else {
+      if (esDestinoProveedor(next)) {
+        limpiarDestinoPostLogin();
+        setNext(null);
+      }
+    }
+  };
 
   useEffect(() => {
     if (error && errorRef.current) {
@@ -74,6 +111,14 @@ export default function RegisterPage() {
   const onSubmit = async (data: RegisterForm) => {
     try {
       clearError();
+      if (tipoRegistro === 'proveedor') {
+        const destino = '/proveedores/convertir?paso=2';
+        guardarDestinoPostLogin(destino);
+        setNext(destino);
+      } else if (esDestinoProveedor(next)) {
+        limpiarDestinoPostLogin();
+        setNext(null);
+      }
       const result = await registerUser(data);
       setVerificationEmail(data.email);
       setVerificationSent(result.email_verificacion_enviada);
@@ -112,7 +157,7 @@ export default function RegisterPage() {
       await api.post('/metricas/sus/registro', {
         ...responses,
         sus_score: score,
-        flujo: 'registro_cliente',
+        flujo: tipoRegistro === 'proveedor' ? 'registro_proveedor' : 'registro_cliente',
         id_usuario: registeredUserId,
       });
     } catch (e) {
@@ -128,7 +173,11 @@ export default function RegisterPage() {
           <div className="bg-slate-800/50 border border-slate-700 rounded-2xl p-8">
             <div className="text-center mb-8">
               <h1 className="text-2xl font-bold text-white">Crear Cuenta</h1>
-              <p className="text-slate-400 mt-2">Registrate en Contrato Directo</p>
+              <p className="text-slate-400 mt-2">
+                {tipoRegistro === 'proveedor'
+                  ? 'Creá tu cuenta para sumarte como proveedor'
+                  : 'Registrate en Contrato Directo'}
+              </p>
             </div>
 
             {error && (
@@ -180,15 +229,71 @@ export default function RegisterPage() {
                 {resendError && (
                   <p className="mt-3 text-sm text-red-300">{resendError}</p>
                 )}
-                <p className="text-center text-slate-400 text-sm mt-6">
+                {tipoRegistro === 'proveedor' && (
+                  <p className="mt-4 rounded-lg border border-cyan-500/20 bg-cyan-500/10 px-3 py-2 text-sm text-cyan-200">
+                    Después de confirmar tu email, iniciá sesión para completar el Paso 2
+                    de tu solicitud de proveedor.
+                  </p>
+                )}
+                <Link
+                  href={next ? `/auth/login?next=${encodeURIComponent(next)}` : '/auth/login'}
+                  className="mt-4 block"
+                >
+                  <Button type="button" variant="outline" className="w-full">
+                    Ya confirmé mi email: iniciar sesión
+                  </Button>
+                </Link>
+                <p className="text-center text-slate-400 text-sm mt-4">
                   ¿Ya confirmaste tu email?{' '}
-                  <Link href="/auth/login" className="text-cyan-400 hover:text-cyan-300 font-medium">
+                  <Link
+                    href={next ? `/auth/login?next=${encodeURIComponent(next)}` : '/auth/login'}
+                    className="text-cyan-400 hover:text-cyan-300 font-medium"
+                  >
                     Iniciá sesión
                   </Link>
                 </p>
               </div>
             ) : (
               <form onSubmit={handleSubmit(onSubmit)} className="space-y-4" autoComplete="off">
+              <div className="mb-5">
+                <p className="mb-2 text-sm text-slate-300">Quiero registrarme</p>
+                <div className="grid grid-cols-2 gap-3">
+                  <button
+                    type="button"
+                    aria-pressed={tipoRegistro === 'cliente'}
+                    onClick={() => cambiarTipoRegistro('cliente')}
+                    className={`flex flex-col items-center gap-2 rounded-xl border px-3 py-4 text-sm transition-colors ${
+                      tipoRegistro === 'cliente'
+                        ? 'border-cyan-400 bg-cyan-500/10 text-white'
+                        : 'border-slate-700 bg-slate-900/40 text-slate-300 hover:border-slate-500'
+                    }`}
+                  >
+                    <User className="h-5 w-5" />
+                    Como Cliente
+                  </button>
+                  <button
+                    type="button"
+                    aria-pressed={tipoRegistro === 'proveedor'}
+                    onClick={() => cambiarTipoRegistro('proveedor')}
+                    className={`flex flex-col items-center gap-2 rounded-xl border px-3 py-4 text-sm transition-colors ${
+                      tipoRegistro === 'proveedor'
+                        ? 'border-cyan-400 bg-cyan-500/10 text-white'
+                        : 'border-slate-700 bg-slate-900/40 text-slate-300 hover:border-slate-500'
+                    }`}
+                  >
+                    <Briefcase className="h-5 w-5" />
+                    Como Proveedor
+                  </button>
+                </div>
+                {tipoRegistro === 'proveedor' && (
+                  <p className="mt-3 rounded-lg border border-cyan-500/20 bg-cyan-500/10 px-3 py-2 text-xs text-cyan-200">
+                    Creá tu cuenta y, después de confirmar tu email e iniciar sesión,
+                    continuás en el Paso 2 para completar tu solicitud. Mientras se
+                    revisa, tu cuenta funciona como cliente.
+                  </p>
+                )}
+              </div>
+
               <Input
                 label="Nombre"
                 placeholder="Tu nombre"
@@ -286,7 +391,10 @@ export default function RegisterPage() {
             {!verificationEmail && (
               <p className="text-center text-slate-400 text-sm mt-6">
                 ¿Ya tenés cuenta?{' '}
-                <Link href="/auth/login" className="text-cyan-400 hover:text-cyan-300 font-medium">
+                <Link
+                  href={next ? `/auth/login?next=${encodeURIComponent(next)}` : '/auth/login'}
+                  className="text-cyan-400 hover:text-cyan-300 font-medium"
+                >
                   Iniciá Sesión
                 </Link>
               </p>
@@ -301,7 +409,7 @@ export default function RegisterPage() {
           setShowSUS(false);
         }}
         onSubmit={handleSUSSubmit}
-        context="cliente"
+        context={tipoRegistro}
       />
     </>
   );

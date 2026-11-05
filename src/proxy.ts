@@ -12,7 +12,12 @@ export function proxy(request: NextRequest) {
     // La refresh_token sola no alcanza: si no, a los 15 min (cuando expira
     // el access) o tras un logout incompleto, el login queda inalcanzable.
     if (token) {
-      return NextResponse.redirect(new URL('/dashboard', request.url));
+      const next = request.nextUrl.searchParams.get('next');
+      const destino =
+        next && next.startsWith('/') && !next.startsWith('//')
+          ? next
+          : '/dashboard';
+      return NextResponse.redirect(new URL(destino, request.url));
     }
   }
 

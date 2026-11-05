@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import api, { extractData } from '@/lib/api';
 import { setTokenCookies, clearTokenCookies } from '@/lib/cookies';
+import { limpiarDestinoPostLogin } from '@/lib/postLoginRedirect';
 import type {
   Usuario,
   LoginDto,
@@ -20,15 +21,19 @@ function mensajeDeError(err: unknown, fallback: string, separador = ', '): strin
   return fallback;
 }
 
+export type ProveedorEstado = 'none' | 'pendiente' | 'aprobado';
+
 interface AuthState {
   user: Partial<Usuario> | null;
   isAuthenticated: boolean;
   isLoading: boolean;
   error: string | null;
+  proveedorEstado: ProveedorEstado;
   login: (dto: LoginDto) => Promise<void>;
   register: (dto: RegisterDto) => Promise<RegisterResponse>;
   logout: () => void;
   loadUser: () => Promise<void>;
+  loadProveedorEstado: () => Promise<void>;
   clearError: () => void;
   cambiarContexto: (rol: 'cliente' | 'proveedor') => Promise<string>;
 }
@@ -38,6 +43,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
   isAuthenticated: false,
   isLoading: true,
   error: null,
+  proveedorEstado: 'none',
 
   login: async (dto: LoginDto) => {
     try {
@@ -47,7 +53,9 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       localStorage.setItem('access_token', data.access_token);
       localStorage.setItem('refresh_token', data.refresh_token);
       setTokenCookies(data.access_token, data.refresh_token);
-      set({ user: data.usuario, isAuthenticated: true, isLoading: false });
+      set({ user: data.usuario, isAuthenticated: true });
+      await get().loadProveedorEstado();
+      set({ isLoading: false });
     } catch (err) {
       const message = mensajeDeError(err, 'Error al iniciar sesión');
       set({ error: message, isLoading: false });
@@ -72,8 +80,10 @@ export const useAuthStore = create<AuthState>((set, get) => ({
   logout: () => {
     localStorage.removeItem('access_token');
     localStorage.removeItem('refresh_token');
+    localStorage.removeItem('contexto_activo');
+    limpiarDestinoPostLogin();
     clearTokenCookies();
-    set({ user: null, isAuthenticated: false, isLoading: false });
+    set({ user: null, isAuthenticated: false, isLoading: false, proveedorEstado: 'none' });
   },
 
   loadUser: async () => {
@@ -81,7 +91,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     const refreshToken = localStorage.getItem('refresh_token');
 
     if (!token && !refreshToken) {
-      set({ isLoading: false });
+      set({ isLoading: false, proveedorEstado: 'none' });
       return;
     }
 
@@ -93,14 +103,16 @@ export const useAuthStore = create<AuthState>((set, get) => ({
           localStorage.setItem('access_token', raw.access_token);
           localStorage.setItem('refresh_token', raw.refresh_token);
           setTokenCookies(raw.access_token, raw.refresh_token);
-          set({ user: raw.usuario, isAuthenticated: true, isLoading: false });
+          set({ user: raw.usuario, isAuthenticated: true });
+          await get().loadProveedorEstado();
+          set({ isLoading: false });
           return;
         }
       } catch {
         localStorage.removeItem('access_token');
         localStorage.removeItem('refresh_token');
         clearTokenCookies();
-        set({ isLoading: false });
+        set({ isLoading: false, proveedorEstado: 'none' });
         return;
       }
     }
@@ -110,7 +122,9 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       const data = extractData<{ usuario?: Partial<Usuario> } & Partial<Usuario>>(res);
       // /auth/me retorna { usuario }; el interceptor ya desenvuelve el envelope data/timestamp
       const usuario = data?.usuario ?? data;
-      set({ user: usuario, isAuthenticated: true, isLoading: false });
+      set({ user: usuario, isAuthenticated: true });
+      await get().loadProveedorEstado();
+      set({ isLoading: false });
     } catch (err) {
       // Interceptor already handled refresh attempt. Si la sesión no es
       // recuperable, hacer logout completo (también limpia las cookies) para
@@ -127,7 +141,35 @@ export const useAuthStore = create<AuthState>((set, get) => ({
 
   clearError: () => set({ error: null }),
 
+  loadProveedorEstado: async () => {
+    const rolesActivos = (get().user?.usuario_roles || [])
+      .filter((ur) => ur.activo)
+      .map((ur) => ur.rol?.nombre)
+      .filter(Boolean);
+
+    if (!rolesActivos.includes('proveedor')) {
+      set({ proveedorEstado: 'none' });
+      return;
+    }
+
+    try {
+      const res = await api.get('/perfiles/proveedor/verificacion');
+      const data = extractData<{ sello_verificado?: boolean }>(res);
+      set({ proveedorEstado: data?.sello_verificado ? 'aprobado' : 'pendiente' });
+    } catch {
+      // Ante un error no se habilita el modo proveedor: la cuenta sigue
+      // operando como cliente hasta poder confirmar la aprobación.
+      set({ proveedorEstado: 'none' });
+    }
+  },
+
   cambiarContexto: async (rol: 'cliente' | 'proveedor') => {
+    if (rol === 'proveedor' && get().proveedorEstado !== 'aprobado') {
+      const message = 'Tu solicitud de proveedor todavía está en revisión.';
+      set({ error: message });
+      throw new Error(message);
+    }
+
     try {
       const res = await api.post('/auth/contexto', { rol });
       const data = extractData<{ access_token: string; refresh_token: string; contexto: string; usuario: Partial<Usuario> }>(res);
@@ -138,6 +180,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       }
       localStorage.setItem('contexto_activo', data.contexto || rol);
       if (data.usuario) set({ user: data.usuario });
+      await get().loadProveedorEstado();
       return data.contexto || rol;
     } catch (err) {
       const message = mensajeDeError(err, 'No se pudo cambiar de rol', ' — ');

@@ -1,11 +1,18 @@
 'use client';
 
+import { useEffect, useState } from 'react';
 import { useAuthStore } from '@/store/auth';
 import Sidebar from '@/components/layout/Sidebar';
 
 export default function PublicLayout({ children }: { children: React.ReactNode }) {
   const user = useAuthStore((s) => s.user);
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
+  const proveedorEstado = useAuthStore((s) => s.proveedorEstado);
+  const [contexto, setContexto] = useState<string | null>(null);
+
+  useEffect(() => {
+    setContexto(localStorage.getItem('contexto_activo'));
+  }, []);
 
   const roles = isAuthenticated
     ? (user?.usuario_roles || [])
@@ -14,11 +21,17 @@ export default function PublicLayout({ children }: { children: React.ReactNode }
         .filter(Boolean)
     : [];
 
+  const esProveedorAprobado =
+    roles.includes('proveedor') && proveedorEstado === 'aprobado';
+  const tieneCliente = roles.includes('cliente');
+
   const role = roles.includes('super_admin') || roles.includes('sistemas')
     ? 'admin'
-    : roles.includes('proveedor')
+    : contexto === 'proveedor' && esProveedorAprobado
       ? 'proveedor'
-      : 'cliente';
+      : !tieneCliente && esProveedorAprobado
+        ? 'proveedor'
+        : 'cliente';
 
   return (
     <div className="min-h-screen flex flex-col">
