@@ -21,7 +21,14 @@ export function useConfigPublica(): ConfigPublica {
   useEffect(() => {
     let vivo = true;
     void obtenerConfigPublica().then((c) => {
-      if (vivo) setConfig(c);
+      if (vivo) {
+        setConfig((actual) =>
+          actual.comision_porcentaje === c.comision_porcentaje &&
+          actual.monto_maximo_servicio_rapido === c.monto_maximo_servicio_rapido
+            ? actual
+            : c,
+        );
+      }
     });
     return () => {
       vivo = false;

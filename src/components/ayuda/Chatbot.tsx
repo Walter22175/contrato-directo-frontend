@@ -506,7 +506,7 @@ export default function Chatbot() {
   // ============================================================
   return (
     <div className="fixed bottom-4 left-4 right-4 z-[60] sm:bottom-6 sm:left-auto sm:right-6 sm:w-80">
-      <Card className="flex h-[min(clamp(27rem,38vw,32rem),calc(100dvh-var(--header-height)-1.5rem))] flex-col overflow-hidden p-0 shadow-2xl">
+      <Card className="flex h-[min(clamp(27rem,38vw,32rem),calc(100dvh-var(--header-height)-1.5rem))] flex-col overflow-hidden border-[#05a1c9]/50 bg-[#071b2a] p-0 shadow-2xl shadow-[#05a1c9]/15">
         {/* Header */}
         <div className="galileo-gradient flex shrink-0 items-center justify-between p-3">
           <div className="flex items-center gap-2">
@@ -540,7 +540,7 @@ export default function Chatbot() {
                   'max-w-[75%] px-3 py-2 rounded-xl text-sm leading-relaxed',
                   m.remitente === 'usuario'
                     ? 'bg-pulse-cobalt text-white rounded-tr-none'
-                    : 'bg-white/5 text-quartz-lavender rounded-tl-none border border-inkline-violet/60'
+                    : 'rounded-tl-none border border-[#05a1c9]/30 bg-[#0b293b] text-quartz-lavender'
                 )}
               >
                 {renderContenido(m.contenido)}
@@ -554,7 +554,7 @@ export default function Chatbot() {
           {escribiendo && (
             <div className="flex gap-2 justify-start">
               <Bot className="w-5 h-5 text-cyan-400 flex-shrink-0 mt-1" />
-              <div className="rounded-xl rounded-tl-none border border-inkline-violet/60 bg-white/5 px-3 py-2 text-sm text-mist-lilac">
+              <div className="rounded-xl rounded-tl-none border border-[#05a1c9]/30 bg-[#0b293b] px-3 py-2 text-sm text-mist-lilac">
                 CoDi está escribiendo…
               </div>
             </div>
@@ -568,7 +568,7 @@ export default function Chatbot() {
               <button
                 key={s}
                 onClick={() => enviarMensaje(s)}
-                className="rounded-full border border-inkline-violet bg-white/5 px-3 py-1 text-xs font-light text-quartz-lavender transition-colors hover:border-pulse-cobalt/60 hover:text-white"
+                className="rounded-full border border-[#05a1c9]/35 bg-[#0b293b] px-3 py-1 text-xs font-light text-quartz-lavender transition-colors hover:border-[#05e0e0]/70 hover:text-white"
               >
                 {s}
               </button>
@@ -592,7 +592,7 @@ export default function Chatbot() {
         )}
 
         {/* Input */}
-        <div className="shrink-0 border-t border-inkline-violet/60 p-3">
+        <div className="shrink-0 border-t border-[#05a1c9]/35 p-3">
           <form
             onSubmit={(e) => {
               e.preventDefault();
@@ -604,7 +604,7 @@ export default function Chatbot() {
               value={input}
               onChange={(e) => setInput(e.target.value)}
               placeholder="Escribí tu pregunta..."
-              className="flex-1 rounded-full border border-inkline-violet bg-deep-indigo px-4 py-2 text-sm font-light text-white placeholder:text-mist-lilac focus:border-pulse-cobalt focus:outline-none focus:ring-2 focus:ring-pulse-cobalt/40"
+              className="flex-1 rounded-full border border-[#05a1c9]/40 bg-[#030f1b] px-4 py-2 text-sm font-light text-white placeholder:text-mist-lilac focus:border-[#05e0e0] focus:outline-none focus:ring-2 focus:ring-[#05e0e0]/30"
             />
             <button
               type="submit"

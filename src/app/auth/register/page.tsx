@@ -262,26 +262,26 @@ export default function RegisterPage() {
                     type="button"
                     aria-pressed={tipoRegistro === 'cliente'}
                     onClick={() => cambiarTipoRegistro('cliente')}
-                    className={`flex flex-col items-center gap-2 rounded-xl border px-3 py-4 text-sm transition-colors ${
+                    className={`group flex flex-col items-center gap-2 rounded-xl border px-3 py-4 text-sm transition-[background-color,border-color,box-shadow,color,transform] duration-200 hover:-translate-y-0.5 active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#05e0e0] focus-visible:ring-offset-2 focus-visible:ring-offset-[#03081a] motion-reduce:transition-none ${
                       tipoRegistro === 'cliente'
-                        ? 'border-cyan-400 bg-cyan-500/10 text-white'
-                        : 'border-slate-700 bg-slate-900/40 text-slate-300 hover:border-slate-500'
+                        ? 'border-[#05e0e0] bg-[#05e0e0] text-[#03081a] shadow-[0_0_22px_rgba(5,224,224,0.28)]'
+                        : 'border-[#05a1c9]/60 bg-[#071b2a] text-slate-200 hover:border-[#05e0e0] hover:bg-[#05e0e0]/10 hover:text-white'
                     }`}
                   >
-                    <User className="h-5 w-5" />
+                    <User className="h-5 w-5 transition-transform duration-200 group-hover:scale-110 group-hover:-rotate-6 motion-reduce:transition-none" />
                     Como Cliente
                   </button>
                   <button
                     type="button"
                     aria-pressed={tipoRegistro === 'proveedor'}
                     onClick={() => cambiarTipoRegistro('proveedor')}
-                    className={`flex flex-col items-center gap-2 rounded-xl border px-3 py-4 text-sm transition-colors ${
+                    className={`group flex flex-col items-center gap-2 rounded-xl border px-3 py-4 text-sm transition-[background-color,border-color,box-shadow,color,transform] duration-200 hover:-translate-y-0.5 active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#05e0e0] focus-visible:ring-offset-2 focus-visible:ring-offset-[#03081a] motion-reduce:transition-none ${
                       tipoRegistro === 'proveedor'
-                        ? 'border-cyan-400 bg-cyan-500/10 text-white'
-                        : 'border-slate-700 bg-slate-900/40 text-slate-300 hover:border-slate-500'
+                        ? 'border-[#05e0e0] bg-[#05e0e0] text-[#03081a] shadow-[0_0_22px_rgba(5,224,224,0.28)]'
+                        : 'border-[#05a1c9]/60 bg-[#071b2a] text-slate-200 hover:border-[#05e0e0] hover:bg-[#05e0e0]/10 hover:text-white'
                     }`}
                   >
-                    <Briefcase className="h-5 w-5" />
+                    <Briefcase className="h-5 w-5 transition-transform duration-200 group-hover:scale-110 group-hover:-rotate-6 motion-reduce:transition-none" />
                     Como Proveedor
                   </button>
                 </div>
