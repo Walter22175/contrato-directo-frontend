@@ -33,6 +33,7 @@ import {
   Handshake,
   KeyRound,
   Gauge,
+  BookOpen,
 } from 'lucide-react';
 import { LlaveIcon } from '@/components/ui/LlaveIcon';
 
@@ -81,12 +82,14 @@ const adminLinks = [
   { href: '/dashboard/admin/reportes/trimestral', label: 'Reporte Trimestral', icon: FileBarChart },
   { href: '/dashboard/admin/metricas', label: 'Métricas de Atención', icon: Activity },
   { href: '/dashboard/admin/inicio-servicio', label: 'Anticipo 30%', icon: Handshake },
+  { href: '/dashboard/admin/mercado-pago', label: 'Mercado Pago', icon: Wallet },
   { href: '/dashboard/admin/agentes', label: 'Agentes de Soporte', icon: UserCheck },
   { href: '/dashboard/sla', label: 'Gestión SLA', icon: Clock },
   { href: '/dashboard/reclamos', label: 'Reclamos', icon: AlertTriangle },
   { href: '/dashboard/mediacion', label: 'Mediación', icon: Scale },
   { href: '/dashboard/sanciones', label: 'Sanciones', icon: Shield },
   { href: '/dashboard/notificaciones', label: 'Notificaciones', icon: Bell },
+  { href: '/ayuda/interno/manual-soporte', label: 'Manual de Soporte', icon: BookOpen },
   { href: '/ayuda', label: 'Centro de Ayuda', icon: HelpCircle },
   { href: '/dashboard/configuracion', label: 'Configuración', icon: Settings },
 ];

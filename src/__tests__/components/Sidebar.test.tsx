@@ -20,4 +20,16 @@ describe('Sidebar', () => {
     expect(screen.getByText('Configuración')).toBeInTheDocument();
     expect(screen.getByText('Centro de Ayuda')).toBeInTheDocument();
   });
+
+  it('renders the admin Mercado Pago and internal manual links', () => {
+    render(<Sidebar role="admin" />);
+    expect(screen.getByRole('link', { name: /mercado pago/i })).toHaveAttribute(
+      'href',
+      '/dashboard/admin/mercado-pago',
+    );
+    expect(screen.getByRole('link', { name: /manual de soporte/i })).toHaveAttribute(
+      'href',
+      '/ayuda/interno/manual-soporte',
+    );
+  });
 });
