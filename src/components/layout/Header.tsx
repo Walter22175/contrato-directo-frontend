@@ -87,7 +87,10 @@ export default function Header({ onToggleSidebar }: { onToggleSidebar?: () => vo
 
   useNotificationsSocket((event) => {
     useNotificationStore.getState().addNotificacion({
-      id_notificacion: crypto.randomUUID(),
+      id_notificacion:
+        event.id_notificacion != null
+          ? String(event.id_notificacion)
+          : crypto.randomUUID(),
       id_usuario: event.id_usuario,
       tipo: event.tipo,
       evento: event.evento,

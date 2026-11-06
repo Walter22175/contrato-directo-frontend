@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
+import type { FormEvent } from 'react';
 import { useParams } from 'next/navigation';
 import Link from 'next/link';
 import api, { extractData } from '@/lib/api';
@@ -16,8 +17,20 @@ import {
   ShieldCheck,
   CheckCircle2,
   ArrowLeft,
+  MessageSquare,
+  Send,
 } from 'lucide-react';
 import type { Contrato, FirmaDigital } from '@/types';
+
+interface MensajeContrato {
+  id_mensaje: number;
+  id_canal: number;
+  id_emisor: string;
+  emisor?: { nombre?: string; apellido?: string };
+  contenido: string;
+  leido: boolean;
+  fecha_envio: string;
+}
 
 const estadoColors: Record<string, string> = {
   borrador: 'text-slate-400 bg-slate-700/50',
@@ -47,6 +60,12 @@ export default function ContratoDetallePage() {
   const [firmando, setFirmando] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [firmaRegistrada, setFirmaRegistrada] = useState<FirmaDigital | null>(null);
+  const [canalId, setCanalId] = useState<number | null>(null);
+  const [mensajes, setMensajes] = useState<MensajeContrato[]>([]);
+  const [nuevoMensaje, setNuevoMensaje] = useState('');
+  const [cargandoMensajes, setCargandoMensajes] = useState(false);
+  const [enviandoMensaje, setEnviandoMensaje] = useState(false);
+  const [errorMensajes, setErrorMensajes] = useState<string | null>(null);
 
   const cargarContrato = useCallback(async () => {
     if (!contratoId) return;
@@ -63,6 +82,83 @@ export default function ContratoDetallePage() {
   useEffect(() => {
     cargarContrato();
   }, [cargarContrato]);
+
+  const esParte =
+    !!user?.id_usuario &&
+    (contrato?.transaccion?.id_cliente === user.id_usuario ||
+      contrato?.transaccion?.id_proveedor === user.id_usuario);
+
+  useEffect(() => {
+    if (!contrato?.id_transaccion || !esParte) {
+      setCanalId(null);
+      setMensajes([]);
+      return;
+    }
+
+    let activo = true;
+    const cargarMensajes = async () => {
+      setCargandoMensajes(true);
+      setErrorMensajes(null);
+      try {
+        const canalRes = await api.post('/mensajeria/canales', {
+          id_transaccion: contrato.id_transaccion,
+        });
+        const canal = extractData<{ id_canal: number }>(canalRes);
+        if (!activo) return;
+
+        setCanalId(canal.id_canal);
+        const mensajesRes = await api.get(
+          `/mensajeria/canales/${canal.id_canal}/mensajes`,
+        );
+        if (!activo) return;
+
+        setMensajes(extractData<MensajeContrato[]>(mensajesRes) ?? []);
+      } catch (e) {
+        if (activo) {
+          setErrorMensajes(
+            mensajeDeError(e, 'No se pudieron cargar los mensajes del contrato.'),
+          );
+        }
+      } finally {
+        if (activo) setCargandoMensajes(false);
+      }
+    };
+
+    void cargarMensajes();
+    return () => {
+      activo = false;
+    };
+  }, [contrato?.id_transaccion, esParte]);
+
+  const enviarMensaje = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    const contenido = nuevoMensaje.trim();
+    if (!canalId || !contenido || enviandoMensaje) return;
+
+    setEnviandoMensaje(true);
+    setErrorMensajes(null);
+    try {
+      const res = await api.post(`/mensajeria/canales/${canalId}/mensajes`, {
+        contenido,
+      });
+      const creado = extractData<MensajeContrato>(res);
+      setMensajes((prev) => [
+        ...prev,
+        {
+          ...creado,
+          emisor: creado.emisor ?? {
+            nombre: user?.nombre,
+            apellido: user?.apellido,
+          },
+        },
+      ]);
+      setNuevoMensaje('');
+    } catch (e) {
+      setErrorMensajes(mensajeDeError(e, 'No se pudo enviar el mensaje.'));
+    } finally {
+      setEnviandoMensaje(false);
+    }
+  };
 
   const firmar = async () => {
     if (!contratoId) return;
@@ -237,6 +333,86 @@ export default function ContratoDetallePage() {
           </div>
         </div>
       </Card>
+
+      {esParte && (
+        <Card>
+          <div className="p-5 space-y-4">
+            <div className="flex items-center gap-2">
+              <MessageSquare className="w-4 h-4 text-cyan-400" />
+              <h2 className="text-sm font-semibold text-slate-300">
+                Mensajes del contrato
+              </h2>
+            </div>
+
+            {errorMensajes && (
+              <div className="px-4 py-3 bg-red-500/10 border border-red-500/30 rounded-lg text-sm text-red-400">
+                {errorMensajes}
+              </div>
+            )}
+
+            {cargandoMensajes ? (
+              <p className="text-sm text-slate-400">Cargando mensajes...</p>
+            ) : (
+              <>
+                <div className="space-y-2 max-h-80 overflow-y-auto pr-1">
+                  {mensajes.length === 0 && (
+                    <p className="text-sm text-slate-400">
+                      Todavía no hay mensajes en este contrato.
+                    </p>
+                  )}
+                  {mensajes.map((mensaje) => {
+                    const propio = mensaje.id_emisor === user?.id_usuario;
+                    const nombreEmisor = [
+                      mensaje.emisor?.nombre,
+                      mensaje.emisor?.apellido,
+                    ]
+                      .filter(Boolean)
+                      .join(' ');
+
+                    return (
+                      <div
+                        key={mensaje.id_mensaje}
+                        className={`rounded-lg px-3 py-2 text-sm ${
+                          propio
+                            ? 'bg-cyan-500/10 border border-cyan-500/20 ml-6'
+                            : 'bg-slate-800/60 border border-slate-700/50 mr-6'
+                        }`}
+                      >
+                        <p className="text-xs text-slate-400 mb-1">
+                          {propio ? 'Vos' : nombreEmisor || 'La otra parte'} ·{' '}
+                          {formatDate(mensaje.fecha_envio)}
+                        </p>
+                        <p className="text-slate-200 whitespace-pre-wrap break-words">
+                          {mensaje.contenido}
+                        </p>
+                      </div>
+                    );
+                  })}
+                </div>
+
+                <form onSubmit={enviarMensaje} className="flex gap-2">
+                  <input
+                    value={nuevoMensaje}
+                    onChange={(e) => setNuevoMensaje(e.target.value)}
+                    maxLength={1000}
+                    placeholder="Escribí un mensaje..."
+                    className="flex-1 bg-slate-800/60 border border-slate-700/50 rounded-lg px-3 py-2 text-sm text-slate-200 placeholder:text-slate-500 focus:outline-none focus:border-cyan-500/50"
+                  />
+                  <Button
+                    type="submit"
+                    size="sm"
+                    isLoading={enviandoMensaje}
+                    disabled={!canalId || !nuevoMensaje.trim()}
+                  >
+                    <Send className="w-4 h-4" />
+                    Enviar
+                  </Button>
+                </form>
+              </>
+            )}
+          </div>
+        </Card>
+      )}
 
       <ConfirmDialog
         open={dialogoAbierto}
