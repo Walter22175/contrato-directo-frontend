@@ -21,12 +21,17 @@ const ETIQUETAS_EVENTO: Record<
   bounce: { label: 'Rebote', tono: 'red' },
   complaint: { label: 'Queja', tono: 'red' },
   reject: { label: 'Rechazado', tono: 'orange' },
-  open: { label: 'Apertura', tono: 'slate' },
-  click: { label: 'Click', tono: 'slate' },
+  open: { label: 'Apertura', tono: 'cyan' },
+  click: { label: 'Click', tono: 'emerald' },
 };
 
 function colorTasa(valor: number, limite: number): string {
   return valor > limite ? 'text-red-400' : 'text-emerald-300';
+}
+
+function fmtPct(valor: number | null | undefined): string {
+  if (valor === null || valor === undefined || Number.isNaN(valor)) return '—';
+  return `${valor.toLocaleString('es-AR', { maximumFractionDigits: 2 })}%`;
 }
 
 export function PanelEmailSeccion({
@@ -108,6 +113,36 @@ export function PanelEmailSeccion({
 
       <Card>
         <div className="flex flex-wrap items-center gap-2 mb-3">
+          <h3 className="font-medium text-white text-sm">Engagement</h3>
+          <Chip tono="cyan">Open / Click tracking</Chip>
+        </div>
+
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3">
+          {(
+            [
+              ['Aperturas', fmtNum(datos.aperturas), 'text-cyan-300'],
+              ['Clicks', fmtNum(datos.clicks), 'text-emerald-300'],
+              ['Open Rate', fmtPct(datos.tasa_apertura), 'text-cyan-300'],
+              ['Click Rate', fmtPct(datos.tasa_click), 'text-emerald-300'],
+              ['CTR', fmtPct(datos.ctr), 'text-slate-100'],
+            ] as const
+          ).map(([label, valor, color]) => (
+            <div key={label} className="bg-slate-900/40 rounded-lg p-3">
+              <p className="text-[10px] text-slate-500 mb-1">{label}</p>
+              <p className={`text-xl font-bold ${color}`}>{valor}</p>
+            </div>
+          ))}
+        </div>
+
+        <p className="text-[11px] text-slate-500 mt-4">
+          Open Rate = aperturas / entregados; Click Rate = clicks / entregados;
+          CTR = clicks / aperturas. Son eventos, no destinatarios únicos: un
+          mismo correo puede registrar varias aperturas o clicks.
+        </p>
+      </Card>
+
+      <Card>
+        <div className="flex flex-wrap items-center gap-2 mb-3">
           <h3 className="font-medium text-white text-sm">Métricas por plantilla / evento</h3>
           <Chip tono="slate">{plantillas?.templates.length ?? 0}</Chip>
         </div>
@@ -127,6 +162,10 @@ export function PanelEmailSeccion({
                   <th className="text-right py-2 pr-3">Rebotes</th>
                   <th className="text-right py-2 pr-3">Quejas</th>
                   <th className="text-right py-2 pr-3">Rechazados</th>
+                  <th className="text-right py-2 pr-3">Aperturas</th>
+                  <th className="text-right py-2 pr-3">Clicks</th>
+                  <th className="text-right py-2 pr-3">Open Rate</th>
+                  <th className="text-right py-2 pr-3">CTR</th>
                   <th className="text-right py-2 pr-3">Entrega</th>
                   <th className="text-right py-2">Rebote</th>
                 </tr>
@@ -154,6 +193,18 @@ export function PanelEmailSeccion({
                     </td>
                     <td className="py-2 pr-3 text-right text-orange-300">
                       {fmtNum(fila.rechazados)}
+                    </td>
+                    <td className="py-2 pr-3 text-right text-cyan-300">
+                      {fmtNum(fila.aperturas)}
+                    </td>
+                    <td className="py-2 pr-3 text-right text-emerald-300">
+                      {fmtNum(fila.clicks)}
+                    </td>
+                    <td className="py-2 pr-3 text-right text-cyan-300">
+                      {fmtPct(fila.tasa_apertura)}
+                    </td>
+                    <td className="py-2 pr-3 text-right text-slate-200">
+                      {fmtPct(fila.ctr)}
                     </td>
                     <td className="py-2 pr-3 text-right text-cyan-300">
                       {fila.tasa_entrega.toLocaleString('es-AR', {

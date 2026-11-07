@@ -154,6 +154,9 @@ describe('ControlTotalPage', () => {
       tasa_entrega: 0,
       tasa_rebote: 0,
       tasa_queja: 0,
+      tasa_apertura: 0,
+      tasa_click: 0,
+      ctr: 0,
       semaforo: 'gris',
     });
     (obtenerEventosEmail as jest.Mock).mockResolvedValue({
@@ -260,17 +263,20 @@ describe('ControlTotalPage', () => {
       generado_en: '2026-11-02T12:00:00Z',
       desde: null,
       hasta: null,
-      total_eventos: 200,
+      total_eventos: 248,
       enviados: 100,
       entregados: 98,
       rebotes: 1,
       quejas: 0,
       rechazados: 1,
-      aperturas: 0,
-      clicks: 0,
+      aperturas: 40,
+      clicks: 8,
       tasa_entrega: 98,
       tasa_rebote: 1,
       tasa_queja: 0,
+      tasa_apertura: 40.82,
+      tasa_click: 8.16,
+      ctr: 20,
       semaforo: 'amarillo',
     });
     (obtenerEventosEmail as jest.Mock).mockResolvedValue({
@@ -302,8 +308,13 @@ describe('ControlTotalPage', () => {
           rebotes: 1,
           quejas: 0,
           rechazados: 0,
+          aperturas: 5,
+          clicks: 2,
           tasa_entrega: 90,
           tasa_rebote: 10,
+          tasa_apertura: 55.56,
+          tasa_click: 22.22,
+          ctr: 40,
         },
       ],
     });
@@ -320,6 +331,10 @@ describe('ControlTotalPage', () => {
     expect(obtenerMetricasPlantillasEmail).toHaveBeenCalled();
     expect(await screen.findByText('Entregabilidad SES')).toBeInTheDocument();
     expect((await screen.findAllByText('Enviados')).length).toBeGreaterThan(0);
+    expect(await screen.findByText('Engagement')).toBeInTheDocument();
+    expect((await screen.findAllByText('Open Rate')).length).toBeGreaterThan(0);
+    expect(await screen.findByText(/40[.,]82%/)).toBeInTheDocument();
+    expect(await screen.findByText(/55[.,]56%/)).toBeInTheDocument();
     expect(await screen.findByText('user@test.com')).toBeInTheDocument();
     expect((await screen.findAllByText('contract-created')).length).toBeGreaterThan(0);
   });

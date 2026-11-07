@@ -263,6 +263,9 @@ export interface ResumenEmail {
   tasa_entrega: number;
   tasa_rebote: number;
   tasa_queja: number;
+  tasa_apertura: number;
+  tasa_click: number;
+  ctr: number;
   semaforo: Semaforo;
 }
 
@@ -291,8 +294,13 @@ export interface MetricaPlantillaEmail {
   rebotes: number;
   quejas: number;
   rechazados: number;
+  aperturas: number;
+  clicks: number;
   tasa_entrega: number;
   tasa_rebote: number;
+  tasa_apertura: number;
+  tasa_click: number;
+  ctr: number;
 }
 
 export interface MetricasPlantillasEmail {
