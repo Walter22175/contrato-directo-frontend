@@ -13,6 +13,9 @@ import {
   obtenerPanelRetencion,
   obtenerInconsistencias,
   obtenerAuditoriaContable,
+  obtenerResumenEmail,
+  obtenerEventosEmail,
+  obtenerMetricasPlantillasEmail,
 } from '@/lib/control-total';
 import type { ResumenControlTotal, TimelineGlobal } from '@/lib/control-total';
 
@@ -65,6 +68,9 @@ jest.mock('@/lib/control-total', () => {
     obtenerInconsistencias: jest.fn(),
     obtenerAuditoriaContable: jest.fn(),
     obtenerInspector: jest.fn(),
+    obtenerResumenEmail: jest.fn(),
+    obtenerEventosEmail: jest.fn(),
+    obtenerMetricasPlantillasEmail: jest.fn(),
   };
 });
 
@@ -133,6 +139,34 @@ describe('ControlTotalPage', () => {
       totales: {},
       por_periodo: [],
     });
+    (obtenerResumenEmail as jest.Mock).mockResolvedValue({
+      generado_en: '2026-11-02T12:00:00Z',
+      desde: null,
+      hasta: null,
+      total_eventos: 0,
+      enviados: 0,
+      entregados: 0,
+      rebotes: 0,
+      quejas: 0,
+      rechazados: 0,
+      aperturas: 0,
+      clicks: 0,
+      tasa_entrega: 0,
+      tasa_rebote: 0,
+      tasa_queja: 0,
+      semaforo: 'gris',
+    });
+    (obtenerEventosEmail as jest.Mock).mockResolvedValue({
+      generado_en: '',
+      data: [],
+      meta: { total: 0, limit: 50 },
+    });
+    (obtenerMetricasPlantillasEmail as jest.Mock).mockResolvedValue({
+      generado_en: '',
+      desde: null,
+      hasta: null,
+      templates: [],
+    });
   });
 
   it('redirige a /dashboard si el usuario no es super_admin', async () => {
@@ -150,7 +184,7 @@ describe('ControlTotalPage', () => {
     await waitFor(() => expect(mockPush).toHaveBeenCalledWith('/dashboard'));
   });
 
-  it('renderiza el título, los KPIs, las 10 pestañas y el aviso de tokens', async () => {
+  it('renderiza el título, los KPIs, las 11 pestañas y el aviso de tokens', async () => {
     render(<ControlTotalPage />);
 
     expect(
@@ -163,7 +197,7 @@ describe('ControlTotalPage', () => {
     expect(screen.getByText('Tokens con problema')).toBeInTheDocument();
     expect(screen.getAllByText('5').length).toBeGreaterThan(0);
 
-    // 10 pestañas
+    // 11 pestañas
     for (const label of [
       'Timeline',
       'Espejo MP ↔ BD',
@@ -175,6 +209,7 @@ describe('ControlTotalPage', () => {
       'Inconsistencias',
       'Contabilidad',
       'Inspector',
+      'Email',
     ]) {
       expect(screen.getByRole('button', { name: label })).toBeInTheDocument();
     }
@@ -218,6 +253,75 @@ describe('ControlTotalPage', () => {
 
     expect(obtenerMonitorColas).toHaveBeenCalled();
     expect((await screen.findAllByText('payments-capture')).length).toBeGreaterThan(0);
+  });
+
+  it('cambia a la pestaña Email y muestra los KPIs de entregabilidad', async () => {
+    (obtenerResumenEmail as jest.Mock).mockResolvedValue({
+      generado_en: '2026-11-02T12:00:00Z',
+      desde: null,
+      hasta: null,
+      total_eventos: 200,
+      enviados: 100,
+      entregados: 98,
+      rebotes: 1,
+      quejas: 0,
+      rechazados: 1,
+      aperturas: 0,
+      clicks: 0,
+      tasa_entrega: 98,
+      tasa_rebote: 1,
+      tasa_queja: 0,
+      semaforo: 'amarillo',
+    });
+    (obtenerEventosEmail as jest.Mock).mockResolvedValue({
+      generado_en: '',
+      data: [
+        {
+          id: 'evt-1',
+          message_id: 'ses-1',
+          recipient_email: 'user@test.com',
+          event_type: 'delivery',
+          template: 'contract-created',
+          provider: 'ses',
+          metadata: null,
+          created_at: '2026-11-02T12:00:00Z',
+        },
+      ],
+      meta: { total: 1, limit: 50 },
+    });
+    (obtenerMetricasPlantillasEmail as jest.Mock).mockResolvedValue({
+      generado_en: '',
+      desde: null,
+      hasta: null,
+      templates: [
+        {
+          template: 'contract-created',
+          total_eventos: 10,
+          enviados: 10,
+          entregados: 9,
+          rebotes: 1,
+          quejas: 0,
+          rechazados: 0,
+          tasa_entrega: 90,
+          tasa_rebote: 10,
+        },
+      ],
+    });
+
+    render(<ControlTotalPage />);
+    await screen.findByRole('heading', { name: 'Panel de Control Total' });
+
+    await act(async () => {
+      fireEvent.click(screen.getByRole('button', { name: 'Email' }));
+    });
+
+    expect(obtenerResumenEmail).toHaveBeenCalled();
+    expect(obtenerEventosEmail).toHaveBeenCalledWith({ limit: 50 });
+    expect(obtenerMetricasPlantillasEmail).toHaveBeenCalled();
+    expect(await screen.findByText('Entregabilidad SES')).toBeInTheDocument();
+    expect((await screen.findAllByText('Enviados')).length).toBeGreaterThan(0);
+    expect(await screen.findByText('user@test.com')).toBeInTheDocument();
+    expect((await screen.findAllByText('contract-created')).length).toBeGreaterThan(0);
   });
 
   it('muestra la tarjeta de error cuando falla el resumen', async () => {

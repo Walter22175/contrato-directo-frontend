@@ -16,30 +16,37 @@ import { PanelRetencionSeccion } from '@/components/control-total/PanelRetencion
 import { PanelInconsistenciasSeccion } from '@/components/control-total/PanelInconsistencias';
 import { AuditoriaContableSeccion } from '@/components/control-total/AuditoriaContable';
 import { InspectorTransaccionSeccion } from '@/components/control-total/InspectorTransaccion';
+import { PanelEmailSeccion } from '@/components/control-total/PanelEmail';
 import { useControlTotalPolling } from '@/hooks/useControlTotalPolling';
 import {
   obtenerAuditoriaContable,
   obtenerEspejo,
+  obtenerEventosEmail,
   obtenerInspector,
   obtenerInconsistencias,
+  obtenerMetricasPlantillasEmail,
   obtenerMonitorColas,
   obtenerMonitorCrons,
   obtenerPanelComisiones,
   obtenerPanelRetencion,
   obtenerPanelTokens,
   obtenerResumenControlTotal,
+  obtenerResumenEmail,
   obtenerTimeline,
   fmtNum,
 } from '@/lib/control-total';
 import type {
   AuditoriaContable,
+  EventosEmail,
   Inconsistencia,
+  MetricasPlantillasEmail,
   MonitorColas,
   MonitorCrons,
   PanelComisiones,
   PanelRetencion,
   PanelTokens,
   ResumenControlTotal,
+  ResumenEmail,
   TimelineGlobal,
   VistaEspejo,
   InspectorTransaccion,
@@ -54,6 +61,7 @@ import {
   Layers,
   LineChart,
   ListTree,
+  Mail,
   Receipt,
   RefreshCw,
   ShieldAlert,
@@ -71,7 +79,8 @@ type Tab =
   | 'retencion'
   | 'inconsistencias'
   | 'contabilidad'
-  | 'inspector';
+  | 'inspector'
+  | 'email';
 
 const TABS: Array<{ id: Tab; label: string; icon: typeof Activity }> = [
   { id: 'timeline', label: 'Timeline', icon: ListTree },
@@ -84,6 +93,7 @@ const TABS: Array<{ id: Tab; label: string; icon: typeof Activity }> = [
   { id: 'inconsistencias', label: 'Inconsistencias', icon: ShieldAlert },
   { id: 'contabilidad', label: 'Contabilidad', icon: BarChart3 },
   { id: 'inspector', label: 'Inspector', icon: Activity },
+  { id: 'email', label: 'Email', icon: Mail },
 ];
 
 function Skeleton({ alto = 'h-24' }: { alto?: string }) {
@@ -234,6 +244,37 @@ function TabContabilidad({ activo }: { activo: boolean }) {
       frecuencia={frecuencia}
       onFrecuencia={setFrecuencia}
       onRango={(desde, hasta) => setRango({ desde, hasta })}
+      refrescar={refrescar}
+    />
+  );
+}
+
+function TabEmail({ activo }: { activo: boolean }) {
+  const { datos, cargando, error, refrescar } = useControlTotalPolling<{
+    resumen: ResumenEmail;
+    eventos: EventosEmail;
+    plantillas: MetricasPlantillasEmail;
+  }>(
+    async () => {
+      const [resumen, eventos, plantillas] = await Promise.all([
+        obtenerResumenEmail(),
+        obtenerEventosEmail({ limit: 50 }),
+        obtenerMetricasPlantillasEmail(),
+      ]);
+      return { resumen, eventos, plantillas };
+    },
+    { activo },
+  );
+
+  if (!activo) return null;
+  if (cargando && !datos) return <Skeleton alto="h-64" />;
+  if (error && !datos) return <ErrorCard msg={`Email: ${error}`} />;
+
+  return (
+    <PanelEmailSeccion
+      datos={datos?.resumen ?? null}
+      eventos={datos?.eventos ?? null}
+      plantillas={datos?.plantillas ?? null}
       refrescar={refrescar}
     />
   );
@@ -414,6 +455,7 @@ export default function ControlTotalPage() {
       <TabRetencion activo={tab === 'retencion'} onInspeccionar={inspeccionar} />
       <TabInconsistencias activo={tab === 'inconsistencias'} onInspeccionar={inspeccionar} />
       <TabContabilidad activo={tab === 'contabilidad'} />
+      <TabEmail activo={tab === 'email'} />
 
       {tab === 'inspector' && (
         <div className="space-y-4">
@@ -432,7 +474,8 @@ export default function ControlTotalPage() {
       <p className="text-[11px] text-slate-600 flex items-center gap-1">
         <LineChart className="w-3 h-3" />
         Acceso restringido a SUPER_ADMIN. Los tokens de Mercado Pago nunca se muestran.
-        Datos de control_evento (migración 1791990000000) y estado en vivo de colas/crons.
+        Datos de control_evento (migración 1791990000000), email_events (migración
+        1792800000000) y estado en vivo de colas/crons.
       </p>
     </div>
   );

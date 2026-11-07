@@ -239,6 +239,69 @@ export interface InspectorTransaccion {
   espejo: VistaEspejo | null;
 }
 
+export type EmailEventType =
+  | 'send'
+  | 'delivery'
+  | 'bounce'
+  | 'complaint'
+  | 'reject'
+  | 'open'
+  | 'click';
+
+export interface ResumenEmail {
+  generado_en: string;
+  desde: string | null;
+  hasta: string | null;
+  total_eventos: number;
+  enviados: number;
+  entregados: number;
+  rebotes: number;
+  quejas: number;
+  rechazados: number;
+  aperturas: number;
+  clicks: number;
+  tasa_entrega: number;
+  tasa_rebote: number;
+  tasa_queja: number;
+  semaforo: Semaforo;
+}
+
+export interface EventoEmail {
+  id: string;
+  message_id: string | null;
+  recipient_email: string;
+  event_type: EmailEventType;
+  template: string | null;
+  provider: string;
+  metadata: Record<string, unknown> | null;
+  created_at: string;
+}
+
+export interface EventosEmail {
+  generado_en: string;
+  data: EventoEmail[];
+  meta: { total: number; limit: number };
+}
+
+export interface MetricaPlantillaEmail {
+  template: string;
+  total_eventos: number;
+  enviados: number;
+  entregados: number;
+  rebotes: number;
+  quejas: number;
+  rechazados: number;
+  tasa_entrega: number;
+  tasa_rebote: number;
+}
+
+export interface MetricasPlantillasEmail {
+  generado_en: string;
+  desde: string | null;
+  hasta: string | null;
+  templates: MetricaPlantillaEmail[];
+}
+
 // ===========================================================================
 // Cliente (solo SUPER_ADMIN; el backend responde 403 para otros roles)
 // ===========================================================================
@@ -325,6 +388,38 @@ export async function obtenerAuditoriaContable(params?: {
 export async function obtenerInspector(idTransaccion: string): Promise<InspectorTransaccion | null> {
   const res = await api.get(`/control-total/transacciones/${idTransaccion}/inspector`);
   return extractData<InspectorTransaccion | null>(res);
+}
+
+// ===========================================================================
+// Email / entregabilidad SES (solo SUPER_ADMIN)
+// ===========================================================================
+
+export async function obtenerResumenEmail(params?: {
+  desde?: string;
+  hasta?: string;
+}): Promise<ResumenEmail> {
+  const res = await api.get('/admin/email/metrics', { params });
+  return extractData<ResumenEmail>(res);
+}
+
+export async function obtenerEventosEmail(params?: {
+  desde?: string;
+  hasta?: string;
+  event_type?: EmailEventType;
+  recipient_email?: string;
+  template?: string;
+  limit?: number;
+}): Promise<EventosEmail> {
+  const res = await api.get('/admin/email/events', { params });
+  return extractData<EventosEmail>(res);
+}
+
+export async function obtenerMetricasPlantillasEmail(params?: {
+  desde?: string;
+  hasta?: string;
+}): Promise<MetricasPlantillasEmail> {
+  const res = await api.get('/admin/email/templates', { params });
+  return extractData<MetricasPlantillasEmail>(res);
 }
 
 // ===========================================================================

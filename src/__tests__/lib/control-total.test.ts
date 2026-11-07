@@ -14,6 +14,9 @@ import {
   obtenerInconsistencias,
   obtenerAuditoriaContable,
   obtenerInspector,
+  obtenerResumenEmail,
+  obtenerEventosEmail,
+  obtenerMetricasPlantillasEmail,
   fmtArs,
   fmtFecha,
   fmtNum,
@@ -87,6 +90,35 @@ describe('control-total (cliente API)', () => {
     expect(getMock).toHaveBeenCalledWith(
       '/control-total/transacciones/uuid-tx/inspector',
     );
+  });
+
+  it('obtenerResumenEmail llama GET /admin/email/metrics con el rango', async () => {
+    await obtenerResumenEmail({ desde: '2026-11-01', hasta: '2026-11-30' });
+    expect(getMock).toHaveBeenCalledWith('/admin/email/metrics', {
+      params: { desde: '2026-11-01', hasta: '2026-11-30' },
+    });
+  });
+
+  it('obtenerEventosEmail pasa los filtros de eventos', async () => {
+    await obtenerEventosEmail({
+      event_type: 'bounce',
+      recipient_email: 'user@test.com',
+      limit: 50,
+    });
+    expect(getMock).toHaveBeenCalledWith('/admin/email/events', {
+      params: {
+        event_type: 'bounce',
+        recipient_email: 'user@test.com',
+        limit: 50,
+      },
+    });
+  });
+
+  it('obtenerMetricasPlantillasEmail llama GET /admin/email/templates', async () => {
+    await obtenerMetricasPlantillasEmail({ desde: '2026-11-01' });
+    expect(getMock).toHaveBeenCalledWith('/admin/email/templates', {
+      params: { desde: '2026-11-01' },
+    });
   });
 
   it('obtenerMonitorColas llama GET /control-total/colas', async () => {
