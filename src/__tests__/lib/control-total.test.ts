@@ -15,6 +15,7 @@ import {
   obtenerAuditoriaContable,
   obtenerInspector,
   obtenerResumenEmail,
+  obtenerInteligenciaOperativa,
   obtenerInteligenciaEmail,
   obtenerEventosEmail,
   obtenerMetricasPlantillasEmail,
@@ -98,6 +99,11 @@ describe('control-total (cliente API)', () => {
     expect(getMock).toHaveBeenCalledWith('/admin/email/metrics', {
       params: { desde: '2026-11-01', hasta: '2026-11-30' },
     });
+  });
+
+  it('obtenerInteligenciaOperativa llama GET /control-total/intelligence', async () => {
+    await obtenerInteligenciaOperativa();
+    expect(getMock).toHaveBeenCalledWith('/control-total/intelligence');
   });
 
   it('obtenerInteligenciaEmail pasa el rango de análisis', async () => {

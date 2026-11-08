@@ -14,6 +14,7 @@ import {
   obtenerInconsistencias,
   obtenerAuditoriaContable,
   obtenerInteligenciaEmail,
+  obtenerInteligenciaOperativa,
   obtenerEventosEmail,
   obtenerMetricasPlantillasEmail,
 } from '@/lib/control-total';
@@ -69,6 +70,7 @@ jest.mock('@/lib/control-total', () => {
     obtenerAuditoriaContable: jest.fn(),
     obtenerInspector: jest.fn(),
     obtenerInteligenciaEmail: jest.fn(),
+    obtenerInteligenciaOperativa: jest.fn(),
     obtenerEventosEmail: jest.fn(),
     obtenerMetricasPlantillasEmail: jest.fn(),
   };
@@ -179,6 +181,166 @@ describe('ControlTotalPage', () => {
       hasta: null,
       templates: [],
     });
+    (obtenerInteligenciaOperativa as jest.Mock).mockResolvedValue({
+      generado_en: '2026-11-08T12:00:00Z',
+      health: {
+        generado_en: '2026-11-08T12:00:00Z',
+        estado: 'amarillo',
+        checks: [
+          {
+            codigo: 'email_bounce',
+            etiqueta: 'Bounce Rate',
+            valor: 2,
+            umbral: '< 1%',
+            estado: 'amarillo',
+            detalle: '2 rebotes sobre 100 envíos (24 h).',
+          },
+        ],
+        metricas: {
+          bounce_rate: 2,
+          complaint_rate: 0,
+          jobs_stuck: 1,
+          jobs_fallidos_24h: 0,
+          errores_24h: 3,
+          crons_detenidos: 0,
+          crons_con_fallos_24h: 0,
+        },
+      },
+      email: {
+        generado_en: '2026-11-08T12:00:00Z',
+        rango: '30d',
+        resumen: {
+          generado_en: '2026-11-08T12:00:00Z',
+          desde: '2026-10-09T12:00:00Z',
+          hasta: '2026-11-08T12:00:00Z',
+          total_eventos: 248,
+          enviados: 100,
+          entregados: 98,
+          rebotes: 2,
+          quejas: 0,
+          rechazados: 0,
+          aperturas: 40,
+          clicks: 8,
+          tasa_entrega: 98,
+          tasa_rebote: 2,
+          tasa_queja: 0,
+          tasa_apertura: 40.82,
+          tasa_click: 8.16,
+          ctr: 20,
+          semaforo: 'amarillo',
+        },
+        tendencia: [],
+        alertas_email: [],
+        ranking: {
+          top_ctr: [
+            {
+              template: 'contract-created',
+              enviados: 10,
+              entregados: 10,
+              aperturas: 5,
+              clicks: 2,
+              tasa_apertura: 50,
+              ctr: 40,
+              tasa_rebote: 0,
+              tasa_queja: 0,
+            },
+          ],
+          top_open_rate: [],
+          top_bounce: [],
+          peores: [],
+        },
+      },
+      contracts: {
+        generado_en: '2026-11-08T12:00:00Z',
+        total: 1,
+        ranking: [],
+        top_activos: [
+          {
+            contratoId: 'contrato-1',
+            id_transaccion: 'tx-1',
+            estado: 'firmado',
+            fecha_creacion: '2026-11-01T12:00:00Z',
+            fecha_fin_servicio: '2026-11-10T12:00:00Z',
+            dias_para_vencer: 2,
+            actividadScore: 9,
+            eventos: 4,
+            mensajes: 2,
+            versiones: 1,
+            modificaciones: 0,
+            id_cliente: 'u-1',
+            id_proveedor: 'u-2',
+          },
+        ],
+        top_mensajes: [],
+        top_versiones: [],
+        top_modificaciones: [],
+        proximos_a_vencer: [
+          {
+            contratoId: 'contrato-1',
+            id_transaccion: 'tx-1',
+            estado: 'firmado',
+            fecha_creacion: '2026-11-01T12:00:00Z',
+            fecha_fin_servicio: '2026-11-10T12:00:00Z',
+            dias_para_vencer: 2,
+            actividadScore: 9,
+            eventos: 4,
+            mensajes: 2,
+            versiones: 1,
+            modificaciones: 0,
+            id_cliente: 'u-1',
+            id_proveedor: 'u-2',
+          },
+        ],
+      },
+      users: {
+        generado_en: '2026-11-08T12:00:00Z',
+        top_activos: [
+          {
+            id_usuario: 'u-1',
+            email: 'admin@test.com',
+            nombre: 'Admin',
+            apellido: null,
+            contratos: 2,
+            mensajes: 3,
+            logins: 4,
+            ultimo_acceso: '2026-11-08T10:00:00Z',
+            actividadScore: 11,
+          },
+        ],
+        top_contratos: [],
+        top_mensajes: [],
+        top_logins: [],
+      },
+      security: {
+        generado_en: '2026-11-08T12:00:00Z',
+        intentos_fallidos_24h: 7,
+        intentos_fallidos_7d: 30,
+        alertas_24h: 1,
+        alertas_7d: 3,
+        ips_sospechosas: [
+          {
+            ip_hash: 'abcdef1234567890',
+            intentos: 12,
+            emails: 4,
+            alertas: 1,
+            ultima_actividad: '2026-11-08T10:00:00Z',
+          },
+        ],
+        usuarios_intentos_fallidos: [],
+      },
+      alerts: [
+        {
+          id: 'EMAIL_BOUNCE:global',
+          tipo: 'EMAIL_BOUNCE',
+          prioridad: 'high',
+          titulo: 'Bounce Rate elevado',
+          detalle: 'La tasa de rebote (2%) supera el umbral recomendado de 1%.',
+          valor: 2,
+          umbral: 1,
+          entidad: null,
+        },
+      ],
+    });
   });
 
   it('redirige a /dashboard si el usuario no es super_admin', async () => {
@@ -196,7 +358,7 @@ describe('ControlTotalPage', () => {
     await waitFor(() => expect(mockPush).toHaveBeenCalledWith('/dashboard'));
   });
 
-  it('renderiza el título, los KPIs, las 11 pestañas y el aviso de tokens', async () => {
+  it('renderiza el título, los KPIs, las 12 pestañas y el aviso de tokens', async () => {
     render(<ControlTotalPage />);
 
     expect(
@@ -209,8 +371,9 @@ describe('ControlTotalPage', () => {
     expect(screen.getByText('Tokens con problema')).toBeInTheDocument();
     expect(screen.getAllByText('5').length).toBeGreaterThan(0);
 
-    // 11 pestañas
+    // 12 pestañas
     for (const label of [
+      'Inteligencia',
       'Timeline',
       'Espejo MP ↔ BD',
       'Colas',
@@ -393,6 +556,26 @@ describe('ControlTotalPage', () => {
     expect((await screen.findAllByText(/55[.,]56%/)).length).toBeGreaterThan(0);
     expect(await screen.findByText('user@test.com')).toBeInTheDocument();
     expect((await screen.findAllByText('contract-created')).length).toBeGreaterThan(0);
+  });
+
+  it('cambia a la pestaña Inteligencia y muestra salud, alertas y rankings', async () => {
+    render(<ControlTotalPage />);
+    await screen.findByRole('heading', { name: 'Panel de Control Total' });
+
+    await act(async () => {
+      fireEvent.click(screen.getByRole('button', { name: 'Inteligencia' }));
+    });
+
+    expect(obtenerInteligenciaOperativa).toHaveBeenCalled();
+    expect(await screen.findByText('Salud del Sistema')).toBeInTheDocument();
+    expect(await screen.findByText('Alertas de riesgo')).toBeInTheDocument();
+    expect(await screen.findByText('Bounce Rate elevado')).toBeInTheDocument();
+    expect(await screen.findByText('Inteligencia de Email')).toBeInTheDocument();
+    expect(await screen.findByText('Inteligencia de Contratos')).toBeInTheDocument();
+    expect(await screen.findByText('Inteligencia de Usuarios')).toBeInTheDocument();
+    expect(await screen.findByText('Inteligencia de Seguridad')).toBeInTheDocument();
+    expect(await screen.findByText('score 9')).toBeInTheDocument();
+    expect((await screen.findAllByText('admin@test.com')).length).toBeGreaterThan(0);
   });
 
   it('recarga la inteligencia al cambiar el rango de tendencia', async () => {

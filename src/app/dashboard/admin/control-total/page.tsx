@@ -17,6 +17,7 @@ import { PanelInconsistenciasSeccion } from '@/components/control-total/PanelInc
 import { AuditoriaContableSeccion } from '@/components/control-total/AuditoriaContable';
 import { InspectorTransaccionSeccion } from '@/components/control-total/InspectorTransaccion';
 import { PanelEmailSeccion } from '@/components/control-total/PanelEmail';
+import { InteligenciaOperativaSeccion } from '@/components/control-total/InteligenciaOperativa';
 import { useControlTotalPolling } from '@/hooks/useControlTotalPolling';
 import {
   obtenerAuditoriaContable,
@@ -32,11 +33,13 @@ import {
   obtenerPanelTokens,
   obtenerResumenControlTotal,
   obtenerInteligenciaEmail,
+  obtenerInteligenciaOperativa,
   obtenerTimeline,
   fmtNum,
 } from '@/lib/control-total';
 import type {
   AuditoriaContable,
+  ControlTotalIntelligence,
   EventosEmail,
   Inconsistencia,
   InteligenciaEmail,
@@ -66,11 +69,13 @@ import {
   Receipt,
   RefreshCw,
   ShieldAlert,
+  Sparkles,
   Timer,
   Wallet,
 } from 'lucide-react';
 
 type Tab =
+  | 'inteligencia'
   | 'timeline'
   | 'espejo'
   | 'colas'
@@ -84,6 +89,7 @@ type Tab =
   | 'email';
 
 const TABS: Array<{ id: Tab; label: string; icon: typeof Activity }> = [
+  { id: 'inteligencia', label: 'Inteligencia', icon: Sparkles },
   { id: 'timeline', label: 'Timeline', icon: ListTree },
   { id: 'espejo', label: 'Espejo MP ↔ BD', icon: Eye },
   { id: 'colas', label: 'Colas', icon: Layers },
@@ -116,6 +122,19 @@ function ErrorCard({ msg }: { msg: string }) {
 // Wrappers por pestaña: cada uno hace su propio polling 15 s mientras está
 // activa. Los datos de espejo/inspector se cargan bajo demanda.
 // ===========================================================================
+
+function TabInteligencia({ activo }: { activo: boolean }) {
+  const { datos, cargando, error, refrescar } =
+    useControlTotalPolling<ControlTotalIntelligence>(
+      obtenerInteligenciaOperativa,
+      { activo },
+    );
+  if (!activo) return null;
+  if (cargando && !datos) return <Skeleton alto="h-64" />;
+  if (error && !datos) return <ErrorCard msg={`Inteligencia: ${error}`} />;
+  if (!datos) return <Skeleton alto="h-64" />;
+  return <InteligenciaOperativaSeccion datos={datos} refrescar={refrescar} />;
+}
 
 function TabTimeline({ activo }: { activo: boolean }) {
   const { datos, cargando, error, refrescar } = useControlTotalPolling<TimelineGlobal>(
@@ -459,6 +478,7 @@ export default function ControlTotalPage() {
       </div>
 
       {/* Contenido por pestaña */}
+      <TabInteligencia activo={tab === 'inteligencia'} />
       <TabTimeline activo={tab === 'timeline'} />
 
       {tab === 'espejo' && (

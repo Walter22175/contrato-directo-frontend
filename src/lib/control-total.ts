@@ -298,6 +298,7 @@ export interface MetricaPlantillaEmail {
   clicks: number;
   tasa_entrega: number;
   tasa_rebote: number;
+  tasa_queja: number;
   tasa_apertura: number;
   tasa_click: number;
   ctr: number;
@@ -350,6 +351,170 @@ export interface InteligenciaEmail {
   resumen: ResumenEmail;
   tendencia: PuntoTendenciaEmail[];
   alertas: AlertaEmail[];
+}
+
+// ===========================================================================
+// Inteligencia operativa (control-total-intelligence.service.ts)
+// ===========================================================================
+
+export type HealthStatus = 'verde' | 'amarillo' | 'rojo';
+export type RiskAlertType =
+  | 'EMAIL_BOUNCE'
+  | 'EMAIL_COMPLAINT'
+  | 'CRON_FAILURE'
+  | 'QUEUE_STUCK'
+  | 'SECURITY_SPIKE'
+  | 'CONTRACT_EXPIRING';
+export type RiskPriority = 'critical' | 'high' | 'medium' | 'low';
+
+export interface HealthCheck {
+  codigo:
+    | 'email_bounce'
+    | 'email_complaint'
+    | 'queue_stuck'
+    | 'errors_24h'
+    | 'cron_failure';
+  etiqueta: string;
+  valor: number;
+  umbral: string;
+  estado: HealthStatus;
+  detalle: string;
+}
+
+export interface SystemHealth {
+  generado_en: string;
+  estado: HealthStatus;
+  checks: HealthCheck[];
+  metricas: {
+    bounce_rate: number;
+    complaint_rate: number;
+    jobs_stuck: number;
+    jobs_fallidos_24h: number;
+    errores_24h: number;
+    crons_detenidos: number;
+    crons_con_fallos_24h: number;
+  };
+}
+
+export interface EmailRankingPlantilla {
+  template: string;
+  enviados: number;
+  entregados: number;
+  aperturas: number;
+  clicks: number;
+  tasa_apertura: number;
+  ctr: number;
+  tasa_rebote: number;
+  tasa_queja: number;
+}
+
+export interface EmailRanking {
+  top_ctr: EmailRankingPlantilla[];
+  top_open_rate: EmailRankingPlantilla[];
+  top_bounce: EmailRankingPlantilla[];
+  peores: EmailRankingPlantilla[];
+}
+
+export interface EmailIntelligenceOperativa {
+  generado_en: string;
+  rango: '30d';
+  resumen: ResumenEmail;
+  tendencia: PuntoTendenciaEmail[];
+  alertas_email: AlertaEmail[];
+  ranking: EmailRanking;
+}
+
+export interface ContratoIntelligence {
+  contratoId: string;
+  id_transaccion: string;
+  estado: string;
+  fecha_creacion: string;
+  fecha_fin_servicio: string | null;
+  dias_para_vencer: number | null;
+  actividadScore: number;
+  eventos: number;
+  mensajes: number;
+  versiones: number;
+  modificaciones: number;
+  id_cliente: string;
+  id_proveedor: string;
+}
+
+export interface ContractsIntelligence {
+  generado_en: string;
+  total: number;
+  ranking: ContratoIntelligence[];
+  top_activos: ContratoIntelligence[];
+  top_mensajes: ContratoIntelligence[];
+  top_versiones: ContratoIntelligence[];
+  top_modificaciones: ContratoIntelligence[];
+  proximos_a_vencer: ContratoIntelligence[];
+}
+
+export interface UsuarioIntelligence {
+  id_usuario: string;
+  email: string;
+  nombre: string;
+  apellido: string | null;
+  contratos: number;
+  mensajes: number;
+  logins: number;
+  ultimo_acceso: string | null;
+  actividadScore: number;
+}
+
+export interface UsersIntelligence {
+  generado_en: string;
+  top_activos: UsuarioIntelligence[];
+  top_contratos: UsuarioIntelligence[];
+  top_mensajes: UsuarioIntelligence[];
+  top_logins: UsuarioIntelligence[];
+}
+
+export interface IpSospechosa {
+  ip_hash: string;
+  intentos: number;
+  emails: number;
+  alertas: number;
+  ultima_actividad: string | null;
+}
+
+export interface UsuarioIntentosFallidos {
+  email_hash: string;
+  intentos: number;
+  alertas: number;
+  ultima_actividad: string | null;
+}
+
+export interface SecurityIntelligence {
+  generado_en: string;
+  intentos_fallidos_24h: number;
+  intentos_fallidos_7d: number;
+  alertas_24h: number;
+  alertas_7d: number;
+  ips_sospechosas: IpSospechosa[];
+  usuarios_intentos_fallidos: UsuarioIntentosFallidos[];
+}
+
+export interface RiskAlert {
+  id: string;
+  tipo: RiskAlertType;
+  prioridad: RiskPriority;
+  titulo: string;
+  detalle: string;
+  valor: number;
+  umbral: number;
+  entidad: string | null;
+}
+
+export interface ControlTotalIntelligence {
+  generado_en: string;
+  health: SystemHealth;
+  email: EmailIntelligenceOperativa;
+  contracts: ContractsIntelligence;
+  users: UsersIntelligence;
+  security: SecurityIntelligence;
+  alerts: RiskAlert[];
 }
 
 // ===========================================================================
@@ -438,6 +603,11 @@ export async function obtenerAuditoriaContable(params?: {
 export async function obtenerInspector(idTransaccion: string): Promise<InspectorTransaccion | null> {
   const res = await api.get(`/control-total/transacciones/${idTransaccion}/inspector`);
   return extractData<InspectorTransaccion | null>(res);
+}
+
+export async function obtenerInteligenciaOperativa(): Promise<ControlTotalIntelligence> {
+  const res = await api.get('/control-total/intelligence');
+  return extractData<ControlTotalIntelligence>(res);
 }
 
 // ===========================================================================
