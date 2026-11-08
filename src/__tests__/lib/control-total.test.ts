@@ -16,6 +16,10 @@ import {
   obtenerInspector,
   obtenerResumenEmail,
   obtenerInteligenciaOperativa,
+  obtenerAlertas,
+  reconocerAlerta,
+  resolverAlerta,
+  descartarAlerta,
   obtenerInteligenciaEmail,
   obtenerEventosEmail,
   obtenerMetricasPlantillasEmail,
@@ -104,6 +108,30 @@ describe('control-total (cliente API)', () => {
   it('obtenerInteligenciaOperativa llama GET /control-total/intelligence', async () => {
     await obtenerInteligenciaOperativa();
     expect(getMock).toHaveBeenCalledWith('/control-total/intelligence');
+  });
+
+  it('obtenerAlertas llama GET /control-total/alerts', async () => {
+    await obtenerAlertas();
+    expect(getMock).toHaveBeenCalledWith('/control-total/alerts');
+  });
+
+  it('las acciones de alertas usan el id codificado y el verbo correcto', async () => {
+    await reconocerAlerta('alerta/1');
+    await resolverAlerta('alerta/1');
+    await descartarAlerta('alerta/1');
+
+    expect(postMock).toHaveBeenNthCalledWith(
+      1,
+      '/control-total/alerts/alerta%2F1/acknowledge',
+    );
+    expect(postMock).toHaveBeenNthCalledWith(
+      2,
+      '/control-total/alerts/alerta%2F1/resolve',
+    );
+    expect(postMock).toHaveBeenNthCalledWith(
+      3,
+      '/control-total/alerts/alerta%2F1/dismiss',
+    );
   });
 
   it('obtenerInteligenciaEmail pasa el rango de análisis', async () => {

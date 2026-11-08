@@ -518,6 +518,56 @@ export interface ControlTotalIntelligence {
 }
 
 // ===========================================================================
+// Alert Center (system_alerts / alert-engine.service.ts)
+// ===========================================================================
+
+export type AlertSeverity = 'CRITICAL' | 'HIGH' | 'MEDIUM' | 'LOW' | 'INFO';
+export type AlertStatus = 'OPEN' | 'ACKNOWLEDGED' | 'RESOLVED' | 'DISMISSED';
+export type SystemAlertType =
+  | 'EMAIL_BOUNCE_RATE_HIGH'
+  | 'EMAIL_COMPLAINT_RATE_HIGH'
+  | 'EMAIL_DELIVERY_DEGRADED'
+  | 'EMAIL_LOW_ENGAGEMENT'
+  | 'QUEUE_STUCK'
+  | 'QUEUE_FAILURE_SPIKE'
+  | 'CRON_INACTIVE'
+  | 'SECURITY_SPIKE'
+  | 'CONTRACT_EXPIRING_SPIKE'
+  | 'PAYMENT_INCONSISTENCY';
+
+export interface SystemAlert {
+  id: string;
+  type: SystemAlertType;
+  severity: AlertSeverity;
+  status: AlertStatus;
+  title: string;
+  description: string;
+  source: string;
+  metadata: Record<string, unknown> | null;
+  notification_channels: string[] | null;
+  first_detected_at: string;
+  last_detected_at: string;
+  resolved_at: string | null;
+  acknowledged_by: string | null;
+  acknowledged_at: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface SystemAlertsResponse {
+  critical: SystemAlert[];
+  high: SystemAlert[];
+  medium: SystemAlert[];
+  low: SystemAlert[];
+  info: SystemAlert[];
+  stats: {
+    open: number;
+    acknowledged: number;
+    resolved: number;
+  };
+}
+
+// ===========================================================================
 // Cliente (solo SUPER_ADMIN; el backend responde 403 para otros roles)
 // ===========================================================================
 
@@ -608,6 +658,26 @@ export async function obtenerInspector(idTransaccion: string): Promise<Inspector
 export async function obtenerInteligenciaOperativa(): Promise<ControlTotalIntelligence> {
   const res = await api.get('/control-total/intelligence');
   return extractData<ControlTotalIntelligence>(res);
+}
+
+export async function obtenerAlertas(): Promise<SystemAlertsResponse> {
+  const res = await api.get('/control-total/alerts');
+  return extractData<SystemAlertsResponse>(res);
+}
+
+export async function reconocerAlerta(id: string): Promise<SystemAlert> {
+  const res = await api.post(`/control-total/alerts/${encodeURIComponent(id)}/acknowledge`);
+  return extractData<SystemAlert>(res);
+}
+
+export async function resolverAlerta(id: string): Promise<SystemAlert> {
+  const res = await api.post(`/control-total/alerts/${encodeURIComponent(id)}/resolve`);
+  return extractData<SystemAlert>(res);
+}
+
+export async function descartarAlerta(id: string): Promise<SystemAlert> {
+  const res = await api.post(`/control-total/alerts/${encodeURIComponent(id)}/dismiss`);
+  return extractData<SystemAlert>(res);
 }
 
 // ===========================================================================

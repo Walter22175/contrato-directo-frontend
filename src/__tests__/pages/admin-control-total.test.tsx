@@ -15,6 +15,10 @@ import {
   obtenerAuditoriaContable,
   obtenerInteligenciaEmail,
   obtenerInteligenciaOperativa,
+  obtenerAlertas,
+  reconocerAlerta,
+  resolverAlerta,
+  descartarAlerta,
   obtenerEventosEmail,
   obtenerMetricasPlantillasEmail,
 } from '@/lib/control-total';
@@ -71,6 +75,10 @@ jest.mock('@/lib/control-total', () => {
     obtenerInspector: jest.fn(),
     obtenerInteligenciaEmail: jest.fn(),
     obtenerInteligenciaOperativa: jest.fn(),
+    obtenerAlertas: jest.fn(),
+    reconocerAlerta: jest.fn(),
+    resolverAlerta: jest.fn(),
+    descartarAlerta: jest.fn(),
     obtenerEventosEmail: jest.fn(),
     obtenerMetricasPlantillasEmail: jest.fn(),
   };
@@ -181,6 +189,17 @@ describe('ControlTotalPage', () => {
       hasta: null,
       templates: [],
     });
+    (obtenerAlertas as jest.Mock).mockResolvedValue({
+      critical: [],
+      high: [],
+      medium: [],
+      low: [],
+      info: [],
+      stats: { open: 0, acknowledged: 0, resolved: 0 },
+    });
+    (reconocerAlerta as jest.Mock).mockResolvedValue({});
+    (resolverAlerta as jest.Mock).mockResolvedValue({});
+    (descartarAlerta as jest.Mock).mockResolvedValue({});
     (obtenerInteligenciaOperativa as jest.Mock).mockResolvedValue({
       generado_en: '2026-11-08T12:00:00Z',
       health: {
@@ -576,6 +595,66 @@ describe('ControlTotalPage', () => {
     expect(await screen.findByText('Inteligencia de Seguridad')).toBeInTheDocument();
     expect(await screen.findByText('score 9')).toBeInTheDocument();
     expect((await screen.findAllByText('admin@test.com')).length).toBeGreaterThan(0);
+  });
+
+  it('ubica Inteligencia y Alertas al final del menu de pestañas', async () => {
+    render(<ControlTotalPage />);
+    await screen.findByRole('heading', { name: 'Panel de Control Total' });
+
+    const buscadas = ['Timeline', 'Email', 'Inteligencia', 'Alertas'];
+    const etiquetas = Array.from(document.querySelectorAll('button'))
+      .map((boton) => boton.textContent?.trim() ?? '')
+      .filter((etiqueta) => buscadas.includes(etiqueta));
+
+    expect(etiquetas).toEqual(buscadas);
+  });
+
+  it('cambia a la pestaña Alertas y permite reconocer una alerta', async () => {
+    const alerta = {
+      id: '11111111-1111-4111-8111-111111111111',
+      type: 'CRON_INACTIVE',
+      severity: 'CRITICAL',
+      status: 'OPEN',
+      title: 'Cron inactivo: mp-captura-cron',
+      description: 'El cron no se ejecuta desde hace más de dos períodos.',
+      source: 'cron:mp-captura-cron',
+      metadata: null,
+      notification_channels: null,
+      first_detected_at: '2026-11-08T10:00:00Z',
+      last_detected_at: '2026-11-08T10:00:00Z',
+      resolved_at: null,
+      acknowledged_by: null,
+      acknowledged_at: null,
+      created_at: '2026-11-08T10:00:00Z',
+      updated_at: '2026-11-08T10:00:00Z',
+    };
+    (obtenerAlertas as jest.Mock).mockResolvedValue({
+      critical: [alerta],
+      high: [],
+      medium: [],
+      low: [],
+      info: [],
+      stats: { open: 1, acknowledged: 0, resolved: 0 },
+    });
+
+    render(<ControlTotalPage />);
+    await screen.findByRole('heading', { name: 'Panel de Control Total' });
+
+    await act(async () => {
+      fireEvent.click(screen.getByRole('button', { name: 'Alertas' }));
+    });
+
+    expect(obtenerAlertas).toHaveBeenCalled();
+    expect(await screen.findByText('Alert Center')).toBeInTheDocument();
+    expect(await screen.findByText('Cron inactivo: mp-captura-cron')).toBeInTheDocument();
+    expect(await screen.findByText('Severidad')).toBeInTheDocument();
+    expect(await screen.findByText('Detectada')).toBeInTheDocument();
+
+    await act(async () => {
+      fireEvent.click(screen.getByRole('button', { name: 'Reconocer' }));
+    });
+
+    expect(reconocerAlerta).toHaveBeenCalledWith(alerta.id);
   });
 
   it('recarga la inteligencia al cambiar el rango de tendencia', async () => {

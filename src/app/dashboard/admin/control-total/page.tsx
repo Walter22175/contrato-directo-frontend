@@ -18,6 +18,7 @@ import { AuditoriaContableSeccion } from '@/components/control-total/AuditoriaCo
 import { InspectorTransaccionSeccion } from '@/components/control-total/InspectorTransaccion';
 import { PanelEmailSeccion } from '@/components/control-total/PanelEmail';
 import { InteligenciaOperativaSeccion } from '@/components/control-total/InteligenciaOperativa';
+import { PanelAlertasSeccion } from '@/components/control-total/PanelAlertas';
 import { useControlTotalPolling } from '@/hooks/useControlTotalPolling';
 import {
   obtenerAuditoriaContable,
@@ -34,6 +35,7 @@ import {
   obtenerResumenControlTotal,
   obtenerInteligenciaEmail,
   obtenerInteligenciaOperativa,
+  obtenerAlertas,
   obtenerTimeline,
   fmtNum,
 } from '@/lib/control-total';
@@ -51,6 +53,7 @@ import type {
   PanelTokens,
   RangoEmail,
   ResumenControlTotal,
+  SystemAlertsResponse,
   TimelineGlobal,
   VistaEspejo,
   InspectorTransaccion,
@@ -59,6 +62,7 @@ import {
   Activity,
   AlertTriangle,
   BarChart3,
+  Bell,
   Clock,
   Eye,
   KeyRound,
@@ -75,7 +79,6 @@ import {
 } from 'lucide-react';
 
 type Tab =
-  | 'inteligencia'
   | 'timeline'
   | 'espejo'
   | 'colas'
@@ -86,10 +89,11 @@ type Tab =
   | 'inconsistencias'
   | 'contabilidad'
   | 'inspector'
-  | 'email';
+  | 'email'
+  | 'inteligencia'
+  | 'alertas';
 
 const TABS: Array<{ id: Tab; label: string; icon: typeof Activity }> = [
-  { id: 'inteligencia', label: 'Inteligencia', icon: Sparkles },
   { id: 'timeline', label: 'Timeline', icon: ListTree },
   { id: 'espejo', label: 'Espejo MP ↔ BD', icon: Eye },
   { id: 'colas', label: 'Colas', icon: Layers },
@@ -101,6 +105,8 @@ const TABS: Array<{ id: Tab; label: string; icon: typeof Activity }> = [
   { id: 'contabilidad', label: 'Contabilidad', icon: BarChart3 },
   { id: 'inspector', label: 'Inspector', icon: Activity },
   { id: 'email', label: 'Email', icon: Mail },
+  { id: 'inteligencia', label: 'Inteligencia', icon: Sparkles },
+  { id: 'alertas', label: 'Alertas', icon: Bell },
 ];
 
 function Skeleton({ alto = 'h-24' }: { alto?: string }) {
@@ -134,6 +140,16 @@ function TabInteligencia({ activo }: { activo: boolean }) {
   if (error && !datos) return <ErrorCard msg={`Inteligencia: ${error}`} />;
   if (!datos) return <Skeleton alto="h-64" />;
   return <InteligenciaOperativaSeccion datos={datos} refrescar={refrescar} />;
+}
+
+function TabAlertas({ activo }: { activo: boolean }) {
+  const { datos, cargando, error, refrescar } =
+    useControlTotalPolling<SystemAlertsResponse>(obtenerAlertas, { activo });
+  if (!activo) return null;
+  if (cargando && !datos) return <Skeleton alto="h-64" />;
+  if (error && !datos) return <ErrorCard msg={`Alertas: ${error}`} />;
+  if (!datos) return <Skeleton alto="h-64" />;
+  return <PanelAlertasSeccion datos={datos} refrescar={refrescar} />;
 }
 
 function TabTimeline({ activo }: { activo: boolean }) {
@@ -503,6 +519,7 @@ export default function ControlTotalPage() {
       <TabInconsistencias activo={tab === 'inconsistencias'} onInspeccionar={inspeccionar} />
       <TabContabilidad activo={tab === 'contabilidad'} />
       <TabEmail activo={tab === 'email'} />
+      <TabAlertas activo={tab === 'alertas'} />
 
       {tab === 'inspector' && (
         <div className="space-y-4">
