@@ -13,7 +13,7 @@ import {
   obtenerPanelRetencion,
   obtenerInconsistencias,
   obtenerAuditoriaContable,
-  obtenerResumenEmail,
+  obtenerInteligenciaEmail,
   obtenerEventosEmail,
   obtenerMetricasPlantillasEmail,
 } from '@/lib/control-total';
@@ -68,7 +68,7 @@ jest.mock('@/lib/control-total', () => {
     obtenerInconsistencias: jest.fn(),
     obtenerAuditoriaContable: jest.fn(),
     obtenerInspector: jest.fn(),
-    obtenerResumenEmail: jest.fn(),
+    obtenerInteligenciaEmail: jest.fn(),
     obtenerEventosEmail: jest.fn(),
     obtenerMetricasPlantillasEmail: jest.fn(),
   };
@@ -139,25 +139,34 @@ describe('ControlTotalPage', () => {
       totales: {},
       por_periodo: [],
     });
-    (obtenerResumenEmail as jest.Mock).mockResolvedValue({
+    (obtenerInteligenciaEmail as jest.Mock).mockResolvedValue({
       generado_en: '2026-11-02T12:00:00Z',
-      desde: null,
-      hasta: null,
-      total_eventos: 0,
-      enviados: 0,
-      entregados: 0,
-      rebotes: 0,
-      quejas: 0,
-      rechazados: 0,
-      aperturas: 0,
-      clicks: 0,
-      tasa_entrega: 0,
-      tasa_rebote: 0,
-      tasa_queja: 0,
-      tasa_apertura: 0,
-      tasa_click: 0,
-      ctr: 0,
-      semaforo: 'gris',
+      rango: '30d',
+      desde: '2026-10-03T12:00:00Z',
+      hasta: '2026-11-02T12:00:00Z',
+      bucket: 'day',
+      resumen: {
+        generado_en: '2026-11-02T12:00:00Z',
+        desde: '2026-10-03T12:00:00Z',
+        hasta: '2026-11-02T12:00:00Z',
+        total_eventos: 0,
+        enviados: 0,
+        entregados: 0,
+        rebotes: 0,
+        quejas: 0,
+        rechazados: 0,
+        aperturas: 0,
+        clicks: 0,
+        tasa_entrega: 0,
+        tasa_rebote: 0,
+        tasa_queja: 0,
+        tasa_apertura: 0,
+        tasa_click: 0,
+        ctr: 0,
+        semaforo: 'gris',
+      },
+      tendencia: [],
+      alertas: [],
     });
     (obtenerEventosEmail as jest.Mock).mockResolvedValue({
       generado_en: '',
@@ -259,25 +268,61 @@ describe('ControlTotalPage', () => {
   });
 
   it('cambia a la pestaña Email y muestra los KPIs de entregabilidad', async () => {
-    (obtenerResumenEmail as jest.Mock).mockResolvedValue({
+    (obtenerInteligenciaEmail as jest.Mock).mockResolvedValue({
       generado_en: '2026-11-02T12:00:00Z',
-      desde: null,
-      hasta: null,
-      total_eventos: 248,
-      enviados: 100,
-      entregados: 98,
-      rebotes: 1,
-      quejas: 0,
-      rechazados: 1,
-      aperturas: 40,
-      clicks: 8,
-      tasa_entrega: 98,
-      tasa_rebote: 1,
-      tasa_queja: 0,
-      tasa_apertura: 40.82,
-      tasa_click: 8.16,
-      ctr: 20,
-      semaforo: 'amarillo',
+      rango: '30d',
+      desde: '2026-10-03T12:00:00Z',
+      hasta: '2026-11-02T12:00:00Z',
+      bucket: 'day',
+      resumen: {
+        generado_en: '2026-11-02T12:00:00Z',
+        desde: '2026-10-03T12:00:00Z',
+        hasta: '2026-11-02T12:00:00Z',
+        total_eventos: 248,
+        enviados: 100,
+        entregados: 98,
+        rebotes: 1,
+        quejas: 0,
+        rechazados: 1,
+        aperturas: 40,
+        clicks: 8,
+        tasa_entrega: 98,
+        tasa_rebote: 1,
+        tasa_queja: 0,
+        tasa_apertura: 40.82,
+        tasa_click: 8.16,
+        ctr: 20,
+        semaforo: 'amarillo',
+      },
+      tendencia: [
+        {
+          fecha: '2026-11-02T00:00:00Z',
+          enviados: 10,
+          entregados: 9,
+          rebotes: 1,
+          quejas: 0,
+          rechazados: 0,
+          aperturas: 4,
+          clicks: 1,
+          tasa_entrega: 90,
+          tasa_rebote: 10,
+          tasa_queja: 0,
+          tasa_apertura: 44.44,
+          tasa_click: 11.11,
+          ctr: 25,
+        },
+      ],
+      alertas: [
+        {
+          codigo: 'rebote_alto',
+          severidad: 'alta',
+          titulo: 'Tasa de rebote alta',
+          detalle: 'La tasa de rebote es 10% y supera el límite de 5%.',
+          valor: 10,
+          limite: 5,
+          operador: '>',
+        },
+      ],
     });
     (obtenerEventosEmail as jest.Mock).mockResolvedValue({
       generado_en: '',
@@ -326,17 +371,46 @@ describe('ControlTotalPage', () => {
       fireEvent.click(screen.getByRole('button', { name: 'Email' }));
     });
 
-    expect(obtenerResumenEmail).toHaveBeenCalled();
-    expect(obtenerEventosEmail).toHaveBeenCalledWith({ limit: 50 });
-    expect(obtenerMetricasPlantillasEmail).toHaveBeenCalled();
+    expect(obtenerInteligenciaEmail).toHaveBeenCalledWith({ rango: '30d' });
+    expect(obtenerEventosEmail).toHaveBeenCalledWith({
+      desde: '2026-10-03T12:00:00Z',
+      hasta: '2026-11-02T12:00:00Z',
+      limit: 50,
+    });
+    expect(obtenerMetricasPlantillasEmail).toHaveBeenCalledWith({
+      desde: '2026-10-03T12:00:00Z',
+      hasta: '2026-11-02T12:00:00Z',
+    });
     expect(await screen.findByText('Entregabilidad SES')).toBeInTheDocument();
     expect((await screen.findAllByText('Enviados')).length).toBeGreaterThan(0);
     expect(await screen.findByText('Engagement')).toBeInTheDocument();
+    expect(await screen.findByText('Reputación')).toBeInTheDocument();
+    expect(await screen.findByText('Tendencias')).toBeInTheDocument();
+    expect(await screen.findByText('Alertas automáticas')).toBeInTheDocument();
+    expect(await screen.findByText('Tasa de rebote alta')).toBeInTheDocument();
     expect((await screen.findAllByText('Open Rate')).length).toBeGreaterThan(0);
-    expect(await screen.findByText(/40[.,]82%/)).toBeInTheDocument();
-    expect(await screen.findByText(/55[.,]56%/)).toBeInTheDocument();
+    expect((await screen.findAllByText(/40[.,]82%/)).length).toBeGreaterThan(0);
+    expect((await screen.findAllByText(/55[.,]56%/)).length).toBeGreaterThan(0);
     expect(await screen.findByText('user@test.com')).toBeInTheDocument();
     expect((await screen.findAllByText('contract-created')).length).toBeGreaterThan(0);
+  });
+
+  it('recarga la inteligencia al cambiar el rango de tendencia', async () => {
+    render(<ControlTotalPage />);
+    await screen.findByRole('heading', { name: 'Panel de Control Total' });
+
+    await act(async () => {
+      fireEvent.click(screen.getByRole('button', { name: 'Email' }));
+    });
+    await screen.findByText('Tendencias');
+
+    await act(async () => {
+      fireEvent.click(screen.getByRole('button', { name: '7 días' }));
+    });
+
+    await waitFor(() =>
+      expect(obtenerInteligenciaEmail).toHaveBeenCalledWith({ rango: '7d' }),
+    );
   });
 
   it('muestra la tarjeta de error cuando falla el resumen', async () => {

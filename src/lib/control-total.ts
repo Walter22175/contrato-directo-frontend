@@ -310,6 +310,48 @@ export interface MetricasPlantillasEmail {
   templates: MetricaPlantillaEmail[];
 }
 
+export type RangoEmail = '24h' | '7d' | '30d' | '90d';
+export type BucketTendenciaEmail = 'hour' | 'day';
+export type SeveridadAlertaEmail = 'alta' | 'media' | 'baja';
+
+export interface PuntoTendenciaEmail {
+  fecha: string;
+  enviados: number;
+  entregados: number;
+  rebotes: number;
+  quejas: number;
+  rechazados: number;
+  aperturas: number;
+  clicks: number;
+  tasa_entrega: number;
+  tasa_rebote: number;
+  tasa_queja: number;
+  tasa_apertura: number;
+  tasa_click: number;
+  ctr: number;
+}
+
+export interface AlertaEmail {
+  codigo: 'rebote_alto' | 'queja_alta' | 'apertura_baja';
+  severidad: SeveridadAlertaEmail;
+  titulo: string;
+  detalle: string;
+  valor: number;
+  limite: number;
+  operador: '>' | '<';
+}
+
+export interface InteligenciaEmail {
+  generado_en: string;
+  rango: RangoEmail;
+  desde: string;
+  hasta: string;
+  bucket: BucketTendenciaEmail;
+  resumen: ResumenEmail;
+  tendencia: PuntoTendenciaEmail[];
+  alertas: AlertaEmail[];
+}
+
 // ===========================================================================
 // Cliente (solo SUPER_ADMIN; el backend responde 403 para otros roles)
 // ===========================================================================
@@ -408,6 +450,13 @@ export async function obtenerResumenEmail(params?: {
 }): Promise<ResumenEmail> {
   const res = await api.get('/admin/email/metrics', { params });
   return extractData<ResumenEmail>(res);
+}
+
+export async function obtenerInteligenciaEmail(params?: {
+  rango?: RangoEmail;
+}): Promise<InteligenciaEmail> {
+  const res = await api.get('/admin/email/intelligence', { params });
+  return extractData<InteligenciaEmail>(res);
 }
 
 export async function obtenerEventosEmail(params?: {

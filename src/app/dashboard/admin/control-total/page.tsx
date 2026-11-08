@@ -31,7 +31,7 @@ import {
   obtenerPanelRetencion,
   obtenerPanelTokens,
   obtenerResumenControlTotal,
-  obtenerResumenEmail,
+  obtenerInteligenciaEmail,
   obtenerTimeline,
   fmtNum,
 } from '@/lib/control-total';
@@ -39,14 +39,15 @@ import type {
   AuditoriaContable,
   EventosEmail,
   Inconsistencia,
+  InteligenciaEmail,
   MetricasPlantillasEmail,
   MonitorColas,
   MonitorCrons,
   PanelComisiones,
   PanelRetencion,
   PanelTokens,
+  RangoEmail,
   ResumenControlTotal,
-  ResumenEmail,
   TimelineGlobal,
   VistaEspejo,
   InspectorTransaccion,
@@ -250,31 +251,57 @@ function TabContabilidad({ activo }: { activo: boolean }) {
 }
 
 function TabEmail({ activo }: { activo: boolean }) {
-  const { datos, cargando, error, refrescar } = useControlTotalPolling<{
-    resumen: ResumenEmail;
-    eventos: EventosEmail;
-    plantillas: MetricasPlantillasEmail;
-  }>(
-    async () => {
-      const [resumen, eventos, plantillas] = await Promise.all([
-        obtenerResumenEmail(),
-        obtenerEventosEmail({ limit: 50 }),
-        obtenerMetricasPlantillasEmail(),
-      ]);
-      return { resumen, eventos, plantillas };
-    },
-    { activo },
-  );
+  const [rango, setRango] = useState<RangoEmail>('30d');
 
   if (!activo) return null;
+
+  return (
+    <TabEmailContenido
+      key={rango}
+      rango={rango}
+      onRangoChange={(nuevo) => setRango(nuevo)}
+    />
+  );
+}
+
+function TabEmailContenido({
+  rango,
+  onRangoChange,
+}: {
+  rango: RangoEmail;
+  onRangoChange: (rango: RangoEmail) => void;
+}) {
+  const { datos, cargando, error, refrescar } = useControlTotalPolling<{
+    inteligencia: InteligenciaEmail;
+    eventos: EventosEmail;
+    plantillas: MetricasPlantillasEmail;
+  }>(async () => {
+    const inteligencia = await obtenerInteligenciaEmail({ rango });
+    const [eventos, plantillas] = await Promise.all([
+      obtenerEventosEmail({
+        desde: inteligencia.desde,
+        hasta: inteligencia.hasta,
+        limit: 50,
+      }),
+      obtenerMetricasPlantillasEmail({
+        desde: inteligencia.desde,
+        hasta: inteligencia.hasta,
+      }),
+    ]);
+    return { inteligencia, eventos, plantillas };
+  });
+
   if (cargando && !datos) return <Skeleton alto="h-64" />;
   if (error && !datos) return <ErrorCard msg={`Email: ${error}`} />;
 
   return (
     <PanelEmailSeccion
-      datos={datos?.resumen ?? null}
+      datos={datos?.inteligencia.resumen ?? null}
+      inteligencia={datos?.inteligencia ?? null}
       eventos={datos?.eventos ?? null}
       plantillas={datos?.plantillas ?? null}
+      rango={rango}
+      onRangoChange={onRangoChange}
       refrescar={refrescar}
     />
   );

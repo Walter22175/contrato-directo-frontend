@@ -15,6 +15,7 @@ import {
   obtenerAuditoriaContable,
   obtenerInspector,
   obtenerResumenEmail,
+  obtenerInteligenciaEmail,
   obtenerEventosEmail,
   obtenerMetricasPlantillasEmail,
   fmtArs,
@@ -96,6 +97,13 @@ describe('control-total (cliente API)', () => {
     await obtenerResumenEmail({ desde: '2026-11-01', hasta: '2026-11-30' });
     expect(getMock).toHaveBeenCalledWith('/admin/email/metrics', {
       params: { desde: '2026-11-01', hasta: '2026-11-30' },
+    });
+  });
+
+  it('obtenerInteligenciaEmail pasa el rango de análisis', async () => {
+    await obtenerInteligenciaEmail({ rango: '90d' });
+    expect(getMock).toHaveBeenCalledWith('/admin/email/intelligence', {
+      params: { rango: '90d' },
     });
   });
 

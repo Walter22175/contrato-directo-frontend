@@ -3,11 +3,14 @@
 import { Card } from '@/components/ui/Card';
 import Button from '@/components/ui/Button';
 import { Chip, Semaforo } from './Semaforo';
+import { InteligenciaEmailSeccion } from './InteligenciaEmail';
 import { fmtFecha, fmtNum } from '@/lib/control-total';
 import type {
   EmailEventType,
   EventosEmail,
+  InteligenciaEmail,
   MetricasPlantillasEmail,
+  RangoEmail,
   ResumenEmail,
 } from '@/lib/control-total';
 import { Mail, RefreshCw } from 'lucide-react';
@@ -36,13 +39,19 @@ function fmtPct(valor: number | null | undefined): string {
 
 export function PanelEmailSeccion({
   datos,
+  inteligencia,
   eventos,
   plantillas,
+  rango,
+  onRangoChange,
   refrescar,
 }: {
   datos: ResumenEmail | null;
+  inteligencia: InteligenciaEmail | null;
   eventos: EventosEmail | null;
   plantillas: MetricasPlantillasEmail | null;
+  rango: RangoEmail;
+  onRangoChange: (rango: RangoEmail) => void;
   refrescar?: () => Promise<void> | void;
 }) {
   if (!datos) return null;
@@ -140,6 +149,14 @@ export function PanelEmailSeccion({
           mismo correo puede registrar varias aperturas o clicks.
         </p>
       </Card>
+
+      {inteligencia && (
+        <InteligenciaEmailSeccion
+          inteligencia={inteligencia}
+          rango={rango}
+          onRangoChange={onRangoChange}
+        />
+      )}
 
       <Card>
         <div className="flex flex-wrap items-center gap-2 mb-3">
