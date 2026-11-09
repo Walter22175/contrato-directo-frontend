@@ -1,12 +1,5 @@
 import type { SlaNivel, SlaConfig, SlaCanal, SlaTracking } from '@/types';
 
-const FERIADOS_ARGENTINA_2026 = [
-  '2026-01-01', '2026-02-16', '2026-02-17', '2026-03-24',
-  '2026-04-02', '2026-04-03', '2026-05-01', '2026-05-25',
-  '2026-06-15', '2026-06-20', '2026-07-09', '2026-08-17',
-  '2026-10-12', '2026-11-20', '2026-12-08', '2026-12-25',
-];
-
 export const SLA_CONFIGURACIONES: SlaConfig[] = [
   {
     nivel: 'nivel_1',
@@ -52,25 +45,6 @@ export const SLA_CONFIGURACIONES: SlaConfig[] = [
 
 export function obtenerConfigSla(nivel: SlaNivel): SlaConfig {
   return SLA_CONFIGURACIONES.find((c) => c.nivel === nivel) || SLA_CONFIGURACIONES[0];
-}
-
-export function esDiaHabil(fecha: Date): boolean {
-  const dia = fecha.getDay();
-  if (dia === 0 || dia === 6) return false;
-  const fechaStr = `${fecha.getFullYear()}-${String(fecha.getMonth() + 1).padStart(2, '0')}-${String(fecha.getDate()).padStart(2, '0')}`;
-  return !FERIADOS_ARGENTINA_2026.includes(fechaStr);
-}
-
-export function agregarMinutosHabiles(fecha: Date, minutos: number): Date {
-  const resultado = new Date(fecha);
-  let minutosRestantes = minutos;
-  while (minutosRestantes > 0) {
-    resultado.setMinutes(resultado.getMinutes() + 1);
-    if (esDiaHabil(resultado)) {
-      minutosRestantes--;
-    }
-  }
-  return resultado;
 }
 
 export function calcularTiempoRestanteMin(fechaLimite: string): number {

@@ -478,20 +478,12 @@ export interface SlaTracking {
   tiempo_limite_resolucion: string;
 }
 
-export interface HorarioAtencion {
-  id_horario: number;
-  nombre: string;
-  dia_semana: number[];
-  hora_inicio: string;
-  hora_fin: string;
-  activo: boolean;
-}
-
 export interface Feriado {
   id_feriado: number;
   fecha: string;
   nombre: string;
-  nacional: boolean;
+  repetir_anualmente: boolean;
+  fecha_creacion: string;
 }
 
 export interface MetricaAtencion {
