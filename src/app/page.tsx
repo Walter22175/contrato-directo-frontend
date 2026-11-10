@@ -6,7 +6,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { useState, useEffect, useRef, useCallback } from 'react';
-import { Search, Shield, FileText, Star, ArrowRight, ChevronRight, Box, Users, ShieldCheck, Sparkles } from 'lucide-react';
+import { Search, Shield, FileText, Star, ArrowRight, ChevronRight, Box, Users, ShieldCheck, Sparkles, Award } from 'lucide-react';
 import Button from '@/components/ui/Button';
 import { Promocion } from '@/types';
 import type { Servicio } from '@/types';
@@ -52,6 +52,17 @@ interface SearchSuggestion {
   id_servicio?: number;
 }
 
+interface TopProveedor {
+  id_usuario: string;
+  nombre?: string;
+  apellido?: string;
+  rubro_principal?: string;
+  calificacion_promedio?: number | null;
+  cantidad_valoraciones?: number;
+  sello_verificado?: boolean;
+  proveedor_destacado?: boolean;
+}
+
 export default function HomePage() {
   const router = useRouter();
   const [heroSearch, setHeroSearch] = useState('');
@@ -61,6 +72,8 @@ export default function HomePage() {
   const [promociones, setPromociones] = useState<Promocion[]>([]);
   const [promocionesLoading, setPromocionesLoading] = useState(true);
   const [servicios, setServicios] = useState<Array<{id_servicio: number; nombre: string; id_categoria: number}>>([]);
+  const [topProveedores, setTopProveedores] = useState<TopProveedor[]>([]);
+  const [topLoading, setTopLoading] = useState(true);
   const searchInputRef = useRef<HTMLInputElement>(null);
   const suggestionsRef = useRef<HTMLDivElement>(null);
 
@@ -90,6 +103,27 @@ export default function HomePage() {
     fetchPromociones();
     fetchServicios();
   }, [fetchPromociones, fetchServicios]);
+
+  useEffect(() => {
+    let activo = true;
+    (async () => {
+      try {
+        const res = await api.get('/proveedores', {
+          params: { ordenar_por: 'ranking', por_pagina: 6 },
+        });
+        const raw = extractData<TopProveedor[] | { data?: TopProveedor[] }>(res);
+        const lista = Array.isArray(raw) ? raw : raw?.data || [];
+        if (activo) setTopProveedores(Array.isArray(lista) ? lista.slice(0, 6) : []);
+      } catch {
+        if (activo) setTopProveedores([]);
+      } finally {
+        if (activo) setTopLoading(false);
+      }
+    })();
+    return () => {
+      activo = false;
+    };
+  }, []);
 
   const generateSuggestions = useCallback(() => {
     if (!heroSearch.trim()) {
@@ -374,6 +408,71 @@ export default function HomePage() {
             </div>
           </div>
         </section>
+
+        {/* Top proveedores */}
+        {!topLoading && topProveedores.length > 0 && (
+          <section className="border-b border-inkline-violet/40 py-20">
+            <div className="mx-auto max-w-[1200px] px-4 sm:px-6 lg:px-8">
+              <div className="mb-10 flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
+                <div>
+                  <p className="galileo-eyebrow text-signal-teal">Ranking</p>
+                  <h2 className="mt-3 text-3xl font-extralight text-pure-white">
+                    Proveedores destacados
+                  </h2>
+                  <p className="mt-2 max-w-xl text-sm font-light text-mist-lilac">
+                    Ordenados por desempeño, valoraciones y cumplimiento.
+                  </p>
+                </div>
+                <Link
+                  href="/proveedores?ordenar_por=ranking"
+                  className="inline-flex items-center gap-2 text-sm font-light text-quartz-lavender transition-colors hover:text-white"
+                >
+                  Ver ranking completo
+                  <ArrowRight className="h-4 w-4" />
+                </Link>
+              </div>
+
+              <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                {topProveedores.map((proveedor, index) => (
+                  <Link
+                    key={proveedor.id_usuario}
+                    href={`/proveedores/${proveedor.id_usuario}`}
+                    className="group rounded-[28px] border border-inkline-violet/60 bg-deep-indigo/70 p-6 transition-colors hover:border-pulse-cobalt/60"
+                  >
+                    <div className="mb-4 flex items-center justify-between">
+                      <span className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-signal-teal/30 bg-signal-teal/10 text-sm font-medium text-signal-teal">
+                        #{index + 1}
+                      </span>
+                      <div className="flex items-center gap-2">
+                        {proveedor.proveedor_destacado && (
+                          <Award className="h-4 w-4 text-signal-teal" />
+                        )}
+                        {proveedor.sello_verificado && (
+                          <ShieldCheck className="h-4 w-4 text-pulse-cobalt" />
+                        )}
+                      </div>
+                    </div>
+                    <h3 className="text-lg font-light text-pure-white">
+                      {proveedor.nombre} {proveedor.apellido}
+                    </h3>
+                    <p className="mt-1 line-clamp-1 text-sm font-light text-mist-lilac">
+                      {proveedor.rubro_principal || 'Proveedor de servicios'}
+                    </p>
+                    <div className="mt-4 flex items-center gap-2 text-sm text-quartz-lavender">
+                      <Star className="h-4 w-4 fill-signal-teal text-signal-teal" />
+                      {proveedor.calificacion_promedio != null
+                        ? proveedor.calificacion_promedio.toFixed(1)
+                        : 'Sin valoraciones'}
+                      <span className="text-xs text-mist-lilac">
+                        ({proveedor.cantidad_valoraciones ?? 0} reseñas)
+                      </span>
+                    </div>
+                  </Link>
+                ))}
+              </div>
+            </div>
+          </section>
+        )}
 
         {/* Nosotros */}
         <section id="nosotros" className="py-24">

@@ -36,7 +36,7 @@ interface RespuestaLista<T> {
   meta?: Partial<MetaBusqueda>;
 }
 
-type SortOption = 'valoracion' | 'nombre' | 'antiguedad' | 'transacciones';
+type SortOption = 'valoracion' | 'nombre' | 'antiguedad' | 'transacciones' | 'ranking';
 type SortDir = 'asc' | 'desc';
 
 interface Filters {
@@ -81,6 +81,7 @@ const disponibilidadOptions = [
 
 const sortOptions: { value: SortOption; label: string }[] = [
   { value: 'valoracion', label: 'Valoración' },
+  { value: 'ranking', label: 'Ranking' },
   { value: 'nombre', label: 'Nombre' },
   { value: 'antiguedad', label: 'Antigüedad' },
   { value: 'transacciones', label: 'Transacciones' },
@@ -134,6 +135,14 @@ export default function ProveedoresPage() {
       }
       const hist = localStorage.getItem('proveedores_historial');
       if (hist) setHistorial(JSON.parse(hist));
+
+      const ordenUrl = new URLSearchParams(window.location.search).get('ordenar_por');
+      if (
+        ordenUrl &&
+        ['valoracion', 'ranking', 'nombre', 'antiguedad', 'transacciones'].includes(ordenUrl)
+      ) {
+        setSortBy(ordenUrl as SortOption);
+      }
     } catch {}
   }, []);
 

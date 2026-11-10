@@ -486,6 +486,67 @@ export interface Feriado {
   fecha_creacion: string;
 }
 
+export interface Tutorial {
+  id_tutorial: number;
+  categoria: string;
+  titulo: string;
+  descripcion: string;
+  url_video?: string | null;
+  url_thumbnail?: string | null;
+  duracion_segundos?: number | null;
+  tags?: string[] | null;
+  orden: number;
+  activo: boolean;
+  veces_visto: number;
+  tipo_contenido: string;
+  fecha_creacion: string;
+  fecha_actualizacion: string;
+}
+
+export interface CreateTutorialDto {
+  categoria: string;
+  titulo: string;
+  descripcion: string;
+  url_video?: string;
+  url_thumbnail?: string;
+  duracion_segundos?: number;
+  tags?: string[];
+  orden?: number;
+  tipo_contenido?: string;
+  activo?: boolean;
+}
+
+export interface PlantillaNotificacion {
+  id_plantilla: number;
+  evento: string;
+  asunto: string;
+  cuerpo_html: string;
+  cuerpo_texto?: string | null;
+  variables_disponibles?: string[] | null;
+  canal: string;
+  idioma: string;
+  activo: boolean;
+  fecha_creacion: string;
+  fecha_actualizacion?: string | null;
+}
+
+export interface CreatePlantillaDto {
+  evento: string;
+  asunto: string;
+  cuerpo_html: string;
+  cuerpo_texto?: string;
+  variables_disponibles?: string[];
+  canal?: string;
+  idioma?: string;
+  activo?: boolean;
+}
+
+export interface PreviewPlantilla {
+  asunto: string;
+  cuerpo_html: string;
+  cuerpo_texto: string;
+}
+
 export interface MetricaAtencion {
   periodo: string;
   tpr_whatsapp_min: number;

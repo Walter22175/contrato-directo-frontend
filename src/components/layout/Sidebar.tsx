@@ -34,8 +34,11 @@ import {
   KeyRound,
   Gauge,
   BookOpen,
+  Mail,
+  CalendarDays,
 } from 'lucide-react';
 import { LlaveIcon } from '@/components/ui/LlaveIcon';
+import { getRolesActivos, puedeAccederAdmin } from '@/lib/roles';
 
 const clientLinks = [
   { href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
@@ -77,6 +80,9 @@ const adminLinks = [
   { href: '/dashboard/admin/roles', label: 'Roles', icon: KeyRound },
   { href: '/dashboard/admin/configuracion', label: 'Config. Sistema', icon: Settings },
   { href: '/dashboard/admin/promociones', label: 'Promociones', icon: ImageIcon },
+  { href: '/dashboard/admin/tutoriales', label: 'Tutoriales', icon: BookOpen },
+  { href: '/dashboard/admin/plantillas', label: 'Plantillas', icon: Mail },
+  { href: '/dashboard/admin/feriados', label: 'Feriados', icon: CalendarDays },
   { href: '/dashboard/admin/servicios', label: 'Gestión de Servicios', icon: Briefcase },
   { href: '/dashboard/admin/reportes', label: 'Reportes', icon: BarChart3 },
   { href: '/dashboard/admin/reportes/trimestral', label: 'Reporte Trimestral', icon: FileBarChart },
@@ -97,9 +103,19 @@ const adminLinks = [
 export default function Sidebar({ role = 'cliente' }: { role?: string }) {
   const pathname = usePathname();
   const logout = useAuthStore((s) => s.logout);
+  const user = useAuthStore((s) => s.user);
   const abierta = useUiStore((s) => s.sidebarAbierta);
   const cerrar = useUiStore((s) => s.cerrarSidebar);
-  const links = role === 'admin' ? adminLinks : role === 'proveedor' ? providerLinks : clientLinks;
+  const roles = getRolesActivos(user);
+  const adminLinksVisibles = adminLinks.filter((link) =>
+    puedeAccederAdmin(link.href, roles),
+  );
+  const links =
+    role === 'admin'
+      ? adminLinksVisibles
+      : role === 'proveedor'
+        ? providerLinks
+        : clientLinks;
   const navRef = useRef<HTMLElement>(null);
   const itemRefs = useRef<Record<string, HTMLAnchorElement | null>>({});
 

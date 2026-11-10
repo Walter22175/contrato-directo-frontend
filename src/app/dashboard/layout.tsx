@@ -5,6 +5,7 @@ import { useAuthStore } from '@/store/auth';
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import api, { extractData, mensajeError } from '@/lib/api';
+import { getRolesActivos, tieneRolAdmin } from '@/lib/roles';
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
@@ -61,15 +62,12 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     return <div className="min-h-screen" />;
   }
 
-  const rolesActivos = (user?.usuario_roles || [])
-    .filter((ur) => ur.activo)
-    .map((ur) => ur.rol?.nombre as string)
-    .filter(Boolean);
+  const rolesActivos = getRolesActivos(user);
   const esProveedorAprobado =
     rolesActivos.includes('proveedor') && proveedorEstado === 'aprobado';
   const tieneCliente = rolesActivos.includes('cliente');
   const contexto = localStorage.getItem('contexto_activo');
-  const isAdmin = rolesActivos.includes('super_admin') || rolesActivos.includes('sistemas');
+  const isAdmin = tieneRolAdmin(rolesActivos);
   const role = isAdmin
     ? 'admin'
     : contexto === 'proveedor' && esProveedorAprobado
