@@ -4,7 +4,7 @@ import { useCallback, useEffect, useState } from 'react';
 import api, { extractData, mensajeError } from '@/lib/api';
 import { Card, CardTitle } from '@/components/ui/Card';
 import { formatDate } from '@/lib/utils';
-import { AlertTriangle, CheckCircle, FileText, RefreshCw, TrendingUp } from 'lucide-react';
+import { AlertTriangle, CheckCircle, Download, FileText, RefreshCw, TrendingUp } from 'lucide-react';
 
 interface CanalReporte {
   canal: string;
@@ -122,6 +122,7 @@ export default function ReporteTrimestralPage() {
   const [reporte, setReporte] = useState<ReporteAtencion | null>(null);
   const [loading, setLoading] = useState(true);
   const [generando, setGenerando] = useState(false);
+  const [exportando, setExportando] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const cargar = useCallback(async () => {
@@ -160,6 +161,30 @@ export default function ReporteTrimestralPage() {
     }
   };
 
+  const exportarCsv = async () => {
+    if (!reporte) return;
+    setExportando(true);
+    setError(null);
+    try {
+      const res = await api.get(`/reportes-atencion/${reporte.id_reporte}/exportar`, {
+        responseType: 'blob',
+      });
+      const blob = new Blob([res.data], { type: 'text/csv;charset=utf-8' });
+      const url = window.URL.createObjectURL(blob);
+      const enlace = document.createElement('a');
+      enlace.href = url;
+      enlace.download = `reporte-atencion-${reporte.tipo}-${reporte.periodo}.csv`;
+      document.body.appendChild(enlace);
+      enlace.click();
+      enlace.remove();
+      window.URL.revokeObjectURL(url);
+    } catch (err) {
+      setError(mensajeError(err, 'No se pudo exportar el reporte.'));
+    } finally {
+      setExportando(false);
+    }
+  };
+
   if (loading) {
     return (
       <div className="space-y-4">
@@ -185,6 +210,15 @@ export default function ReporteTrimestralPage() {
           </p>
         </div>
         <div className="flex items-center gap-2">
+          <button
+            type="button"
+            onClick={exportarCsv}
+            disabled={!reporte || exportando}
+            className="inline-flex items-center gap-2 px-3 py-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-sm text-slate-200 disabled:opacity-50"
+          >
+            <Download className="w-4 h-4" />
+            {exportando ? 'Exportando...' : 'Exportar CSV'}
+          </button>
           <button
             type="button"
             onClick={cargar}

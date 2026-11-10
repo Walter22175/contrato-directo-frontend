@@ -8,11 +8,23 @@ import Button from '@/components/ui/Button';
 import Select from '@/components/ui/Select';
 import Textarea from '@/components/ui/Textarea';
 import Image from 'next/image';
-import { Plus, Edit, Trash2, Save, X, Image as ImageIcon, Loader2, Search } from 'lucide-react';
+import { Plus, Edit, Trash2, Save, X, Image as ImageIcon, Loader2, Search, Tag, CalendarClock, CheckCircle2, TrendingUp } from 'lucide-react';
 import { Promocion, CreatePromocionDto } from '@/types';
+
+interface MetricasPromociones {
+  total: number;
+  activas: number;
+  inactivas: number;
+  vigentes: number;
+  programadas: number;
+  vencidas: number;
+  por_vencer_7dias: number;
+  valor_vigente: number;
+}
 
 export default function AdminPromocionesPage() {
   const [promociones, setPromociones] = useState<Promocion[]>([]);
+  const [metricas, setMetricas] = useState<MetricasPromociones | null>(null);
   const [loading, setLoading] = useState(true);
   const [busqueda, setBusqueda] = useState('');
   const [modalAbierto, setModalAbierto] = useState(false);
@@ -45,9 +57,17 @@ export default function AdminPromocionesPage() {
     }
   }, []);
 
+  const fetchMetricas = useCallback(async () => {
+    try {
+      const res = await api.get('/promociones/metricas');
+      setMetricas(extractData<MetricasPromociones>(res));
+    } catch {}
+  }, []);
+
   useEffect(() => {
     fetchPromociones();
-  }, [fetchPromociones]);
+    fetchMetricas();
+  }, [fetchPromociones, fetchMetricas]);
 
   const promocionesFiltradas = promociones.filter((p) =>
     p.titulo.toLowerCase().includes(busqueda.toLowerCase()) ||
@@ -122,6 +142,7 @@ export default function AdminPromocionesPage() {
         await api.post('/promociones', payload);
       }
       fetchPromociones();
+      fetchMetricas();
       setModalAbierto(false);
       resetForm();
     } catch (error) {
@@ -136,6 +157,7 @@ export default function AdminPromocionesPage() {
     try {
       await api.delete(`/promociones/${id}`);
       fetchPromociones();
+      fetchMetricas();
     } catch (error) {
       console.error('Error eliminando promoción:', error);
     }
@@ -154,6 +176,63 @@ export default function AdminPromocionesPage() {
           Nueva Promoción
         </Button>
       </div>
+
+      {metricas && (
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+          <Card>
+            <div className="p-4">
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-sm text-slate-400">Promociones totales</span>
+                <Tag className="w-5 h-5 text-cyan-400" />
+              </div>
+              <div className="text-2xl font-bold text-white">{metricas.total}</div>
+              <div className="text-xs text-slate-500 mt-1">
+                {metricas.activas} activas · {metricas.inactivas} inactivas
+              </div>
+            </div>
+          </Card>
+          <Card>
+            <div className="p-4">
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-sm text-slate-400">Vigentes</span>
+                <CheckCircle2 className="w-5 h-5 text-green-400" />
+              </div>
+              <div className="text-2xl font-bold text-white">{metricas.vigentes}</div>
+              <div className="text-xs text-slate-500 mt-1">
+                {metricas.programadas} programadas
+              </div>
+            </div>
+          </Card>
+          <Card>
+            <div className="p-4">
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-sm text-slate-400">Por vencer (7 días)</span>
+                <CalendarClock className="w-5 h-5 text-yellow-400" />
+              </div>
+              <div className="text-2xl font-bold text-white">{metricas.por_vencer_7dias}</div>
+              <div className="text-xs text-slate-500 mt-1">
+                {metricas.vencidas} vencidas
+              </div>
+            </div>
+          </Card>
+          <Card>
+            <div className="p-4">
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-sm text-slate-400">Valor vigente</span>
+                <TrendingUp className="w-5 h-5 text-cyan-400" />
+              </div>
+              <div className="text-2xl font-bold text-white">
+                {metricas.valor_vigente.toLocaleString('es-AR', {
+                  style: 'currency',
+                  currency: 'ARS',
+                  minimumFractionDigits: 0,
+                })}
+              </div>
+              <div className="text-xs text-slate-500 mt-1">Suma de precios vigentes</div>
+            </div>
+          </Card>
+        </div>
+      )}
 
       <div className="relative max-w-md">
         <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
