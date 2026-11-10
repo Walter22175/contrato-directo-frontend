@@ -77,6 +77,7 @@ export default function Footer() {
               <li><Link href="/servicios" className="transition-colors hover:text-white">Buscar Servicios</Link></li>
               <li><Link href="/proveedores" className="transition-colors hover:text-white">Ser Proveedor</Link></li>
               <li><Link href="/ayuda" className="transition-colors hover:text-white">Centro de Ayuda</Link></li>
+              <li><Link href="/roadmap" className="transition-colors hover:text-white">Roadmap</Link></li>
             </ul>
           </div>
 

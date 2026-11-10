@@ -221,6 +221,27 @@ export default function AyudaPage() {
           </Card>
         </Link>
       ))}
+      <Link href="/roadmap" className="block">
+        <Card>
+          <div className="flex items-start gap-4">
+            <div className="w-10 h-10 shrink-0 bg-cyan-500/10 border border-cyan-500/20 rounded-xl flex items-center justify-center">
+              <Megaphone className="w-5 h-5 text-cyan-400" />
+            </div>
+            <div>
+              <span className="inline-block text-xs font-semibold uppercase tracking-wide bg-cyan-500/10 text-cyan-400 border border-cyan-500/20 rounded px-2 py-0.5 mb-1">
+                Roadmap
+              </span>
+              <h2 className="font-semibold text-white">
+                Conocé las próximas fases de la plataforma
+              </h2>
+              <p className="text-sm text-slate-400 mt-1">
+                Fases, responsables y requisitos fiscales de la expansión a
+                productos.
+              </p>
+            </div>
+          </div>
+        </Card>
+      </Link>
     </div>
   );
 

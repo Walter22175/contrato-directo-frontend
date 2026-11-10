@@ -19,22 +19,44 @@ const tipoColor: Record<string, string> = {
   plataforma: 'text-purple-400 bg-purple-500/10 border-purple-500/20',
 };
 
+const TIPOS: { value: '' | 'transaccional' | 'actividad' | 'plataforma'; label: string }[] = [
+  { value: '', label: 'Todas' },
+  { value: 'transaccional', label: 'Transaccional' },
+  { value: 'actividad', label: 'Actividad' },
+  { value: 'plataforma', label: 'Plataforma' },
+];
+
 export default function NotificacionesPage() {
   const [notificaciones, setNotificaciones] = useState<Notificacion[]>([]);
   const [loading, setLoading] = useState(true);
-  const [filtro, setFiltro] = useState<'todas' | 'no_leidas'>('todas');
+  const [tipoFiltro, setTipoFiltro] = useState<'' | 'transaccional' | 'actividad' | 'plataforma'>('');
+  const [soloNoLeidas, setSoloNoLeidas] = useState(false);
+  const [noLeidas, setNoLeidas] = useState(0);
 
   const fetchNotificaciones = useCallback(async () => {
+    setLoading(true);
     try {
-      const res = await api.get('/notificaciones');
-      const data = extractData<Notificacion[] | { data?: Notificacion[] } | null>(res);
-      setNotificaciones(Array.isArray(data) ? data : data?.data || []);
+      const params: Record<string, string | number | boolean> = { limite: 50 };
+      if (tipoFiltro) params.tipo = tipoFiltro;
+      if (soloNoLeidas) params.leida = false;
+
+      const res = await api.get('/notificaciones', { params });
+      const data = extractData<
+        { data?: Notificacion[]; meta?: { no_leidas?: number } } | Notificacion[] | null
+      >(res);
+      const lista = Array.isArray(data) ? data : data?.data || [];
+      setNotificaciones(lista);
+      setNoLeidas(
+        Array.isArray(data)
+          ? lista.filter((n) => !n.leida).length
+          : data?.meta?.no_leidas ?? lista.filter((n) => !n.leida).length,
+      );
     } catch {
       setNotificaciones([]);
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [tipoFiltro, soloNoLeidas]);
 
   useEffect(() => {
     fetchNotificaciones();
@@ -44,24 +66,23 @@ export default function NotificacionesPage() {
     try {
       await api.patch(`/notificaciones/${id}/leer`);
       setNotificaciones((prev) =>
-        prev.map((n) => (n.id_notificacion === id ? { ...n, leida: true } : n)),
+        soloNoLeidas
+          ? prev.filter((n) => n.id_notificacion !== id)
+          : prev.map((n) => (n.id_notificacion === id ? { ...n, leida: true } : n)),
       );
+      setNoLeidas((prev) => Math.max(0, prev - 1));
     } catch {}
   };
 
   const marcarTodas = async () => {
     try {
       await api.patch('/notificaciones/leer-todas');
-      setNotificaciones((prev) => prev.map((n) => ({ ...n, leida: true })));
+      setNotificaciones((prev) =>
+        soloNoLeidas ? [] : prev.map((n) => ({ ...n, leida: true })),
+      );
+      setNoLeidas(0);
     } catch {}
   };
-
-  const filtradas =
-    filtro === 'no_leidas'
-      ? notificaciones.filter((n) => !n.leida)
-      : notificaciones;
-
-  const noLeidas = notificaciones.filter((n) => !n.leida).length;
 
   const formatearFecha = (f: string) => {
     const d = new Date(f);
@@ -93,11 +114,15 @@ export default function NotificacionesPage() {
             Configuración
           </Link>
           <button
-            onClick={() => setFiltro(filtro === 'todas' ? 'no_leidas' : 'todas')}
-            className="flex items-center gap-2 px-3 py-2 text-sm bg-slate-800 border border-slate-700 rounded-lg text-slate-300 hover:bg-slate-700 transition-colors"
+            onClick={() => setSoloNoLeidas((prev) => !prev)}
+            className={`flex items-center gap-2 px-3 py-2 text-sm border rounded-lg transition-colors ${
+              soloNoLeidas
+                ? 'bg-cyan-500/10 border-cyan-500/40 text-cyan-300'
+                : 'bg-slate-800 border-slate-700 text-slate-300 hover:bg-slate-700'
+            }`}
           >
-            {filtro === 'todas' ? <Bell className="w-4 h-4" /> : <BellOff className="w-4 h-4" />}
-            {filtro === 'todas' ? 'Sin leer' : 'Todas'}
+            {soloNoLeidas ? <BellOff className="w-4 h-4" /> : <Bell className="w-4 h-4" />}
+            {soloNoLeidas ? 'Solo sin leer' : 'Sin leer'}
           </button>
           {noLeidas > 0 && (
             <button
@@ -111,24 +136,45 @@ export default function NotificacionesPage() {
         </div>
       </div>
 
+      <div className="flex flex-wrap gap-2">
+        {TIPOS.map((tipo) => (
+          <button
+            key={tipo.value || 'todas'}
+            type="button"
+            onClick={() => setTipoFiltro(tipo.value)}
+            className={`rounded-full border px-4 py-1.5 text-xs font-medium transition-colors ${
+              tipoFiltro === tipo.value
+                ? 'border-cyan-500/50 bg-cyan-500/15 text-cyan-300'
+                : 'border-slate-700 text-slate-400 hover:border-slate-600 hover:text-white'
+            }`}
+          >
+            {tipo.label}
+          </button>
+        ))}
+      </div>
+
       {loading ? (
         <div className="space-y-3">
           {[1, 2, 3].map((i) => (
             <div key={i} className="h-20 bg-slate-800/50 rounded-xl animate-pulse" />
           ))}
         </div>
-      ) : filtradas.length === 0 ? (
+      ) : notificaciones.length === 0 ? (
         <Card>
           <div className="text-center py-12">
             <Bell className="w-12 h-12 text-slate-600 mx-auto mb-3" />
             <p className="text-slate-400">
-              {filtro === 'no_leidas' ? 'No tenés notificaciones sin leer' : 'No tenés notificaciones'}
+              {soloNoLeidas
+                ? 'No tenés notificaciones sin leer'
+                : tipoFiltro
+                  ? `No tenés notificaciones de tipo ${tipoFiltro}`
+                  : 'No tenés notificaciones'}
             </p>
           </div>
         </Card>
       ) : (
         <div className="space-y-2">
-          {filtradas.map((n) => {
+          {notificaciones.map((n) => {
             const Icon = tipoIcon[n.tipo] || Bell;
             const colors = tipoColor[n.tipo] || 'text-slate-400 bg-slate-500/10 border-slate-500/20';
             return (

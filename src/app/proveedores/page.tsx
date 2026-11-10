@@ -10,6 +10,7 @@ import {
   SlidersHorizontal, ArrowUpDown, Clock, TrendingUp, Users, MessageSquare
 } from 'lucide-react';
 import { LlaveIcon } from '@/components/ui/LlaveIcon';
+import { useAuthStore } from '@/store/auth';
 import type { PerfilProveedor, Categoria } from '@/types';
 
 type ProveedorLista = Partial<PerfilProveedor> & {
@@ -110,6 +111,7 @@ function formatearAntiguedad(meses?: number) {
 }
 
 export default function ProveedoresPage() {
+  const { isAuthenticated } = useAuthStore();
   const [proveedores, setProveedores] = useState<ProveedorLista[]>([]);
   const [meta, setMeta] = useState<MetaBusqueda | null>(null);
   const [categorias, setCategorias] = useState<Categoria[]>([]);
@@ -145,6 +147,25 @@ export default function ProveedoresPage() {
       }
     } catch {}
   }, []);
+
+  // CP-019: con sesión iniciada el historial vive en el backend; sin sesión
+  // se mantiene el fallback local para no perder la utilidad de la página.
+  useEffect(() => {
+    if (!isAuthenticated) return;
+    let cancelado = false;
+    api
+      .get('/perfiles/cliente/historial-busquedas')
+      .then((res) => {
+        const data = extractData<{ busquedas?: string[] }>(res);
+        if (!cancelado && Array.isArray(data?.busquedas)) {
+          setHistorial(data.busquedas.slice(0, 5));
+        }
+      })
+      .catch(() => {});
+    return () => {
+      cancelado = true;
+    };
+  }, [isAuthenticated]);
 
   useEffect(() => {
     try {
@@ -217,10 +238,24 @@ export default function ProveedoresPage() {
   useEffect(() => { setPage(1); }, [filters, sortBy, sortDir]);
 
   const addHistorial = (term: string) => {
-    if (!term.trim()) return;
-    const updated = [term, ...historial.filter((h) => h !== term)].slice(0, 5);
+    const limpio = term.trim();
+    if (!limpio) return;
+    const updated = [
+      limpio,
+      ...historial.filter((h) => h.toLowerCase() !== limpio.toLowerCase()),
+    ].slice(0, 5);
     setHistorial(updated);
     try { localStorage.setItem('proveedores_historial', JSON.stringify(updated)); } catch {}
+
+    if (isAuthenticated) {
+      api
+        .post('/perfiles/cliente/historial-busquedas', { termino: limpio })
+        .then((res) => {
+          const data = extractData<{ busquedas?: string[] }>(res);
+          if (Array.isArray(data?.busquedas)) setHistorial(data.busquedas.slice(0, 5));
+        })
+        .catch(() => {});
+    }
   };
 
   const totalPages = Math.max(meta?.total_paginas || 1, 1);
