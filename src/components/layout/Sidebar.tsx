@@ -36,6 +36,7 @@ import {
   BookOpen,
   Mail,
   CalendarDays,
+  Receipt,
 } from 'lucide-react';
 import { LlaveIcon } from '@/components/ui/LlaveIcon';
 import { getRolesActivos, puedeAccederAdmin } from '@/lib/roles';
@@ -86,6 +87,7 @@ const adminLinks = [
   { href: '/dashboard/admin/servicios', label: 'Gestión de Servicios', icon: Briefcase },
   { href: '/dashboard/admin/reportes', label: 'Reportes', icon: BarChart3 },
   { href: '/dashboard/admin/reportes/trimestral', label: 'Reporte Trimestral', icon: FileBarChart },
+  { href: '/dashboard/admin/reportes/fiscal', label: 'Reporte Fiscal (ARCA)', icon: Receipt },
   { href: '/dashboard/admin/metricas', label: 'Métricas de Atención', icon: Activity },
   { href: '/dashboard/admin/inicio-servicio', label: 'Anticipo 30%', icon: Handshake },
   { href: '/dashboard/admin/mercado-pago', label: 'Mercado Pago', icon: Wallet },

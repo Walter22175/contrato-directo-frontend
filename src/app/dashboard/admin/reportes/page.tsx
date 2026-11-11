@@ -3,7 +3,18 @@
 import { useState, useEffect, useCallback } from 'react';
 import api, { extractData } from '@/lib/api';
 import { Card } from '@/components/ui/Card';
-import { BarChart3, TrendingUp, Users, DollarSign, AlertTriangle, FileText } from 'lucide-react';
+import {
+  BarChart3,
+  TrendingUp,
+  Users,
+  DollarSign,
+  AlertTriangle,
+  FileText,
+  FileBarChart,
+  Receipt,
+  ArrowRight,
+} from 'lucide-react';
+import Link from 'next/link';
 import type { Reclamo, Usuario } from '@/types';
 
 interface ResumenLista<T> {
@@ -68,6 +79,45 @@ export default function AdminReportesPage() {
           <option value="trimestre">Trimestre</option>
           <option value="anual">Anual</option>
         </select>
+      </div>
+
+      {/* Accesos a Reportes Específicos */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <Link
+          href="/dashboard/admin/reportes/trimestral"
+          className="p-4 bg-slate-800/60 hover:bg-slate-800 border border-slate-700 hover:border-cyan-500/50 rounded-xl transition-all flex items-center justify-between group"
+        >
+          <div className="flex items-center gap-3">
+            <div className="p-2.5 bg-cyan-500/10 text-cyan-400 rounded-lg group-hover:scale-105 transition-transform">
+              <FileBarChart className="w-5 h-5" />
+            </div>
+            <div>
+              <h2 className="text-sm font-semibold text-white group-hover:text-cyan-300 transition-colors">
+                Reporte Trimestral de Atención (OE10)
+              </h2>
+              <p className="text-xs text-slate-400">Métricas de soporte, CSAT, SLA, encuestas y autoservicio</p>
+            </div>
+          </div>
+          <ArrowRight className="w-4 h-4 text-slate-400 group-hover:text-cyan-400 group-hover:translate-x-1 transition-all" />
+        </Link>
+
+        <Link
+          href="/dashboard/admin/reportes/fiscal"
+          className="p-4 bg-slate-800/60 hover:bg-slate-800 border border-slate-700 hover:border-emerald-500/50 rounded-xl transition-all flex items-center justify-between group"
+        >
+          <div className="flex items-center gap-3">
+            <div className="p-2.5 bg-emerald-500/10 text-emerald-400 rounded-lg group-hover:scale-105 transition-transform">
+              <Receipt className="w-5 h-5" />
+            </div>
+            <div>
+              <h2 className="text-sm font-semibold text-white group-hover:text-emerald-300 transition-colors">
+                Reporte Fiscal RG 5794/2025 ARCA (OE13)
+              </h2>
+              <p className="text-xs text-slate-400">Recaudación de IVA, retenciones y trazabilidad de operaciones</p>
+            </div>
+          </div>
+          <ArrowRight className="w-4 h-4 text-slate-400 group-hover:text-emerald-400 group-hover:translate-x-1 transition-all" />
+        </Link>
       </div>
 
       {loading ? (

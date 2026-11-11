@@ -4,7 +4,15 @@ import { useCallback, useEffect, useState } from 'react';
 import api, { extractData, mensajeError } from '@/lib/api';
 import { Card, CardTitle } from '@/components/ui/Card';
 import { formatDate } from '@/lib/utils';
-import { AlertTriangle, CheckCircle, Download, FileText, RefreshCw, TrendingUp } from 'lucide-react';
+import {
+  AlertTriangle,
+  CheckCircle,
+  Download,
+  FileText,
+  Layers,
+  RefreshCw,
+  TrendingUp,
+} from 'lucide-react';
 
 interface CanalReporte {
   canal: string;
@@ -52,6 +60,33 @@ interface ReporteAtencion {
   generado_por: string | null;
 }
 
+interface EdicionTrimestral {
+  id_edicion: number;
+  id_revision: number;
+  id_categoria: number;
+  id_usuario?: string | null;
+  periodo: string;
+  accion: string;
+  detalle?: Record<string, unknown> | null;
+  fecha_creacion: string;
+}
+
+const ETIQUETAS_EDICION: Record<string, string> = {
+  categoria_inactiva: 'Categoría inactiva',
+  rubro_baja_demanda: 'Rubro con baja demanda',
+  servicio_baja_demanda: 'Servicio con baja demanda',
+};
+
+/**
+ * El reporte de atención usa periodos `YYYY-Tn` y la revisión trimestral del
+ * catálogo `YYYY-Qn`; ambos trimestres coinciden en número.
+ */
+function periodoRevision(periodo: string | undefined): string | null {
+  if (!periodo) return null;
+  const match = /^(\d{4})-T([1-4])$/.exec(periodo);
+  return match ? `${match[1]}-Q${match[2]}` : null;
+}
+
 const ETIQUETAS_CANAL: Record<string, string> = {
   whatsapp: 'WhatsApp',
   email: 'Email',
@@ -85,6 +120,13 @@ function formatearMinutos(minutos: number): string {
   if (minutos < 60) return `${Math.round(minutos)}m`;
   const horas = minutos / 60;
   return `${horas.toFixed(horas < 10 ? 1 : 0)}h`;
+}
+
+function formatearFechaEdicion(fecha: string | undefined): string {
+  if (!fecha) return '—';
+  const valor = new Date(fecha);
+  if (Number.isNaN(valor.getTime())) return '—';
+  return formatDate(fecha);
 }
 
 function calcularAreasMejora(datos: DatosReporteAtencion): string[] {
@@ -124,6 +166,8 @@ export default function ReporteTrimestralPage() {
   const [generando, setGenerando] = useState(false);
   const [exportando, setExportando] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [ediciones, setEdiciones] = useState<EdicionTrimestral[]>([]);
+  const [cargandoEdiciones, setCargandoEdiciones] = useState(false);
 
   const cargar = useCallback(async () => {
     setLoading(true);
@@ -144,6 +188,44 @@ export default function ReporteTrimestralPage() {
   useEffect(() => {
     cargar();
   }, [cargar]);
+
+  const periodoEdiciones = periodoRevision(reporte?.periodo);
+
+  useEffect(() => {
+    if (!periodoEdiciones) {
+      setEdiciones([]);
+      return;
+    }
+
+    let cancelado = false;
+    const cargarEdiciones = async () => {
+      setCargandoEdiciones(true);
+      try {
+        const res = await api.get('/catalogo/ediciones-trimestrales', {
+          params: { periodo: periodoEdiciones },
+        });
+        if (!cancelado) {
+          const data = extractData<EdicionTrimestral[]>(res);
+          setEdiciones(
+            Array.isArray(data)
+              ? data.filter((ed) => ed && typeof ed.id_edicion === 'number')
+              : [],
+          );
+        }
+      } catch {
+        // Degradación elegante: el reporte de atención sigue siendo visible
+        // aunque el usuario no tenga permiso o no exista revisión del catálogo.
+        if (!cancelado) setEdiciones([]);
+      } finally {
+        if (!cancelado) setCargandoEdiciones(false);
+      }
+    };
+
+    cargarEdiciones();
+    return () => {
+      cancelado = true;
+    };
+  }, [periodoEdiciones]);
 
   const generar = async () => {
     setGenerando(true);
@@ -402,6 +484,63 @@ export default function ReporteTrimestralPage() {
                       <span className="text-sm text-slate-300">{area}</span>
                     </div>
                   ))}
+                </div>
+              )}
+            </div>
+          </Card>
+
+          <Card>
+            <div className="p-4">
+              <div className="flex flex-wrap items-center justify-between gap-2">
+                <CardTitle>Ediciones del Catálogo (OE5)</CardTitle>
+                {periodoEdiciones && (
+                  <span className="text-xs text-slate-500">Revisión {periodoEdiciones}</span>
+                )}
+              </div>
+              <p className="text-xs text-slate-500 mt-1">
+                Categorías, rubros y servicios señalados por la revisión trimestral del catálogo
+                para este mismo periodo.
+              </p>
+
+              {!periodoEdiciones ? (
+                <p className="text-sm text-slate-500 mt-4">
+                  El periodo del reporte no permite asociar una revisión trimestral del catálogo.
+                </p>
+              ) : cargandoEdiciones ? (
+                <p className="text-sm text-slate-500 mt-4 animate-pulse">Cargando ediciones...</p>
+              ) : ediciones.length === 0 ? (
+                <div className="flex items-center gap-3 mt-4 p-3 bg-slate-800/50 rounded-lg">
+                  <Layers className="w-4 h-4 text-slate-400 flex-shrink-0" />
+                  <span className="text-sm text-slate-400">
+                    Sin ediciones registradas para {periodoEdiciones}. Se persisten al marcar la
+                    revisión trimestral como revisada.
+                  </span>
+                </div>
+              ) : (
+                <div className="mt-4 space-y-2">
+                  {ediciones.map((ed) => {
+                    const nombre =
+                      typeof ed.detalle?.nombre === 'string' ? ed.detalle.nombre : null;
+                    return (
+                      <div
+                        key={ed.id_edicion}
+                        className="flex flex-wrap items-center justify-between gap-2 p-3 bg-slate-800/50 rounded-lg text-sm"
+                      >
+                        <div className="flex flex-wrap items-center gap-2">
+                          <Layers className="w-4 h-4 text-purple-400 flex-shrink-0" />
+                          <span className="text-slate-200 font-medium">
+                            {nombre ?? `Categoría #${ed.id_categoria}`}
+                          </span>
+                          <span className="px-1.5 py-0.5 rounded bg-orange-500/10 text-orange-400 text-[11px]">
+                            {ETIQUETAS_EDICION[ed.accion] ?? ed.accion}
+                          </span>
+                        </div>
+                        <span className="text-xs text-slate-500">
+                          {formatearFechaEdicion(ed.fecha_creacion)}
+                        </span>
+                      </div>
+                    );
+                  })}
                 </div>
               )}
             </div>

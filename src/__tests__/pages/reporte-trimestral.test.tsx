@@ -50,10 +50,29 @@ const reporte = {
   },
 };
 
+const ediciones = [
+  {
+    id_edicion: 1,
+    id_revision: 10,
+    id_categoria: 5,
+    periodo: '2026-Q3',
+    accion: 'rubro_baja_demanda',
+    detalle: { nombre: 'Electricidad' },
+    fecha_creacion: '2026-10-02T00:00:00.000Z',
+  },
+];
+
 describe('ReporteTrimestralPage', () => {
   beforeEach(() => {
-    (api.get as jest.Mock).mockResolvedValue({
-      data: { statusCode: 200, timestamp: '', data: [reporte] },
+    (api.get as jest.Mock).mockImplementation((url: string) => {
+      if (url.includes('/catalogo/ediciones-trimestrales')) {
+        return Promise.resolve({
+          data: { statusCode: 200, timestamp: '', data: ediciones },
+        });
+      }
+      return Promise.resolve({
+        data: { statusCode: 200, timestamp: '', data: [reporte] },
+      });
     });
   });
 
@@ -82,6 +101,18 @@ describe('ReporteTrimestralPage', () => {
       render(<ReporteTrimestralPage />);
     });
     expect(screen.getByText('Áreas de Mejora Identificadas')).toBeInTheDocument();
+  });
+
+  it('renders catalog editions for the same quarter', async () => {
+    await act(async () => {
+      render(<ReporteTrimestralPage />);
+    });
+    expect(screen.getByText('Ediciones del Catálogo (OE5)')).toBeInTheDocument();
+    expect(screen.getByText('Electricidad')).toBeInTheDocument();
+    expect(screen.getByText('Rubro con baja demanda')).toBeInTheDocument();
+    expect(api.get).toHaveBeenCalledWith('/catalogo/ediciones-trimestrales', {
+      params: { periodo: '2026-Q3' },
+    });
   });
 
   it('shows an empty state when no report exists', async () => {

@@ -18,6 +18,7 @@ import {
   Plus,
   Pencil,
   Trash2,
+  Eye,
 } from 'lucide-react';
 
 type RespuestaApi<T> = T & { data?: T };
@@ -137,6 +138,17 @@ interface RevisionTrimestral {
   propuestas_umbrales?: { nombre_propuesto: string; estado: string }[];
 }
 
+interface EdicionTrimestral {
+  id_edicion: number;
+  id_revision: number;
+  id_categoria: number;
+  id_usuario?: string | null;
+  periodo: string;
+  accion: string;
+  detalle?: Record<string, any>;
+  fecha_creacion: string;
+}
+
 interface BusquedaFallida {
   id_busqueda: number;
   consulta: string;
@@ -206,6 +218,9 @@ export default function AdminServiciosPage() {
   const [temas, setTemas] = useState<TemasResponse | null>(null);
   const [solicitudes, setSolicitudes] = useState<SolicitudRubro[]>([]);
   const [revisiones, setRevisiones] = useState<RevisionTrimestral[]>([]);
+  const [edicionesRevision, setEdicionesRevision] = useState<Record<number, EdicionTrimestral[]>>({});
+  const [cargandoEdiciones, setCargandoEdiciones] = useState<number | null>(null);
+  const [revisionExpandida, setRevisionExpandida] = useState<number | null>(null);
   const [filtroEstado, setFiltroEstado] = useState<'activas' | 'resueltas'>('activas');
   const [filtroTipo, setFiltroTipo] = useState<'todos' | 'rubro' | 'servicio'>('todos');
   const [filtroServicios, setFiltroServicios] = useState<'activos' | 'todos'>('activos');
@@ -315,6 +330,29 @@ export default function AdminServiciosPage() {
       setMsg({ tipo: 'error', texto: mensajeDeError(e, 'Error al generar revisión trimestral') });
     } finally {
       setEvaluando(false);
+    }
+  };
+
+  const toggleVerEdiciones = async (idRevision: number) => {
+    if (revisionExpandida === idRevision) {
+      setRevisionExpandida(null);
+      return;
+    }
+    setRevisionExpandida(idRevision);
+    if (!edicionesRevision[idRevision]) {
+      setCargandoEdiciones(idRevision);
+      try {
+        const res = await api.get<EdicionTrimestral[]>(`/catalogo/revisiones-trimestrales/${idRevision}/ediciones`);
+        const data = extractData<EdicionTrimestral[]>(res);
+        setEdicionesRevision((prev) => ({
+          ...prev,
+          [idRevision]: Array.isArray(data) ? data : [],
+        }));
+      } catch {
+        setEdicionesRevision((prev) => ({ ...prev, [idRevision]: [] }));
+      } finally {
+        setCargandoEdiciones(null);
+      }
     }
   };
 
@@ -1051,17 +1089,68 @@ export default function AdminServiciosPage() {
                           </div>
                         ) : null}
                       </div>
-                      {r.estado !== 'revisada' && (
+                      <div className="flex items-center gap-2 flex-shrink-0">
                         <button
-                          onClick={() => marcarRevisada(r.id_revision)}
-                          disabled={accionando === r.id_revision}
-                          className="flex items-center gap-1.5 px-3 py-1.5 bg-green-500/10 hover:bg-green-500/20 text-green-400 text-xs font-medium rounded-lg transition-colors disabled:opacity-50 flex-shrink-0"
+                          onClick={() => toggleVerEdiciones(r.id_revision)}
+                          className="flex items-center gap-1.5 px-3 py-1.5 bg-purple-500/10 hover:bg-purple-500/20 text-purple-300 text-xs font-medium rounded-lg transition-colors flex-shrink-0"
+                          title="Ver categorías señaladas y editadas en la revisión trimestral"
                         >
-                          <CheckCircle className="w-3.5 h-3.5" />
-                          Marcar revisada
+                          <Eye className="w-3.5 h-3.5" />
+                          {revisionExpandida === r.id_revision ? 'Ocultar ediciones' : 'Ver ediciones'}
                         </button>
-                      )}
+                        {r.estado !== 'revisada' && (
+                          <button
+                            onClick={() => marcarRevisada(r.id_revision)}
+                            disabled={accionando === r.id_revision}
+                            className="flex items-center gap-1.5 px-3 py-1.5 bg-green-500/10 hover:bg-green-500/20 text-green-400 text-xs font-medium rounded-lg transition-colors disabled:opacity-50 flex-shrink-0"
+                          >
+                            <CheckCircle className="w-3.5 h-3.5" />
+                            Marcar revisada
+                          </button>
+                        )}
+                      </div>
                     </div>
+
+                    {revisionExpandida === r.id_revision && (
+                      <div className="mt-3 pt-3 border-t border-slate-700/60">
+                        <p className="text-xs font-semibold text-slate-300 mb-2 flex items-center gap-1.5">
+                          <Briefcase className="w-3.5 h-3.5 text-purple-400" />
+                          Ediciones registradas en el catálogo (OE5):
+                        </p>
+                        {cargandoEdiciones === r.id_revision ? (
+                          <p className="text-xs text-slate-500 animate-pulse py-1">Cargando ediciones...</p>
+                        ) : (edicionesRevision[r.id_revision] || []).length === 0 ? (
+                          <p className="text-xs text-slate-500 py-1">
+                            No se registraron bajas de categorías en esta revisión aún (se persisten al marcar como revisada).
+                          </p>
+                        ) : (
+                          <div className="space-y-1.5">
+                            {edicionesRevision[r.id_revision].map((ed) => {
+                              const catNombre = categorias.find((c) => c.id_categoria === ed.id_categoria)?.nombre;
+                              return (
+                                <div
+                                  key={ed.id_edicion}
+                                  className="flex items-center justify-between text-xs bg-slate-900/60 px-3 py-2 rounded-lg border border-slate-800"
+                                >
+                                  <div className="flex items-center gap-2">
+                                    <span className="font-mono text-cyan-400">Cat #{ed.id_categoria}</span>
+                                    <span className="text-slate-200 font-medium">
+                                      {catNombre || `Categoría #${ed.id_categoria}`}
+                                    </span>
+                                    <span className="px-1.5 py-0.5 rounded bg-orange-500/10 text-orange-400 text-[11px] font-mono">
+                                      {ed.accion}
+                                    </span>
+                                  </div>
+                                  <span className="text-slate-500 text-[11px]">
+                                    {new Date(ed.fecha_creacion).toLocaleDateString('es-AR')}
+                                  </span>
+                                </div>
+                              );
+                            })}
+                          </div>
+                        )}
+                      </div>
+                    )}
                   </div>
                 ))}
               </div>

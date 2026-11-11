@@ -5,6 +5,7 @@ import { Card, CardTitle } from '@/components/ui/Card';
 import { ChipLanzamiento } from '@/components/ui/Tooltip';
 import { CreditCard, FileText, TrendingUp, Clock, CheckCircle } from 'lucide-react';
 import { LlaveIcon } from '@/components/ui/LlaveIcon';
+import { MiReputacionCard } from '@/components/proveedor/MiReputacionCard';
 
 const stats = [
   { label: 'Transacciones', value: '12', change: '+3 este mes', icon: CreditCard, color: 'text-cyan-400' },
@@ -63,6 +64,11 @@ export default function DashboardPage() {
           );
         })}
       </div>
+
+      {/* Mi Reputación (OE7 - Ranking Proveedores) */}
+      {esProveedor && user?.id_usuario && (
+        <MiReputacionCard idProveedor={user.id_usuario} />
+      )}
 
       {/* Recent Activity */}
       <Card>
