@@ -4,7 +4,7 @@ import { useCallback, useEffect, useState } from 'react';
 import api, { extractData } from '@/lib/api';
 import { Card } from '@/components/ui/Card';
 import Button from '@/components/ui/Button';
-import { KeyRound, Plus, Users, Loader2 } from 'lucide-react';
+import { KeyRound, Plus, Users, Edit, Loader2 } from 'lucide-react';
 import type { Rol } from '@/types';
 
 /** Espejo de RolNombreEnum del backend: el DTO de creación solo acepta estos valores. */
@@ -45,6 +45,7 @@ export default function AdminRolesPage() {
   const [permisosText, setPermisosText] = useState('{}');
   const [guardando, setGuardando] = useState(false);
   const [msg, setMsg] = useState<{ tipo: 'ok' | 'error'; texto: string } | null>(null);
+  const [editandoId, setEditandoId] = useState<number | null>(null);
 
   const cargar = useCallback(async () => {
     setCargando(true);
@@ -78,7 +79,30 @@ export default function AdminRolesPage() {
 
   const disponibles = NOMBRES_ROL.filter((n) => !roles.some((r) => r.nombre === n));
 
-  const crearRol = async () => {
+  const editarRol = async (id: number) => {
+    try {
+      const det = await api.get<RolConConteo>(`/roles/${id}`);
+      const detalle = extractData<RolConConteo | null>(det);
+      if (!detalle) return;
+      setEditandoId(id);
+      setNombre(detalle.nombre || '');
+      setDescripcion(detalle.descripcion || '');
+      setPermisosText(JSON.stringify(detalle.permisos ?? {}));
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    } catch {
+      setMsg({ tipo: 'error', texto: 'Error al cargar el rol para editar' });
+    }
+  };
+
+  const cancelarEdicion = () => {
+    setEditandoId(null);
+    setNombre('');
+    setDescripcion('');
+    setPermisosText('{}');
+    setMsg(null);
+  };
+
+  const guardarRol = async () => {
     if (!nombre) return;
     if (!PATRON_ROL.test(nombre)) {
       setMsg({ tipo: 'error', texto: MENSAJE_PATRON });
@@ -99,18 +123,27 @@ export default function AdminRolesPage() {
     setGuardando(true);
     setMsg(null);
     try {
-      await api.post('/roles', {
-        nombre,
-        descripcion: descripcion.trim() || undefined,
-        permisos,
-      });
-      setMsg({ tipo: 'ok', texto: `Rol "${nombre.replace('_', ' ')}" creado correctamente` });
+      if (editandoId !== null) {
+        await api.patch(`/roles/${editandoId}`, {
+          descripcion: descripcion.trim() || undefined,
+          permisos,
+        });
+        setMsg({ tipo: 'ok', texto: `Rol "${nombre.replace('_', ' ')}" actualizado correctamente` });
+      } else {
+        await api.post('/roles', {
+          nombre,
+          descripcion: descripcion.trim() || undefined,
+          permisos,
+        });
+        setMsg({ tipo: 'ok', texto: `Rol "${nombre.replace('_', ' ')}" creado correctamente` });
+      }
       setNombre('');
       setDescripcion('');
       setPermisosText('{}');
+      setEditandoId(null);
       await cargar();
     } catch (e) {
-      setMsg({ tipo: 'error', texto: mensajeDeError(e, 'Error al crear el rol') });
+      setMsg({ tipo: 'error', texto: mensajeDeError(e, editandoId ? 'Error al actualizar el rol' : 'Error al crear el rol') });
     } finally {
       setGuardando(false);
     }
@@ -138,7 +171,9 @@ export default function AdminRolesPage() {
         <div className="p-6 space-y-4">
           <div className="flex items-center gap-2">
             <Plus className="w-4 h-4 text-cyan-400" />
-            <h2 className="text-lg font-semibold text-white">Agregar rol</h2>
+            <h2 className="text-lg font-semibold text-white">
+              {editandoId !== null ? 'Editar rol' : 'Agregar rol'}
+            </h2>
           </div>
 
           <div className="grid md:grid-cols-3 gap-4">
@@ -154,6 +189,7 @@ export default function AdminRolesPage() {
                 maxLength={40}
                 placeholder="coordinador_tecnicos"
                 autoComplete="off"
+                disabled={editandoId !== null}
                 className="w-full px-3 py-2 bg-slate-800 border border-slate-600 rounded-lg text-white text-sm font-mono placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-cyan-500"
               />
               <datalist id="roles-sugeridos">
@@ -195,15 +231,34 @@ export default function AdminRolesPage() {
             </div>
           </div>
 
-          <div className="flex justify-end">
+          <div className="flex justify-end gap-2">
+            {editandoId !== null && (
+              <Button
+                type="button"
+                variant="outline"
+                onClick={cancelarEdicion}
+                disabled={guardando}
+              >
+                Cancelar edición
+              </Button>
+            )}
             <Button
               type="button"
-              onClick={crearRol}
+              onClick={guardarRol}
               disabled={!nombre || guardando}
               isLoading={guardando}
             >
-              <Plus className="w-4 h-4 mr-1.5" />
-              Crear rol
+              {editandoId !== null ? (
+                <>
+                  <Edit className="w-4 h-4 mr-1.5" />
+                  Actualizar rol
+                </>
+              ) : (
+                <>
+                  <Plus className="w-4 h-4 mr-1.5" />
+                  Crear rol
+                </>
+              )}
             </Button>
           </div>
         </div>
@@ -247,6 +302,13 @@ export default function AdminRolesPage() {
                     <Users className="w-3.5 h-3.5" />
                     {r.usuariosActivos ?? '—'} usuario{(r.usuariosActivos ?? 0) === 1 ? '' : 's'}
                   </span>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => editarRol(r.id_rol)}
+                  >
+                    Editar
+                  </Button>
                 </div>
               ))}
             </div>

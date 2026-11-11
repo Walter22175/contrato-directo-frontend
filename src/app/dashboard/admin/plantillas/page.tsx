@@ -1,7 +1,8 @@
 'use client';
 
+import Link from 'next/link';
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { Edit, Eye, Loader2, Mail, Plus, Search, Trash2, X } from 'lucide-react';
+import { Edit, Eye, Loader2, Mail, Plus, Search, Trash2, X, ArrowRight, LayoutDashboard } from 'lucide-react';
 import api, { extractData, mensajeError } from '@/lib/api';
 import { Card } from '@/components/ui/Card';
 import Input from '@/components/ui/Input';
@@ -416,6 +417,22 @@ export default function AdminPlantillasPage() {
                   )}
                 </div>
               ) : null}
+              <div className="mt-6 flex flex-col sm:flex-row gap-3 pt-6 border-t border-slate-700/50">
+                <Link
+                  href="/dashboard/notificaciones"
+                  className="flex items-center justify-center gap-2 px-4 py-2.5 text-sm bg-cyan-600 hover:bg-cyan-700 text-white rounded-lg transition-colors w-full sm:w-auto"
+                >
+                  <ArrowRight className="w-4 h-4" />
+                  Conocer Detalles
+                </Link>
+                <Link
+                  href="/dashboard"
+                  className="flex items-center justify-center gap-2 px-4 py-2.5 text-sm bg-slate-700 hover:bg-slate-600 text-white rounded-lg transition-colors w-full sm:w-auto"
+                >
+                  <LayoutDashboard className="w-4 h-4" />
+                  Ir a mi dashboard
+                </Link>
+              </div>
             </div>
           </div>
         </div>
