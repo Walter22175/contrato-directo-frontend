@@ -4,7 +4,7 @@ import { useCallback, useEffect, useState } from 'react';
 import api, { extractData } from '@/lib/api';
 import { Card } from '@/components/ui/Card';
 import Button from '@/components/ui/Button';
-import { KeyRound, Plus, Users, Edit, Loader2 } from 'lucide-react';
+import { KeyRound, Plus, Users, Edit, Loader2, Trash2 } from 'lucide-react';
 import type { Rol } from '@/types';
 
 /** Espejo de RolNombreEnum del backend: el DTO de creación solo acepta estos valores. */
@@ -100,6 +100,26 @@ export default function AdminRolesPage() {
     setDescripcion('');
     setPermisosText('{}');
     setMsg(null);
+  };
+
+  const eliminarRol = async () => {
+    if (editandoId === null) return;
+    if (!confirm('¿Seguro que querés eliminar este rol? Esta acción no se puede deshacer.')) return;
+    setGuardando(true);
+    setMsg(null);
+    try {
+      await api.delete(`/roles/${editandoId}`);
+      setMsg({ tipo: 'ok', texto: 'Rol eliminado correctamente' });
+      setEditandoId(null);
+      setNombre('');
+      setDescripcion('');
+      setPermisosText('{}');
+      await cargar();
+    } catch (e) {
+      setMsg({ tipo: 'error', texto: mensajeDeError(e, 'Error al eliminar el rol') });
+    } finally {
+      setGuardando(false);
+    }
   };
 
   const guardarRol = async () => {
@@ -233,14 +253,25 @@ export default function AdminRolesPage() {
 
           <div className="flex justify-end gap-2">
             {editandoId !== null && (
-              <Button
-                type="button"
-                variant="outline"
-                onClick={cancelarEdicion}
-                disabled={guardando}
-              >
-                Cancelar edición
-              </Button>
+              <>
+                <Button
+                  type="button"
+                  variant="danger"
+                  onClick={eliminarRol}
+                  disabled={guardando}
+                >
+                  <Trash2 className="w-4 h-4 mr-1.5" />
+                  Eliminar rol
+                </Button>
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={cancelarEdicion}
+                  disabled={guardando}
+                >
+                  Cancelar edición
+                </Button>
+              </>
             )}
             <Button
               type="button"

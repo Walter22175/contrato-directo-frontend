@@ -65,16 +65,12 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   const rolesActivos = getRolesActivos(user);
   const esProveedorAprobado =
     rolesActivos.includes('proveedor') && proveedorEstado === 'aprobado';
-  const tieneCliente = rolesActivos.includes('cliente');
-  const contexto = localStorage.getItem('contexto_activo');
   const isAdmin = tieneRolAdmin(rolesActivos);
   const role = isAdmin
     ? 'admin'
-    : contexto === 'proveedor' && esProveedorAprobado
+    : esProveedorAprobado
       ? 'proveedor'
-      : !tieneCliente && esProveedorAprobado
-        ? 'proveedor'
-        : 'cliente';
+      : 'cliente';
 
   return (
     <div className="flex flex-1">

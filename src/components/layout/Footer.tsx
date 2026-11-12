@@ -4,7 +4,6 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 import { MessageCircle, Mail, Phone, MapPin } from 'lucide-react';
-import { useAuthStore } from '@/store/auth';
 
 function LinkedInIcon({ className }: { className?: string }) {
   return (
@@ -16,21 +15,11 @@ function LinkedInIcon({ className }: { className?: string }) {
 
 export default function Footer() {
   const pathname = usePathname();
-  const user = useAuthStore((s) => s.user);
-  const isLoading = useAuthStore((s) => s.isLoading);
 
   const esRutaDashboard =
     pathname === '/dashboard' || pathname.startsWith('/dashboard/');
-  const esAdmin = (user?.usuario_roles || []).some(
-    (ur) =>
-      ur.activo &&
-      (ur.rol?.nombre === 'super_admin' || ur.rol?.nombre === 'sistemas'),
-  );
 
-  if (
-    pathname.startsWith('/dashboard/admin') ||
-    (esRutaDashboard && (isLoading || esAdmin))
-  ) {
+  if (esRutaDashboard) {
     return null;
   }
 
