@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback } from 'react';
 import api, { extractData } from '@/lib/api';
 import { Card } from '@/components/ui/Card';
 import ConfirmDialog from '@/components/ui/ConfirmDialog';
-import { Users, Search, XCircle, Shield, Plus, X } from 'lucide-react';
+import { Users, Search, XCircle, Shield, ShieldCheck, Plus, X, Loader2 } from 'lucide-react';
 import type { Usuario, Rol, Categoria } from '@/types';
 
 type Tab = 'todos' | 'pendientes' | 'verificados';
@@ -33,6 +33,7 @@ export default function AdminUsuariosPage() {
   const [categoriasDisponibles, setCategoriasDisponibles] = useState<Categoria[]>([]);
   const [categoriasSeleccionadas, setCategoriasSeleccionadas] = useState<number[]>([]);
   const [guardandoRol, setGuardandoRol] = useState(false);
+  const [verificandoProveedor, setVerificandoProveedor] = useState(false);
   const [busquedaDebounced, setBusquedaDebounced] = useState('');
   const [confirmacion, setConfirmacion] = useState<Confirmacion | null>(null);
   const [pagina, setPagina] = useState(1);
@@ -158,6 +159,28 @@ export default function AdminUsuariosPage() {
       setMsg({ tipo: 'error', texto: mensajeDeError(e, 'Error al quitar el rol') });
     } finally {
       setGuardandoRol(false);
+    }
+  };
+
+  const verificarProveedor = async () => {
+    if (!selectedUser) return;
+    setVerificandoProveedor(true);
+    setMsg(null);
+    try {
+      await api.patch(`/usuarios/${selectedUser.id_usuario}/proveedor/verificar`, {});
+      const res = await api.get<RespuestaApi<Usuario>>(`/usuarios/${selectedUser.id_usuario}`);
+      const actualizado = extractData<Usuario>(res);
+      if (actualizado) {
+        setSelectedUser(actualizado);
+        setUsuarios((prev) =>
+          prev.map((x) => (x.id_usuario === actualizado.id_usuario ? actualizado : x))
+        );
+      }
+      setMsg({ tipo: 'ok', texto: `${selectedUser.nombre} ${selectedUser.apellido} verificado como proveedor` });
+    } catch (e) {
+      setMsg({ tipo: 'error', texto: mensajeDeError(e, 'Error al verificar el proveedor') });
+    } finally {
+      setVerificandoProveedor(false);
     }
   };
 
@@ -418,6 +441,27 @@ export default function AdminUsuariosPage() {
                       ? `${categoriasSeleccionadas.length} categoría${categoriasSeleccionadas.length > 1 ? 's' : ''} seleccionada${categoriasSeleccionadas.length > 1 ? 's' : ''}: el proveedor solo podrá agregar servicios de ${categoriasSeleccionadas.map(nombreCategoria).join(', ')}`
                       : 'Sin categorías marcadas: el proveedor podrá agregar servicios de cualquier categoría.'}
                   </p>
+                </div>
+              )}
+              {((selectedUser.usuario_roles || []).some(
+                (ur) => ur.activo && ur.rol?.nombre === 'proveedor'
+              )) && (
+                <div className="flex items-center gap-2 pt-2">
+                  <button
+                    onClick={verificarProveedor}
+                    disabled={verificandoProveedor}
+                    className="flex items-center gap-1.5 px-3 py-2 bg-green-600 hover:bg-green-500 text-white text-xs font-medium rounded-lg transition-colors disabled:opacity-50"
+                  >
+                    {verificandoProveedor ? (
+                      <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                    ) : (
+                      <ShieldCheck className="w-3.5 h-3.5" />
+                    )}
+                    {verificandoProveedor ? 'Verificando...' : 'Verificar proveedor'}
+                  </button>
+                  <span className="text-xs text-slate-500">
+                    Otorga el sello de proveedor verificado
+                  </span>
                 </div>
               )}
             </div>
