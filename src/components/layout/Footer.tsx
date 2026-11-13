@@ -27,7 +27,7 @@ export default function Footer() {
   }
 
   return (
-    <footer className="border-t border-inkline-violet/60 bg-deep-indigo">
+    <footer className="relative z-50 border-t border-inkline-violet/60 bg-deep-indigo">
       <div className="w-full px-4 py-16 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 gap-10 md:grid-cols-2 lg:grid-cols-4">
           <div className="col-span-1 md:col-span-2 lg:col-span-1">
