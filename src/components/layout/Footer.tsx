@@ -19,13 +19,13 @@ export default function Footer() {
   const esRutaDashboard =
     pathname === '/dashboard' || pathname.startsWith('/dashboard/');
 
-  if (esRutaDashboard) {
+  if (esRutaDashboard || pathname.startsWith('/proveedores')) {
     return null;
   }
 
   return (
     <footer className="border-t border-inkline-violet/60 bg-deep-indigo">
-      <div className="mx-auto max-w-[1200px] px-4 py-16 sm:px-6 lg:px-8">
+      <div className="w-full px-4 py-16 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 gap-10 md:grid-cols-2 lg:grid-cols-4">
           <div className="col-span-1 md:col-span-2 lg:col-span-1">
             <Link
