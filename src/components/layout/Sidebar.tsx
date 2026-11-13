@@ -171,8 +171,8 @@ export default function Sidebar({ role = 'cliente' }: { role?: string }) {
                   cerrar();
                   centrarItem(link.href);
                 }}
-                className={cn(
-                  'flex items-center gap-3 rounded-full border px-4 py-2.5 text-sm font-light transition-colors',
+className={cn(
+  'flex items-center gap-3 rounded-full border px-4 py-1.5 text-sm font-light transition-colors',
                   isActive
                     ? 'border-pulse-cobalt/50 bg-pulse-cobalt/15 text-white'
                     : 'border-transparent text-quartz-lavender hover:border-inkline-violet hover:bg-white/5 hover:text-white',
@@ -191,7 +191,7 @@ export default function Sidebar({ role = 'cliente' }: { role?: string }) {
               logout();
               cerrar();
             }}
-            className="flex w-full items-center gap-3 rounded-full border border-transparent px-4 py-2.5 text-sm font-light text-quartz-lavender transition-colors hover:border-inkline-violet hover:bg-white/5 hover:text-white md:hidden"
+            className="flex w-full items-center gap-3 rounded-full border border-transparent px-4 py-1.5 text-sm font-light text-quartz-lavender transition-colors hover:border-inkline-violet hover:bg-white/5 hover:text-white md:hidden"
           >
             <LogOut className="w-5 h-5" />
             Cerrar Sesión

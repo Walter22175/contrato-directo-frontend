@@ -4,6 +4,8 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 import { MessageCircle, Mail, Phone, MapPin } from 'lucide-react';
+import { useAuthStore } from '@/store/auth';
+import { getRolesActivos } from '@/lib/roles';
 
 function LinkedInIcon({ className }: { className?: string }) {
   return (
@@ -15,11 +17,12 @@ function LinkedInIcon({ className }: { className?: string }) {
 
 export default function Footer() {
   const pathname = usePathname();
+  const user = useAuthStore((s) => s.user);
+  const roles = getRolesActivos(user);
+  const esSuperAdmin = roles.includes('super_admin');
 
-  const esRutaDashboard =
-    pathname === '/dashboard' || pathname.startsWith('/dashboard/');
-
-  if (esRutaDashboard || pathname.startsWith('/proveedores')) {
+  // Super admin: footer solo en landing page
+  if (esSuperAdmin && pathname !== '/') {
     return null;
   }
 
