@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback, type FormEvent } from 'react';
 import { useAuthStore } from '@/store/auth';
 import api, { extractData } from '@/lib/api';
+import { useRouter } from 'next/navigation';
 import { Card } from '@/components/ui/Card';
 import { MessageSquare, Plus, Send, ArrowLeft, Circle, CheckCircle, Clock, Search } from 'lucide-react';
 import type { Ticket } from '@/types';
@@ -42,6 +43,7 @@ const prioridadColors: Record<string, string> = {
 
 export default function TicketsPage() {
   const { user } = useAuthStore();
+  const router = useRouter();
   const [tickets, setTickets] = useState<Ticket[]>([]);
   const [loading, setLoading] = useState(true);
   const [selected, setSelected] = useState<string | null>(null);
@@ -119,7 +121,9 @@ export default function TicketsPage() {
       setShowNew(false);
       setNuevo({ asunto: '', descripcion: '', prioridad: 'media' });
       await fetchTickets();
-      if (data?.id_ticket) await fetchDetalle(data.id_ticket);
+      if (data?.id_ticket) {
+        router.push(`/dashboard/tickets/${data.id_ticket}`);
+      }
     } catch {} finally {
       setSending(false);
     }
