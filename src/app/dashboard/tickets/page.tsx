@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback, type FormEvent } from 'react';
 import { useAuthStore } from '@/store/auth';
 import api, { extractData } from '@/lib/api';
 import { Card } from '@/components/ui/Card';
-import { MessageSquare, Plus, Send, ArrowLeft, Circle, CheckCircle, Clock } from 'lucide-react';
+import { MessageSquare, Plus, Send, ArrowLeft, Circle, CheckCircle, Clock, Search } from 'lucide-react';
 import type { Ticket } from '@/types';
 
 interface Respuesta {
@@ -51,12 +51,16 @@ export default function TicketsPage() {
   const [sending, setSending] = useState(false);
   const [showNew, setShowNew] = useState(false);
   const [nuevo, setNuevo] = useState({ asunto: '', descripcion: '', prioridad: 'media' });
+  const [buscarSeguimiento, setBuscarSeguimiento] = useState('');
 
   const idUsuario = user?.id_usuario;
 
   const fetchTickets = useCallback(async () => {
     try {
-      const res = await api.get('/tickets', { params: { id_usuario: idUsuario } });
+      const params: Record<string, string> = {};
+      if (idUsuario) params.id_usuario = idUsuario;
+      if (buscarSeguimiento.trim()) params.numero_seguimiento = buscarSeguimiento.trim();
+      const res = await api.get('/tickets', { params });
       const data = extractData<Ticket[] | { data?: Ticket[] } | null>(res);
       setTickets(Array.isArray(data) ? data : data?.data || []);
     } catch {
@@ -64,7 +68,7 @@ export default function TicketsPage() {
     } finally {
       setLoading(false);
     }
-  }, [idUsuario]);
+  }, [idUsuario, buscarSeguimiento]);
 
   useEffect(() => {
     fetchTickets();
@@ -149,6 +153,11 @@ export default function TicketsPage() {
                 <div className="flex items-center gap-4 text-xs text-slate-500">
                   <span className={prioridadColors[detalle.prioridad]}>{detalle.prioridad}</span>
                   <span>{formatearFecha(detalle.fecha_creacion)}</span>
+                  {detalle.numero_seguimiento && (
+                    <span className="text-cyan-400 font-mono">
+                      #{detalle.numero_seguimiento}
+                    </span>
+                  )}
                 </div>
               </div>
             </Card>
@@ -207,6 +216,17 @@ export default function TicketsPage() {
           <Plus className="w-4 h-4" />
           Nuevo
         </button>
+      </div>
+
+      <div className="relative max-w-md">
+        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
+        <input
+          type="text"
+          placeholder="Buscar por número de seguimiento (CD-XXXX-XXXXXX)..."
+          value={buscarSeguimiento}
+          onChange={(e) => setBuscarSeguimiento(e.target.value)}
+          className="w-full pl-11 pr-4 py-2.5 bg-slate-800 border border-slate-600 rounded-lg text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-cyan-500"
+        />
       </div>
 
       {showNew && (
@@ -274,6 +294,11 @@ export default function TicketsPage() {
                 <div className="flex-1 min-w-0">
                   <h3 className="text-sm font-medium text-white truncate">{t.asunto}</h3>
                   <p className="text-xs text-slate-500 truncate mt-0.5">{t.descripcion}</p>
+                  {t.numero_seguimiento && (
+                    <p className="text-xs text-cyan-400 font-mono mt-0.5">
+                      Seguimiento: {t.numero_seguimiento}
+                    </p>
+                  )}
                 </div>
                 <div className="flex flex-col items-end gap-1 flex-shrink-0">
                   <span className={`text-xs ${prioridadColors[t.prioridad]}`}>{t.prioridad}</span>

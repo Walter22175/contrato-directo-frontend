@@ -338,6 +338,7 @@ export interface Ticket {
   estado: string;
   prioridad: string;
   fecha_creacion: string;
+  numero_seguimiento?: string;
 }
 
 export interface Faq {
