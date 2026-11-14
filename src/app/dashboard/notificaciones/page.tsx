@@ -194,7 +194,8 @@ export default function NotificacionesPage() {
                 onClick={() => {
                   if (!n.leida) marcarLeida(n.id_notificacion);
                   if (n.id_ticket) router.push(`/dashboard/tickets/${n.id_ticket}`);
-                  else router.push('/dashboard/tickets');
+                  else if ((n.evento || '').toLowerCase().includes('ticket'))
+                    router.push('/dashboard/tickets');
                 }}
                 className={`flex items-start gap-4 p-4 rounded-xl border transition-colors ${
                   n.leida

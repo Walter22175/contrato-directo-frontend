@@ -92,6 +92,8 @@ export default function Header({ onToggleSidebar }: { onToggleSidebar?: () => vo
           ? String(event.id_notificacion)
           : crypto.randomUUID(),
       id_usuario: event.id_usuario,
+      id_ticket:
+        event.id_ticket != null ? String(event.id_ticket) : undefined,
       tipo: event.tipo,
       evento: event.evento,
       titulo: event.titulo,
@@ -308,7 +310,7 @@ export default function Header({ onToggleSidebar }: { onToggleSidebar?: () => vo
     setNotifOpen(false);
     if (notif.id_ticket) {
       router.push(`/dashboard/tickets/${notif.id_ticket}`);
-    } else {
+    } else if ((notif.evento || '').toLowerCase().includes('ticket')) {
       router.push('/dashboard/tickets');
     }
   };

@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback, type FormEvent } from 'react';
 import { useAuthStore } from '@/store/auth';
 import api, { extractData } from '@/lib/api';
+import { getRolesActivos, tieneRolAdmin } from '@/lib/roles';
 import { useRouter } from 'next/navigation';
 import { Card } from '@/components/ui/Card';
 import { MessageSquare, Plus, Send, ArrowLeft, Circle, CheckCircle, Clock, Search } from 'lucide-react';
@@ -56,11 +57,12 @@ export default function TicketsPage() {
   const [buscarSeguimiento, setBuscarSeguimiento] = useState('');
 
   const idUsuario = user?.id_usuario;
+  const esSoporte = tieneRolAdmin(getRolesActivos(user));
 
   const fetchTickets = useCallback(async () => {
     try {
       const params: Record<string, string> = {};
-      if (idUsuario) params.id_usuario = idUsuario;
+      if (idUsuario && !esSoporte) params.id_usuario = idUsuario;
       if (buscarSeguimiento.trim()) params.numero_seguimiento = buscarSeguimiento.trim();
       const res = await api.get('/tickets', { params });
       const data = extractData<Ticket[] | { data?: Ticket[] } | null>(res);
@@ -70,7 +72,7 @@ export default function TicketsPage() {
     } finally {
       setLoading(false);
     }
-  }, [idUsuario, buscarSeguimiento]);
+  }, [idUsuario, esSoporte, buscarSeguimiento]);
 
   useEffect(() => {
     fetchTickets();

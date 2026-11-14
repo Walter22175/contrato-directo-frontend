@@ -9,6 +9,7 @@ const WS_URL = process.env.NEXT_PUBLIC_WS_URL || 'http://localhost:3001';
 interface NotificationEvent {
   id_usuario: string;
   id_notificacion?: string | number;
+  id_ticket?: string | number;
   tipo: string;
   evento: string;
   titulo: string;
