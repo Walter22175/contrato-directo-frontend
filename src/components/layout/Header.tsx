@@ -305,6 +305,12 @@ export default function Header({ onToggleSidebar }: { onToggleSidebar?: () => vo
     if (!notif.leida) {
       await marcarLeida(notif.id_notificacion);
     }
+    setNotifOpen(false);
+    if (notif.id_ticket) {
+      router.push(`/dashboard/tickets/${notif.id_ticket}`);
+    } else {
+      router.push('/dashboard/tickets');
+    }
   };
 
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {

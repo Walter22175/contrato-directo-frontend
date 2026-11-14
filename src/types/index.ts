@@ -354,6 +354,7 @@ export interface Faq {
 export interface Notificacion {
   id_notificacion: string;
   id_usuario: string;
+  id_ticket?: string;
   tipo: string;
   evento: string;
   titulo: string;

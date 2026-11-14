@@ -2,54 +2,65 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import api, { extractData } from '@/lib/api';
 import { Card } from '@/components/ui/Card';
-import { Bell, BellOff, CheckCheck, CreditCard, Activity, Globe, Settings } from 'lucide-react';
+import { Bell, BellOff, CheckCheck, CreditCard, Activity, Globe, Settings, Ticket } from 'lucide-react';
 import type { Notificacion } from '@/types';
 
 const tipoIcon: Record<string, typeof Bell> = {
   transaccional: CreditCard,
   actividad: Activity,
   plataforma: Globe,
+  ticket: Ticket,
 };
 
 const tipoColor: Record<string, string> = {
   transaccional: 'text-green-400 bg-green-500/10 border-green-500/20',
   actividad: 'text-blue-400 bg-blue-500/10 border-blue-500/20',
   plataforma: 'text-purple-400 bg-purple-500/10 border-purple-500/20',
+  ticket: 'text-cyan-400 bg-cyan-500/10 border-cyan-500/20',
 };
 
-const TIPOS: { value: '' | 'transaccional' | 'actividad' | 'plataforma'; label: string }[] = [
+const TIPOS: { value: '' | 'transaccional' | 'actividad' | 'plataforma' | 'ticket'; label: string }[] = [
   { value: '', label: 'Todas' },
   { value: 'transaccional', label: 'Transaccional' },
   { value: 'actividad', label: 'Actividad' },
   { value: 'plataforma', label: 'Plataforma' },
+  { value: 'ticket', label: 'Tickets' },
 ];
 
 export default function NotificacionesPage() {
   const [notificaciones, setNotificaciones] = useState<Notificacion[]>([]);
   const [loading, setLoading] = useState(true);
-  const [tipoFiltro, setTipoFiltro] = useState<'' | 'transaccional' | 'actividad' | 'plataforma'>('');
+  const [tipoFiltro, setTipoFiltro] = useState<'' | 'transaccional' | 'actividad' | 'plataforma' | 'ticket'>('');
   const [soloNoLeidas, setSoloNoLeidas] = useState(false);
   const [noLeidas, setNoLeidas] = useState(0);
+  const router = useRouter();
 
   const fetchNotificaciones = useCallback(async () => {
     setLoading(true);
     try {
       const params: Record<string, string | number | boolean> = { limite: 50 };
-      if (tipoFiltro) params.tipo = tipoFiltro;
+      if (tipoFiltro && tipoFiltro !== 'ticket') params.tipo = tipoFiltro;
       if (soloNoLeidas) params.leida = false;
 
       const res = await api.get('/notificaciones', { params });
       const data = extractData<
         { data?: Notificacion[]; meta?: { no_leidas?: number } } | Notificacion[] | null
       >(res);
-      const lista = Array.isArray(data) ? data : data?.data || [];
+      const listaRaw = Array.isArray(data) ? data : data?.data || [];
+      const lista =
+        tipoFiltro === 'ticket'
+          ? listaRaw.filter((n) => (n.evento || '').toLowerCase().includes('ticket'))
+          : listaRaw;
       setNotificaciones(lista);
       setNoLeidas(
-        Array.isArray(data)
+        tipoFiltro === 'ticket'
           ? lista.filter((n) => !n.leida).length
-          : data?.meta?.no_leidas ?? lista.filter((n) => !n.leida).length,
+          : Array.isArray(data)
+            ? lista.filter((n) => !n.leida).length
+            : data?.meta?.no_leidas ?? lista.filter((n) => !n.leida).length,
       );
     } catch {
       setNotificaciones([]);
@@ -180,7 +191,11 @@ export default function NotificacionesPage() {
             return (
               <div
                 key={n.id_notificacion}
-                onClick={() => !n.leida && marcarLeida(n.id_notificacion)}
+                onClick={() => {
+                  if (!n.leida) marcarLeida(n.id_notificacion);
+                  if (n.id_ticket) router.push(`/dashboard/tickets/${n.id_ticket}`);
+                  else router.push('/dashboard/tickets');
+                }}
                 className={`flex items-start gap-4 p-4 rounded-xl border transition-colors ${
                   n.leida
                     ? 'bg-slate-900/30 border-slate-800'
