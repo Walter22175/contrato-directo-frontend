@@ -3,8 +3,10 @@
 import { useState, useEffect, useCallback } from 'react';
 import api, { extractData } from '@/lib/api';
 import { Card } from '@/components/ui/Card';
-import { Users, Briefcase, FileText, AlertTriangle, TrendingUp, Activity, CreditCard, BookOpen } from 'lucide-react';
+import { Users, Briefcase, FileText, AlertTriangle, TrendingUp, Activity, CreditCard, BookOpen, ShieldCheck } from 'lucide-react';
 import Link from 'next/link';
+import { useAuthStore } from '@/store/auth';
+import { esRolTotal, getRolesActivos } from '@/lib/roles';
 import type { Reclamo, Transaccion, Usuario } from '@/types';
 
 interface ResumenLista<T> {
@@ -20,6 +22,8 @@ interface Stats {
 }
 
 export default function AdminPage() {
+  const user = useAuthStore((s) => s.user);
+  const roles = getRolesActivos(user);
   const [stats, setStats] = useState<Stats>({ totalUsuarios: 0, totalProveedores: 0, totalTransacciones: 0, totalReclamos: 0 });
   const [loading, setLoading] = useState(true);
 
@@ -55,6 +59,9 @@ export default function AdminPage() {
   ];
 
   const quickLinks = [
+    ...(esRolTotal(roles)
+      ? [{ label: 'Auditoría', description: 'Trazabilidad de acciones críticas y accesos denegados', icon: ShieldCheck, href: '/dashboard/admin/auditoria' }]
+      : []),
     { label: 'Gestión de Usuarios', description: 'Administrar usuarios, roles y verificaciones', icon: Users, href: '/dashboard/admin/usuarios' },
     { label: 'Gestión de Servicios', description: 'Administrar catálogo y categorías', icon: Briefcase, href: '/dashboard/admin/servicios' },
     { label: 'Catálogo Dinámico', description: 'Búsquedas fallidas, umbrales y solicitudes de rubro', icon: TrendingUp, href: '/dashboard/admin/servicios' },

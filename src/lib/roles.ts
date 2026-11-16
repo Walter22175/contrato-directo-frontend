@@ -16,6 +16,7 @@ const ROLES_TOTALES: RolAdmin[] = ['super_admin', 'sistemas'];
 /** Paginas sensibles reservadas a super_admin y sistemas. */
 const RUTAS_TOTALES = [
   '/dashboard/admin/control-total',
+  '/dashboard/admin/auditoria',
   '/dashboard/admin/usuarios',
   '/dashboard/admin/roles',
   '/dashboard/admin/configuracion',
