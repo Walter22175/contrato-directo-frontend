@@ -1,6 +1,8 @@
 import type { Metadata, Viewport } from "next";
 import { Inter } from "next/font/google";
+import { ErrorBoundary } from "@sentry/nextjs";
 import "./globals.css";
+import SentryProvider from "@/components/providers/SentryProvider";
 import AuthProvider from "@/components/providers/AuthProvider";
 import GlobalChatbot from "@/components/providers/GlobalChatbot";
 import BlacklightOverlay from "@/components/providers/BlacklightOverlay";
@@ -39,13 +41,16 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="es" className={inter.variable}>
       <body className="min-h-screen text-slate-300 antialiased" style={{ backgroundColor: '#03081a' }}>
-        <AuthProvider>
-          <GlobalChatbot />
-          <BlacklightOverlay />
-          <Header />
-          <main className="flex-1">{children}</main>
-          <Footer />
-        </AuthProvider>
+        <SentryProvider />
+        <ErrorBoundary>
+          <AuthProvider>
+            <GlobalChatbot />
+            <BlacklightOverlay />
+            <Header />
+            <main className="flex-1">{children}</main>
+            <Footer />
+          </AuthProvider>
+        </ErrorBoundary>
       </body>
     </html>
   );
