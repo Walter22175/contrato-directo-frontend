@@ -12,6 +12,10 @@ const nextConfig: NextConfig = {
   },
 };
 
+const sentryEnabled =
+  process.env.NEXT_PUBLIC_SENTRY_ENABLED !== "false" &&
+  Boolean(process.env.NEXT_PUBLIC_SENTRY_DSN);
+
 export default withSentryConfig(nextConfig, {
   // For all available options, see:
   // https://docs.sentry.io/platforms/javascript/guides/nextjs/sourcemaps/uploading/bundler-plugin-options/
@@ -38,10 +42,9 @@ export default withSentryConfig(nextConfig, {
   },
 
   // Route browser requests to Sentry through a Next.js rewrite to circumvent ad-blockers.
-  // This can increase your server load as well as your hosting bill.
-  // Note: Check that the configured route will not match with your Next.js middleware, otherwise reporting of client-
-  // side errors will fail.
-  tunnelRoute: "/monitoring",
+  // Solo se activa cuando Sentry está habilitado y tiene DSN; de lo contrario
+  // el túnel /monitoring respondería 500 al no tener destino al que reenviar eventos.
+  ...(sentryEnabled ? { tunnelRoute: "/monitoring" } : {}),
 
   webpack: {
     // Enables automatic instrumentation of Vercel Cron Monitors. (Does not yet work with App Router route handlers.)
