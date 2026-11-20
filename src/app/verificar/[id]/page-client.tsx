@@ -3,7 +3,8 @@
 import { useState, useEffect } from 'react';
 import { useParams } from 'next/navigation';
 import Link from 'next/link';
-import api, { extractData } from '@/lib/api';
+import { ApiError } from '@walter22175/api-client';
+import { getPublic } from '@/lib/sdk-public';
 import { ShieldCheck, ShieldAlert, ShieldQuestion, Loader2 } from 'lucide-react';
 
 interface ResultadoVerificacion {
@@ -36,13 +37,23 @@ export default function VerificarContratoPage() {
   const [resultado, setResultado] = useState<ResultadoVerificacion | null>(null);
   const [cargando, setCargando] = useState(true);
   const [noEncontrado, setNoEncontrado] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     if (!id) return;
-    api
-      .get(`/contratos/${id}/verificar`)
-      .then((res) => setResultado(extractData<ResultadoVerificacion>(res)))
-      .catch(() => setNoEncontrado(true))
+    setResultado(null);
+    setNoEncontrado(false);
+    setError(null);
+    setCargando(true);
+    getPublic<ResultadoVerificacion>(`/contratos/${id}/verificar`)
+      .then((data) => setResultado(data))
+      .catch((err) => {
+        if (err instanceof ApiError && err.status === 404) {
+          setNoEncontrado(true);
+        } else {
+          setError('No se pudo verificar el contrato. Intentá nuevamente.');
+        }
+      })
       .finally(() => setCargando(false));
   }, [id]);
 
@@ -63,6 +74,12 @@ export default function VerificarContratoPage() {
           <div className="bg-slate-900 border border-slate-800 rounded-xl p-8 text-center">
             <Loader2 className="w-8 h-8 text-cyan-400 animate-spin mx-auto" />
             <p className="text-slate-400 text-sm mt-3">Verificando contrato...</p>
+          </div>
+        ) : error ? (
+          <div className="bg-slate-900 border border-red-500/30 rounded-xl p-8 text-center">
+            <ShieldAlert className="w-12 h-12 text-red-400 mx-auto mb-3" />
+            <h2 className="text-lg font-semibold text-white mb-1">No se pudo verificar</h2>
+            <p className="text-slate-400 text-sm">{error}</p>
           </div>
         ) : noEncontrado || !resultado ? (
           <div className="bg-slate-900 border border-red-500/30 rounded-xl p-8 text-center">

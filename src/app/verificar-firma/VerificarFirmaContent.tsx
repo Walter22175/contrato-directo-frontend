@@ -3,7 +3,8 @@
 import { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
-import api, { extractData } from '@/lib/api';
+import { ApiError } from '@walter22175/api-client';
+import { getPublic } from '@/lib/sdk-public';
 import Button from '@/components/ui/Button';
 import { useAuthStore } from '@/store/auth';
 import {
@@ -87,10 +88,24 @@ export default function VerificarFirmaContent() {
     setError(null);
     setCargando(true);
     try {
-      const res = await api.get(`/contratos/verificar?hash=${hashLimpio}`);
-      setResultado(extractData<ResultadoVerificacionHash>(res));
-    } catch {
-      setError('No se pudo verificar el hash. Intentá nuevamente.');
+      const data = await getPublic<ResultadoVerificacionHash>(
+        `/contratos/verificar?hash=${encodeURIComponent(hashLimpio)}`,
+      );
+      setResultado(data);
+    } catch (err) {
+      if (err instanceof ApiError) {
+        if (err.status === 400) {
+          setError('El hash no tiene un formato válido.');
+        } else if (err.status === 429) {
+          setError('Demasiadas consultas. Esperá un momento e intentá de nuevo.');
+        } else if (err.status >= 500) {
+          setError('El servicio de verificación no está disponible. Intentá nuevamente.');
+        } else {
+          setError('No se pudo verificar el hash. Intentá nuevamente.');
+        }
+      } else {
+        setError('No se pudo verificar el hash. Revisá tu conexión e intentá nuevamente.');
+      }
     } finally {
       setCargando(false);
     }

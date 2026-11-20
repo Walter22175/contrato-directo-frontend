@@ -94,3 +94,8 @@ jest.mock('@/lib/api', () => {
     }),
   };
 });
+
+jest.mock('@/lib/sdk-public', () => ({
+  __esModule: true,
+  getPublic: jest.fn(),
+}));

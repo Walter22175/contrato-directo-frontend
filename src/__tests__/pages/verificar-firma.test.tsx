@@ -3,7 +3,8 @@
  */
 import './setup';
 import { render, screen, act, fireEvent, waitFor } from '@testing-library/react';
-import api from '@/lib/api';
+import { ApiError } from '@walter22175/api-client';
+import { getPublic } from '@/lib/sdk-public';
 import { useAuthStore } from '@/store/auth';
 import VerificarFirmaContent from '@/app/verificar-firma/VerificarFirmaContent';
 
@@ -71,13 +72,11 @@ describe('VerificarFirmaContent', () => {
     expect(
       screen.getByText('Ingresá un hash SHA-256 válido (64 caracteres hexadecimales).'),
     ).toBeInTheDocument();
-    expect(api.get).not.toHaveBeenCalled();
+    expect(getPublic).not.toHaveBeenCalled();
   });
 
   it('muestra la evidencia completa cuando el hash es válido', async () => {
-    (api.get as jest.Mock).mockResolvedValue({
-      data: { statusCode: 200, timestamp: '', data: resultadoEncontrado },
-    });
+    (getPublic as jest.Mock).mockResolvedValue(resultadoEncontrado);
 
     const { container } = await act(async () => render(<VerificarFirmaContent />));
 
@@ -86,7 +85,7 @@ describe('VerificarFirmaContent', () => {
     });
 
     await waitFor(() => {
-      expect(api.get).toHaveBeenCalledWith(`/contratos/verificar?hash=${HASH}`);
+      expect(getPublic).toHaveBeenCalledWith(`/contratos/verificar?hash=${HASH}`);
     });
 
     expect(await screen.findByText('Contrato Válido')).toBeInTheDocument();
@@ -103,12 +102,10 @@ describe('VerificarFirmaContent', () => {
   });
 
   it('muestra estado no encontrado cuando el hash no existe', async () => {
-    (api.get as jest.Mock).mockResolvedValue({
-      data: {
-        statusCode: 200,
-        timestamp: '',
-        data: { encontrado: false, hash_consultado: HASH, verificado_en: '2026-10-26T15:00:00Z' },
-      },
+    (getPublic as jest.Mock).mockResolvedValue({
+      encontrado: false,
+      hash_consultado: HASH,
+      verificado_en: '2026-10-26T15:00:00Z',
     });
 
     const { container } = await act(async () => render(<VerificarFirmaContent />));
@@ -130,9 +127,7 @@ describe('VerificarFirmaContent', () => {
         selector ? selector(storeSinSesion) : storeSinSesion,
     );
 
-    (api.get as jest.Mock).mockResolvedValue({
-      data: { statusCode: 200, timestamp: '', data: resultadoEncontrado },
-    });
+    (getPublic as jest.Mock).mockResolvedValue(resultadoEncontrado);
 
     const { container } = await act(async () => render(<VerificarFirmaContent />));
 
@@ -149,16 +144,14 @@ describe('VerificarFirmaContent', () => {
   it('auto-carga el hash desde la URL (escaneo de QR) sin tipear nada', async () => {
     (globalThis as { __MOCK_SEARCH_PARAMS__?: string }).__MOCK_SEARCH_PARAMS__ = `?hash=${HASH}`;
 
-    (api.get as jest.Mock).mockResolvedValue({
-      data: { statusCode: 200, timestamp: '', data: resultadoEncontrado },
-    });
+    (getPublic as jest.Mock).mockResolvedValue(resultadoEncontrado);
 
     await act(async () => {
       render(<VerificarFirmaContent />);
     });
 
     await waitFor(() => {
-      expect(api.get).toHaveBeenCalledWith(`/contratos/verificar?hash=${HASH}`);
+      expect(getPublic).toHaveBeenCalledWith(`/contratos/verificar?hash=${HASH}`);
     });
 
     expect(await screen.findByText('Contrato Válido')).toBeInTheDocument();
@@ -176,6 +169,24 @@ describe('VerificarFirmaContent', () => {
     expect(
       await screen.findByText('El hash recibido en el enlace no es válido.'),
     ).toBeInTheDocument();
-    expect(api.get).not.toHaveBeenCalled();
+    expect(getPublic).not.toHaveBeenCalled();
+  });
+
+  it('muestra error de servicio cuando la API falla', async () => {
+    (getPublic as jest.Mock).mockRejectedValue(
+      new ApiError(503, 'unavailable', '/contratos/verificar', 'get'),
+    );
+
+    const { container } = await act(async () => render(<VerificarFirmaContent />));
+
+    await act(async () => {
+      submitHash(HASH, container);
+    });
+
+    expect(
+      await screen.findByText(
+        'El servicio de verificación no está disponible. Intentá nuevamente.',
+      ),
+    ).toBeInTheDocument();
   });
 });
