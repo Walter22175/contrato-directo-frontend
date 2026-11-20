@@ -1,31 +1,26 @@
-/**
- * Configuración de Sentry para el servidor (Node).
- * Leída automáticamente por @sentry/nextjs.
- */
-const config = {
-  dsn: process.env.SENTRY_DSN || "",
-  environment: process.env.VERCEL_ENV || "development",
-  release: process.env.COMMIT_SHA || undefined,
-  enabled: Boolean(process.env.SENTRY_DSN),
-  tracesSampleRate: Number(process.env.SENTRY_TRACES_SAMPLE_RATE ?? "0.1"),
-  sendDefaultPii: false,
-  beforeSend(event: unknown) {
-    const e = event as {
-      request?: { method?: string };
-      contexts?: { response?: { status_code?: number } };
-      tags?: { [key: string]: string };
-    };
-    if (
-      e.request?.method &&
-      e.contexts?.response?.status_code &&
-      e.contexts.response.status_code >= 400 &&
-      e.contexts.response.status_code < 500 &&
-      e.tags?.["is_critical_4xx"] !== "true"
-    ) {
-      return null;
-    }
-    return event;
-  },
-};
+// This file configures the initialization of Sentry on the server.
+// The config you add here will be used whenever the server handles a request.
+// https://docs.sentry.io/platforms/javascript/guides/nextjs/
 
-export default config;
+import * as Sentry from "@sentry/nextjs";
+
+Sentry.init({
+  dsn: "https://93d0637d04ab6ef315d59bf9485b98f7@o4512454279036928.ingest.us.sentry.io/4512464899407872",
+
+  // Define how likely traces are sampled. Adjust this value in production, or use tracesSampler for greater control.
+  tracesSampleRate: 1,
+
+  // Turns off collection of data that could identify users. Adjust per category:
+  // https://docs.sentry.io/platforms/javascript/configuration/options/#dataCollection
+  dataCollection: {
+    userInfo: false,
+    graphQL: { document: false, variables: false },
+    genAI: { inputs: false, outputs: false },
+    databaseQueryData: false,
+    queues: false,
+    httpBodies: [],
+    httpHeaders: { deny: ["forwarded", "-ip", "remote-", "via", "-user"] },
+    cookies: { deny: ["forwarded", "-ip", "remote-", "via", "-user"] },
+    urlQueryParams: { deny: ["forwarded", "-ip", "remote-", "via", "-user"] },
+  },
+});

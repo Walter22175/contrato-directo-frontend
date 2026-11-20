@@ -6,23 +6,27 @@
 import * as Sentry from "@sentry/nextjs";
 
 const SENTRY_DSN = process.env.SENTRY_DSN;
+const SENTRY_ENABLED =
+  process.env.NEXT_PUBLIC_SENTRY_ENABLED !== "false" && Boolean(SENTRY_DSN);
 const ENVIRONMENT = process.env.VERCEL_ENV || "development";
+const RELEASE =
+  process.env.COMMIT_SHA || process.env.VERCEL_GIT_COMMIT_SHA || undefined;
 
 /**
  * (Re)inicializa Sentry en Edge. Solo tiene efecto si existe DSN.
  */
 export function initSentryEdge(): void {
-  if (!SENTRY_DSN) {
+  if (!SENTRY_ENABLED) {
     return;
   }
 
   Sentry.init({
     dsn: SENTRY_DSN,
     environment: ENVIRONMENT,
+    release: RELEASE,
     enabled: true,
     tracesSampleRate: Number(process.env.SENTRY_TRACES_SAMPLE_RATE || "0.0"),
-    sendDefaultPii: false,
-  } as any);
+  });
 }
 
 /**
@@ -57,5 +61,6 @@ export function setRequestContext(ctx: {
 
   Sentry.setContext("app", {
     environment: ENVIRONMENT,
+    release: RELEASE ?? "local",
   });
 }

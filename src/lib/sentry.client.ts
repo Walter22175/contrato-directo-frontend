@@ -6,33 +6,30 @@
  * Registra: React Errors, Hydration Errors, API Failures, Routing Errors,
  * Formularios fallidos.
  *
- * El SDK ya se inicializa automáticamente vía sentry.client.config.ts y
- * <Sentry /> en el layout. Estas funciones exponen el scope para anotar
- * errores y mensajes con contexto de request.
+ * El SDK se inicializa en instrumentation-client.ts, antes de la hidratación.
+ * Estas funciones exponen el scope para anotar errores y mensajes con
+ * contexto de request.
  */
 
 import * as Sentry from "@sentry/nextjs";
 
-const SENTRY_DSN =
-  typeof process !== "undefined" && process.env.NEXT_PUBLIC_SENTRY_DSN
-    ? process.env.NEXT_PUBLIC_SENTRY_DSN
-    : undefined;
+const SENTRY_DSN = process.env.NEXT_PUBLIC_SENTRY_DSN;
 
-const ENVIRONMENT =
-  typeof process !== "undefined" && process.env.NEXT_PUBLIC_VERCEL_ENV
-    ? process.env.NEXT_PUBLIC_VERCEL_ENV
-    : "development";
+const SENTRY_ENABLED =
+  process.env.NEXT_PUBLIC_SENTRY_ENABLED !== "false" && Boolean(SENTRY_DSN);
+
+const ENVIRONMENT = process.env.NEXT_PUBLIC_VERCEL_ENV || "development";
 
 const RELEASE =
-  typeof process !== "undefined" && process.env.NEXT_PUBLIC_COMMIT_SHA
-    ? `${process.env.NEXT_PUBLIC_COMMIT_SHA}`
-    : undefined;
+  process.env.NEXT_PUBLIC_COMMIT_SHA ||
+  process.env.NEXT_PUBLIC_VERCEL_GIT_COMMIT_SHA ||
+  undefined;
 
 /**
  * (Re)inicializa Sentry en el cliente. Solo tiene efecto si existe DSN.
  */
 export function initSentryClient(): void {
-  if (!SENTRY_DSN) {
+  if (!SENTRY_ENABLED) {
     return;
   }
 
@@ -42,14 +39,17 @@ export function initSentryClient(): void {
     release: RELEASE,
     enabled: true,
     tracesSampleRate: Number(
-      typeof process !== "undefined" &&
-        process.env.NEXT_PUBLIC_SENTRY_TRACES_SAMPLE_RATE
-        ? process.env.NEXT_PUBLIC_SENTRY_TRACES_SAMPLE_RATE
-        : "0.1",
+      process.env.NEXT_PUBLIC_SENTRY_TRACES_SAMPLE_RATE ?? "0.1",
     ),
-    sendDefaultPii: false,
-    beforeSend(event: unknown) {
-      const e = event as {
+    dataCollection: {
+      userInfo: false,
+      cookies: false,
+      httpHeaders: { request: false, response: false },
+      httpBodies: [],
+      urlQueryParams: false,
+    },
+    beforeSend(event) {
+      const e = event as unknown as {
         request?: { method?: string };
         contexts?: { response?: { status_code?: number } };
         tags?: { [key: string]: string };
@@ -65,8 +65,7 @@ export function initSentryClient(): void {
       }
       return event;
     },
-    autoSessionTracking: true,
-  } as any);
+  });
 }
 
 /**

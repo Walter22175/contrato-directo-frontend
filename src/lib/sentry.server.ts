@@ -9,14 +9,17 @@
 import * as Sentry from "@sentry/nextjs";
 
 const SENTRY_DSN = process.env.SENTRY_DSN;
+const SENTRY_ENABLED =
+  process.env.NEXT_PUBLIC_SENTRY_ENABLED !== "false" && Boolean(SENTRY_DSN);
 const ENVIRONMENT = process.env.VERCEL_ENV || "development";
-const RELEASE = process.env.COMMIT_SHA || undefined;
+const RELEASE =
+  process.env.COMMIT_SHA || process.env.VERCEL_GIT_COMMIT_SHA || undefined;
 
 /**
  * (Re)inicializa Sentry en el servidor. Solo tiene efecto si existe DSN.
  */
 export function initSentryServer(): void {
-  if (!SENTRY_DSN) {
+  if (!SENTRY_ENABLED) {
     return;
   }
 
@@ -28,9 +31,15 @@ export function initSentryServer(): void {
     tracesSampleRate: Number(
       process.env.SENTRY_TRACES_SAMPLE_RATE || "0.1",
     ),
-    sendDefaultPii: false,
-    beforeSend(event: unknown) {
-      const e = event as {
+    dataCollection: {
+      userInfo: false,
+      cookies: false,
+      httpHeaders: { request: false, response: false },
+      httpBodies: [],
+      urlQueryParams: false,
+    },
+    beforeSend(event) {
+      const e = event as unknown as {
         request?: { method?: string };
         contexts?: { response?: { status_code?: number } };
         tags?: { [key: string]: string };
@@ -46,7 +55,7 @@ export function initSentryServer(): void {
       }
       return event;
     },
-  } as any);
+  });
 }
 
 /**
